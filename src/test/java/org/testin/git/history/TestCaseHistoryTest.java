@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-import static org.testin.git.TestCaseHistory.FIELD;
-import static org.testin.git.TestCaseHistory.RECORD;
+import static org.testin.git.history.TestCaseHistory.FIELD;
+import static org.testin.git.history.TestCaseHistory.RECORD;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

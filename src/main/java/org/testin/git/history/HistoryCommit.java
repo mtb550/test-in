@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Bundle;
 
-import java.util.List;
+import java.time.ZonedDateTime;
 
-public record History(@NotNull List<HistoryEntry> entries, @NotNull String problem) {
-    // Rule-VIEW-PANEL-100
-    public static final @NotNull History NOT_UNDER_GIT = new History(List.of(), Bundle.message("view.history.not.under.git"));
-
-    static @NotNull History read(final @NotNull List<HistoryEntry> entries) {
-        return new History(List.copyOf(entries), "");
-    }
-
-    public static @NotNull History failed(final @NotNull String reason) {
-        return new History(List.of(), Bundle.message("view.history.failed", reason));
+record HistoryCommit(@NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull String path) {
+    @NotNull String objectName() {
+        return hash + ":" + path;
     }
 }

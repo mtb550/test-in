@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class LocalGit {
+public final class LocalGit {
     static boolean onThePath() {
         return git(Path.of("."), "--version").isPresent();
     }
@@ -52,7 +52,7 @@ final class LocalGit {
         }
     }
 
-    static @NotNull String mustGit(final @NotNull Path directory, final @NotNull String... arguments) {
+    public static @NotNull String mustGit(final @NotNull Path directory, final @NotNull String... arguments) {
         return git(directory, arguments).orElseThrow(() -> new AssertionError(
                 "git " + String.join(" ", arguments) + " failed in " + directory));
     }

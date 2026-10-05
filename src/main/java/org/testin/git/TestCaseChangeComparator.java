@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class TestCaseChangeComparator {
-    static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
+public final class TestCaseChangeComparator {
+    public static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         addIfChanged(changes, TestCaseEditorAttributes.DESCRIPTION.getName(), oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
         addIfChanged(changes, TestCaseEditorAttributes.EXPECTED_RESULT.getName(), oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.history;
 
 import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.indexer.TestCaseFile;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;

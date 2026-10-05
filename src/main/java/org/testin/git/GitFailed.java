@@ -19,5 +19,5 @@ package org.testin.git;
 import lombok.experimental.StandardException;
 
 @StandardException
-final class GitFailed extends RuntimeException {
+public final class GitFailed extends RuntimeException {
 }

@@ -72,6 +72,16 @@ public final class GitRepositoryService {
         return run(repositoryPath, GitCommand.CONFIG, "--get", key).filter(value -> !value.isBlank()).isEmpty();
     }
 
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-096
+    public @NotNull String log(final @NotNull Path path, final @NotNull String... arguments) {
+        return GitCommandRunner.execute(p, path, GitCommand.LOG, arguments);
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-096
+    public @NotNull Map<String, String> objects(final @NotNull Path path, final @NotNull List<String> objectNames) {
+        return GitCommandRunner.readObjects(p, path, objectNames);
+    }
+
     // Rule-TREE-PANEL-104
     public boolean isNotRepository(final @NotNull Path path) {
         return !OptionalPlugin.GIT.isAvailable() || !GitUtil.isGitRoot(path);

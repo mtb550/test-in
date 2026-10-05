@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.FieldChange;
 
 import java.time.ZonedDateTime;
 import java.util.List;
