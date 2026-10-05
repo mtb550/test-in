@@ -62,6 +62,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +97,10 @@ public class HistoryTab {
         reading.setRepeats(false);
         reading.start();
 
+        final @NotNull Map<Path, String> runItemsNow = BugHistory.runItemsNow(p, tc.getId());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull History history = Services.getInstance(p, TestCases.class).testCaseFile(tc)
-                    .map(file -> TestCaseHistory.read(p, file, tc).with(BugHistory.read(p, file, tc.getId())))
+                    .map(file -> BugHistory.addTo(TestCaseHistory.read(p, file, tc), p, file, tc.getId(), runItemsNow))
                     .orElseGet(() -> History.failed(Bundle.message("view.history.no.file")));
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -190,7 +192,7 @@ public class HistoryTab {
     // Rule-VIEW-PANEL-105
     private static @NotNull JComponent bugCard(final @NotNull Project p, final @NotNull BugCard bug, final @NotNull TestCaseDto tc) {
         final @NotNull BugEvent event = bug.event();
-        final @NotNull Color bar = event.kind().isOpen() ? event.item().getBugSeverity().getColor() : event.kind().getColor();
+        final @NotNull Color bar = event.kind().barOf(event.item());
 
         final @NotNull JBPanel<?> box = new JBPanel<>();
         box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
@@ -246,8 +248,10 @@ public class HistoryTab {
 
     private static @NotNull List<JComponent> bugAttributes(final @NotNull Project p, final @NotNull TestRunItems item) {
         final @NotNull List<JComponent> rows = new ArrayList<>();
-        rows.add(field(TestRunEditorAttributes.BUG_SEVERITY.getName(), text(item.getBugSeverity().getLabel(), Fonts.body(), item.getBugSeverity().getColor())));
-        rows.add(field(TestRunEditorAttributes.BUG_PRIORITY.getName(), plain(item.getBugPriority().getLabel())));
+        if (item.isFailed()) {
+            rows.add(field(TestRunEditorAttributes.BUG_SEVERITY.getName(), text(item.getBugSeverity().getLabel(), Fonts.body(), item.getBugSeverity().getColor())));
+            rows.add(field(TestRunEditorAttributes.BUG_PRIORITY.getName(), plain(item.getBugPriority().getLabel())));
+        }
         item.bugIssue().ifPresent(url -> rows.add(field(TestRunEditorAttributes.BUG_ISSUE.getName(), BugIssueLink.of(p, url))));
         return rows;
     }

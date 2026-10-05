@@ -18,6 +18,7 @@ package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.result.TestRunItems;
+import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -42,23 +43,35 @@ public class HistoryCardsTest {
 
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-107
     @Test
-    public void cardsAreNewestFirstWithWhatIsNotCommittedOnTopAndTheTestCaseCardFirstWithinOneCommit() {
+    public void cardsFollowTheCommitOrderWithWhatIsNotCommittedOnTopAndTheTestCaseCardFirstWithinOneCommit() {
         final @NotNull HistoryEntry uncommitted = entry("", 1);
-        final @NotNull HistoryEntry review = entry("c".repeat(40), 4);
-        final @NotNull HistoryEntry created = entry("a".repeat(40), 1);
+        final @NotNull HistoryEntry rebased = entry("d".repeat(40), 1);
+        final @NotNull HistoryEntry review = entry("c".repeat(40), 9);
+        final @NotNull HistoryEntry created = entry("a".repeat(40), 3);
         final @NotNull BugCard uncommittedBug = bug("", 5);
-        final @NotNull BugCard sameCommit = bug("c".repeat(40), 4);
+        final @NotNull BugCard sameCommit = bug("c".repeat(40), 9);
         final @NotNull BugCard between = bug("b".repeat(40), 2);
+        final @NotNull List<String> order = List.of("d".repeat(40), "c".repeat(40), "b".repeat(40), "a".repeat(40));
 
-        final @NotNull History history = History.read(List.of(uncommitted, review, created)).with(List.of(uncommittedBug, sameCommit, between));
+        final @NotNull History history = History.read(List.of(uncommitted, rebased, review, created)).with(List.of(uncommittedBug, sameCommit, between), order);
 
-        assertEquals(history.cards(), List.of(uncommitted, uncommittedBug, review, sameCommit, between, created));
+        assertEquals(history.cards(), List.of(uncommitted, uncommittedBug, rebased, review, sameCommit, between, created), "a rebased commit keeps its old author date and still comes first");
+    }
+
+    // Rule-VIEW-PANEL-106
+    @Test
+    public void bugsGitCouldNotReadSaySoUnderTheTestCaseCards() {
+        final @NotNull History history = History.read(List.of(entry("a".repeat(40), 1))).withoutBugs("fatal: bad object");
+
+        assertEquals(history.cards().size(), 1);
+        assertEquals(history.problem(), Bundle.message("view.history.bugs.failed", "fatal: bad object"));
+        assertEquals(History.NOT_UNDER_GIT.withoutBugs("fatal").problem(), History.NOT_UNDER_GIT.problem(), "the first problem stays the one shown");
     }
 
     // Rule-VIEW-PANEL-100
     @Test
     public void aTestProjectNotUnderGitKeepsItsLineBesideTheBugsItHoldsNow() {
-        final @NotNull History history = History.NOT_UNDER_GIT.with(List.of(bug("", 5)));
+        final @NotNull History history = History.NOT_UNDER_GIT.with(List.of(bug("", 5)), List.of());
 
         assertEquals(history.cards().size(), 1);
         assertEquals(history.problem(), History.NOT_UNDER_GIT.problem());

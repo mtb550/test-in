@@ -88,6 +88,17 @@ public class BugEventsTest {
         assertTrue(BugEvents.between(CYCLE_3, runItem(RunItemStatus.FAILED, BugSeverity.MINOR, "Sara"), reworded).isEmpty(), "the actual result is not shown on a bug card");
     }
 
+    // Rule-VIEW-PANEL-105
+    @Test
+    public void onlyAFailedRunItemColorsItsBugBySeverity() {
+        final @NotNull TestRunItems linked = TestRunItems.builder().status(RunItemStatus.BLOCKED).bugSeverity(BugSeverity.BLOCKER).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
+        final @NotNull TestRunItems failed = TestRunItems.builder().status(RunItemStatus.FAILED).bugSeverity(BugSeverity.BLOCKER).build();
+
+        assertEquals(BugEventKind.RECORDED.barOf(linked), BugEventKind.RECORDED.getColor(), "a blocked run item has no triage to show");
+        assertEquals(BugEventKind.RECORDED.barOf(failed), BugSeverity.BLOCKER.getColor());
+        assertEquals(BugEventKind.CLEARED.barOf(failed), BugEventKind.CLEARED.getColor());
+    }
+
     // Rule-VIEW-PANEL-108
     @Test
     public void aBugIsClearedWhenItsRunItemNoLongerFailsOrIsRemoved() {

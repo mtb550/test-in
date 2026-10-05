@@ -77,8 +77,8 @@ There is no key for this. The tab is called **History**.
   event in any test run is a bug card of its own, apart from the test case
   cards: recorded, changed, cleared, or its run item removed. It opens with the
   event, its test run, when, who and the commit, then shows the bug's severity
-  and priority, and its filed issue when there is one. Severity and priority
-  belong to the bug card, never to the test case card.
+  and priority when its run item failed, and its filed issue when there is one.
+  Severity and priority belong to the bug card, never to the test case card.
 - **Rule-VIEW-PANEL-106** — The bugs are read from Git beside the test case's
   own changes, from its run item in every test run. A run item change that
   touches no bug is not shown.
@@ -123,10 +123,10 @@ There is no key for this. The tab is called **History**.
 4. **A field row** — the field, what it was, and what it became. A commit that
    changed none of the fields reads *reordered or restamped*.
 5. **A bug card** — a card of its own, marked by a bar in the bug's severity
-   color. It opens with what happened, **Recorded**, then **Bug in** and the test
+   color, or in red when its run item did not fail and only has a filed issue. It opens with what happened, **Recorded**, then **Bug in** and the test
    run, who and when, and the commit's hash, or **Not committed yet**. Then the
-   bug's severity and priority, and its filed issue with its state on GitHub
-   when there is one. Clicking the test run's name opens that test run
+   bug's severity and priority when its run item failed, and its filed issue
+   with its state on GitHub when there is one. Clicking the test run's name opens that test run
    with the run item selected; a test run no longer in the test project is gray,
    and its tooltip says so.
 6. **Changed** — each of the bug's own attributes, from what it was to what it
@@ -159,6 +159,12 @@ Initialize Git (git init), to start one.*
 
 **A run item version cannot be read.** Its bug card is left out, and the rest of
 the commit's cards show.
+
+**Git cannot read the bugs.** The test case's own entries still show, and one
+line under them says *The bugs could not be read from Git*, with Git's reason.
+
+**A run item removed and not committed yet.** Its bug card names nobody and no
+time, because Testin does not record who removed it.
 
 **Git cannot be read.** The tab shows one line with Git's reason. The rest of
 the panel works as before.

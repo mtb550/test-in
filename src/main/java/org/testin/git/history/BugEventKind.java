@@ -20,6 +20,7 @@ import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
 
@@ -56,4 +57,9 @@ public enum BugEventKind {
     private final @NotNull String label;
     private final @NotNull Color color;
     private final boolean open;
+
+    // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-108
+    public @NotNull Color barOf(final @NotNull TestRunItems item) {
+        return open && item.isFailed() ? item.getBugSeverity().getColor() : color;
+    }
 }

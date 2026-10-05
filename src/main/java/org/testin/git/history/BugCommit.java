@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 record BugCommit(@NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull List<ChangedFile> files) {
+    @NotNull Stream<String> paths() {
+        return files.stream().flatMap(changed -> Stream.of(changed.before(), changed.after())).filter(path -> !path.isEmpty());
+    }
+
     @NotNull Stream<String> objectNames() {
         return files.stream().flatMap(changed -> Stream.of(
                 changed.before().isEmpty() ? "" : hash + "^:" + changed.before(),

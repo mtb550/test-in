@@ -19,46 +19,41 @@ package org.testin.git.history;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-public record History(@NotNull List<HistoryEntry> entries, @NotNull List<BugCard> bugs, @NotNull String problem) {
+public record History(@NotNull List<HistoryEntry> entries, @NotNull List<BugCard> bugs, @NotNull List<String> order, @NotNull String problem) {
     // Rule-VIEW-PANEL-100
-    public static final @NotNull History NOT_UNDER_GIT = new History(List.of(), List.of(), Bundle.message("view.history.not.under.git"));
+    public static final @NotNull History NOT_UNDER_GIT = new History(List.of(), List.of(), List.of(), Bundle.message("view.history.not.under.git"));
 
     static @NotNull History read(final @NotNull List<HistoryEntry> entries) {
-        return new History(List.copyOf(entries), List.of(), "");
+        return new History(List.copyOf(entries), List.of(), List.of(), "");
     }
 
     public static @NotNull History failed(final @NotNull String reason) {
-        return new History(List.of(), List.of(), Bundle.message("view.history.failed", reason));
+        return new History(List.of(), List.of(), List.of(), Bundle.message("view.history.failed", reason));
     }
 
     // Rule-VIEW-PANEL-106
-    public @NotNull History with(final @NotNull List<BugCard> bugCards) {
-        return new History(entries, List.copyOf(bugCards), problem);
+    @NotNull History with(final @NotNull List<BugCard> bugCards, final @NotNull List<String> commitOrder) {
+        return new History(entries, List.copyOf(bugCards), List.copyOf(commitOrder), problem);
+    }
+
+    // Rule-VIEW-PANEL-106
+    @NotNull History withoutBugs(final @NotNull String reason) {
+        return new History(entries, List.of(), List.of(), problem.isBlank() ? Bundle.message("view.history.bugs.failed", reason) : problem);
     }
 
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-107
     public @NotNull List<HistoryCard> cards() {
-        final @NotNull List<HistoryCard> cards = new ArrayList<>();
-        int entry = 0;
-        int bug = 0;
-
-        while (entry < entries.size() || bug < bugs.size()) {
-            if (bug == bugs.size() || entry < entries.size() && !isNewer(bugs.get(bug), entries.get(entry))) {
-                cards.add(entries.get(entry++));
-            } else {
-                cards.add(bugs.get(bug++));
-            }
-        }
-        return cards;
-    }
-
-    private static boolean isNewer(final @NotNull BugCard bug, final @NotNull HistoryEntry entry) {
-        if (bug.hash().equals(entry.hash())) return false;
-        if (bug.isCommitted() != entry.isCommitted()) return !bug.isCommitted();
-
-        return bug.when().isAfter(entry.when());
+        final @NotNull Map<String, Integer> position = IntStream.range(0, order.size()).boxed().collect(Collectors.toMap(order::get, Function.identity(), (first, _) -> first));
+        return Stream.<HistoryCard>concat(entries.stream(), bugs.stream())
+                .sorted(Comparator.comparingInt((HistoryCard card) -> card.isCommitted() ? position.getOrDefault(card.hash(), order.size()) : -1))
+                .toList();
     }
 }

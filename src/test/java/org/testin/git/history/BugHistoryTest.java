@@ -34,6 +34,7 @@ public class BugHistoryTest {
     public void everyCommitIsReadWithTheRunItemsItAddedChangedMovedOrRemoved() {
         final @NotNull String log = RECORD + "a".repeat(40) + FIELD + "Sara" + FIELD + "2026-10-05T17:27:00+03:00\n\n"
                 + "M\tTest Runs/Cycle 3/" + RUN_ITEM + "\n"
+                + "M\tTest Cases/Login/77777777-7777-4777-8777-777777777397.tc\n"
                 + "R100\tTest Runs/Cycle 2/" + RUN_ITEM + "\tTest Runs/Cycle 2 (Android)/" + RUN_ITEM + "\n"
                 + RECORD + "b".repeat(40) + FIELD + "Muteb" + FIELD + "2026-10-04T20:42:00+03:00\n\n"
                 + "A\tTest Runs/Cycle 3/" + RUN_ITEM + "\n"
@@ -43,6 +44,7 @@ public class BugHistoryTest {
 
         assertEquals(commits.size(), 2);
         assertEquals(commits.getFirst().who(), "Sara");
+        assertEquals(commits.getFirst().files().size(), 2, "the test case's own file is not a run item");
         assertEquals(commits.getFirst().files(), List.of(
                 new ChangedFile("Test Runs/Cycle 3/" + RUN_ITEM, "Test Runs/Cycle 3/" + RUN_ITEM),
                 new ChangedFile("Test Runs/Cycle 2/" + RUN_ITEM, "Test Runs/Cycle 2 (Android)/" + RUN_ITEM)));

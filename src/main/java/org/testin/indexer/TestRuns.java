@@ -31,6 +31,7 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,10 +69,17 @@ public final class TestRuns {
         return testRun;
     }
 
-    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-106
+    // Rule-VIEW-PANEL-092
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store().getTestRunsByPath().entrySet().stream()
                 .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withTestCasesShown(entry.getValue())));
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-107
+    public @NotNull Map<Path, TestRunItems> runItemsOf(final @NotNull UUID testCaseId) {
+        final @NotNull Map<Path, TestRunItems> runItems = new HashMap<>();
+        store().getTestRunsByPath().forEach((testRun, tr) -> tr.resultOf(testCaseId).ifPresent(runItem -> runItems.put(Path.of(testRun), runItem)));
+        return runItems;
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-051

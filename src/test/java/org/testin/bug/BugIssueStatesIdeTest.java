@@ -24,6 +24,7 @@ import org.testin.Await;
 import org.testin.Said;
 import org.testin.git.history.BugCard;
 import org.testin.git.history.BugHistory;
+import org.testin.git.history.History;
 import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestRuns;
 import org.testin.model.status.RunItemStatus;
@@ -95,7 +96,7 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         assertEquals(Bundle.message("bug.state.fixed"), states().of(FIXED).label());
         assertEquals(Bundle.message("bug.state.open"), states().of(OPEN).label());
 
-        final @NotNull List<BugCard> bugs = BugHistory.read(getProject(), new TestCaseFile(root.resolve("NAFATH"), Path.of("Test Cases", "Login", TEST_CASE_ID + ".tc")), TEST_CASE_ID);
+        final @NotNull List<BugCard> bugs = BugHistory.addTo(History.NOT_UNDER_GIT, getProject(), new TestCaseFile(root.resolve("NAFATH"), Path.of("Test Cases", "Login", TEST_CASE_ID + ".tc")), TEST_CASE_ID, BugHistory.runItemsNow(getProject(), TEST_CASE_ID)).bugs();
         assertEquals("the fixed bug left the history", 2, bugs.size());
 
         final @NotNull List<String> fixed = Drawn.words(BugIssueLink.of(getProject(), FIXED));

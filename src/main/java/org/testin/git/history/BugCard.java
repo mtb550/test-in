@@ -17,12 +17,15 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Config;
 
 import java.time.ZonedDateTime;
 
 public record BugCard(@NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull BugEvent event) implements HistoryCard {
     // Rule-VIEW-PANEL-107
     static @NotNull BugCard notCommitted(final @NotNull BugEvent event) {
+        if (event.kind() == BugEventKind.REMOVED) return new BugCard("", "", Config.NOT_EXECUTED, event);
+
         return new BugCard("", event.item().getExecutedBy(), event.item().getExecutedAt(), event);
     }
 }

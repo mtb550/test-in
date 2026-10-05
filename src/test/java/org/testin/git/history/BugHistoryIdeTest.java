@@ -31,6 +31,7 @@ import org.testin.util.Mapper;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -54,8 +55,9 @@ public class BugHistoryIdeTest extends AbstractGitRemoteIdeTest {
     }
 
     private @NotNull List<BugCard> bugsOf(final @NotNull Path testProject) {
+        final @NotNull Map<Path, String> now = BugHistory.runItemsNow(getProject(), ID);
         try {
-            return ApplicationManager.getApplication().executeOnPooledThread(() -> BugHistory.read(getProject(), new TestCaseFile(testProject, Path.of("Test Cases", "Login", ID + ".tc")), ID)).get();
+            return ApplicationManager.getApplication().executeOnPooledThread(() -> BugHistory.addTo(History.read(List.of()), getProject(), new TestCaseFile(testProject, Path.of("Test Cases", "Login", ID + ".tc")), ID, now).bugs()).get();
         } catch (final InterruptedException | ExecutionException ex) {
             throw new AssertionError("the bugs were never read", ex);
         }
