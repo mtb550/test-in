@@ -59,12 +59,12 @@ public final class BugIssueStates {
         this.gh = ApplicationManager.getApplication().isUnitTestMode() ? Optional.empty() : Optional.of(GitHubCli::onPath);
     }
 
-    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-091
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-091
     public @NotNull BugIssueState of(final @NotNull String bugIssueUrl) {
         return BugIssueUrl.issue(bugIssueUrl).map(issue -> answers.getOrDefault(issue, BugIssueState.NOT_READ)).orElse(BugIssueState.NOT_READ);
     }
 
-    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-092
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-092
     public void readAll(final @NotNull Runnable redraw) {
         final @NotNull Map<BugRepository, Set<Integer>> filed = filedIn(Services.getInstance(p, TestRuns.class).getAllTestRuns().values());
         if (filed.isEmpty() || gh.isEmpty() || !reading.compareAndSet(false, true)) return;

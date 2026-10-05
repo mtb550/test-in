@@ -24,15 +24,23 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.open.TestinEditors;
 import org.testin.git.change.FieldChange;
+import org.testin.git.history.BugCard;
+import org.testin.git.history.BugEvent;
+import org.testin.git.history.BugHistory;
 import org.testin.git.history.History;
+import org.testin.git.history.HistoryCard;
 import org.testin.git.history.HistoryEntry;
 import org.testin.git.history.HistoryEntryKind;
 import org.testin.git.history.TestCaseHistory;
 import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
+import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.Pill;
@@ -40,6 +48,8 @@ import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.Fonts;
+import org.testin.view.details.AbstractDetails;
+import org.testin.view.details.BugIssueLink;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -52,6 +62,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,6 +74,7 @@ public class HistoryTab {
     private static final int GROUP = 50;
     private static final int GAP = 12;
     private static final int FIELD_WIDTH = 110;
+    private static final int BAR = 3;
     private static final @NotNull Color NOT_COMMITTED = JBColor.ORANGE;
     private static final @NotNull Color HASH = JBColor.LIGHT_GRAY;
 
@@ -86,12 +98,12 @@ public class HistoryTab {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull History history = Services.getInstance(p, TestCases.class).testCaseFile(tc)
-                    .map(file -> TestCaseHistory.read(p, file, tc))
+                    .map(file -> TestCaseHistory.read(p, file, tc).with(BugHistory.read(p, file, tc.getId())))
                     .orElseGet(() -> History.failed(Bundle.message("view.history.no.file")));
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 reading.stop();
-                if (isCurrent(historyTab, request)) show(p, historyTab, history, request);
+                if (isCurrent(historyTab, request)) show(p, historyTab, history, tc, request);
             }, p.getDisposed());
         });
     }
@@ -101,8 +113,9 @@ public class HistoryTab {
     }
 
     // Rule-VIEW-PANEL-100
-    private static void show(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull History history, final @NotNull Object request) {
-        if (history.entries().isEmpty()) {
+    private static void show(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull History history, final @NotNull TestCaseDto tc, final @NotNull Object request) {
+        final @NotNull List<HistoryCard> cards = history.cards();
+        if (cards.isEmpty()) {
             line(historyTab, history.problem());
             return;
         }
@@ -114,19 +127,23 @@ public class HistoryTab {
 
         historyTab.removeAll();
         historyTab.add(entriesPanel, BorderLayout.NORTH);
-        draw(p, historyTab, entriesPanel, history.entries(), 0, request);
+        if (!history.problem().isBlank()) historyTab.add(lineLabel(history.problem()), BorderLayout.CENTER);
+        draw(p, historyTab, entriesPanel, cards, tc, 0, request);
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-099, Rule-VIEW-PANEL-101
-    private static void draw(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull JBPanel<?> entriesPanel, final @NotNull List<HistoryEntry> entries, final int from, final @NotNull Object request) {
+    private static void draw(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull JBPanel<?> entriesPanel, final @NotNull List<HistoryCard> cards, final @NotNull TestCaseDto tc, final int from, final @NotNull Object request) {
         if (!isCurrent(historyTab, request)) return;
 
-        entries.subList(from, Math.min(entries.size(), from + GROUP)).forEach(entry -> entriesPanel.add(left(entry(entry))));
+        cards.subList(from, Math.min(cards.size(), from + GROUP)).forEach(card -> entriesPanel.add(left(switch (card) {
+            case HistoryEntry entry -> entry(entry);
+            case BugCard bug -> bugCard(p, bug, tc);
+        })));
         historyTab.revalidate();
         historyTab.repaint();
 
-        if (from + GROUP < entries.size()) {
-            ApplicationManager.getApplication().invokeLater(() -> draw(p, historyTab, entriesPanel, entries, from + GROUP, request), p.getDisposed());
+        if (from + GROUP < cards.size()) {
+            ApplicationManager.getApplication().invokeLater(() -> draw(p, historyTab, entriesPanel, cards, tc, from + GROUP, request), p.getDisposed());
         }
     }
 
@@ -154,7 +171,7 @@ public class HistoryTab {
     }
 
     // Rule-VIEW-PANEL-097
-    private static @NotNull JComponent hash(final @NotNull HistoryEntry entry) {
+    private static @NotNull JComponent hash(final @NotNull HistoryCard entry) {
         final @NotNull JComponent hash = pill(new Pill(entry.shortHash(), HASH));
         Tooltip.set(hash, entry.hash());
         return hash;
@@ -168,6 +185,71 @@ public class HistoryTab {
         if (entry.changes().isEmpty()) return List.of(muted(Bundle.message("git.change.reordered")));
 
         return entry.changes().stream().map(change -> field(change.fieldName(), change(change))).toList();
+    }
+
+    // Rule-VIEW-PANEL-105
+    private static @NotNull JComponent bugCard(final @NotNull Project p, final @NotNull BugCard bug, final @NotNull TestCaseDto tc) {
+        final @NotNull BugEvent event = bug.event();
+        final @NotNull Color bar = event.kind().isOpen() ? event.item().getBugSeverity().getColor() : event.kind().getColor();
+
+        final @NotNull JBPanel<?> box = new JBPanel<>();
+        box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
+        box.setOpaque(false);
+        box.setBorder(JBUI.Borders.compound(JBUI.Borders.customLineBottom(JBColor.border()), JBUI.Borders.compound(JBUI.Borders.customLine(bar, 0, BAR, 0, 0), JBUI.Borders.empty(8, 8, 10, 0))));
+
+        box.add(left(bugHead(p, bug, tc)));
+        bugRows(p, event).forEach(row -> box.add(left(row)));
+        return box;
+    }
+
+    private static @NotNull JComponent bugHead(final @NotNull Project p, final @NotNull BugCard bug, final @NotNull TestCaseDto tc) {
+        final @NotNull JBPanel<?> head = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        head.setOpaque(false);
+
+        final @NotNull JBPanel<?> bugIn = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        bugIn.setOpaque(false);
+        bugIn.add(strong(Bundle.message("view.history.bug.in")));
+        bugIn.add(testRun(p, bug.event(), tc));
+
+        final @NotNull JComponent kind = pill(new Pill(bug.event().kind().getLabel(), bug.event().kind().getColor()));
+        final @NotNull List<JComponent> parts = bug.isCommitted()
+                ? List.of(kind, bugIn, strong(bug.who()), muted(Display.formatDate(bug.when())), hash(bug))
+                : List.of(kind, bugIn, pill(new Pill(Bundle.message("view.history.not.committed"), NOT_COMMITTED)), strong(bug.who()), muted(Display.formatDate(bug.when())));
+        parts.stream().filter(part -> !(part instanceof JBLabel label) || !label.getText().isBlank()).forEach(head::add);
+        return head;
+    }
+
+    // Rule-VIEW-PANEL-109
+    private static @NotNull JComponent testRun(final @NotNull Project p, final @NotNull BugEvent event, final @NotNull TestCaseDto tc) {
+        return Services.getInstance(p, TestRuns.class).findTestRunDir(event.testRun())
+                .<JComponent>map(dir -> {
+                    final @NotNull JComponent link = AbstractDetails.link(event.testRunName(), _ -> Services.getInstance(p, TestinEditors.class).openAndSelect(dir, tc));
+                    link.setFont(Fonts.strong());
+                    return link;
+                })
+                .orElseGet(() -> {
+                    final @NotNull JBLabel gone = text(event.testRunName(), Fonts.strong(), JBColor.GRAY);
+                    Tooltip.set(gone, Bundle.message("view.history.bug.test.run.gone"));
+                    return gone;
+                });
+    }
+
+    // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-108
+    private static @NotNull List<JComponent> bugRows(final @NotNull Project p, final @NotNull BugEvent event) {
+        return switch (event.kind()) {
+            case RECORDED -> bugAttributes(p, event.item());
+            case CHANGED -> event.changes().stream().map(change -> field(change.fieldName(), change(change))).toList();
+            case CLEARED -> List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.cleared.why", event.item().getStatus().getLabel()))));
+            case REMOVED -> List.of();
+        };
+    }
+
+    private static @NotNull List<JComponent> bugAttributes(final @NotNull Project p, final @NotNull TestRunItems item) {
+        final @NotNull List<JComponent> rows = new ArrayList<>();
+        rows.add(field(TestRunEditorAttributes.BUG_SEVERITY.getName(), text(item.getBugSeverity().getLabel(), Fonts.body(), item.getBugSeverity().getColor())));
+        rows.add(field(TestRunEditorAttributes.BUG_PRIORITY.getName(), plain(item.getBugPriority().getLabel())));
+        item.bugIssue().ifPresent(url -> rows.add(field(TestRunEditorAttributes.BUG_ISSUE.getName(), BugIssueLink.of(p, url))));
+        return rows;
     }
 
     private static @NotNull JComponent change(final @NotNull FieldChange change) {
@@ -203,6 +285,10 @@ public class HistoryTab {
         return text(value, Fonts.body(), JBColor.GRAY);
     }
 
+    private static @NotNull JBLabel plain(final @NotNull String value) {
+        return text(value, Fonts.body(), UIUtil.getLabelForeground());
+    }
+
     private static @NotNull JBLabel strong(final @NotNull String value) {
         return text(value, Fonts.strong(), UIUtil.getLabelForeground());
     }
@@ -216,14 +302,17 @@ public class HistoryTab {
 
     private static void line(final @NotNull JBPanel<?> historyTab, final @NotNull String message) {
         historyTab.removeAll();
-
-        final @NotNull JBLabel line = new JBLabel(message, SwingConstants.CENTER);
-        line.setForeground(UIUtil.getContextHelpForeground());
-        line.setBorder(JBUI.Borders.empty(20));
-        historyTab.add(line, BorderLayout.CENTER);
+        historyTab.add(lineLabel(message), BorderLayout.CENTER);
 
         historyTab.revalidate();
         historyTab.repaint();
+    }
+
+    private static @NotNull JBLabel lineLabel(final @NotNull String message) {
+        final @NotNull JBLabel line = new JBLabel(message, SwingConstants.CENTER);
+        line.setForeground(UIUtil.getContextHelpForeground());
+        line.setBorder(JBUI.Borders.empty(20));
+        return line;
     }
 
     private static @NotNull JComponent left(final @NotNull JComponent component) {

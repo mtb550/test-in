@@ -26,8 +26,8 @@ A card shows only a title. This opens the whole test case beside it.
   goes with it, so the panel is never a column of empty rows.
 - **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
   message for any of them.
-- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
-  every time it refreshes.
+- **Rule-VIEW-PANEL-008** — The panel has two tabs, Details and History, and
+  both are drawn every time it refreshes.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
@@ -58,7 +58,7 @@ The panel opens on the right of the IDE, beside the editor.
 ┌──────────────────────────────────────────────────────────────────────────┐
 │  Testin View                                              ( < )  ( > )   │
 ├──────────────────────────────────────────────────────────────────────────┤
-│  | Details |    History     Open Bugs                                    │
+│  | Details |    History                                                  │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │   Demo  >  Test Cases  >  Accounts  >  Login                             │

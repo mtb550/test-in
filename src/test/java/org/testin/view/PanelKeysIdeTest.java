@@ -119,16 +119,13 @@ public class PanelKeysIdeTest extends AbstractViewPanelIdeTest {
         assertEquals("Tab on Details did not bring History to the front", ViewTab.HISTORY.getDisplayName(), view.tabInFront());
 
         assertTrue(KeyPress.press(getProject(), view.keyboardTarget(ViewTab.HISTORY), key(Shortcuts.TabNext)));
-        assertEquals("Tab on History did not bring Open Bugs to the front", ViewTab.OPEN_BUGS.getDisplayName(), view.tabInFront());
-
-        assertTrue(KeyPress.press(getProject(), view.keyboardTarget(ViewTab.OPEN_BUGS), key(Shortcuts.TabNext)));
-        assertEquals("Tab on Open Bugs did not come round to Details", ViewTab.DETAILS.getDisplayName(), view.tabInFront());
+        assertEquals("Tab on History did not come round to Details", ViewTab.DETAILS.getDisplayName(), view.tabInFront());
 
         assertTrue(KeyPress.press(getProject(), view.keyboardTarget(ViewTab.DETAILS), key(Shortcuts.TabPrevious)));
-        assertEquals("Shift+Tab on Details did not go round to Open Bugs", ViewTab.OPEN_BUGS.getDisplayName(), view.tabInFront());
+        assertEquals("Shift+Tab on Details did not go round to History", ViewTab.HISTORY.getDisplayName(), view.tabInFront());
 
-        assertTrue(KeyPress.press(getProject(), view.keyboardTarget(ViewTab.OPEN_BUGS), key(Shortcuts.TabPrevious)));
-        assertEquals("Shift+Tab on Open Bugs did not bring History back", ViewTab.HISTORY.getDisplayName(), view.tabInFront());
+        assertTrue(KeyPress.press(getProject(), view.keyboardTarget(ViewTab.HISTORY), key(Shortcuts.TabPrevious)));
+        assertEquals("Shift+Tab on History did not bring Details back", ViewTab.DETAILS.getDisplayName(), view.tabInFront());
     }
 
     // Rule-VIEW-PANEL-058

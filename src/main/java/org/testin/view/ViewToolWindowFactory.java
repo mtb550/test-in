@@ -51,7 +51,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         return Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow("testin.view"));
     }
 
-    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-092
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-092
     public static void refreshShown(final @NotNull Project p) {
         panel(p).ifPresent(ViewPanel::refreshCurrentView);
     }

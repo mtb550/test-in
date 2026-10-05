@@ -27,8 +27,8 @@ test run.
   goes with it, so the panel is never a column of empty rows.
 - **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
   message for any of them.
-- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
-  every time it refreshes.
+- **Rule-VIEW-PANEL-008** — The panel has two tabs, Details and History, and
+  both are drawn every time it refreshes.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
@@ -146,16 +146,12 @@ cases at once, is never timed.
 **If nobody is named** — the **Executed By** row holds the date on its own, and
 with neither a name nor a date the row is not drawn at all (Rule-VIEW-PANEL-031).
 
-## The same bug, on the tab beside this one
+## The same bug, on the History tab
 
 The **Bug Severity** and **Bug Priority** rows say what *this* test run
-recorded. The [Open Bugs tab](seeOpenBugs.md) says what every test run recorded,
-so a test case that has failed in more than one cycle shows one bug here and all
-of them there.
-
-The two used to disagree rather than differ: this panel read **Blocker** and **High** while the tab beside it said no
-bugs were found, because that tab never
-looked at the test case (#229).
+recorded. The [History tab](readHistory.md) shows every bug any test run
+recorded on this test case, each as a bug card of its own, so a test case that
+has failed in more than one cycle shows one bug here and all of them there.
 
 ---
 

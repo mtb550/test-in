@@ -93,7 +93,7 @@ plugin, and each says which of the two it is.
    here so the tree can be read. In the IDE the tester sets its width.
 2. **Editor panel** — where a test set or a test run opens when the tester opens
    one from the tree. The tree panel itself never shows a test case.
-3. **View panel** — details, history and open bugs for the test case the tester
+3. **View panel** — details and history, bugs included, for the test case the tester
    has selected. It is a part of Testin of its own, and its pages are
    [here](../viewPanel/main.md).
 

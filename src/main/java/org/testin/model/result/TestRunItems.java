@@ -136,7 +136,7 @@ public class TestRunItems {
         return isRemoved() && !status.isRunItemStatus() ? RunItemStatus.REMOVED : status;
     }
 
-    // Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-064
+    // Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-105
     @JsonIgnore
     public boolean isFailed() {
         return shownStatus() == RunItemStatus.FAILED;

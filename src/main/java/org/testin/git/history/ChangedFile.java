@@ -17,13 +17,16 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.change.FieldChange;
 
-import java.time.ZonedDateTime;
-import java.util.List;
+record ChangedFile(@NotNull String before, @NotNull String after) {
+    static @NotNull ChangedFile of(final @NotNull String line) {
+        final String @NotNull [] parts = line.strip().split("\t");
+        final @NotNull String path = parts[parts.length - 1];
 
-public record HistoryEntry(@NotNull HistoryEntryKind kind, @NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull List<FieldChange> changes) implements HistoryCard {
-    static @NotNull HistoryEntry of(final @NotNull HistoryEntryKind kind, final @NotNull HistoryCommit commit, final @NotNull List<FieldChange> changes) {
-        return new HistoryEntry(kind, commit.hash(), commit.who(), commit.when(), commit.message(), changes);
+        return switch (parts[0].charAt(0)) {
+            case 'A', 'C' -> new ChangedFile("", path);
+            case 'D' -> new ChangedFile(path, "");
+            default -> new ChangedFile(parts[1], path);
+        };
     }
 }

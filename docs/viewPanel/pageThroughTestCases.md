@@ -27,12 +27,12 @@ The panel was handed a list of test cases. These two keys walk that list.
   goes with it, so the panel is never a column of empty rows.
 - **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
   message for any of them.
-- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
-  every time it refreshes.
+- **Rule-VIEW-PANEL-008** — The panel has two tabs, Details and History, and
+  both are drawn every time it refreshes.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-019** — The two keys work from any of the three tabs.
+- **Rule-VIEW-PANEL-019** — The two keys work from either of the two tabs.
 - **Rule-VIEW-PANEL-020** — An arrow with nowhere to go is gray.
 - **Rule-VIEW-PANEL-021** — Paging says nothing.
 - **Rule-VIEW-PANEL-022** — Only two gestures hand over more than one test case.

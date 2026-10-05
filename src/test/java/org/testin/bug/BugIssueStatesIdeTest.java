@@ -18,21 +18,23 @@ package org.testin.bug;
 
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.notification.Notification;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
+import org.testin.git.history.BugCard;
+import org.testin.git.history.BugHistory;
+import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestRuns;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.result.TestRunItems;
-import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
-import org.testin.view.bugs.OpenBugsTab;
+import org.testin.view.details.BugIssueLink;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +84,7 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         Await.until("the bug states were never read", () -> redrawn.get() == 1);
     }
 
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-091, Rule-VIEW-PANEL-092, Rule-VIEW-PANEL-095
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-091, Rule-VIEW-PANEL-092, Rule-VIEW-PANEL-095
     public void testEveryFiledBugGetsItsStateFromOneRequestAndAFixedOneStaysListed() {
         twoBugsFiled();
         ghAnswers(ANSWER);
@@ -93,11 +95,13 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         assertEquals(Bundle.message("bug.state.fixed"), states().of(FIXED).label());
         assertEquals(Bundle.message("bug.state.open"), states().of(OPEN).label());
 
-        final @NotNull JBPanel<?> tab = new JBPanel<>();
-        new OpenBugsTab().load(getProject(), tab, Optional.of(TestCaseDto.builder().id(TEST_CASE_ID).build()));
-        final @NotNull List<String> words = Drawn.words(tab);
-        assertTrue("the fixed bug left the tab, or its pill is missing: " + words, Drawn.holds(words, "#9") && Drawn.holds(words, Bundle.message("bug.state.fixed")));
-        assertTrue("the open bug shows no pill: " + words, Drawn.holds(words, "#14") && Drawn.holds(words, Bundle.message("bug.state.open")));
+        final @NotNull List<BugCard> bugs = BugHistory.read(getProject(), new TestCaseFile(root.resolve("NAFATH"), Path.of("Test Cases", "Login", TEST_CASE_ID + ".tc")), TEST_CASE_ID);
+        assertEquals("the fixed bug left the history", 2, bugs.size());
+
+        final @NotNull List<String> fixed = Drawn.words(BugIssueLink.of(getProject(), FIXED));
+        assertTrue("the fixed bug's pill is missing: " + fixed, Drawn.holds(fixed, "#9") && Drawn.holds(fixed, Bundle.message("bug.state.fixed")));
+        final @NotNull List<String> open = Drawn.words(BugIssueLink.of(getProject(), OPEN));
+        assertTrue("the open bug shows no pill: " + open, Drawn.holds(open, "#14") && Drawn.holds(open, Bundle.message("bug.state.open")));
     }
 
     // Rule-VIEW-PANEL-094

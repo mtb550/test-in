@@ -72,7 +72,7 @@ public enum FailureDetail {
     private final @NotNull Predicate<TestRunItems> filled;
     private final @NotNull Consumer<TestRunItems> clear;
 
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-105
     public static boolean recordsABug(final @NotNull TestRunItems item) {
         return item.isFailed() || BUG_ISSUE_URL.filled.test(item);
     }

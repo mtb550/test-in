@@ -9,6 +9,12 @@ made.
 The History tab reads the test case's history from Git. Each commit that changed
 the test case's file is one entry. Testin stores no history of its own.
 
+The test case's bugs are read from Git too. A bug is what a run item records
+about a failure, so each time a test run recorded, changed or cleared a bug on
+this test case, History shows a bug card of its own beside the test case's
+entries. The bug card opens with what happened and in which test run, and the
+test run's name opens that test run with the run item selected.
+
 There is no key for this. The tab is called **History**.
 
 ## Rules
@@ -27,11 +33,25 @@ There is no key for this. The tab is called **History**.
   goes with it, so the panel is never a column of empty rows.
 - **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
   message for any of them.
-- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
-  every time it refreshes.
+- **Rule-VIEW-PANEL-008** — The panel has two tabs, Details and History, and
+  both are drawn every time it refreshes.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
+- **Rule-VIEW-PANEL-091** — Beside a filed bug's link stands its state on
+  GitHub: the Status column of the Project board it sits on, or else Open, Fixed
+  or Not planned. A link whose state has not been read stands alone.
+- **Rule-VIEW-PANEL-092** — Testin asks GitHub when a test run opens and on
+  Refresh, for every bug the test project holds, one request per repository, in
+  the background. The panel never waits for the answer, and the answer is never
+  written to the test run.
+- **Rule-VIEW-PANEL-093** — When GitHub cannot be asked - gh missing, signed out
+  or offline - every link still shows and opens, and one message says why.
+- **Rule-VIEW-PANEL-094** — A board's Status needs gh's read:project permission.
+  Without it the issue's own state shows, and one message, once per session,
+  names the command that grants it.
+- **Rule-VIEW-PANEL-095** — A bug GitHub calls closed stays in the tab with its
+  pill, so the tester sees the fix landed and knows to test it again.
 - **Rule-VIEW-PANEL-096** — The History tab shows the test case's Git history on
   the current branch, newest first: one entry for each commit that changed its
   file. Each entry names when, who and the commit's message, then each field
@@ -46,23 +66,50 @@ There is no key for this. The tab is called **History**.
   newest first. Only a read longer than 0.3 seconds shows a Reading line, and
   one test case's history is never drawn over another's.
 - **Rule-VIEW-PANEL-100** — A test project that is not under Git has no history.
-  The tab says so in one line, and names Initialize Git (git init) in View
-  Pending Commits as the way to start one.
+  The tab lists the bugs its test runs hold now, each as a Not committed yet bug
+  card, then says in one line that it has no history, and names Initialize Git
+  (git init) in View Pending Commits as the way to start one.
 - **Rule-VIEW-PANEL-101** — The tab shows every commit that changed the test
   case. Git is read away from the screen, and the entries are drawn in groups,
   so the IDE never waits for a long history.
+- **Rule-VIEW-PANEL-105** — A bug is what a run item records about a failure: a
+  Failed run item status, or the link of the issue it was filed as. Each bug
+  event in any test run is a bug card of its own, apart from the test case
+  cards: recorded, changed, cleared, or its run item removed. It opens with the
+  event, its test run, when, who and the commit, then shows the bug's severity
+  and priority, and its filed issue when there is one. Severity and priority
+  belong to the bug card, never to the test case card.
+- **Rule-VIEW-PANEL-106** — The bugs are read from Git beside the test case's
+  own changes, from its run item in every test run. A run item change that
+  touches no bug is not shown.
+- **Rule-VIEW-PANEL-107** — Bugs not committed yet are Not committed yet bug
+  cards at the top: each test run's run item as this machine holds it now,
+  against the last commit.
+- **Rule-VIEW-PANEL-108** — A cleared bug says why: its run item is no longer
+  Failed and has no link, or its run item was removed from the test run.
+- **Rule-VIEW-PANEL-109** — A bug card names its test run, and the name opens
+  that test run with the run item selected. When the test run is no longer in
+  the test project, its name is gray and its tooltip says so.
 
 ## The screen
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│   Details    | History |   Open Bugs                                       │
+│   Details    | History |                                                   │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  [Not committed yet]  Muteb  5 Oct 2026, 08:12                        (1)  │
 │     Priority          Medium → High                                   (4)  │
+│ ┃[Recorded]  Bug in cycle 4  [Not committed yet]  Muteb  5 Oct, 18:40 (5)  │
+│ ┃   Bug Severity      Major                                                │
+│ ┃   Bug Priority      High                                                 │
+│ ┃   Bug Issue         #123  (In progress)                                  │
 │  2 Oct 2026, 16:40  Sara  [4f1c9e2]  Cycle 4 review                   (2)  │
 │     Expected Result   The dashboard opens → The dashboard opens within …   │
 │     Steps             3 steps → 4 steps                                    │
+│ ┃[Changed]  Bug in cycle 2  Sara  2 Oct 2026, 16:40  [4f1c9e2]        (6)  │
+│ ┃   Bug Severity      Minor → Major                                        │
+│ ┃[Cleared]  Bug in cycle 1  mtb  1 Oct 2026, 20:42  [5e6594a]         (7)  │
+│ ┃   Because           run item now Passed                                  │
 │  24 Sep 2026, 16:07  Muteb  [a83d07e]  UC-10                          (3)  │
 │     Test Case         [Created]                                            │
 └────────────────────────────────────────────────────────────────────────────┘
@@ -75,6 +122,21 @@ There is no key for this. The tab is called **History**.
 3. **Created** — the commit that first added the test case.
 4. **A field row** — the field, what it was, and what it became. A commit that
    changed none of the fields reads *reordered or restamped*.
+5. **A bug card** — a card of its own, marked by a bar in the bug's severity
+   color. It opens with what happened, **Recorded**, then **Bug in** and the test
+   run, who and when, and the commit's hash, or **Not committed yet**. Then the
+   bug's severity and priority, and its filed issue with its state on GitHub
+   when there is one. Clicking the test run's name opens that test run
+   with the run item selected; a test run no longer in the test project is gray,
+   and its tooltip says so.
+6. **Changed** — each of the bug's own attributes, from what it was to what it
+   became. A run item change that touches no bug is not shown.
+7. **Cleared** — the bar is green, and the card says why: the run item is no
+   longer Failed and has no link. A run item removed from its test run reads
+   **Run item removed**.
+
+A commit that changed the test case and a bug gives two cards, the test case's
+first.
 
 ## Main flow
 
@@ -82,15 +144,21 @@ There is no key for this. The tab is called **History**.
 2. If the read takes longer than 0.3 seconds, the tab reads *Reading the
    history from Git...*.
 3. Testin asks Git for the commits that changed the test case's file, newest
-   first, and reads each version.
+   first, and reads each version. Beside it, Testin asks Git for the commits
+   that changed the test case's run item in any test run, and compares each
+   version with the one before it.
 4. The tab shows the entries. Paging to another test case reads its history the
    same way.
 
 ## What Testin refuses
 
-**The test project is not under Git.** The tab shows one line: *This test
-project is not under Git, so it has no history. Choose View Pending Commits,
-then Initialize Git (git init), to start one.*
+**The test project is not under Git.** The tab shows a Not committed yet bug
+card for each bug the test runs hold now, then one line: *This test project is
+not under Git, so it has no history. Choose View Pending Commits, then
+Initialize Git (git init), to start one.*
+
+**A run item version cannot be read.** Its bug card is left out, and the rest of
+the commit's cards show.
 
 **Git cannot be read.** The tab shows one line with Git's reason. The rest of
 the panel works as before.

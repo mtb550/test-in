@@ -68,7 +68,7 @@ public final class TestRuns {
         return testRun;
     }
 
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-106
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store().getTestRunsByPath().entrySet().stream()
                 .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withTestCasesShown(entry.getValue())));

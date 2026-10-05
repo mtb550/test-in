@@ -25,8 +25,8 @@ There is no key for this. It happens once the panel is open.
   goes with it, so the panel is never a column of empty rows.
 - **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
   message for any of them.
-- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
-  every time it refreshes.
+- **Rule-VIEW-PANEL-008** — The panel has two tabs, Details and History, and
+  both are drawn every time it refreshes.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
@@ -39,8 +39,8 @@ There is no key for this. It happens once the panel is open.
 - **Rule-VIEW-PANEL-018** — Every fill starts again at the first test case, so
   the paging position is never carried over.
 - **Rule-VIEW-PANEL-102** — Following keeps the tab in front. A tester reading
-  History or Open Bugs stays on that tab as the selection moves; only opening
-  the panel starts on Details.
+  History stays on History as the selection moves; only opening the panel starts
+  on Details.
 
 ## What the tester sees
 

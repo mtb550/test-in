@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
-import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;
 import org.testin.view.history.HistoryTab;
 
@@ -45,13 +44,6 @@ public enum ViewTab {
             ViewPanel::getHistoryScrollPane,
             ViewPanel::getHistoryTab,
             panel -> new HistoryTab().load(panel.getP(), panel.getHistoryTab(), panel.shownTestCase())
-    ),
-
-    OPEN_BUGS(
-            Bundle.message("view.tab.open.bugs"),
-            ViewPanel::getOpenBugsScrollPane,
-            ViewPanel::getOpenBugsTab,
-            panel -> new OpenBugsTab().load(panel.getP(), panel.getOpenBugsTab(), panel.shownTestCase())
     );
 
     private final @NotNull String displayName;

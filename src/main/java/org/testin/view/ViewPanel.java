@@ -55,15 +55,11 @@ public class ViewPanel implements Disposable {
     private final @NotNull JBPanel<?> detailsTab;
     @Getter
     private final @NotNull JBPanel<?> historyTab;
-    @Getter
-    private final @NotNull JBPanel<?> openBugsTab;
 
     @Getter
     private final @NotNull JBScrollPane detailsScrollPane;
     @Getter
     private final @NotNull JBScrollPane historyScrollPane;
-    @Getter
-    private final @NotNull JBScrollPane openBugsScrollPane;
 
     @Getter
     private final @NotNull ViewPagination page;
@@ -83,23 +79,19 @@ public class ViewPanel implements Disposable {
         Disposer.register(ProjectLifetime.of(p), this);
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
-        openBugsTab = new JBPanel<>(new BorderLayout());
 
         FontSync.syncWithNativeEditor(p, detailsTab, this);
         FontSync.syncWithNativeEditor(p, historyTab, this);
-        FontSync.syncWithNativeEditor(p, openBugsTab, this);
 
         // Rule-SETTING-039
         tabs().forEach(tab -> tab.addMouseWheelListener(WheelForwarding::forwardWheelToScrollPane));
 
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);
-        openBugsScrollPane = createScrollPane(openBugsTab);
 
         // Rule-VIEW-PANEL-058
         new EscapeAction(p, detailsTab);
         new EscapeAction(p, historyTab);
-        new EscapeAction(p, openBugsTab);
 
         for (final ViewTab tab : ViewTab.values()) takesTheKeyboard(tab);
         IdeEventQueue.getInstance().addPostprocessor(event -> {
@@ -115,7 +107,7 @@ public class ViewPanel implements Disposable {
     }
 
     private @NotNull Stream<JBPanel<?>> tabs() {
-        return Stream.of(detailsTab, historyTab, openBugsTab);
+        return Stream.of(detailsTab, historyTab);
     }
 
     // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080, Rule-INTERNAL-122
@@ -247,7 +239,6 @@ public class ViewPanel implements Disposable {
     public void dispose() {
         detailsTab.removeAll();
         historyTab.removeAll();
-        openBugsTab.removeAll();
 
         ViewToolWindowFactory.onPanelDisposed(p, this);
     }

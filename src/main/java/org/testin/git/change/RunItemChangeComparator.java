@@ -30,9 +30,19 @@ import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class RunItemChangeComparator {
+public final class RunItemChangeComparator {
     // UC-SHARE-010, Rule-SHARE-046
     static @NotNull List<FieldChange> compare(final @NotNull TestRunItems oldItem, final @NotNull TestRunItems newItem) {
+        final @NotNull List<FieldChange> changes = differences(oldItem, newItem);
+        if (changes.isEmpty()) {
+            changes.add(new FieldChange(TestRunEditorAttributes.RUN_STATUS.getName(), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_RUN_ITEM));
+        }
+
+        return changes;
+    }
+
+    // UC-SHARE-010, Rule-SHARE-046, Rule-VIEW-PANEL-105
+    public static @NotNull List<FieldChange> differences(final @NotNull TestRunItems oldItem, final @NotNull TestRunItems newItem) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
         addIfChanged(changes, TestRunEditorAttributes.RUN_STATUS.getName(), oldItem.getStatus().getLabel(), newItem.getStatus().getLabel());
@@ -44,11 +54,6 @@ final class RunItemChangeComparator {
         addIfChanged(changes, TestRunEditorAttributes.EXECUTED_BY.getName(), oldItem.getExecutedBy(), newItem.getExecutedBy());
         addIfChanged(changes, TestRunEditorAttributes.EXECUTED_AT.getName(), Display.formatDate(oldItem.getExecutedAt()), Display.formatDate(newItem.getExecutedAt()));
         addIfChanged(changes, Bundle.message("git.change.screenshots"), String.join(", ", oldItem.getScreenshots()), String.join(", ", newItem.getScreenshots()));
-
-        if (changes.isEmpty()) {
-            changes.add(new FieldChange(TestRunEditorAttributes.RUN_STATUS.getName(), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_RUN_ITEM));
-        }
-
         return changes;
     }
 

@@ -17,13 +17,25 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.change.FieldChange;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
-public record HistoryEntry(@NotNull HistoryEntryKind kind, @NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull List<FieldChange> changes) implements HistoryCard {
-    static @NotNull HistoryEntry of(final @NotNull HistoryEntryKind kind, final @NotNull HistoryCommit commit, final @NotNull List<FieldChange> changes) {
-        return new HistoryEntry(kind, commit.hash(), commit.who(), commit.when(), commit.message(), changes);
+public sealed interface HistoryCard permits HistoryEntry, BugCard {
+    int SHORT_HASH = 7;
+
+    @NotNull String hash();
+
+    @NotNull String who();
+
+    @NotNull ZonedDateTime when();
+
+    // Rule-VIEW-PANEL-098
+    default boolean isCommitted() {
+        return !hash().isEmpty();
+    }
+
+    // Rule-VIEW-PANEL-097
+    default @NotNull String shortHash() {
+        return hash().substring(0, Math.min(SHORT_HASH, hash().length()));
     }
 }

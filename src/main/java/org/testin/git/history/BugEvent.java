@@ -18,12 +18,14 @@ package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.change.FieldChange;
+import org.testin.model.result.TestRunItems;
 
-import java.time.ZonedDateTime;
+import java.nio.file.Path;
 import java.util.List;
 
-public record HistoryEntry(@NotNull HistoryEntryKind kind, @NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull List<FieldChange> changes) implements HistoryCard {
-    static @NotNull HistoryEntry of(final @NotNull HistoryEntryKind kind, final @NotNull HistoryCommit commit, final @NotNull List<FieldChange> changes) {
-        return new HistoryEntry(kind, commit.hash(), commit.who(), commit.when(), commit.message(), changes);
+public record BugEvent(@NotNull BugEventKind kind, @NotNull Path testRun, @NotNull TestRunItems item, @NotNull List<FieldChange> changes) {
+    // Rule-VIEW-PANEL-109
+    public @NotNull String testRunName() {
+        return String.valueOf(testRun.getFileName());
     }
 }

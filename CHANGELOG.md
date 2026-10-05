@@ -52,8 +52,8 @@ than repairing it, and a team sharing a test project should update together.
   inside the test project rather than as a path on disk. A dialog you can resize opens at six tenths of the IDE window
   and scrolls rather than pushing its buttons out of sight, and a folder or file field has its browse button inside it.
 - **A pasted test case lands under the selected one,** rather than beside the test case it was copied from.
-- **A failure nobody triaged reads Enhancement / Low** in the grid, the Details tab, the Open Bugs tab, the Excel report
-  and a bug report, and every failure is listed on the Open Bugs tab.
+- **A failure nobody triaged reads Enhancement / Low** in the grid, the Details tab, History, the Excel report and a bug
+  report, and every failure is a bug card on History.
 - **A narrow editor scrolls its toolbar and status bar sideways** instead of cutting an icon in half or wrapping the
   test case count onto three lines.
 - **The status bars name every key that works:** **Alt+Enter** for spelling corrections, **Ctrl+V** for a screenshot,
@@ -68,9 +68,14 @@ than repairing it, and a team sharing a test project should update together.
   and the card do. Its icon still says what automation is there.
 - **A blank priority in a bulk edit is P3 (Low),** the default priority, and a blank value in a bulk edit is never
   counted among the values Testin could not read.
+- **History tells a test case's bugs from Git:** each time a test run recorded, changed or cleared a bug on the test
+  case, History shows a bug card of its own beside the test case's entries, with its bug severity, bug priority and
+  filed issue. The test run's name opens that test run with the run item selected.
 
 ### Removed
 
+- **The Open Bugs tab:** the view panel has two tabs, Details and History, and History now shows every bug any test run
+  recorded, read from Git rather than from this machine's memory.
 - **English only:** the French and Hindi translations are gone. Nobody who reads either language had checked them, and
   no tool could, so Testin now shows only words that have been read.
 

@@ -18,19 +18,16 @@ package org.testin.view.details;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.TestRuns;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.BrowserOpened;
 import org.testin.view.Drawn;
-import org.testin.view.bugs.OpenBugsTab;
 
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -99,16 +96,10 @@ public class BugOnTheSummaryLineIdeTest extends AbstractViewPanelIdeTest {
         issue.doClick();
         assertEquals("clicking the issue did not open it in the browser", List.of(ISSUE), browser.addresses());
 
-        Services.getInstance(getProject(), TestRuns.class).changeResult(tr.getPath(), tc.getId(), result -> {
-            result.setStatus(RunItemStatus.FAILED);
-            result.linkBug(ISSUE);
-        });
-        final @NotNull JBPanel<?> bugs = new JBPanel<>();
-        new OpenBugsTab().load(getProject(), bugs, Optional.of(tc));
-        final @NotNull ActionLink listed = (ActionLink) Drawn.reading(bugs, "#412");
-        assertTrue("hovering the issue on Open Bugs does not give its whole address: " + listed.getToolTipText(), String.valueOf(listed.getToolTipText()).contains(ISSUE));
+        final @NotNull ActionLink listed = (ActionLink) Drawn.reading(BugIssueLink.of(getProject(), ISSUE), "#412");
+        assertTrue("hovering the issue on a bug card does not give its whole address: " + listed.getToolTipText(), String.valueOf(listed.getToolTipText()).contains(ISSUE));
 
         listed.doClick();
-        assertEquals("clicking the issue on Open Bugs did not open it in the browser", List.of(ISSUE, ISSUE), browser.addresses());
+        assertEquals("clicking the issue on a bug card did not open it in the browser", List.of(ISSUE, ISSUE), browser.addresses());
     }
 }

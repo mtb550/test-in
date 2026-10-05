@@ -35,7 +35,7 @@ import javax.swing.JComponent;
 public final class BugIssueLink {
     private static final int GAP = 6;
 
-    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-080, Rule-VIEW-PANEL-091
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-080, Rule-VIEW-PANEL-091
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull String url) {
         final @NotNull JBPanel<?> line = AbstractDetails.row(GAP);
 

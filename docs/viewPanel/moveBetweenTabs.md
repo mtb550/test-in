@@ -2,11 +2,11 @@
 
 # UC-VIEW-PANEL-017: Move between the panel's tabs
 
-**As a** tester, **I want** to reach the **History** and **Open Bugs** tabs from
-the keyboard, **so that** I can read them without taking my hands off it.
+**As a** tester, **I want** to reach the **History** tab from the keyboard,
+**so that** I can read it without taking my hands off it.
 
-The panel has three tabs: **Details**, **History** and **Open Bugs**. `Tab`
-brings the next one to the front, and `Shift+Tab` the one before.
+The panel has two tabs: **Details** and **History**. `Tab` brings the next one
+to the front, and `Shift+Tab` the one before.
 
 ## Rules
 
@@ -24,14 +24,14 @@ brings the next one to the front, and `Shift+Tab` the one before.
   goes with it, so the panel is never a column of empty rows.
 - **Rule-VIEW-PANEL-007** — Opening, paging and closing say nothing. There is no
   message for any of them.
-- **Rule-VIEW-PANEL-008** — The panel has three tabs, and all three are drawn
-  every time it refreshes.
+- **Rule-VIEW-PANEL-008** — The panel has two tabs, Details and History, and
+  both are drawn every time it refreshes.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
 - **Rule-VIEW-PANEL-079** — `Tab` brings the next tab to the front, and
-  `Shift+Tab` the one before. After **Open Bugs** comes **Details** again, and
-  before **Details** comes **Open Bugs**.
+  `Shift+Tab` the one before. After **History** comes **Details** again, and
+  before **Details** comes **History**.
 - **Rule-VIEW-PANEL-080** — The keyboard is in the tab in front: after `Tab`,
   after `Shift+Tab`, after a click on a tab's name and after a click inside a
   tab. A link inside a tab takes no keyboard, so `Tab` always moves between
@@ -46,7 +46,7 @@ marked, and its contents fill the panel.
 ┌──────────────────────────────────────────────────────────────────────────┐
 │  Testin View                                              ( < )  ( > )   │
 ├──────────────────────────────────────────────────────────────────────────┤
-│    Details    | History |    Open Bugs                                   │
+│    Details    | History |                                                │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │   2 Oct 2026, 16:40  Sara  4f1c9e2  Cycle 4 review                       │
@@ -66,10 +66,9 @@ No message appears. Nothing is written.
    with the keyboard in it.
 2. The tester presses `Tab`. **History** comes to the front, and the keyboard is
    in it.
-3. The tester presses `Tab` again. **Open Bugs** comes to the front.
-4. The tester presses `Tab` again. **Details** comes back, and `F2` works there
+3. The tester presses `Tab` again. **Details** comes back, and `F2` works there
    again.
-5. `Shift+Tab` goes the same way backwards.
+4. `Shift+Tab` goes the same way backwards.
 
 A click does the same as the key: a click on a tab's name, or anywhere inside a
 tab, puts the keyboard in that tab.

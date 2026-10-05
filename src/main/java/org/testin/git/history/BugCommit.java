@@ -17,13 +17,16 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.change.FieldChange;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
-public record HistoryEntry(@NotNull HistoryEntryKind kind, @NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull List<FieldChange> changes) implements HistoryCard {
-    static @NotNull HistoryEntry of(final @NotNull HistoryEntryKind kind, final @NotNull HistoryCommit commit, final @NotNull List<FieldChange> changes) {
-        return new HistoryEntry(kind, commit.hash(), commit.who(), commit.when(), commit.message(), changes);
+record BugCommit(@NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull List<ChangedFile> files) {
+    @NotNull Stream<String> objectNames() {
+        return files.stream().flatMap(changed -> Stream.of(
+                changed.before().isEmpty() ? "" : hash + "^:" + changed.before(),
+                changed.after().isEmpty() ? "" : hash + ":" + changed.after()
+        )).filter(name -> !name.isEmpty());
     }
 }
