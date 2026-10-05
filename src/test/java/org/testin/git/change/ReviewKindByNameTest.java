@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;

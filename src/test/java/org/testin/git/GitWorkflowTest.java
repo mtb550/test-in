@@ -16,18 +16,7 @@
 
 package org.testin.git;
 
-import org.testin.TempTree;
-import org.testin.model.Priority;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.Rank;
-import org.testin.testcase.TestCaseOrder;
-import org.testin.util.RealMapper;
-import org.testng.SkipException;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
-import java.util.Objects;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -37,11 +26,27 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
+import org.testin.TempTree;
+import org.testin.git.change.ChangeSubject;
+import org.testin.git.change.ChangeType;
+import org.testin.git.change.DiffType;
+import org.testin.git.change.GitDiffProcessor;
+import org.testin.git.change.PendingChange;
+import org.testin.model.Priority;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.Rank;
+import org.testin.testcase.TestCaseOrder;
+import org.testin.util.RealMapper;
+import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import static org.testin.git.LocalGit.git;
 import static org.testin.git.LocalGit.mustGit;

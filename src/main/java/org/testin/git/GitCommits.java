@@ -19,6 +19,7 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import git4idea.commands.GitCommand;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.change.PendingChange;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;

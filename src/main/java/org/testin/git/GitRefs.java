@@ -20,6 +20,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
+import org.testin.git.change.DiffType;
+import org.testin.git.change.PendingChange;
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;

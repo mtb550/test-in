@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;

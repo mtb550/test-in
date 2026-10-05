@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
 import org.testin.TempTree;
 import org.testin.model.Priority;

@@ -24,7 +24,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.FieldChange;
+import org.testin.git.change.FieldChange;
 import org.testin.git.history.History;
 import org.testin.git.history.HistoryEntry;
 import org.testin.git.history.HistoryEntryKind;

@@ -22,6 +22,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
+import org.testin.git.change.GitDiffProcessor;
+import org.testin.git.change.PendingChange;
 import org.testin.indexer.Nodes;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;

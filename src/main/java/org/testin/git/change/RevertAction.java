@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 
-public record FieldChange(@NotNull String fieldName, @NotNull String oldValue, @NotNull String newValue, @NotNull ChangeType changeType) {
+@FunctionalInterface
+public interface RevertAction {
+    RevertAction NONE = (_, _) -> {
+    };
+
+    void apply(final @NotNull TestCaseDtoBuilder draft, final @NotNull TestCaseDto oldDto);
 }

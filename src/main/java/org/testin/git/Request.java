@@ -17,6 +17,7 @@
 package org.testin.git;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.change.PendingChange;
 
 import java.util.List;
 

@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitRefs;
+import org.testin.git.GitRepositoryService;
+import org.testin.git.StatusEntry;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -56,7 +59,7 @@ public final class GitDiffProcessor {
     }
 
     // UC-SHARE-010
-    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<List<String>, Map<String, String>> committedContents, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
+    public static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<List<String>, Map<String, String>> committedContents, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
 

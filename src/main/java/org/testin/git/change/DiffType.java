@@ -14,16 +14,38 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
 
-import java.nio.file.Path;
-import java.util.List;
+import java.util.function.Function;
 
-public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @NotNull TestCaseDto committed, @NotNull List<FieldChange> fieldChanges) {
-    public boolean isRevertible() {
-        return subject == ChangeSubject.TEST_CASE && !testCaseId.isEmpty();
+@AllArgsConstructor
+public enum DiffType {
+    ADDED(
+            ChangeSubject::getCreated
+    ),
+
+    MODIFIED(
+            ChangeSubject::getChanged
+    ),
+
+    DELETED(
+            ChangeSubject::getRemoved
+    );
+
+    private final @NotNull Function<ChangeSubject, ChangeType> change;
+
+    public @NotNull ChangeType changeOf(final @NotNull ChangeSubject subject) {
+        return change.apply(subject);
+    }
+
+    public boolean hasBefore() {
+        return this != ADDED;
+    }
+
+    public boolean hasAfter() {
+        return this != DELETED;
     }
 }

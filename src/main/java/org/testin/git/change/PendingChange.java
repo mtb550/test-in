@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.change;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 
-@FunctionalInterface
-public interface RevertAction {
-    RevertAction NONE = (_, _) -> {
-    };
+import java.nio.file.Path;
+import java.util.List;
 
-    void apply(final @NotNull TestCaseDtoBuilder draft, final @NotNull TestCaseDto oldDto);
+public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name, @NotNull String testSet, @NotNull String testCaseId, @NotNull Path relativeFilePath, @NotNull DiffType type, @NotNull TestCaseDto committed, @NotNull List<FieldChange> fieldChanges) {
+    public boolean isRevertible() {
+        return subject == ChangeSubject.TEST_CASE && !testCaseId.isEmpty();
+    }
 }

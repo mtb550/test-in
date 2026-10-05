@@ -16,6 +16,7 @@
 
 package org.testin.git;
 
+import org.testin.git.change.GitDiffProcessor;
 import org.testin.model.DirectoryType;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
