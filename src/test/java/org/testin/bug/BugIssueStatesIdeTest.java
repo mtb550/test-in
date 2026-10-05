@@ -83,10 +83,21 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         return asked.stream().filter(arguments -> arguments.contains("name=" + repository)).toList();
     }
 
-    private void readAndWait() {
+    private int readAndWait() {
         final @NotNull AtomicInteger redrawn = new AtomicInteger();
         states().readAll(redrawn::incrementAndGet);
-        Await.until("the bug states were never read", () -> redrawn.get() == 1);
+        Await.until("the bug states were never read", () -> !states().isReading());
+        return redrawn.get();
+    }
+
+    // Rule-VIEW-PANEL-092
+    public void testAnAnswerThatDidNotChangeRedrawsNothing() {
+        nothingWaits();
+        twoBugsFiled();
+        ghAnswers(ANSWER);
+
+        assertEquals("the first answer was not drawn", 1, readAndWait());
+        assertEquals("an answer that changed nothing redrew the panel", 0, readAndWait());
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-091, Rule-VIEW-PANEL-092, Rule-VIEW-PANEL-095

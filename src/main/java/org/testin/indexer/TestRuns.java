@@ -72,7 +72,7 @@ public final class TestRuns {
     // Rule-VIEW-PANEL-092
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store().getTestRunsByPath().entrySet().stream()
-                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withTestCasesShown(entry.getValue())));
+                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), Map.Entry::getValue));
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-107

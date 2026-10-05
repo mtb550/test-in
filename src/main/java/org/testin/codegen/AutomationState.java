@@ -97,7 +97,7 @@ public final class AutomationState implements Disposable {
                 .inSmartMode(p)
                 .coalesceBy(this, asking.keySet())
                 .expireWith(this)
-                .finishOnUiThread(ModalityState.defaultModalityState(), answer -> keep(answer, reading, asking, onAnswered))
+                .finishOnUiThread(ModalityState.defaultModalityState(), answer -> keep(p, answer, reading, asking, onAnswered))
                 .submit(AppExecutorUtil.getAppExecutorService());
     }
 
@@ -128,8 +128,9 @@ public final class AutomationState implements Disposable {
         return new Answer(answers, found, codeVersion);
     }
 
-    private void keep(final @NotNull Answer answer, final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, Automated> asking, final @NotNull Runnable onAnswered) {
-        if (answer.states().isEmpty()) return;
+    // Rule-CODEGEN-082, Rule-EDITOR-PANEL-211
+    private void keep(final @NotNull Project p, final @NotNull Answer answer, final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, Automated> asking, final @NotNull Runnable onAnswered) {
+        if (answer.states().isEmpty() || !CodeOn.isOn(p)) return;
 
         known.putAll(answer.states());
         readAtCodeVersion = answer.codeVersion();

@@ -71,26 +71,27 @@ public final class BugIssueStates {
         if (filed.isEmpty() || gh.isEmpty() || !reading.compareAndSet(false, true)) return;
 
         final @NotNull Function<ProgressIndicator, GitHubCli> cli = gh.orElseThrow();
+        final @NotNull AtomicBoolean changed = new AtomicBoolean();
         BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("bug.states.reading"), true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 for (final Map.Entry<BugRepository, Set<Integer>> repository : filed.entrySet()) {
                     indicator.checkCanceled();
                     indicator.setText2(repository.getKey().displayName());
-                    read(cli.apply(indicator), repository.getKey(), repository.getValue());
+                    if (read(cli.apply(indicator), repository.getKey(), repository.getValue())) changed.set(true);
                 }
             }
 
             @Override
             public void onFinished() {
                 reading.set(false);
-                redraw.run();
+                if (changed.get()) redraw.run();
             }
         });
     }
 
     // Rule-VIEW-PANEL-093, Rule-VIEW-PANEL-094, Rule-INTERNAL-127
-    private void read(final @NotNull GitHubCli cli, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
+    private boolean read(final @NotNull GitHubCli cli, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         final @NotNull Hints hints = Services.getInstance(p, Hints.class);
         final @NotNull IssueStates asked = cli.states(mapper, repository, numbers, true);
@@ -98,12 +99,17 @@ public final class BugIssueStates {
 
         if (!said.problem().isEmpty()) {
             hints.fire(Hint.of(SetupStep.BUG_STATES, said.problem()));
-            return;
+            return false;
         }
 
         hints.clear(SetupStep.BUG_STATES);
         if (!asked.boardRefused()) hints.clear(SetupStep.BOARD_COLUMNS);
-        numbers.forEach(number -> answers.put(new BugIssue(repository.host(), repository.owner(), repository.name(), number), said.stateOf(number)));
+        return numbers.stream().filter(number -> remember(repository, number, said.stateOf(number))).count() > 0;
+    }
+
+    // Rule-VIEW-PANEL-092
+    private boolean remember(final @NotNull BugRepository repository, final int number, final @NotNull BugIssueState state) {
+        return !state.equals(answers.put(new BugIssue(repository.host(), repository.owner(), repository.name(), number), state));
     }
 
     // Rule-VIEW-PANEL-094, Rule-INTERNAL-127
@@ -121,6 +127,11 @@ public final class BugIssueStates {
                 .flatMap(Optional::stream)
                 .collect(Collectors.groupingBy(issue -> new BugRepository(issue.host(), issue.owner(), issue.name()),
                         Collectors.mapping(BugIssue::number, Collectors.toCollection(TreeSet::new))));
+    }
+
+    @TestOnly
+    boolean isReading() {
+        return reading.get();
     }
 
     @TestOnly
