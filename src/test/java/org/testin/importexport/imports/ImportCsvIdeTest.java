@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class ImportCsvIdeTest extends AbstractTempRootIdeTest {
+    private static final @NotNull String BOM = Character.toString(0xFEFF);
+
 
     private @NotNull List<TestCaseDto> imported(final @NotNull String text) {
         try {
@@ -41,8 +43,8 @@ public class ImportCsvIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-124
     public void testACsvFileIsReadTheWayASpreadsheetWritesIt() {
-        final @NotNull List<TestCaseDto> testCases = imported("""
-                \uFEFFDescription,Expected Result,Module\r
+        final @NotNull List<TestCaseDto> testCases = imported(BOM + """
+                Description,Expected Result,Module\r
                 log in with a valid user,"the dashboard opens, and ""Welcome"" shows",accounts\r
                 \r
                 ,,\r

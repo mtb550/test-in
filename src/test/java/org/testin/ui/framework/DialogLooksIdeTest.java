@@ -34,6 +34,7 @@ import org.testin.testrun.TestRunTreeCellRenderer;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
+import org.testin.util.Icons;
 import org.testin.view.Drawn;
 
 import javax.swing.AbstractButton;
@@ -78,7 +79,7 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
     private static final @NotNull Icon GREEN = new Icon() {
         @Override
         public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-            g.setColor(new Color(0x5F, 0xB8, 0x65));
+            g.setColor(Icons.GREEN);
             g.fillRect(x, y, getIconWidth(), getIconHeight());
         }
 

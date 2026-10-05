@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import static org.testin.git.TestCaseHistory.FIELD;
+import static org.testin.git.TestCaseHistory.RECORD;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -58,8 +60,8 @@ public class TestCaseHistoryTest {
     // Rule-VIEW-PANEL-096
     @Test
     public void everyCommitIsReadWithItsHashAuthorDateMessageAndThePathItHadThen() {
-        final @NotNull String log = "\u001e" + "a".repeat(40) + "\u001fSara\u001f2026-10-02T16:40:00+03:00\u001fCycle 4 review: steps | expected\n\n" + PATH + "\n"
-                + "\u001e" + "b".repeat(40) + "\u001fMuteb\u001f2026-09-24T16:07:00+03:00\u001f\n\nTest Cases/Old name/" + ID + ".tc\n";
+        final @NotNull String log = RECORD + "a".repeat(40) + FIELD + "Sara" + FIELD + "2026-10-02T16:40:00+03:00" + FIELD + "Cycle 4 review: steps | expected\n\n" + PATH + "\n"
+                + RECORD + "b".repeat(40) + FIELD + "Muteb" + FIELD + "2026-09-24T16:07:00+03:00" + FIELD + "\n\nTest Cases/Old name/" + ID + ".tc\n";
 
         final @NotNull List<HistoryCommit> commits = TestCaseHistory.commits(log, PATH);
 
@@ -129,6 +131,20 @@ public class TestCaseHistoryTest {
         assertEquals(broken.kind(), HistoryEntryKind.UNREADABLE);
         assertEquals(broken.who(), "Sara");
         assertEquals(broken.message(), "broken");
+    }
+
+    // Rule-VIEW-PANEL-096
+    @Test
+    public void theVersionAfterAnUnreadableOneIsNotCalledReordered() {
+        final @NotNull List<HistoryCommit> commits = List.of(commit(3, "Cycle 4 review"), commit(2, "broken"), commit(1, "UC-10"));
+        final @NotNull TestCaseDto now = version("The dashboard opens");
+        final @NotNull Map<String, String> versions = versions(commits, List.of(now, now, now));
+        versions.put(commits.get(1).objectName(), "{ not a test case");
+
+        final @NotNull HistoryEntry after = TestCaseHistory.entries(MAPPER, commits, versions, now).getFirst();
+
+        assertEquals(after.kind(), HistoryEntryKind.UNCOMPARED);
+        assertEquals(after.message(), "Cycle 4 review");
     }
 
     // Rule-VIEW-PANEL-096

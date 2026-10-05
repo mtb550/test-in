@@ -64,7 +64,7 @@ public class HistoryTab {
     private static final int GAP = 12;
     private static final int FIELD_WIDTH = 110;
     private static final @NotNull Color NOT_COMMITTED = JBColor.ORANGE;
-    private static final @NotNull Color HASH = new JBColor(0xDCEAF2, 0x1D2E38);
+    private static final @NotNull Color HASH = JBColor.LIGHT_GRAY;
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-099
     public void load(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull Optional<TestCaseDto> shown) {
@@ -163,6 +163,7 @@ public class HistoryTab {
     // Rule-VIEW-PANEL-096
     private static @NotNull List<JComponent> rows(final @NotNull HistoryEntry entry) {
         if (entry.kind() == HistoryEntryKind.UNREADABLE) return List.of(muted(Bundle.message("view.history.unreadable")));
+        if (entry.kind() == HistoryEntryKind.UNCOMPARED) return List.of(muted(Bundle.message("view.history.uncompared")));
         if (entry.kind() == HistoryEntryKind.CREATED) return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(Bundle.message("view.history.created"), RunItemStatus.PASSED.getRowColor()))));
         if (entry.changes().isEmpty()) return List.of(muted(Bundle.message("git.change.reordered")));
 
@@ -174,7 +175,7 @@ public class HistoryTab {
         values.setOpaque(false);
 
         final @NotNull JBLabel was = text(change.oldValue(), Fonts.body().deriveFont(Map.of(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON)), RunItemStatus.FAILED.getRowColor());
-        Stream.of(was, muted("\u2192"), text(change.newValue(), Fonts.body(), RunItemStatus.PASSED.getRowColor()))
+        Stream.of(was, muted("→"), text(change.newValue(), Fonts.body(), RunItemStatus.PASSED.getRowColor()))
                 .filter(label -> !label.getText().isBlank())
                 .forEach(values::add);
         return values;

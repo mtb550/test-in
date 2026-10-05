@@ -56,8 +56,8 @@ public class BadgesTest {
 
     @Test
     public void brightnessIsWhatTheEyeSeesNotWhatTheChannelSays() {
-        assertTrue(Badges.isLight(new Color(0, 255, 0)));
-        assertFalse(Badges.isLight(new Color(0, 0, 255)));
+        assertTrue(Badges.isLight(Color.GREEN));
+        assertFalse(Badges.isLight(Color.BLUE));
     }
 
     // Rule-EDITOR-PANEL-253

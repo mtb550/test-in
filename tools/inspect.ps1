@@ -1265,6 +1265,74 @@ function Read-QualifiedClassNames([string[]] $scopes) {
     }
 }
 
+function Read-ColorCodes([string[]] $scopes) {
+    <#
+        A color is IntelliJ's own, never a number.
+
+        #348 took every color literal out and docs/internal/customizations.md
+        records that nothing is left. A color written as RGB or hex is right in
+        one theme and wrong in another, and it is a second owner for a color the
+        platform or the house already names: JBColor's constants,
+        JBUI.CurrentTheme, util/Icons for icon colors, util/FixedColors. A color
+        built from another named color, new JBColor(Color.WHITE, Color.WHITE), is
+        not a number and passes.
+    #>
+    $code = 'new\s+(JB)?Color\s*\(\s*(0x|\d)|new\s+JBColor\s*\([^;]*,\s*(0x|\d)|Color\.decode\s*\(|ColorUtil\.fromHex\s*\('
+
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $number = 0
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+                $number++
+                $match = [regex]::Match($text, $code)
+                if (-not $match.Success) { continue }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line       = $number
+                    Inspection = 'ColorCode'
+                    Severity   = 'ERROR'
+                    Message    = "A color is IntelliJ's own or a house owner's (Icons, FixedColors), never RGB or hex: $($match.Value)"
+                }
+            }
+        }
+    }
+}
+
+function Read-UnicodeEscapes([string[]] $scopes) {
+    <#
+        A character is written as itself, never as a unicode escape.
+
+        IntelliJ's UnnecessaryUnicodeEscape reports only a character the file
+        could hold as it is, and its warning still reaches the editor. An escape
+        is unreadable for every other character too: a control character is
+        Character.toString(0x1E), which says what it is without one. Java turns
+        an escape into its character before it reads the line, so a comment, a
+        string and a text block are all checked. An escaped backslash before
+        the u is not an escape and is skipped.
+    #>
+    $escape = '(?<!\\)\\u+[0-9a-fA-F]{4}'
+
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $number = 0
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+                $number++
+                $match = [regex]::Match($text, $escape)
+                if (-not $match.Success) { continue }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line       = $number
+                    Inspection = 'UnicodeEscape'
+                    Severity   = 'ERROR'
+                    Message    = "Write the character itself, or Character.toString(0x..) for one that cannot be seen: $($match.Value)"
+                }
+            }
+        }
+    }
+}
+
 function Read-NonMarkerComments([string[]] $scopes) {
     <#
         A comment that is not a marker.
@@ -1477,6 +1545,8 @@ $problems += @(Read-MissingCopyright $everyTree)
 $problems += @(Read-NonMarkerComments $everyTree)
 $problems += @(Read-UnusedLambdaParameters $everyTree)
 $problems += @(Read-QualifiedClassNames $everyTree)
+$problems += @(Read-UnicodeEscapes $everyTree)
+$problems += @(Read-ColorCodes $everyTree)
 $problems += @(Read-HelpersNamedLikeTests $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
 $problems += @(Read-MisalignedMarkdownTable)

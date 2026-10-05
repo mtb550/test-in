@@ -37,8 +37,8 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseHistory {
-    private static final @NotNull String RECORD = "\u001e";
-    private static final @NotNull String FIELD = "\u001f";
+    static final @NotNull String RECORD = Character.toString(0x1E);
+    static final @NotNull String FIELD = Character.toString(0x1F);
     private static final @NotNull String FORMAT = "--format=%x1e%H%x1f%an%x1f%aI%x1f%s";
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-099, Rule-VIEW-PANEL-100, Rule-VIEW-PANEL-101
@@ -96,7 +96,8 @@ public final class TestCaseHistory {
         if (version.isEmpty()) return HistoryEntry.of(HistoryEntryKind.UNREADABLE, commit, List.of());
         if (oldest) return HistoryEntry.of(HistoryEntryKind.CREATED, commit, List.of());
 
-        return HistoryEntry.of(HistoryEntryKind.CHANGED, commit, before.map(older -> TestCaseChangeComparator.compare(older, version.orElseThrow())).orElse(List.of()));
+        return before.map(older -> HistoryEntry.of(HistoryEntryKind.CHANGED, commit, TestCaseChangeComparator.compare(older, version.orElseThrow())))
+                .orElseGet(() -> HistoryEntry.of(HistoryEntryKind.UNCOMPARED, commit, List.of()));
     }
 
     private static @NotNull Optional<TestCaseDto> parsed(final @NotNull Mapper mapper, final @NotNull String json) {

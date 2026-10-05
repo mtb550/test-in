@@ -19,5 +19,6 @@ package org.testin.git;
 public enum HistoryEntryKind {
     CHANGED,
     CREATED,
-    UNREADABLE
+    UNREADABLE,
+    UNCOMPARED
 }

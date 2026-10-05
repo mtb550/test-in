@@ -96,7 +96,9 @@ then Initialize Git (git init), to start one.*
 the panel works as before.
 
 **A version cannot be read.** Its entry still shows when, who, the hash and the
-message, and says *This version could not be read*.
+message, and says *This version could not be read*. The entry after it has
+nothing to compare with, so it says *What changed is not known, because the
+version before it could not be read*.
 
 **A long history.** Every commit is shown. The first entries appear at once,
 and the rest follow while the tester reads.
