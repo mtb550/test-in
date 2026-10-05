@@ -27,8 +27,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Said;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.services.Services;
-import org.testin.util.Bundle;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -105,25 +107,33 @@ public class TestSourceRootIdeTest extends AbstractCodegenIdeTest {
         }
     }
 
-    // Rule-CODEGEN-065, Rule-CODEGEN-072
-    public void testWithNoTestSourceFolderTheFirstWriteSaysSoOnceAndARemovalSaysNothing() {
+    private @NotNull List<String> folderHint() {
+        return Services.getInstance(getProject(), Hints.class).waiting().stream().filter(hint -> hint.step() == SetupStep.TEST_SOURCE_FOLDER).map(Hint::text).toList();
+    }
+
+    // Rule-CODEGEN-065, Rule-CODEGEN-072, Rule-INTERNAL-127
+    public void testWithNoTestSourceFolderAWriteLeavesAHintNamingWhatWasSkippedAndAFolderClearsIt() {
         final @NotNull VirtualFile sources = theTestSourceRoots().getFirst();
-        final @NotNull String noRoot = Bundle.message("codegen.no.source.root.title");
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         aRememberedFolderThatWasDeleted();
         PsiTestUtil.removeSourceRoot(getModule(), sources);
         try {
             GenType.REMOVE_TEST_SET.execute(getProject(), indexedTestSet("Payment", theTestCasesDirectory()));
+            assertEquals("a removal said something about the missing folder", List.of(), folderHint());
+
             createdTestSet("Login");
             createdTestSet("Logout");
 
-            final @NotNull List<Notification> noRootSaid = said.stream().filter(n -> n.getTitle().equals(noRoot)).toList();
-            assertEquals("the missing test source folder was not said exactly once: " + noRootSaid, 1, noRootSaid.size());
-            assertTrue("the message does not name the class that was skipped", noRootSaid.getFirst().getContent().contains("LoginTest"));
+            assertEquals("a message was raised for the missing folder", List.of(), said);
+            assertEquals("the hint does not name the last class skipped", 1, folderHint().size());
+            assertTrue("the hint does not name the last class skipped: " + folderHint(), folderHint().getFirst().contains("LogoutTest"));
         } finally {
             PsiTestUtil.addSourceRoot(getModule(), sources, true);
             remembered().set(sources);
         }
+
+        createdTestSet("Signup");
+        assertEquals("a found folder left the hint waiting", List.of(), folderHint());
     }
 }

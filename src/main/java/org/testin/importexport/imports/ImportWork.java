@@ -93,7 +93,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
 
     // UC-SHARE-005, UC-SHARE-006
     private void executeImportWriteAction(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet) {
-        final boolean generateCode = CodeOn.isOnOrWarnOnce(p);
+        final boolean generateCode = CodeOn.isOnOrHinted(p);
 
         final int total = selectedTestCasesBySheet.values().stream().mapToInt(List::size).sum();
 

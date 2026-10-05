@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.editor.open.TestinEditors;
 import org.testin.git.GitRepositoryService;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -50,8 +52,9 @@ public final class SaveTestinYml {
         return Optional.empty();
     }
 
-    // UC-TREE-PANEL-029, Rule-TREE-PANEL-113
+    // UC-TREE-PANEL-029, Rule-TREE-PANEL-113, Rule-INTERNAL-129
     public static void start(final @NotNull Project p) {
+        Services.getInstance(p, Guides.class).add(Guide.LINK_THIS_REPOSITORY);
         final @NotNull Optional<String> why = whyNot(p);
         if (why.isPresent()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, why.orElseThrow());

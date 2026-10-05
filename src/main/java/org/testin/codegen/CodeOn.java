@@ -69,8 +69,8 @@ public final class CodeOn {
     }
 
     // Rule-CODEGEN-082, Rule-CODEGEN-005, Rule-INTERNAL-127
-    public static boolean isOnOrWarnOnce(final @NotNull Project p) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return false;
+    public static boolean isOnOrHinted(final @NotNull Project p) {
+        if (!OptionalPlugin.JAVA.isAvailableOrHinted(p)) return false;
 
         final @NotNull Optional<String> why = hinted(p);
         why.ifPresent(reason -> Logger.debug("Automation code left as it is: " + reason));

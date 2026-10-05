@@ -24,11 +24,16 @@ import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.editor.card.CardHoverAction;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.model.TestCaseDto;
+import org.testin.services.Services;
 
 // UC-CODEGEN-006
 public class NavigateToTestMethodAction extends AbstractAnyProjectAction {
+    // UC-CODEGEN-006, Rule-INTERNAL-129
     public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        Services.getInstance(p, Guides.class).add(Guide.AUTOMATION_CODE);
         if (CodeOn.isOffAndWarned(p)) return;
 
         CodeNavigation.available().toCode(p, tc);

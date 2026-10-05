@@ -22,6 +22,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.git.conflict.ConflictResolution;
 import org.testin.git.conflict.GitConflictOffer;
 import org.testin.git.conflict.RebaseEnd;
+import org.testin.git.review.ViewPendingCommitsWork;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -49,11 +53,12 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
                 : Bundle.message("git.synced.pushed.many", String.valueOf(pushed.getAsInt()));
     }
 
-    // UC-SHARE-016, Rule-SHARE-069
+    // UC-SHARE-016, Rule-SHARE-069, Rule-INTERNAL-127
     void syncRepository(final @NotNull Path repoPath) {
         if (git.isNotRepository(repoPath)) {
             notifier.softRefuse(p, Bundle.message("git.sync.nothing.title"),
                     Bundle.message("git.sync.nothing.message", repoPath.getFileName()));
+            new ViewPendingCommitsWork(p).hintNotUnderGit(repoPath);
             return;
         }
 
@@ -64,12 +69,15 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
                     final @NotNull String remoteName = git.getRemoteName(repoPath);
                     final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
 
+                    final @NotNull Hints hints = Services.getInstance(p, Hints.class);
                     if (remoteUrl.isEmpty()) {
+                        hints.fire(Hint.of(SetupStep.GIT_REMOTE, Bundle.message("git.sync.aborted.message")));
                         ApplicationManager.getApplication().invokeLater(() ->
-                                notifier.warn(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
+                                notifier.softRefuse(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
                         );
                         return;
                     }
+                    hints.clear(SetupStep.GIT_REMOTE);
 
                     final @NotNull String branch = git.syncBranch(repoPath);
                     if (branch.isBlank()) {

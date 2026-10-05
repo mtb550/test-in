@@ -32,6 +32,9 @@ import org.testin.git.change.PendingChange;
 import org.testin.git.conflict.ConflictResolution;
 import org.testin.git.conflict.GitConflictOffer;
 import org.testin.git.conflict.RebaseEnd;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.indexer.Nodes;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -57,17 +60,19 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
     // UC-SHARE-009, Rule-SHARE-042
     public void openFor(final @NotNull Path path) {
         if (git.isNotRepository(path)) {
-            notifier.warnWithAction(p,
-                    Bundle.message("git.no.repository.title"),
-                    Bundle.message("git.no.repository.message", path.getFileName()),
-                    Bundle.message("git.no.repository.action"),
-                    () -> initializeGitRepository(path)
-            );
-
+            notifier.softRefuse(p, Bundle.message("git.no.repository.title"), Bundle.message("git.no.repository.message", path.getFileName()));
+            hintNotUnderGit(path);
             return;
         }
 
+        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY);
         scanForChanges(path);
+    }
+
+    // UC-SHARE-009, Rule-SHARE-042, Rule-INTERNAL-127
+    public void hintNotUnderGit(final @NotNull Path path) {
+        Services.getInstance(p, Hints.class).fire(Hint.of(SetupStep.GIT_REPOSITORY, Bundle.message("git.no.repository.message", path.getFileName()),
+                Bundle.message("git.no.repository.action"), () -> initializeGitRepository(path)));
     }
 
     // UC-SHARE-010, Rule-SHARE-050, Rule-SHARE-127
@@ -225,6 +230,7 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
                 _ -> {
                     git.initialize(repoPath);
                     ApplicationManager.getApplication().invokeLater(() -> {
+                        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY);
                         notifier.softShow(p, Bundle.message("git.initialized"));
 
                         scanForChanges(repoPath);
@@ -273,6 +279,7 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
         GitBackgroundTask.run(p, Bundle.message("git.task.configuring.remote"), false,
                 _ -> {
                     git.configureRemote(repoPath, remoteName, remoteUrl);
+                    Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REMOTE);
                     ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, remoteUrl, branch, commitId));
                 },
                 ex -> GitFailure.show(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", FailureText.of(ex))));

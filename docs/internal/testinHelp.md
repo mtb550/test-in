@@ -29,10 +29,13 @@ There is no key for this. Click the question mark.
 - **Rule-INTERNAL-129** — A guide is offered where its need shows, and stays for
   the session. *How to set up Testin on this machine* when the Testin folder is
   not set or holds no test project. *How to link this repository to its test
-  project* at View Pending Commits and Sync. *How to raise bug reports* when a
-  run item is set to Failed. *Test case editor shortcuts* when a test set opens,
-  and *Test run editor shortcuts* when a test run opens. A hint offers its own
-  guide.
+  project* at Select Test Project and Save to testin.yml. *How to share test
+  projects over Git* at View Pending Commits and Sync, and when a Git step
+  fails. *How to resolve Git conflicts* when a pull stops on a conflict. *How to
+  raise bug reports* when a run item is set to Failed. *How to generate and run
+  automation code* at Automate Test Case, Navigate to Test Method and Run Tests.
+  *Test case editor shortcuts* when a test set opens, and *Test run editor
+  shortcuts* when a test run opens. A hint offers its own guide.
 - **Rule-INTERNAL-130** — A guide opens in a Testin window, from the pages the
   plugin carries, so it needs no network and matches the installed version. A
   link to another page opens it in the same window; a web address opens in the

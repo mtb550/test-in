@@ -28,7 +28,8 @@ repository.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
 - **Rule-SHARE-042** — Testin offers to make the repository at the moment it
-  finds there is none.
+  finds there is none: a short message answers, and Testin Help holds Initialize
+  Git (git init) until the repository exists.
 - **Rule-SHARE-043** — Nothing is committed by making the repository. Only the
   repository itself is made.
 - **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
@@ -39,18 +40,20 @@ repository.
 
 ## What the tester sees
 
-No window opens. A warning message appears at the bottom right of the IDE,
-titled **Git repository not found**, and it stays in the IDE's notification
-list. One link sits under it, reading **Initialize Git (git init)**; clicking
-it makes the repository, and a small message reads *Git initialized*.
+No window opens. A short message titled **Git repository not found** answers,
+and the Testin Help mark at the end of the status bar turns red. Its hint carries
+**Initialize Git (git init)** and the guide *How to share test projects over
+Git*; clicking it makes the repository, and a small message reads *Git
+initialized*.
 
 ## Main flow
 
 1. The tester selects a test project and chooses **View Pending Commits**.
 2. Testin finds the folder is not a Git repository.
-3. A message titled **Git repository not found** reads *The selected project*,
-   then the folder's name, then *is not a Git repository.*
-4. The message carries a link reading **Initialize Git (git init)**.
+3. A short message titled **Git repository not found** reads *The selected
+   project*, then the folder's name, then *is not a Git repository.*
+4. The Testin Help mark turns red, and its hint carries **Initialize Git (git
+   init)**.
 5. The tester clicks it.
 6. Testin makes the repository.
 7. A message reads *Git initialized*.

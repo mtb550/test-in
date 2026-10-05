@@ -36,9 +36,24 @@ public enum Guide {
             "guides/linkThisRepository.md"
     ),
 
+    SHARE_OVER_GIT(
+            Bundle.message("guide.share.over.git"),
+            "guides/shareOverGit.md"
+    ),
+
+    RESOLVE_GIT_CONFLICTS(
+            Bundle.message("guide.resolve.git.conflicts"),
+            "guides/resolveGitConflicts.md"
+    ),
+
     RAISE_BUG_REPORTS(
             Bundle.message("guide.raise.bug.reports"),
             "guides/raiseBugReports.md"
+    ),
+
+    AUTOMATION_CODE(
+            Bundle.message("guide.automation.code"),
+            "guides/automationCode.md"
     ),
 
     TEST_CASE_EDITOR_SHORTCUTS(

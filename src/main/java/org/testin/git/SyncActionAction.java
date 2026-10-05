@@ -60,7 +60,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
     // UC-SHARE-016, Rule-INTERNAL-129
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        Services.getInstance(p, Guides.class).add(Guide.LINK_THIS_REPOSITORY);
+        Services.getInstance(p, Guides.class).add(Guide.SHARE_OVER_GIT);
         activeProjectPath(e).ifPresentOrElse(path -> new SyncWork(p).syncRepository(path), () ->
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
                         Bundle.message("git.sync.no.project")));

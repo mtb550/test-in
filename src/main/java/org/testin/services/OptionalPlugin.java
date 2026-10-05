@@ -23,12 +23,13 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.notifications.Notifier;
 import org.testin.util.Bundle;
-import org.testin.util.Once;
 
 import java.util.Objects;
 
@@ -36,32 +37,35 @@ public enum OptionalPlugin {
     JAVA(
             "com.intellij.java",
             "Java",
-            Bundle.message("plugin.java.requirement")
+            Bundle.message("plugin.java.requirement"),
+            SetupStep.JAVA_PLUGIN
     ),
 
     TESTNG(
             "TestNG-J",
             "TestNG",
-            Bundle.message("plugin.testng.requirement")
+            Bundle.message("plugin.testng.requirement"),
+            SetupStep.TESTNG_PLUGIN
     ),
 
     GIT(
             "Git4Idea",
             "Git",
-            Bundle.message("plugin.git.requirement")
+            Bundle.message("plugin.git.requirement"),
+            SetupStep.GIT_PLUGIN
     );
 
     private final @NotNull String pluginId;
     private final @NotNull String label;
     private final @NotNull String requirement;
-    private final @NotNull Key<Boolean> warned;
+    private final @NotNull SetupStep step;
     private volatile @NotNull Availability availability = Availability.UNKNOWN;
 
-    OptionalPlugin(final @NotNull String pluginId, final @NotNull String label, final @NotNull String requirement) {
+    OptionalPlugin(final @NotNull String pluginId, final @NotNull String label, final @NotNull String requirement, final @NotNull SetupStep step) {
         this.pluginId = pluginId;
         this.label = label;
         this.requirement = requirement;
-        this.warned = Key.create("testin.optionalPlugin.warned." + pluginId);
+        this.step = step;
     }
 
     // Rule-CODEGEN-005
@@ -80,20 +84,23 @@ public enum OptionalPlugin {
         return PluginManagerCore.isPluginInstalled(id) && !PluginManagerCore.isDisabled(id);
     }
 
+    // Rule-CODEGEN-062, Rule-INTERNAL-127
     public boolean isMissingAndWarned(final @NotNull Project p) {
         if (isAvailable()) return false;
-        warn(p);
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("plugin.not.available.title", label), requirement);
+        hint(p);
         return true;
     }
 
-    public boolean isAvailableOrWarnOnce(final @NotNull Project p) {
+    // Rule-CODEGEN-005, Rule-INTERNAL-127
+    public boolean isAvailableOrHinted(final @NotNull Project p) {
         if (isAvailable()) return true;
-        if (Once.claim(p, warned)) warn(p);
+        hint(p);
         return false;
     }
 
-    private void warn(final @NotNull Project p) {
-        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("plugin.not.available.title", label), requirement);
+    private void hint(final @NotNull Project p) {
+        Services.getInstance(p, Hints.class).fire(Hint.of(step, requirement));
     }
 
     // UC-SHARE-010, Rule-SHARE-105

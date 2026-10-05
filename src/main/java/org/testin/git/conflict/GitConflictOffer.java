@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.GitRefs;
 import org.testin.git.GitRepositoryService;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -43,8 +45,9 @@ public final class GitConflictOffer {
         }, p.getDisposed());
     }
 
-    // UC-SHARE-017
+    // UC-SHARE-017, Rule-INTERNAL-129
     public static void show(final @NotNull Project p, final @NotNull List<String> conflicting, final @NotNull Runnable onResolve, final @NotNull Runnable onContinue, final @NotNull Runnable onAbort) {
+        Services.getInstance(p, Guides.class).add(Guide.RESOLVE_GIT_CONFLICTS);
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         notifier.warnWithActions(

@@ -54,7 +54,7 @@ public enum JavaCodeUpdate implements CodeUpdate {
 
     // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082
     private static boolean cannotGenerate(final @NotNull Project p, final @NotNull String description) {
-        if (!CodeOn.isOnOrWarnOnce(p)) return true;
+        if (!CodeOn.isOnOrHinted(p)) return true;
         if (!DumbService.isDumb(p)) return false;
 
         if (Once.claim(p, INDEXING_SAID)) {

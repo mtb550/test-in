@@ -21,6 +21,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.CodeOn;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.model.TestCaseDto;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
@@ -32,6 +34,7 @@ public final class ExecuteTestCases {
     // UC-CODEGEN-008, Rule-CODEGEN-031, Rule-CODEGEN-033, Rule-CODEGEN-035
     public static void run(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
+        Services.getInstance(p, Guides.class).add(Guide.AUTOMATION_CODE);
 
         // Rule-CODEGEN-082
         if (CodeOn.isOffAndWarned(p)) return;

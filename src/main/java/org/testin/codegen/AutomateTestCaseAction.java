@@ -28,6 +28,8 @@ import org.testin.actions.TestinData;
 import org.testin.codegen.agent.AgentConnection;
 import org.testin.codegen.agent.WriteBodies;
 import org.testin.editor.TestinEditor;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
@@ -70,9 +72,10 @@ public class AutomateTestCaseAction extends AbstractAnyProjectAction {
         return TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList();
     }
 
-    // UC-CODEGEN-005, Rule-CODEGEN-025
+    // UC-CODEGEN-005, Rule-CODEGEN-025, Rule-INTERNAL-129
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        Services.getInstance(p, Guides.class).add(Guide.AUTOMATION_CODE);
         final @NotNull List<TestCaseDto> toWrite = withoutAMethod(p, nameable(e));
         if (toWrite.isEmpty() && !AgentConnection.stored().isConnected()) return;
 

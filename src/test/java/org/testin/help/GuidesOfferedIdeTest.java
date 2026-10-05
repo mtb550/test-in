@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
+import org.testin.git.GitFailure;
+import org.testin.git.conflict.GitConflictOffer;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
@@ -36,6 +38,19 @@ public class GuidesOfferedIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull Guides guides() {
         return Services.getInstance(getProject(), Guides.class);
+    }
+
+    // Rule-INTERNAL-129
+    public void testAGitFailureOffersGitSharingAndAConflictOffersConflicts() {
+        guides().forgetAll();
+
+        GitFailure.show(getProject(), "Sync Failed", "fatal: could not read from remote repository");
+        GitConflictOffer.show(getProject(), List.of("Test Cases/Login/a.tc"), () -> {
+        }, () -> {
+        }, () -> {
+        });
+
+        assertEquals(List.of(Guide.SHARE_OVER_GIT, Guide.RESOLVE_GIT_CONFLICTS), guides().offered());
     }
 
     // Rule-INTERNAL-129

@@ -32,6 +32,11 @@ than repairing it, and a team sharing a test project should update together.
 
 ### Changed
 
+- **Testin Help covers Git and automation code too:** a missing Java, TestNG or Git plugin, a missing test source
+  folder, a test project not under Git and a missing remote wait on the ? as hints; **Initialize Git** is in its hint.
+  A key you press still answers with a short message. Three new guides: sharing test projects over Git, resolving Git
+  conflicts, and generating and running automation code. Sync and View Pending Commits offer the Git guide; Select Test
+  Project and Save to testin.yml offer the linking guide.
 - **Testin Help says what is not set up, instead of messages:** the ? at the end of the status bar shows in every project.
   It turns red, with the fix and its guide, when the Testin folder is not set, when testin.yml does not name the test
   project, when bug states cannot be read, or when board columns need gh's read:project permission; the four messages

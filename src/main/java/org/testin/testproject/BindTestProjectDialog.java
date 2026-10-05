@@ -18,6 +18,8 @@ package org.testin.testproject;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.model.DirectoryType;
 import org.testin.model.status.ProjectStatus;
 import org.testin.notifications.Done;
@@ -41,6 +43,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog {
     public BindTestProjectDialog(final @NotNull Project p, final @NotNull Map<String, ProjectStatus> underRoot, final @NotNull Runnable onBound) {
         super(p);
         this.onBound = onBound;
+        Services.getInstance(p, Guides.class).add(Guide.LINK_THIS_REPOSITORY);
 
         title = Bundle.message("dialog.bind.title");
 

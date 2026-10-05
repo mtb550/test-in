@@ -79,13 +79,13 @@ Java code.
 
 ## What Testin refuses
 
-**If a generator is reached anyway** — a message titled **Java Plugin Not
-Available** reads *Automation code generation and navigation require the Java
-plugin, which is not available in this IDE.* It appears once for the whole code
-project. It does not appear once for each test case.
+**If a generator is reached anyway** — nothing appears. The Testin Help mark
+turns red, and its hint reads *Automation code generation and navigation require
+the Java plugin, which is not available in this IDE.*, with the guide *How to
+generate and run automation code*.
 
-**If navigation is reached anyway** — the same message, every time rather than
-once.
+**If navigation is reached anyway** — a short message titled **Java Plugin Not
+Available** says the same, every time, and the hint waits beside it.
 
 **If the IDE is still building its index** — the change is refused rather than
 waited for, and the message names the test case: *Log in with a valid user needs

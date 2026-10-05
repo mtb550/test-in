@@ -40,9 +40,9 @@ nothing about it until something would have written code.
 - **Rule-CODEGEN-066** — The first test source folder of the first module that
   has one is the one Testin uses.
 - **Rule-CODEGEN-072** — Opening a code project says nothing about the test
-  source folder. The first thing that would have written code says it, names
-  what was skipped, and says it once for that project however many test cases
-  follow.
+  source folder. The first thing that would have written code puts a hint in
+  Testin Help naming what was skipped; the hint waits, saying nothing more,
+  until a test source folder is found.
 - **Rule-CODEGEN-093** — A remembered test source folder that has since been
   deleted is forgotten, and the next thing that needs one looks again as though
   none had been found.
@@ -77,19 +77,22 @@ stays in the Notifications log, because the work it interrupted was theirs.
 3. The tester writes test cases, reads test runs, exports, imports and reports.
    None of it needs the folder.
 4. The tester saves a test case whose description would name a method.
-5. Testin looks for the folder, finds none, and says so once — naming what was
-   skipped.
+5. Testin looks for the folder, finds none, and puts a hint in Testin Help
+   naming what was skipped. Nothing else is said.
 6. The tester marks a folder as a test source folder in the IDE's own project
    settings.
-7. Testin looks again the next time it needs the folder.
+7. Testin looks again the next time it needs the folder, finds it, and the hint
+   clears.
 
 ## What Testin refuses
 
-**The first creation** — a message titled **No Java Test Source Root** names
-what was skipped. The test set or test case is still created.
+**The first creation** — the Testin Help mark turns red. Its hint reads *This
+project has no Java test source folder, so the class* and the class *was not
+created*, with the guide *How to generate and run automation code*. The test set
+or test case is still created.
 
-**Every creation after it** — nothing more is said for that project. The answer
-has not changed and neither has the message.
+**Every creation after it** — the hint names the latest class skipped, and
+nothing else is said.
 
 **Every removal, rename and move** — nothing at all is said. There was no code
 to tidy up, and reporting that would be alarming for something that does not

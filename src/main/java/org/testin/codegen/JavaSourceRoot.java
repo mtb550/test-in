@@ -22,20 +22,20 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.logger.Logger;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.FromContentModule;
-import org.testin.util.Once;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,7 +43,6 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JavaSourceRoot {
-    private static final @NotNull Key<Boolean> NO_ROOT_SAID = Key.create("testin.noJavaTestSourceRoot.said");
 
     // UC-CODEGEN-020, Rule-CODEGEN-064, Rule-CODEGEN-066
     public static @NotNull Optional<VirtualFile> find(final @NotNull Project p) {
@@ -67,15 +66,13 @@ public final class JavaSourceRoot {
         return Optional.empty();
     }
 
-    // UC-CODEGEN-020, Rule-CODEGEN-065, Rule-CODEGEN-072
+    // UC-CODEGEN-020, Rule-CODEGEN-065, Rule-CODEGEN-072, Rule-INTERNAL-127
     public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p, final @NotNull String className) {
         final @NotNull Optional<VirtualFile> root = find(p);
+        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
 
-        if (root.isEmpty() && Once.claim(p, NO_ROOT_SAID)) {
-            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("codegen.no.source.root.title"),
-                    Bundle.message("codegen.no.source.root.message", className));
-        }
-
+        root.ifPresentOrElse(_ -> hints.clear(SetupStep.TEST_SOURCE_FOLDER),
+                () -> hints.fire(Hint.of(SetupStep.TEST_SOURCE_FOLDER, Bundle.message("codegen.no.source.root.message", className))));
         return root;
     }
 

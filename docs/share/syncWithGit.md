@@ -78,13 +78,14 @@ list.
 
 **If nothing that is a test project is selected** — the menu entry is gray.
 
-**If the folder is not a Git repository** — a message titled **Nothing to
-Sync** names the folder, then reads *is not under Git yet. Open Pending Commits
-to create the repository.*
+**If the folder is not a Git repository** — a short message titled **Nothing
+to Sync** names the folder, then reads *is not under Git yet. Open Pending
+Commits to create the repository.* Testin Help holds **Initialize Git (git
+init)** until the repository exists.
 
-**If no remote address is set** — a message titled **Sync Aborted** reads *No
-remote URL is configured for this project. Push a commit first to configure the
-remote.*
+**If no remote address is set** — a short message titled **Sync Aborted** reads
+*No remote URL is configured for this project. Push a commit first to configure
+the remote.* Testin Help holds the same until the first push sets a remote.
 
 **If Git cannot name a branch** — the sync fails, and the message says so.
 

@@ -22,22 +22,9 @@ import org.testin.Said;
 import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.util.Bundle;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public class ViewPendingCommitsWorkIdeTest extends AbstractGitRemoteIdeTest {
-
-    // UC-SHARE-009, Rule-SHARE-042
-    public void testTestinOffersToMakeTheRepositoryWhenThereIsNone() {
-        final @NotNull Path notARepository = directory("not-a-repository");
-        write(notARepository, ".tp", "{}");
-        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
-
-        new ViewPendingCommitsWork(getProject()).openFor(notARepository);
-
-        final @NotNull Notification none = titled(said, Bundle.message("git.no.repository.title"));
-        assertEquals(List.of(Bundle.message("git.no.repository.action")), answers(none));
-    }
 
     // UC-SHARE-015, Rule-SHARE-066, Rule-SHARE-067
     public void testCommitsNotOnTheRemoteAreCountedRatherThanReportedAsNoChanges() {

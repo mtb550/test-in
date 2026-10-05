@@ -43,6 +43,30 @@ public enum SetupStep {
 
     BOARD_COLUMNS(
             Guide.RAISE_BUG_REPORTS
+    ),
+
+    JAVA_PLUGIN(
+            Guide.AUTOMATION_CODE
+    ),
+
+    TESTNG_PLUGIN(
+            Guide.AUTOMATION_CODE
+    ),
+
+    TEST_SOURCE_FOLDER(
+            Guide.AUTOMATION_CODE
+    ),
+
+    GIT_PLUGIN(
+            Guide.SHARE_OVER_GIT
+    ),
+
+    GIT_REPOSITORY(
+            Guide.SHARE_OVER_GIT
+    ),
+
+    GIT_REMOTE(
+            Guide.SHARE_OVER_GIT
     );
 
     private final @NotNull Guide guide;

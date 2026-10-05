@@ -35,7 +35,7 @@ public class CodeOffHintIdeTest extends BasePlatformTestCase {
 
     // Rule-CODEGEN-082, Rule-INTERNAL-127
     public void testCodeOffIsAHintWithSaveToTestinYmlAndNoMessage() {
-        final @NotNull List<String> said = Said.during(getProject(), () -> assertFalse("code is on with no testin.yml", CodeOn.isOnOrWarnOnce(getProject())));
+        final @NotNull List<String> said = Said.during(getProject(), () -> assertFalse("code is on with no testin.yml", CodeOn.isOnOrHinted(getProject())));
 
         assertEquals("a message was raised while code updated", List.of(), said);
         assertEquals("code off did not wait as one hint", 1, waiting().size());
