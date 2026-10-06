@@ -34,7 +34,7 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
     static @NotNull Optional<TestRunDirectoryDto> selectedTestRun(final @NotNull Optional<DirectoryDto> dir) {
         return dir.filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
-                .filter(TestRunDirectoryDto::isStillOpen);
+                .filter(TestRunDirectoryDto::isOpen);
     }
 
     // UC-TREE-PANEL-022

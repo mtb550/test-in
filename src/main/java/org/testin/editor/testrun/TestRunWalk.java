@@ -197,7 +197,7 @@ public final class TestRunWalk {
 
         if (editor.runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
 
-        if (!editor.getParent().isStillOpen()) return;
+        if (!editor.getParent().takesRunItemStatuses()) return;
 
         status.getRunItemStatus().ifPresent(runItemStatus -> {
             sayWhatTheRunItemStatusCleared(tc, runItemStatus, failure);
@@ -236,7 +236,7 @@ public final class TestRunWalk {
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
     public void finishIfEverythingIsJudged() {
-        if (!editor.getParent().isStillOpen()) return;
+        if (!editor.getParent().isOpen()) return;
 
         if (editor.run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
 
@@ -259,7 +259,7 @@ public final class TestRunWalk {
     }
 
     private boolean canStartExecution() {
-        return !isExecuting() && editor.getParent().isStillOpen();
+        return !isExecuting() && editor.getParent().isOpen();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135

@@ -220,16 +220,16 @@ public class PanelShowsOneTestCaseIdeTest extends AbstractViewPanelIdeTest {
     public void testOpenedFromATestRunThePanelShowsTheTestCaseAsTheRowShowsIt() {
         final @NotNull TestCaseDto tc = threeTestCases().getFirst();
         final @NotNull TestRunItems row = EditorFixtures.pending(tc);
-        row.recordRunItemStatus(RunItemStatus.FAILED, "muteb", handedCopy(tc, "Log in as the row recorded it"));
+        row.recordRunItemStatus(RunItemStatus.FAILED, "muteb");
         final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(row));
 
         view.getPanel().show(List.of(handedCopy(tc, "The copy the editor handed over")), pathOf(tr));
-        assertTrue("the panel did not show the test case as the test run's row shows it: " + details(), holds(details(), "Log in as the row recorded it"));
+        assertTrue("the panel did not show the test case as the test run's run item shows it: " + details(), holds(details(), tc.getDescription()));
         assertFalse("the panel showed the copy it was handed: " + details(), holds(details(), "The copy the editor handed over"));
 
-        Services.getInstance(getProject(), TestRuns.class).changeResult(tr.getPath(), tc.getId(), result -> result.recordRunItemStatus(RunItemStatus.PASSED, "muteb", handedCopy(tc, "Log in as the row recorded it again")));
+        Services.getInstance(getProject(), TestRuns.class).changeResult(tr.getPath(), tc.getId(), result -> result.recordRunItemStatus(RunItemStatus.PASSED, "muteb"));
         view.getPanel().refreshCurrentView();
 
-        assertTrue("the panel did not read the row again when it refreshed: " + details(), holds(details(), "Log in as the row recorded it again"));
+        assertTrue("the panel did not read the run item again when it refreshed: " + details(), holds(details(), RunItemStatus.PASSED.getLabel()));
     }
 }

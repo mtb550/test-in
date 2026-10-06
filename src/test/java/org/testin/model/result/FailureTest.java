@@ -20,7 +20,6 @@ package org.testin.model.result;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugSeverity;
 import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
@@ -73,7 +72,7 @@ public class FailureTest {
         final TestRunItems item = row();
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
 
         assertEquals(item.getActualResult(), "", "a test case that passed has nothing to explain");
         assertEquals(item.getStacktrace(), "");
@@ -84,7 +83,7 @@ public class FailureTest {
         final TestRunItems item = row();
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.FAILED, "tester");
 
         assertEquals(item.getActualResult(), "expected [true] but found [false]");
         assertEquals(item.getExecutedBy(), "tester");
@@ -96,7 +95,7 @@ public class FailureTest {
         final TestRunItems item = row().setBugIssueUrl("https://github.com/mtb550/product/issues/123");
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.FAILED, "tester");
 
         assertEquals(item.getBugIssueUrl(), "https://github.com/mtb550/product/issues/123");
     }

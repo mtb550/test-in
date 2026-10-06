@@ -17,16 +17,20 @@
 package org.testin.view.details;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
+import org.testin.testrun.ChangedSinceCommit;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.Pill;
+import org.testin.util.Bundle;
 
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
@@ -58,7 +62,15 @@ public final class RunItemSummary extends AbstractDetails {
 
         Bug.of(p, runItem, currentPath, dto).ifPresent(line::add);
 
-        return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
+        final int next = addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
+        return ChangedSinceCommit.of(runItem) ? addFullWidthRow(panel, gbc, changedSince(), JBUI.insets(GAP, INSETS_SIDE, 0, INSETS_SIDE), next) : next;
+    }
+
+    // Rule-EDITOR-PANEL-263
+    private static @NotNull JBLabel changedSince() {
+        final @NotNull JBLabel label = new JBLabel(Bundle.message("test.run.changed.since.commit"));
+        label.setForeground(UIUtil.getContextHelpForeground());
+        return label;
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086

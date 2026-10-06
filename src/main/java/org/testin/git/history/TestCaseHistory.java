@@ -103,7 +103,7 @@ public final class TestCaseHistory {
                 .orElseGet(() -> HistoryEntry.of(HistoryEntryKind.UNCOMPARED, commit, List.of()));
     }
 
-    private static @NotNull Optional<TestCaseDto> parsed(final @NotNull Mapper mapper, final @NotNull String json) {
+    static @NotNull Optional<TestCaseDto> parsed(final @NotNull Mapper mapper, final @NotNull String json) {
         if (json.isBlank()) return Optional.empty();
 
         try {

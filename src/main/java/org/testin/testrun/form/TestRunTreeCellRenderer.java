@@ -16,6 +16,7 @@
 
 package org.testin.testrun.form;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.SimpleTextAttributes;
@@ -41,6 +42,10 @@ public final class TestRunTreeCellRenderer {
                     } else if (node.getUserObject() instanceof TestCaseDto tc) {
                         getTextRenderer().setIcon(Icons.TEST_CASE_LETTER);
                         getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                    } else if (node.getUserObject() instanceof String folder) {
+                        // Rule-TREE-PANEL-134
+                        getTextRenderer().setIcon(AllIcons.Nodes.Folder);
+                        getTextRenderer().append(folder, SimpleTextAttributes.GRAYED_ATTRIBUTES);
                     }
                 }
             }

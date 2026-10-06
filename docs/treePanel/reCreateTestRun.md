@@ -34,8 +34,10 @@ This copies a test run's test cases and settings into a new, empty one.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
-- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, run item statuses and configuration can no longer change.
+- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** keeps
+  its test cases and configuration: Edit Test Run refuses it. Its run item
+  statuses can still be given and corrected until it is **Committed**. A
+  Committed test run changes no more.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node

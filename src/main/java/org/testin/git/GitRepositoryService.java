@@ -82,6 +82,11 @@ public final class GitRepositoryService {
         return GitCommandRunner.readObjects(p, path, objectNames);
     }
 
+    // Rule-EDITOR-PANEL-239
+    public @NotNull List<String> files(final @NotNull Path path, final @NotNull String revision, final @NotNull String folder) {
+        return GitRefs.records(GitCommandRunner.execute(p, path, GitCommand.LS_TREE, "-r", "-z", "--name-only", revision, "--", folder));
+    }
+
     // Rule-TREE-PANEL-104
     public boolean isNotRepository(final @NotNull Path path) {
         return !OptionalPlugin.GIT.isAvailable() || !GitUtil.isGitRoot(path);

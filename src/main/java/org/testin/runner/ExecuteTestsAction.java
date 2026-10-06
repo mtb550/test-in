@@ -59,7 +59,7 @@ public class ExecuteTestsAction extends AbstractAnyProjectAction {
 
     private @NotNull Optional<TestRunDirectoryDto> selectedTestRun(final @NotNull AnActionEvent e) {
         return TestinData.firstSelected(e, TestRunDirectoryDto.class)
-                .filter(TestRunDirectoryDto::isStillOpen);
+                .filter(TestRunDirectoryDto::isOpen);
     }
 
     private void openAndRun(final @NotNull Project p, final @NotNull TestRunDirectoryDto testRun) {

@@ -51,8 +51,8 @@ press `P` or `F`.
   before it writes its own, and keeps the bug severity, the bug priority and the
   bug issue link. The message that names what a pass cleared names what it
   cleared too.
-- **Rule-EDITOR-PANEL-241** — Running a judged row again records the new run
-  item status against the test case as it is now.
+- **Rule-EDITOR-PANEL-241** — A run item can be run again until its test run is
+  Committed, and the new run item status is recorded.
 - **Rule-EDITOR-PANEL-242** — A status from the automation for the test case the
   walk is on moves the walk to the next test case waiting for a run item status. The tester's own run item status does exactly the same, and execution goes on. Until
   the status comes, the walk stays on that test case.
@@ -128,8 +128,8 @@ hand.
 
 ## What Testin refuses
 
-**If the test run is completed or closed** — the result is ignored. This is the
-one path that respects a signed off test run.
+**If the test run is Committed** — the result is ignored. A Completed or Closed
+test run still records it (Rule-TREE-PANEL-009).
 
 **If the test case is not covered by this test run** — the result is ignored.
 

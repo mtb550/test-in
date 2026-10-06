@@ -41,6 +41,7 @@ import org.testin.ui.framework.SelectionTree;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class CreateTestRun implements NodeCreator {
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021
     public void configureTestRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceTestCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
-        new TestRunForm(p).open(testCasesRoot, name, sourceTestCases, sourceConfiguration,
+        new TestRunForm(p).open(testCasesRoot, name, sourceTestCases, List.of(), sourceConfiguration,
                 new TestRunFormAction(Bundle.message("test.run.create.title"), Bundle.message("test.run.create.button"), (form, selection) -> create(form, selection, parentDir)));
     }
 

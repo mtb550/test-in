@@ -114,7 +114,7 @@ public class TestRunGridEditingTest {
         row.setBugSeverity(BugSeverity.MAJOR);
         row.setBugPriority(BugPriority.HIGH);
 
-        row.recordRunItemStatus(RunItemStatus.PASSED, "mtb", new TestCaseDto());
+        row.recordRunItemStatus(RunItemStatus.PASSED, "mtb");
 
         assertEquals(row.getActualResult(), "");
         assertEquals(row.getStacktrace(), "");
@@ -129,7 +129,7 @@ public class TestRunGridEditingTest {
         final TestRunItems row = item();
         row.setActualResult("The balance showed 0.00");
 
-        row.recordRunItemStatus(RunItemStatus.FAILED, "mtb", new TestCaseDto());
+        row.recordRunItemStatus(RunItemStatus.FAILED, "mtb");
 
         assertEquals(row.getActualResult(), "The balance showed 0.00",
                 "the actual result is the point of a failure");
@@ -142,7 +142,7 @@ public class TestRunGridEditingTest {
         row.setBugSeverity(BugSeverity.MAJOR);
 
         final List<String> warned = row.wouldClear(RunItemStatus.PASSED, Failure.NONE);
-        row.recordRunItemStatus(RunItemStatus.PASSED, "mtb", new TestCaseDto());
+        row.recordRunItemStatus(RunItemStatus.PASSED, "mtb");
 
         assertTrue(row.wouldClear(RunItemStatus.PASSED, Failure.NONE).isEmpty(),
                 "everything named in the warning is gone afterward, or the warning was wrong: " + warned);

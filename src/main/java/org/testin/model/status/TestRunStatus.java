@@ -73,6 +73,14 @@ public enum TestRunStatus implements MenuItem {
             AllIcons.Actions.Cancel,
             Stage.OVER,
             SetBy.TESTER
+    ),
+
+    COMMITTED(
+            Bundle.message("status.test.run.committed"),
+            Shortcuts.NO_KEY,
+            AllIcons.Actions.Commit,
+            Stage.RECORDED,
+            SetBy.TESTIN
     );
 
     private final @NotNull String label;
@@ -98,8 +106,14 @@ public enum TestRunStatus implements MenuItem {
         return this != IN_PROGRESS;
     }
 
+    // Rule-TREE-PANEL-009
     public boolean isTerminal() {
-        return this == COMPLETED || this == CLOSED;
+        return stage >= Stage.OVER;
+    }
+
+    // Rule-TREE-PANEL-009, Rule-TREE-PANEL-135, Rule-PRODUCT-011
+    public boolean isRecord() {
+        return this == COMMITTED;
     }
 
     // UC-TREE-PANEL-020
@@ -133,5 +147,6 @@ public enum TestRunStatus implements MenuItem {
         private static final int HANDED_OUT = 1;
         private static final int RUNNING = 2;
         private static final int OVER = 3;
+        private static final int RECORDED = 4;
     }
 }

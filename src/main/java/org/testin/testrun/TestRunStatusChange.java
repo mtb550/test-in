@@ -22,7 +22,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
+import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.indexer.TestRuns;
+import org.testin.indexer.WatchedPath;
 import org.testin.logger.Logger;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.TestRunStatus;
@@ -31,6 +33,8 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.setting.TestinRoot;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -64,7 +68,15 @@ public final class TestRunStatusChange {
         persist(testRun, open);
         redraw(open);
 
-        notifier.softShow(p, newStatus.getLabel());
+        if (newStatus == TestRunStatus.COMPLETED) offerTheCommit(testRun);
+        else notifier.softShow(p, newStatus.getLabel());
+    }
+
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
+    private void offerTheCommit(final @NotNull TestRunDirectoryDto testRun) {
+        WatchedPath.testProjectOf(testRun.getPath(), Services.getInstance(p, TestinRoot.class).absolutePath()).ifPresent(testProject ->
+                notifier.infoWithActions(p, TestRunStatus.COMPLETED.getLabel(), Bundle.message("test.run.completed.commit", testRun.getName()),
+                        notifier.action(Bundle.message("action.Testin.ViewPendingCommits.text"), () -> new ViewPendingCommitsWork(p).openFor(testProject))));
     }
 
     private void persist(final @NotNull TestRunDirectoryDto testRun, final @NotNull Optional<TestRunEditor> open) {

@@ -54,11 +54,6 @@ import java.util.function.Consumer;
 public final class RunItemStatusService {
     private final @NotNull Project p;
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
-    private static @NotNull TestCaseDto asItIsNow(final @NotNull TestRunItems item) {
-        return item.liveTestCase().copy();
-    }
-
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-137
     public void executeNext(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
         final int executingIndex = editor.getWalk().getCurrentlyExecutingIndex();
@@ -70,17 +65,28 @@ public final class RunItemStatusService {
         }
 
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
+        if (editor.runItem(currentTc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
+            passDeleted(editor, executingIndex);
+            return;
+        }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         if (!recordOn(editor, currentTc.getId(), status, item -> {
             editor.getWalk().stopTheClock();
-            item.recordRunItemStatus(status, tester, asItIsNow(item));
+            item.recordRunItemStatus(status, tester);
         })) return;
 
         confirmRunItemStatus(status, 1);
 
         // Rule-EDITOR-PANEL-130
         ApplicationManager.getApplication().invokeLater(() -> editor.getWalk().startTimerForIndex(executingIndex));
+    }
+
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-264
+    private void passDeleted(final @NotNull TestRunEditor editor, final int executingIndex) {
+        editor.getWalk().stopTheClock();
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.item.status.walk.passed.deleted"));
+        ApplicationManager.getApplication().invokeLater(() -> editor.getWalk().startTimerForIndex(executingIndex + 1));
     }
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-183, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
@@ -96,14 +102,14 @@ public final class RunItemStatusService {
         recordOn(editor, tc.getId(), status, item -> {
             if (!clockCounted) item.recordDuration(duration);
             failure.recordOn(item);
-            item.recordRunItemStatus(status, tester, asItIsNow(item));
+            item.recordRunItemStatus(status, tester);
         });
     }
 
     // UC-EDITOR-PANEL-038, Rule-EDITOR-PANEL-240
     private boolean correct(final @NotNull TestRunEditor editor, final @NotNull TestCaseDto tc, final @NotNull RunItemStatus status) {
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        return recordOn(editor, tc.getId(), status, item -> item.correctRunItemStatus(status, tester, asItIsNow(item)));
+        return recordOn(editor, tc.getId(), status, item -> item.recordRunItemStatus(status, tester));
     }
 
     // Rule-EDITOR-PANEL-225
@@ -249,7 +255,7 @@ public final class RunItemStatusService {
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-        judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctRunItemStatus(status, tester, asItIsNow(item))));
+        judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.recordRunItemStatus(status, tester)));
         if (!judged.isEmpty()) offerBugReports(status);
         triggerFilterRefresh(editor);
 

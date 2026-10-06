@@ -46,7 +46,7 @@ public final class LightMode implements Disposable {
 
     // UC-EDITOR-PANEL-046
     public void refresh(final @NotNull TestRunDirectoryDto testRun) {
-        if (!testRun.isStillOpen()) {
+        if (!testRun.isOpen()) {
             closeIfShowing(testRun);
             return;
         }

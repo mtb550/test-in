@@ -44,7 +44,7 @@ public class NotExecutedTimestampTest {
     public void aRunItemStatusGivesTheTestCaseARealTime() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
 
         assertFalse(Config.isNotExecuted(item.getExecutedAt()));
         assertFalse(Display.formatDate(item.getExecutedAt()).isEmpty());

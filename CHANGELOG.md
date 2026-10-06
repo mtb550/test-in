@@ -10,10 +10,20 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 converts test data an older build wrote, so a test project 2.13.0-alpha has not converted is refused, naming
 2.13.0-alpha as the release that can. The run items of a test run recorded with 2.13.0-alpha are not read either: each
 one stored an empty bug severity and bug priority, and a run item now always has both. Remove such a test run rather
-than repairing it, and a team sharing a test project should update together.
+than repairing it, and a team sharing a test project should update together. Wipe the test runs too: a run item no
+longer keeps a copy of its test case, and the copies earlier builds wrote are not read.
 
 ### Added
 
+- **A committed test run is the record:** committing in View Pending Commits makes every Completed test run of the test
+  project **Committed**, and Testin commits its `.tr` with the commit's id straight after, in the same push. From then on
+  its run items show each test case as that commit holds it, edited or deleted since, and say *Changed since this test
+  run was committed* where it differs today. A Committed test run takes nothing more; F2 on one of its run items says to
+  change the test case in its test set.
+- **A completed test run asks to be committed:** setting a test run Completed shows a notification with **View Pending
+  Commits** on it, because the commit is what makes it the record.
+- **Edit Test Run lists deleted test cases:** a run item whose test case was deleted sits under *Deleted test cases*,
+  ticked; untick it and save to remove it.
 - **An agent writes the test method:** Automate Test Case still writes the **@Test** method and a TODO, and now hands
   the test case to a command-line agent you already run — Claude Code, Codex, Gemini CLI, pi or any other — and puts its
   answer where the TODO was. The agent is two fields in the settings, a command and its arguments. Testin sends that one
@@ -32,6 +42,10 @@ than repairing it, and a team sharing a test project should update together.
 
 ### Changed
 
+- **A test run not committed shows every edit:** a run item shows its test case as it is now, judged or not. A
+  Completed or Closed test run still takes run item statuses and corrections; only a Committed one refuses them.
+- **Every marker in View Pending Commits is ticked and stays ticked:** a node's own file always goes with the commit.
+- **The walk moves past a deleted test case:** the run item status key records nothing on it, says so, and goes on.
 - **Two more guides in Testin Help:** *How to get started*, the ten-minute first run, offered on a new machine, and
   *How to collect Testin's logs*, offered when Testin shows an error or the log level changes.
 - **Testin Help covers Git and automation code too:** a missing Java, TestNG or Git plugin, a missing test source
@@ -116,8 +130,8 @@ than repairing it, and a team sharing a test project should update together.
   IntelliJ IDEA Classic keymap gets the same Mac keys as the macOS one. Windows and Linux keep their keys.
 - The web page report keeps the line breaks of a test case description, and the Excel report heads its test case column
   **Test Case**, as the web page, the PDF and the Word document do.
-- **A signed off test run keeps what it recorded:** on a Completed or Closed test run, **P**, **F** and **B**, the
-  failure details and the grid's Actual Result are gray and say why, as the status bar always claimed.
+- **A committed test run keeps what it recorded:** on a Committed test run, **P**, **F** and **B**, the failure details
+  and the grid's Actual Result are gray and say why, as the status bar claims.
 - Renaming a test set, a test set package or a test project renames its automation class or package again, and so does
   undo the rename: the code was looked up under the new name after the tree already carried it, so it was never found.
 - A search or filter that matches nothing in a test run reads *No test cases match the search*, as it does in a test

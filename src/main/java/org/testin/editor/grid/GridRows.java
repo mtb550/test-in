@@ -43,12 +43,12 @@ public final class GridRows {
     public static @NotNull List<String[]> ofRunItems(final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, TestRunItems> runItems, final @NotNull ToIntFunction<TestCaseDto> position) {
         return rows(testCases, List.of(TestRunEditorAttributes.values()), TestRunEditorAttributes.ORDER, position, tc -> {
             final @NotNull TestRunItems runItem = runItemOf(tc, runItems);
-            return attribute -> attribute.getRunItemValueExtractor().apply(runItem);
+            return attribute -> attribute.gridValue(runItem);
         });
     }
 
     private static @NotNull TestRunItems runItemOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, TestRunItems> runItems) {
-        return Optional.ofNullable(runItems.get(tc.getId())).orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
+        return Optional.ofNullable(runItems.get(tc.getId())).orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc), Optional.empty()));
     }
 
     private static <A> @NotNull List<String[]> rows(final @NotNull List<TestCaseDto> testCases, final @NotNull List<A> columns, final @NotNull A order, final @NotNull ToIntFunction<TestCaseDto> position, final @NotNull Function<TestCaseDto, Function<A, String>> valuesOf) {

@@ -43,6 +43,9 @@ One field, one small dialog. The rest of the test case is left alone.
 - **Rule-VIEW-PANEL-048** — A saved change is one entry on the undo history.
 - **Rule-VIEW-PANEL-049** — Saving a change rewrites the automation code for
   that field, where the field has any.
+- **Rule-VIEW-PANEL-110** — F2 changes nothing from a run item of a Committed
+  test run: a short message says the test run keeps the test case as it was, and
+  to change the test case in its test set.
 
 ## The screen
 

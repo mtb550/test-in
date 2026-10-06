@@ -171,9 +171,9 @@ a small form before it records anything.
 
 ## What Testin refuses
 
-**If the test run is completed or closed** — `F` is gray, and its tooltip
-reads *This test run is Completed, so it records nothing further.* Nothing is
-written.
+**If the test run is Committed** — `F` is gray, and its tooltip reads
+*This test run is Committed, so it records nothing further.* Nothing is
+written. A Completed or Closed test run still records it (Rule-TREE-PANEL-009).
 
 **If the tester presses `Escape`** — the dialog closes at once, without asking.
 Nothing at all is recorded, what was typed is gone, and the test case keeps

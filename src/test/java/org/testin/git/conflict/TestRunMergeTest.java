@@ -116,6 +116,24 @@ public class TestRunMergeTest {
         assertEquals(merge.merged().path("modifiedBy").asText(), "Sara", "the audit block takes the later edit");
     }
 
+    // Rule-SHARE-130
+    @Test
+    public void aCommittedTestRunBringsItsCommitWithItsStatus() {
+        final Merge merge = TestRunMarkerMerge.of(RealMapper.build(), BASE_MARKER, MINE_MARKER, THEIRS_MARKER.replace("\"status\" : \"COMPLETED\"", "\"status\" : \"COMMITTED\", \"commit\" : \"ea9a501\""));
+
+        assertEquals(merge.merged().path("status").asText(), "COMMITTED");
+        assertEquals(merge.merged().path("commit").asText(), "ea9a501", "a Committed test run without its commit would read nothing");
+    }
+
+    // Rule-SHARE-130
+    @Test
+    public void aCommitIsKeptWhenTheOtherSideIsBehind() {
+        final Merge merge = TestRunMarkerMerge.of(RealMapper.build(), BASE_MARKER, MINE_MARKER.replace("\"status\" : \"IN_PROGRESS\"", "\"status\" : \"COMMITTED\", \"commit\" : \"ea9a501\""), THEIRS_MARKER);
+
+        assertEquals(merge.merged().path("status").asText(), "COMMITTED");
+        assertEquals(merge.merged().path("commit").asText(), "ea9a501");
+    }
+
     @Test
     public void theAnswersTheyEachGaveAreBothKept() {
         final Merge merge = TestRunMarkerMerge.of(RealMapper.build(), BASE_MARKER, MINE_MARKER, THEIRS_MARKER);

@@ -39,8 +39,10 @@ This changes a test run that is not signed off yet.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
-- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, run item statuses and configuration can no longer change.
+- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** keeps
+  its test cases and configuration: Edit Test Run refuses it. Its run item
+  statuses can still be given and corrected until it is **Committed**. A
+  Committed test run changes no more.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -63,10 +65,9 @@ This changes a test run that is not signed off yet.
   everything that test case recorded in that test run. Adding a test case adds
   it as **Pending**.
 - **Rule-TREE-PANEL-076** — A test case this dialog does not show is not one the
-  tester chose to remove. That is a test case deleted from its test set after
-  the test run was made, and one in a test set deprecated, or under a package
-  archived, since then. What the test run recorded about it is kept, and saving
-  the dialog never removes it.
+  tester chose to remove. That is a test case in a test set deprecated, or under
+  a package archived, since the test run was made. What the test run recorded
+  about it is kept, and saving the dialog never removes it.
 - **Rule-TREE-PANEL-093** — The dialog opens with every row saying what the test
   run actually covers, folders included. A folder is ticked only when everything
   under it is ticked, so a folder is never ticked over test cases the test run
@@ -82,6 +83,9 @@ This changes a test run that is not signed off yet.
   lands, not as it was when the dialog opened. A run item status that arrived
   while the dialog was open, from a pull or from the test run being worked on,
   is kept.
+- **Rule-TREE-PANEL-134** — Edit Test Run lists the run items whose test case
+  was deleted under a Deleted test cases folder, ticked; unticking one and
+  saving removes it from the test run.
 
 ## What the tester sees
 

@@ -93,12 +93,22 @@ public final class GitCommits {
         paths.addAll(screenshotsAlongside(repositories.status(repositoryPath), paths));
         paths.addAll(markersAlongside(repositoryPath, paths));
 
+        commit(repositoryPath, message, paths);
+    }
+
+    // UC-SHARE-012, Rule-SHARE-054, Rule-SHARE-130
+    public void commit(final @NotNull Path repositoryPath, final @NotNull String message, final @NotNull Set<String> paths) {
         final @NotNull Set<String> stageable = stageable(repositoryPath, paths);
         if (!stageable.isEmpty()) {
             GitCommandRunner.executeOverPaths(p, repositoryPath, stageable, GitCommand.ADD);
         }
 
         GitCommandRunner.executeOverPaths(p, repositoryPath, paths, GitCommand.COMMIT, "--only", "-m", message);
+    }
+
+    // Rule-SHARE-130
+    public @NotNull String headHash(final @NotNull Path repositoryPath) {
+        return GitCommandRunner.execute(p, repositoryPath, GitCommand.REV_PARSE, "HEAD").trim();
     }
 
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {

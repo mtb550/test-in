@@ -60,6 +60,11 @@ public class TestRunMarker extends AbstractMarker {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime executionEndedAt = Config.NOT_EXECUTED;
 
+    // Rule-EDITOR-PANEL-239
+    @NonNull
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String commit = "";
+
     // UC-TREE-PANEL-009, UC-TREE-PANEL-022, Rule-INTERNAL-117
     public void configure(final @NotNull Map<TestRunConfiguration, String> answered) {
         configuration = answered;
@@ -68,6 +73,12 @@ public class TestRunMarker extends AbstractMarker {
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-091, Rule-INTERNAL-117
     public void changeStatus(final @NotNull TestRunStatus next) {
         status = next;
+    }
+
+    // UC-SHARE-012, Rule-EDITOR-PANEL-239, Rule-INTERNAL-117
+    public void recordCommit(final @NotNull String hash) {
+        commit = hash;
+        status = TestRunStatus.COMMITTED;
     }
 
     // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191, Rule-INTERNAL-117

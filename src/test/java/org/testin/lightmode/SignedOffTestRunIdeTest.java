@@ -16,11 +16,9 @@
 
 package org.testin.lightmode;
 
-import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.Nodes;
+import org.testin.NodesOnDisk;
 import org.testin.indexer.TestRuns;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.result.TestRunItems;
@@ -38,27 +36,26 @@ public class SignedOffTestRunIdeTest extends AbstractTempRootIdeTest {
 
     private static final @NotNull String RECORDED = "The expired card was accepted";
 
-    private final @NotNull UUID failed = UUID.randomUUID();
+    private UUID failed;
+    private Path cycle;
 
     private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
+    @Override
+    protected void setUp() {
+        super.setUp();
+        final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
+        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
+        failed = made.testCase(made.testSet(tp.getTestCasesDirectory(), "Payments")).getId();
+        cycle = made.testRun(tp.getTestRunsDirectory(), "Cycle-1").getPath();
+    }
+
     private @NotNull Path aTestRunWithOneFailure() {
-        final @NotNull Path testRunPath = WriteAction.computeAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-            final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
-            final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
-            nodes.addTestProject(tp);
-
-            final @NotNull Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
-            nodes.addTestRunDir(mapper.setTestRunNode(path, tp.getTestRunsDirectory()));
-            return path;
-        });
-
-        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(List.of(
+        indexedTestRuns().putTestRun(cycle, new TestRunDto().setResults(List.of(
                 new TestRunItems().setId(failed).setStatus(RunItemStatus.FAILED).setActualResult(RECORDED))));
-        return testRunPath;
+        return cycle;
     }
 
     private boolean saveAFailureOnto(final @NotNull Path testRunPath) {
@@ -68,20 +65,34 @@ public class SignedOffTestRunIdeTest extends AbstractTempRootIdeTest {
         }).save();
     }
 
-    // Rule-TREE-PANEL-009, Rule-PRODUCT-011
-    public void testASignedOffTestRunRecordsNothingFurther() {
+    private @NotNull String recordedOn(final @NotNull Path testRunPath) {
+        return indexedTestRuns().getTestRunByPath(testRunPath).resultOf(failed).map(TestRunItems::getActualResult).orElse("");
+    }
+
+    // Rule-TREE-PANEL-135, Rule-PRODUCT-011
+    public void testACommittedTestRunRecordsNothingFurther() {
         final @NotNull Path testRunPath = aTestRunWithOneFailure();
         final @NotNull RunItemStatusService service = Services.getInstance(getProject(), RunItemStatusService.class);
-
         assertTrue("an open test run refused a write", service.heldTestRun(testRunPath).isPresent());
+
+        indexedTestRuns().changeTestRunMarker(testRunPath, marker -> marker.setStatus(TestRunStatus.COMMITTED));
+
+        assertTrue("a Committed test run still took a write", service.heldTestRun(testRunPath).isEmpty());
+        assertFalse("a Committed test run saved a failure typed after it was committed", saveAFailureOnto(testRunPath));
+        assertEquals("a Committed test run changed what it recorded", RECORDED, recordedOn(testRunPath));
+    }
+
+    // Rule-TREE-PANEL-009
+    public void testACompletedOrClosedTestRunStillTakesAFailure() {
+        final @NotNull Path testRunPath = aTestRunWithOneFailure();
+        final @NotNull RunItemStatusService service = Services.getInstance(getProject(), RunItemStatusService.class);
 
         for (final TestRunStatus signedOff : List.of(TestRunStatus.COMPLETED, TestRunStatus.CLOSED)) {
             indexedTestRuns().changeTestRunMarker(testRunPath, marker -> marker.setStatus(signedOff));
 
-            assertTrue(signedOff + " still took a write", service.heldTestRun(testRunPath).isEmpty());
-            assertFalse(signedOff + " saved a failure typed after the sign-off", saveAFailureOnto(testRunPath));
-            assertEquals(signedOff + " changed what it recorded", RECORDED,
-                    indexedTestRuns().getTestRunByPath(testRunPath).resultOf(failed).map(TestRunItems::getActualResult).orElse(""));
+            assertTrue(signedOff + " refused a write", service.heldTestRun(testRunPath).isPresent());
+            assertTrue(signedOff + " refused a failure", saveAFailureOnto(testRunPath));
+            assertEquals(signedOff + " did not record the failure", "Typed after the sign-off", recordedOn(testRunPath));
         }
     }
 }

@@ -136,7 +136,7 @@ public class TreeNodeKindsTest {
             assertEquals(node.isTestCaseContainer(), runsTestCases, name(node) + (runsTestCases ? " is not offered Run Tests" : " is offered Run Tests"));
         }
 
-        assertTrue(new TestRunDirectoryDto().isStillOpen(), "a new test run is not offered Run Tests");
+        assertTrue(new TestRunDirectoryDto().isOpen(), "a new test run is not offered Run Tests");
     }
 
     // Rule-TREE-PANEL-094
@@ -144,7 +144,7 @@ public class TreeNodeKindsTest {
     public void aSignedOffTestRunIsRemovedButNotRenamedNumberedOrDragged() {
         for (final TestRunStatus status : TestRunStatus.values()) {
             final @NotNull TestRunDirectoryDto testRun = testRunIn(status);
-            final boolean signedOff = status == TestRunStatus.COMPLETED || status == TestRunStatus.CLOSED;
+            final boolean signedOff = status.isTerminal();
 
             assertTrue(testRun.isRemovable(), "a " + status + " test run cannot be removed");
             assertEquals(testRun.isRenamable(), !signedOff, "a " + status + " test run");

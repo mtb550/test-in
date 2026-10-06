@@ -19,6 +19,7 @@ package org.testin.git.review;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
+import org.testin.git.change.ChangeSubject;
 import org.testin.git.change.ChangeType;
 import org.testin.git.change.FieldChange;
 import org.testin.git.change.PendingChange;
@@ -121,12 +122,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
     private void fillRows(final @NotNull List<PendingChange> differences) {
         for (final PendingChange diff : differences) {
             for (final FieldChange change : diff.fieldChanges()) {
-                changes.addRow(
-                        change.changeType().getLabel(),
-                        diff.testSet(),
-                        diff.name(),
-                        change.oldValue(),
-                        change.newValue());
+                final Object @NotNull [] cells = {change.changeType().getLabel(), diff.testSet(), diff.name(), change.oldValue(), change.newValue()};
+                // Rule-SHARE-129
+                if (diff.subject() == ChangeSubject.MARKER) changes.addFixedRow(Bundle.message("dialog.pending.marker.fixed"), cells);
+                else changes.addRow(cells);
                 rowDifferences.add(new Row(diff, change));
             }
         }

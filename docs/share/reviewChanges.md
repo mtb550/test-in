@@ -56,6 +56,9 @@ uncommitted work.
   kept. That holds for reading the changes, committing, choosing a branch,
   putting a folder under Git, setting the remote or the identity, Sync, the
   push, and every step of resolving conflicts.
+- **Rule-SHARE-129** — Every marker in View Pending Commits is ticked and cannot
+  be unticked, because a node's own file always goes with the commit. Its row is
+  gray and says so when pointed at.
 
 ## The screen
 

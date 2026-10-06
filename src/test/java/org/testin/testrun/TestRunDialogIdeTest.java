@@ -261,16 +261,22 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
         assertTrue("a covered test case under a fully covered folder is not ticked", rowOf(paid).isChecked());
     }
 
-    // Rule-TREE-PANEL-076
-    public void testSavingTheEditKeepsWhatTheDialogDoesNotShow() {
+    private @NotNull CheckedTreeNode theDeletedRow(final @NotNull UUID deleted) {
+        return rows().stream().filter(row -> row.getUserObject() instanceof final TestCaseDto tc && tc.getId().equals(deleted)).findFirst()
+                .orElseThrow(() -> new AssertionError("a test case deleted since is not offered: " + offered()));
+    }
+
+    // Rule-TREE-PANEL-076, Rule-TREE-PANEL-134
+    public void testSavingTheEditKeepsWhatTheDialogDoesNotShowAndTheDeletedTestCasesLeftTicked() {
         final @NotNull UUID deleted = UUID.randomUUID();
         final @NotNull TestRunDirectoryDto testRun = cycle1In(tp.getTestRunsDirectory(), List.of(new TestRunItems().setId(first.getId()), new TestRunItems().setId(inOld.getId()).setStatus(RunItemStatus.FAILED), new TestRunItems().setId(deleted).setStatus(RunItemStatus.PASSED)));
 
         indexedTestRuns().changeTestRunMarker(testRun.getPath(), marker -> marker.configure(everyQuestionAnswered()));
         theEditDialogOpenedOn(testRun);
-        final @NotNull List<Object> offered = offered();
-        assertFalse("a test case of a deprecated test set is offered", offered.contains(inOld));
-        assertTrue("a test case deleted since is offered", offered.stream().noneMatch(row -> row instanceof final TestCaseDto tc && tc.getId().equals(deleted)));
+        assertFalse("a test case of a deprecated test set is offered", offered().contains(inOld));
+        final @NotNull CheckedTreeNode deletedRow = theDeletedRow(deleted);
+        assertTrue("a test case deleted since is not ticked", deletedRow.isChecked());
+        assertEquals("the deleted test case is not under its own folder", Bundle.message("test.run.deleted.test.cases"), ((CheckedTreeNode) deletedRow.getParent()).getUserObject());
 
         theButton(StatusBarShortcut.SAVE).doClick();
 
@@ -279,6 +285,20 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
         assertEquals("saving removed what the test run recorded for a test case the dialog did not show", Set.of(first.getId(), inOld.getId(), deleted), saved.coveredIds());
         assertEquals(RunItemStatus.FAILED, saved.resultOf(inOld.getId()).map(TestRunItems::getStatus).orElseThrow());
         assertEquals(RunItemStatus.PASSED, saved.resultOf(deleted).map(TestRunItems::getStatus).orElseThrow());
+    }
+
+    // Rule-TREE-PANEL-134
+    public void testUntickingADeletedTestCaseAndSavingRemovesItFromTheTestRun() {
+        final @NotNull UUID deleted = UUID.randomUUID();
+        final @NotNull TestRunDirectoryDto testRun = cycle1In(tp.getTestRunsDirectory(), List.of(new TestRunItems().setId(first.getId()), new TestRunItems().setId(deleted).setStatus(RunItemStatus.PASSED)));
+        indexedTestRuns().changeTestRunMarker(testRun.getPath(), marker -> marker.configure(everyQuestionAnswered()));
+        theEditDialogOpenedOn(testRun);
+
+        theTestCaseTree().setNodeState(theDeletedRow(deleted), false);
+        theButton(StatusBarShortcut.SAVE).doClick();
+
+        Await.until("saving the edit did not close the dialog", () -> !ShownDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
+        assertEquals("the unticked deleted test case was kept", Set.of(first.getId()), indexedTestRuns().getTestRunByPath(testRun.getPath()).coveredIds());
     }
 
     // Rule-TREE-PANEL-070, Rule-TREE-PANEL-072

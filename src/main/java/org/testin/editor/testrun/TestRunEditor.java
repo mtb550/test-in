@@ -41,6 +41,7 @@ import org.testin.editor.toolbar.StopExecutionBtn;
 import org.testin.editor.toolbar.TestRunDetailsPopupBtn;
 import org.testin.filter.FilterSelection;
 import org.testin.filter.TestCaseFilter;
+import org.testin.git.history.CommittedTestRun;
 import org.testin.help.Guide;
 import org.testin.help.Guides;
 import org.testin.indexer.TestRuns;
@@ -121,6 +122,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 indexer.awaitIndexing();
+                CommittedTestRun.read(p, parent.getPath());
                 final @NotNull TestRunDto fromDisk = testRun.orElseGet(() -> testRuns.getTestRunByPath(parent.getPath()));
 
                 final @NotNull Map<UUID, TestRunItems> results = fromDisk.getResults().stream()
@@ -325,7 +327,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
     protected @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<TestRunEditorAttributes> attributes) {
-        return gridPanelBuilder.buildTestRunTable(rows, attributes, getParent()::isStillOpen);
+        return gridPanelBuilder.buildTestRunTable(rows, attributes, getParent()::takesRunItemStatuses);
     }
 
     @Override

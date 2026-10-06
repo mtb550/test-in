@@ -87,15 +87,15 @@ for it, and what is written back is that answer rather than an invented one.
 
 ### The seven and what each adds
 
-| File   | Node                       | Adds                                                                                                                            | Values                                                  |
-|--------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| `.tp`  | Test project               | `status`, and `format` - which format this project's files are in, 2 for the one described here                                 | `ACTIVE` `INACTIVE`                                     |
-| `.tcd` | The `Test Cases` directory | —                                                                                                                               |                                                         |
-| `.trd` | The `Test Runs` directory  | —                                                                                                                               |                                                         |
-| `.tsp` | Test set package           | `status`                                                                                                                        | `ACTIVE` `ARCHIVED`                                     |
-| `.ts`  | Test set                   | `status`                                                                                                                        | `ACTIVE` `DEPRECATED`                                   |
-| `.trp` | Test run package           | `status`                                                                                                                        | `ACTIVE` `ARCHIVED`                                     |
-| `.tr`  | Test run                   | `status`, and the test run's own facts: `configuration`, `resultAnalysis`, `executionStartedAt`, `executionEndedAt` — see below | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
+| File   | Node                       | Adds                                                                                                                                      | Values                                                              |
+|--------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `.tp`  | Test project               | `status`, and `format` - which format this project's files are in, 2 for the one described here                                           | `ACTIVE` `INACTIVE`                                                 |
+| `.tcd` | The `Test Cases` directory | —                                                                                                                                         |                                                                     |
+| `.trd` | The `Test Runs` directory  | —                                                                                                                                         |                                                                     |
+| `.tsp` | Test set package           | `status`                                                                                                                                  | `ACTIVE` `ARCHIVED`                                                 |
+| `.ts`  | Test set                   | `status`                                                                                                                                  | `ACTIVE` `DEPRECATED`                                               |
+| `.trp` | Test run package           | `status`                                                                                                                                  | `ACTIVE` `ARCHIVED`                                                 |
+| `.tr`  | Test run                   | `status`, and the test run's own facts: `configuration`, `resultAnalysis`, `executionStartedAt`, `executionEndedAt`, `commit` — see below | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` `COMMITTED` |
 
 **A directory carrying two markers of one family is read as the more specific
 one.** Under `Test Cases` the order is `.ts` then `.tsp`; under `Test Runs` it is
@@ -114,18 +114,19 @@ precedence, and nothing else may ask in a different order.
 }
 ```
 
-**The test run marker adds four more**, because they are facts about the test
+**The test run marker adds five more**, because they are facts about the test
 run rather than about any one result. They are what it was executed against,
-what the tester wrote about the run item statuses afterward, and when execution
-started and last stopped. They are the test run's, so they are in the test run's
+what the tester wrote about the run item statuses afterward, when execution
+started and last stopped, and the commit that made it a record. They are the test run's, so they are in the test run's
 own file:
 
-| Field                | Type | Required                   | Meaning                                                                                                                                                               |
-|----------------------|------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `configuration`      | map  | no, **omitted when empty** | What the test run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
-| `resultAnalysis`     | map  | no, **omitted when empty** | What the tester wrote about each group of run item statuses. Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text                                    |
-| `executionStartedAt` | date | no, defaults to the epoch  | When Start Execution was first pressed. Kept: a test run resumed next week still started when it started                                                              |
-| `executionEndedAt`   | date | no, defaults to the epoch  | When execution last stopped                                                                                                                                           |
+| Field                | Type   | Required                   | Meaning                                                                                                                                                                                  |
+|----------------------|--------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `configuration`      | map    | no, **omitted when empty** | What the test run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text                    |
+| `resultAnalysis`     | map    | no, **omitted when empty** | What the tester wrote about each group of run item statuses. Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text                                                       |
+| `executionStartedAt` | date   | no, defaults to the epoch  | When Start Execution was first pressed. Kept: a test run resumed next week still started when it started                                                                                 |
+| `executionEndedAt`   | date   | no, defaults to the epoch  | When execution last stopped                                                                                                                                                              |
+| `commit`             | string | no, **omitted when empty** | The commit that made the test run Committed, written by Testin straight after it (Rule-SHARE-130). Its run items show their test cases as that commit holds them (Rule-EDITOR-PANEL-239) |
 
 ```json
 {
@@ -262,10 +263,13 @@ screenshot, so one put there by hand under such a name goes too.
 | `actualResult` | string           | Empty unless the test case failed                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `stacktrace`   | string           | Empty unless the test case failed. Text only: a pasted screenshot is never in it                                                                                                                                                                                                                                                                                                                                                                                |
 | `screenshots`  | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write                                                                                                                                                                                                                                 |
-| `testCase`     | object           | The test case as it was when the run item status was given, in the shape of a `.tc` (Rule-EDITOR-PANEL-238). Left out until a run item status is given, so a pending result has none, and a result written before 2.13.0-alpha has none either and shows the test case as it is now. A correction keeps it; running the test case again replaces it (Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241). Editing or deleting the test case never touches it          |
 | `bugSeverity`  | enum             | `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT`. `ENHANCEMENT` until the tester chooses another, and again after a pass (Rule-EDITOR-PANEL-147)                                                                                                                                                                                                                                                                                                                         |
 | `bugPriority`  | enum             | `HIGH` `MEDIUM` `LOW`. `LOW` until the tester chooses another, and again after a pass (Rule-EDITOR-PANEL-147)                                                                                                                                                                                                                                                                                                                                                   |
 | `bugIssueUrl`  | string           | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure                                                                                                                                                                                                                                                                                                |
+
+A run item keeps no copy of its test case (Rule-EDITOR-PANEL-238): a test run
+that is not Committed shows each test case as it is now, and a Committed one reads
+it from its `commit`. A `testCase` object an earlier version wrote is not read.
 
 A severity and a priority are never missing. A passed test case carries
 `"bugSeverity" : "ENHANCEMENT"`, and only a failure shows it. A file that still

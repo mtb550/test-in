@@ -55,7 +55,8 @@ public class SetTestRunStatusIdeTest extends AbstractTempRootIdeTest {
         new TestRunStatusChange(getProject()).apply(testRun, finalStatus);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-        assertTrue("a " + finalStatus + " test run still accepts run item statuses", testRun.whySignedOff().isPresent());
+        assertTrue("a " + finalStatus + " test run refuses run item statuses, though only a Committed one may", testRun.whySignedOff().isEmpty());
+        assertFalse("a " + finalStatus + " test run can still be edited", testRun.isOpen());
         assertEquals("a run item status recorded before the test run was " + finalStatus + " changed", RunItemStatus.PASSED, statusOf(testRun, passed));
         assertEquals("a pending test case is still pending once the test run is " + finalStatus, RunItemStatus.UNTESTED, statusOf(testRun, stillPending));
         assertEquals("a pending test case is still pending once the test run is " + finalStatus, RunItemStatus.UNTESTED, statusOf(testRun, alsoPending));
@@ -65,7 +66,7 @@ public class SetTestRunStatusIdeTest extends AbstractTempRootIdeTest {
         return indexedTestRuns().getTestRunByPath(testRun.getPath()).resultOf(testCaseId).map(TestRunItems::getStatus).orElse(RunItemStatus.REMOVED);
     }
 
-    // Rule-TREE-PANEL-067
+    // Rule-TREE-PANEL-067, Rule-TREE-PANEL-009
     public void testCompletingATestRunMarksEveryPendingTestCaseUntested() {
         finish(TestRunStatus.COMPLETED);
     }

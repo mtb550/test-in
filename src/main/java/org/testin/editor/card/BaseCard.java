@@ -177,7 +177,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    private @NotNull JBLabel createDetailLabel() {
+    protected static @NotNull JBLabel createDetailLabel() {
         final @NotNull JBLabel label = new JBLabel();
         label.setForeground(UIUtil.getContextHelpForeground());
         label.setAlignmentX(Component.LEFT_ALIGNMENT);

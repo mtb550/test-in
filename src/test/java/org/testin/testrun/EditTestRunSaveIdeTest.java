@@ -25,6 +25,7 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
@@ -85,6 +86,29 @@ public class EditTestRunSaveIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the run item status that arrived while the dialog was open was replaced", RunItemStatus.FAILED, statusOf(testRun, JUDGED_WHILE_OPEN));
         assertEquals(RunItemStatus.PENDING, statusOf(testRun, STILL_PENDING));
         assertEquals("a test case the edit added is not Pending", RunItemStatus.PENDING, statusOf(testRun, ADDED_BY_THE_EDIT));
+    }
+
+    private void refusedOnceSignedOff(final @NotNull TestRunStatus status) {
+        final @NotNull TestRunDirectoryDto testRun = anOpenTestRun();
+        testRun.getMarker().changeStatus(status);
+
+        assertFalse("a " + status + " test run took an edit", save(testRun));
+        assertEquals("a " + status + " test run changed what it covers", Set.of(JUDGED_WHILE_OPEN, STILL_PENDING), indexedTestRuns().getTestRunByPath(testRun.getPath()).coveredIds());
+    }
+
+    // Rule-TREE-PANEL-009, Rule-TREE-PANEL-073
+    public void testACompletedTestRunRefusesTheEdit() {
+        refusedOnceSignedOff(TestRunStatus.COMPLETED);
+    }
+
+    // Rule-TREE-PANEL-009, Rule-TREE-PANEL-073
+    public void testAClosedTestRunRefusesTheEdit() {
+        refusedOnceSignedOff(TestRunStatus.CLOSED);
+    }
+
+    // Rule-TREE-PANEL-073, Rule-TREE-PANEL-135
+    public void testACommittedTestRunRefusesTheEdit() {
+        refusedOnceSignedOff(TestRunStatus.COMMITTED);
     }
 
     // Rule-TREE-PANEL-060

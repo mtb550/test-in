@@ -56,6 +56,13 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
+
+        // Rule-EDITOR-PANEL-263
+        @Override
+        public @NotNull String gridValue(final @NotNull TestRunItems runItem) {
+            final @NotNull String description = super.gridValue(runItem);
+            return ChangedSinceCommit.of(runItem) ? description + " " + Bundle.message("test.run.changed.since.short") : description;
+        }
     },
 
     EXPECTED_RESULT(
@@ -185,5 +192,10 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
 
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, runItemValueExtractor.apply(runItem));
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
+    public @NotNull String gridValue(final @NotNull TestRunItems runItem) {
+        return runItemValueExtractor.apply(runItem);
     }
 }

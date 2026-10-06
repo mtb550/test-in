@@ -24,7 +24,9 @@ import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
+import org.testin.model.TestCaseDto;
 import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.result.TestRunItems;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.notifications.Done;
@@ -43,6 +45,7 @@ import org.testin.util.Bundle;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -59,10 +62,11 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
     }
 
     private void edit(final @NotNull TestRunDirectoryDto testRun) {
-        final @NotNull Set<UUID> covered = testRuns.getTestRunByPath(testRun.getPath()).coveredIds();
+        final @NotNull TestRunDto held = testRuns.getTestRunByPath(testRun.getPath());
+        final @NotNull List<TestCaseDto> deleted = held.getResults().stream().filter(TestRunItems::isRemoved).map(TestRunItems::liveTestCase).toList();
 
         boundTestProject.get().ifPresentOrElse(
-                tp -> new TestRunForm(p).open(tp.getTestCasesDirectory(), testRun.getName(), covered, testRun.getMarker().getConfiguration(), saves(testRun)),
+                tp -> new TestRunForm(p).open(tp.getTestCasesDirectory(), testRun.getName(), held.coveredIds(), deleted, testRun.getMarker().getConfiguration(), saves(testRun)),
                 () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
     }
 
@@ -86,7 +90,7 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
             return false;
         }
 
-        if (!testRun.isStillOpen()) {
+        if (!testRun.isOpen()) {
             notifier.softRefuse(p, Bundle.message("test.run.status.changed", testRun.getName(), testRun.getMarker().getStatusLabel()));
             return false;
         }

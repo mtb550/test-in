@@ -74,8 +74,8 @@ There is no key for this. The figures are in the status bar.
 ```
 
 1. **The test run status** — with the same icon the tree draws. Its tooltip
-   reads *This test run's status. A completed or closed test run records no more
-   run item statuses*.
+   reads *This test run's status. A committed test run records no more run item
+   statuses*.
 2. **The figures** — one for each run item status any test case carries, each
    in that run item status's own color, separated by a dot. Their tooltip reads
    *How this test run is going*.

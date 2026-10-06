@@ -16,9 +16,6 @@
 
 package org.testin.model;
 
-
-import java.util.Optional;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.result.TestRunItems;
@@ -26,6 +23,9 @@ import org.testin.model.status.RunItemStatus;
 import org.testin.util.Mapper;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -39,113 +39,104 @@ public class TestCaseAsJudgedTest {
         return TestCaseDto.builder().id(id).description(description).build();
     }
 
-    private static @NotNull TestCaseDto copyOf(final TestCaseDto tc) {
-        return MAPPER.readValue(MAPPER.writeValueAsString(tc), TestCaseDto.class);
+    private static @NotNull TestRunItems passed(final UUID id) {
+        final TestRunItems item = TestRunItems.builder().id(id).build();
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
+        return item;
     }
 
-    // Rule-PRODUCT-007, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-239
+    // Rule-EDITOR-PANEL-239
     @Test
-    public void aRunItemStatusKeepsTheTestCaseItWasGivenAgainst() {
+    public void aRunItemOfATestRunNotCommittedShowsEveryEdit() {
         final UUID id = UUID.randomUUID();
-        final TestCaseDto live = testCaseReading(id, "before");
-        final TestRunItems item = TestRunItems.builder().id(id).build().showing(Optional.of(live));
+        final TestRunItems item = passed(id);
 
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", copyOf(live));
-        live.setDescription("after");
-        item.showing(Optional.of(live));
+        item.showing(Optional.of(testCaseReading(id, "after")), Optional.empty());
 
-        assertEquals(item.shownTestCase().getDescription(), "before", "the row shows what was executed");
+        assertEquals(item.shownTestCase().getDescription(), "after", "a test run not committed shows the test case as it is now");
+    }
+
+    // Rule-EDITOR-PANEL-239
+    @Test
+    public void aRunItemOfACommittedTestRunShowsTheTestCaseFromItsCommit() {
+        final UUID id = UUID.randomUUID();
+        final TestRunItems item = passed(id);
+
+        item.showing(Optional.of(testCaseReading(id, "after")), Optional.of(testCaseReading(id, "before")));
+
+        assertEquals(item.shownTestCase().getDescription(), "before", "the run item shows what its commit holds");
         assertEquals(item.liveTestCase().getDescription(), "after", "actions still reach the test case as it is now");
     }
 
     // Rule-EDITOR-PANEL-240
     @Test
-    public void aCorrectionKeepsTheJudgedTestCase() {
+    public void aCorrectionChangesOnlyTheRunItemStatusWhoAndWhen() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "before"));
+        final TestRunItems item = passed(id);
+        item.showing(Optional.of(testCaseReading(id, "now")), Optional.empty());
 
-        item.correctRunItemStatus(RunItemStatus.FAILED, "tester", testCaseReading(id, "after"));
+        item.recordRunItemStatus(RunItemStatus.FAILED, "other tester");
 
         assertEquals(item.getStatus(), RunItemStatus.FAILED);
-        assertEquals(item.shownTestCase().getDescription(), "before", "only the run item status, who and when change");
-    }
-
-    @Test
-    public void aCorrectionOnARowNeverJudgedTakesTheTestCaseAsItIsNow() {
-        final UUID id = UUID.randomUUID();
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-
-        item.correctRunItemStatus(RunItemStatus.BLOCKED, "tester", testCaseReading(id, "now"));
-
+        assertEquals(item.getExecutedBy(), "other tester");
         assertEquals(item.shownTestCase().getDescription(), "now");
     }
 
-    // Rule-EDITOR-PANEL-241
+    // Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
     @Test
-    public void runningAJudgedRowAgainTakesTheTestCaseAsItIsNow() {
-        final UUID id = UUID.randomUUID();
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", testCaseReading(id, "before"));
+    public void aTestCaseDeletedFromATestRunNotCommittedKeepsItsRunItemStatus() {
+        final TestRunItems item = passed(UUID.randomUUID());
 
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "after"));
+        item.showing(Optional.empty(), Optional.empty());
 
-        assertEquals(item.shownTestCase().getDescription(), "after");
+        assertTrue(item.isRemoved(), "nothing may act on the run item of a test case that no longer exists");
+        assertEquals(item.shownStatus(), RunItemStatus.PASSED, "the run item status is shown whatever happened to the test case");
     }
 
     // Rule-EDITOR-PANEL-239
     @Test
-    public void aTestCaseDeletedAfterItsRunItemStatusKeepsItsFullTextAndItsRunItemStatus() {
+    public void aTestCaseDeletedFromACommittedTestRunKeepsTheTextOfItsCommit() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "before"));
+        final TestRunItems item = passed(id);
 
-        item.showing(Optional.empty());
+        item.showing(Optional.empty(), Optional.of(testCaseReading(id, "before")));
 
-        assertTrue(item.isRemoved(), "nothing may act on the row of a test case that no longer exists");
-        assertEquals(item.shownStatus(), RunItemStatus.PASSED, "the result is shown whatever happened to the test case");
-        assertEquals(item.shownTestCase().getDescription(), "before", "not the placeholder");
+        assertFalse(item.isRemoved(), "a committed test run keeps every run item it recorded");
+        assertEquals(item.shownStatus(), RunItemStatus.PASSED);
+        assertEquals(item.shownTestCase().getDescription(), "before");
     }
 
     @Test
-    public void theJudgedTestCaseTakesItsTestSetFromTheLiveTestCase() {
+    public void theCommittedTestCaseTakesItsTestSetFromTheLiveTestCase() {
         final UUID id = UUID.randomUUID();
         final TestSetDirectoryDto set = new TestSetDirectoryDto();
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "before"));
+        final TestRunItems item = passed(id);
 
-        item.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()));
+        item.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()), Optional.of(testCaseReading(id, "before")));
 
         assertSame(item.shownTestCase().getParent(), set, "where the test case sits is the live test case's, so navigation still works");
     }
 
+    // Rule-EDITOR-PANEL-238
     @Test
-    public void aResultNotJudgedYetIsWrittenWithoutATestCase() {
-        final String written = MAPPER.writeValueAsString(TestRunItems.builder().id(UUID.randomUUID()).build());
-
-        assertFalse(written.contains("testCase"), "a pending result carries no testCase key: " + written);
-    }
-
-    @Test
-    public void aJudgedResultIsWrittenWithItsTestCaseAndReadBack() {
+    public void aRunItemIsWrittenWithoutATestCase() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "as executed"));
+        final TestRunItems item = passed(id);
+        item.showing(Optional.of(testCaseReading(id, "now")), Optional.of(testCaseReading(id, "before")));
 
         final String written = MAPPER.writeValueAsString(item);
-        final TestRunItems read = MAPPER.readValue(written, TestRunItems.class);
 
-        assertTrue(written.contains("\"testCase\""), written);
-        assertEquals(read.shownTestCase().getDescription(), "as executed");
+        assertFalse(written.contains("testCase"), "a run item keeps no copy of its test case: " + written);
     }
 
+    // Rule-EDITOR-PANEL-238
     @Test
-    public void aResultWrittenBeforeThisChangeShowsTheLiveTestCase() {
+    public void aRunItemWrittenWithACopyIsReadWithoutIt() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems read = MAPPER.readValue("{\"id\":\"" + id + "\",\"status\":\"PASSED\"}", TestRunItems.class);
+        final TestRunItems read = MAPPER.readValue("{\"id\":\"" + id + "\",\"status\":\"PASSED\",\"testCase\":{\"id\":\"" + id + "\",\"description\":\"old copy\"}}", TestRunItems.class);
 
-        read.showing(Optional.of(testCaseReading(id, "live")));
+        read.showing(Optional.of(testCaseReading(id, "live")), Optional.empty());
 
-        assertEquals(read.shownTestCase().getDescription(), "live", "an old result reads as not judged against anything");
+        assertEquals(read.shownTestCase().getDescription(), "live", "an old copy in the file is not read");
     }
 }

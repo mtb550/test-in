@@ -28,10 +28,12 @@ import org.testin.model.TestCaseDto;
 import org.testin.model.node.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.SelectionTree;
+import org.testin.util.Bundle;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -71,11 +73,12 @@ public final class TestRunForm {
     }
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022
-    public void open(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull TestRunFormAction action) {
+    public void open(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull List<TestCaseDto> deleted, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull TestRunFormAction action) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesRoot.getPath(), testCasesRoot);
 
             final @NotNull CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
+            if (!deleted.isEmpty()) root.add(deletedFolder(deleted));
             if (!checked.isEmpty()) checkOnly(root, checked);
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -84,6 +87,13 @@ public final class TestRunForm {
                 new TestRunConfigurationDialog(p, form, new TestRunFormFilter(p, testCasesRoot.getPath(), root), action).show();
             });
         });
+    }
+
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-134
+    private static @NotNull CheckedTreeNode deletedFolder(final @NotNull List<TestCaseDto> deleted) {
+        final @NotNull CheckedTreeNode folder = new CheckedTreeNode(Bundle.message("test.run.deleted.test.cases"));
+        deleted.forEach(tc -> folder.add(new CheckedTreeNode(tc)));
+        return folder;
     }
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-093, Rule-TREE-PANEL-076

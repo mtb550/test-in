@@ -39,7 +39,7 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-008
     public void updateState() {
-        final boolean stillOpen = editor.getParent().isStillOpen();
+        final boolean stillOpen = editor.getParent().isOpen();
 
         setEnabled(stillOpen);
         describe(stillOpen

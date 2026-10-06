@@ -50,20 +50,18 @@ import java.util.UUID;
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestRunItems {
-    private static final @NotNull UUID NOT_JUDGED = new UUID(0L, 0L);
-
     @JsonIgnore
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @Builder.Default
     private @NotNull Optional<TestCaseDto> live = Optional.empty();
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-239
-    @NotNull
-    @Builder.Default
+    // Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-239
+    @JsonIgnore
+    @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NotJudgedAgainst.class)
-    private TestCaseDto testCase = notJudged();
+    @Builder.Default
+    private @NotNull Optional<TestCaseDto> recorded = Optional.empty();
     @NotNull
     @Builder.Default
     private UUID id = new UUID(0L, 0L);
@@ -106,24 +104,17 @@ public class TestRunItems {
     @Setter(AccessLevel.NONE)
     private boolean removed;
 
-    private static @NotNull TestCaseDto notJudged() {
-        return TestCaseDto.builder().id(NOT_JUDGED).build();
-    }
-
     private static boolean clears(final @NotNull RunItemStatus next) {
         return next == RunItemStatus.PASSED;
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
-    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now) {
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
+    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now, final @NotNull Optional<TestCaseDto> inCommit) {
         live = now;
-        removed = now.isEmpty();
-        if (isJudgedAgainst()) now.ifPresent(tc -> testCase.setParent(tc.getParent()));
+        recorded = inCommit;
+        removed = now.isEmpty() && inCommit.isEmpty();
+        inCommit.ifPresent(committed -> now.ifPresent(tc -> committed.setParent(tc.getParent())));
         return this;
-    }
-
-    private boolean isJudgedAgainst() {
-        return !testCase.getId().equals(NOT_JUDGED);
     }
 
     @JsonIgnore
@@ -191,19 +182,8 @@ public class TestRunItems {
         return status.isRunItemStatus() || isRemoved();
     }
 
-    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-241
-    public void recordRunItemStatus(final @NotNull RunItemStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
-        testCase = asItIsNow;
-        judge(next, tester);
-    }
-
-    // UC-EDITOR-PANEL-038, UC-EDITOR-PANEL-039, Rule-EDITOR-PANEL-240
-    public void correctRunItemStatus(final @NotNull RunItemStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
-        if (!isJudgedAgainst()) testCase = asItIsNow;
-        judge(next, tester);
-    }
-
-    private void judge(final @NotNull RunItemStatus next, final @NotNull String tester) {
+    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-038, UC-EDITOR-PANEL-039, UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241
+    public void recordRunItemStatus(final @NotNull RunItemStatus next, final @NotNull String tester) {
         if (clears(next)) FailureDetail.clearAll(this);
 
         status = next;
@@ -217,23 +197,16 @@ public class TestRunItems {
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
     public @NotNull TestCaseDto shownTestCase() {
-        return isJudgedAgainst() ? testCase : liveTestCase();
+        return recorded.orElseGet(this::liveTestCase);
+    }
+
+    // Rule-EDITOR-PANEL-263
+    public @NotNull Optional<TestCaseDto> recordedTestCase() {
+        return recorded;
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     public @NotNull TestCaseDto liveTestCase() {
         return live.orElseGet(() -> TestCaseDto.deleted(id));
-    }
-
-    static final class NotJudgedAgainst {
-        @Override
-        public boolean equals(final Object value) {
-            return value instanceof TestCaseDto judged && judged.getId().equals(NOT_JUDGED);
-        }
-
-        @Override
-        public int hashCode() {
-            return NOT_JUDGED.hashCode();
-        }
     }
 }

@@ -19,7 +19,6 @@ package org.testin.indexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.model.FileKind;
 import org.testin.model.result.TestRunItems;
@@ -195,7 +194,6 @@ final class TestRunWriter {
         });
     }
 
-    @TestOnly
     void awaitWrites() {
         try {
             queue.submit(() -> {

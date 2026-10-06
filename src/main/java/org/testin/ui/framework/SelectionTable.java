@@ -20,19 +20,26 @@ import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.NamedColorUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.ui.dialogs.DialogStyle;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 
@@ -41,6 +48,7 @@ public final class SelectionTable implements DialogComponent {
     private final @NotNull DefaultTableModel model;
     private final @NotNull JBScrollPane scroll;
     private final @NotNull JBPopupMenu rowMenu = new JBPopupMenu();
+    private final @NotNull Map<Integer, String> fixed = new HashMap<>();
 
     private int menuRow = -1;
 
@@ -58,9 +66,25 @@ public final class SelectionTable implements DialogComponent {
             public @NotNull Dimension getPreferredScrollableViewportSize() {
                 return new Dimension(super.getPreferredScrollableViewportSize().width, DialogSize.VISIBLE_ROWS * getRowHeight());
             }
+
+            // Rule-SHARE-129
+            @Override
+            public @NotNull Component prepareRenderer(final @NotNull TableCellRenderer renderer, final int row, final int column) {
+                final @NotNull Component cell = super.prepareRenderer(renderer, row, column);
+                if (fixed.containsKey(convertRowIndexToModel(row))) cell.setForeground(NamedColorUtil.getInactiveTextColor());
+                return cell;
+            }
+
+            // Rule-SHARE-129
+            @Override
+            public @Nullable String getToolTipText(final @NotNull MouseEvent event) {
+                final int row = rowAtPoint(event.getPoint());
+                return row < 0 ? null : fixed.getOrDefault(convertRowIndexToModel(row), super.getToolTipText(event));
+            }
         };
         // Rule-INTERNAL-095
         DialogStyle.asRow(table);
+        table.setSelectionModel(new KeepsFixedRows());
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setFillsViewportHeight(true);
         // Rule-INTERNAL-122
@@ -102,6 +126,13 @@ public final class SelectionTable implements DialogComponent {
         model.addRow(values);
     }
 
+    // Rule-SHARE-129
+    public void addFixedRow(final @NotNull String why, final @NotNull Object... values) {
+        fixed.put(model.getRowCount(), why);
+        model.addRow(values);
+        table.addRowSelectionInterval(model.getRowCount() - 1, model.getRowCount() - 1);
+    }
+
     public void selectAll() {
         if (table.getRowCount() > 0) table.addRowSelectionInterval(0, table.getRowCount() - 1);
     }
@@ -131,6 +162,12 @@ public final class SelectionTable implements DialogComponent {
     }
 
     public void removeRow(final int row) {
+        final @NotNull Map<Integer, String> after = new HashMap<>();
+        fixed.forEach((at, why) -> {
+            if (at != row) after.put(at > row ? at - 1 : at, why);
+        });
+        fixed.clear();
+        fixed.putAll(after);
         model.removeRow(row);
     }
 
@@ -165,5 +202,33 @@ public final class SelectionTable implements DialogComponent {
     @Override
     public boolean fillsSpace() {
         return true;
+    }
+
+    // Rule-SHARE-129
+    private final class KeepsFixedRows extends DefaultListSelectionModel {
+        @Override
+        public void setSelectionInterval(final int anchor, final int lead) {
+            super.setSelectionInterval(anchor, lead);
+            keepFixed();
+        }
+
+        @Override
+        public void removeSelectionInterval(final int from, final int to) {
+            super.removeSelectionInterval(from, to);
+            keepFixed();
+        }
+
+        @Override
+        public void clearSelection() {
+            super.clearSelection();
+            keepFixed();
+        }
+
+        private void keepFixed() {
+            fixed.keySet().stream()
+                    .filter(row -> row < model.getRowCount())
+                    .map(table::convertRowIndexToView)
+                    .forEach(row -> super.addSelectionInterval(row, row));
+        }
     }
 }

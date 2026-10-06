@@ -20,8 +20,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
+import org.testin.model.TestCaseDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestRunDirectoryDto;
@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 public final class TestRuns {
     private final @NotNull Project p;
     private final @NotNull ProjectIndexer indexer;
+    private final @NotNull Map<String, Map<UUID, TestCaseDto>> recorded = new ConcurrentHashMap<>();
 
     public TestRuns(final @NotNull Project p) {
         this.p = p;
@@ -59,14 +61,30 @@ public final class TestRuns {
     }
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return withTestCasesShown(store().getTestRunByPath(testRunPath));
+        return withTestCasesShown(testRunPath, store().getTestRunByPath(testRunPath));
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-REPORT-021, Rule-VIEW-PANEL-083
-    private @NotNull TestRunDto withTestCasesShown(final @NotNull TestRunDto testRun) {
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
+    private @NotNull TestRunDto withTestCasesShown(final @NotNull Path testRunPath, final @NotNull TestRunDto testRun) {
         final @NotNull IndexerDataStore store = store();
-        testRun.getResults().forEach(item -> item.showing(store.findTestCase(item.getId())));
+        final @NotNull Map<UUID, TestCaseDto> inCommit = recorded.getOrDefault(commitOf(testRunPath), Map.of());
+        testRun.getResults().forEach(item -> item.showing(store.findTestCase(item.getId()), Optional.ofNullable(inCommit.get(item.getId()))));
         return testRun;
+    }
+
+    // Rule-EDITOR-PANEL-239
+    public @NotNull String commitOf(final @NotNull Path testRunPath) {
+        return store().findTestRunDir(testRunPath).map(dir -> dir.getMarker().getCommit()).orElse("");
+    }
+
+    // Rule-EDITOR-PANEL-239
+    public boolean hasRecorded(final @NotNull String commit) {
+        return recorded.containsKey(commit);
+    }
+
+    // Rule-EDITOR-PANEL-239
+    public void rememberRecorded(final @NotNull String commit, final @NotNull Map<UUID, TestCaseDto> testCases) {
+        recorded.put(commit, testCases);
     }
 
     // Rule-VIEW-PANEL-092
@@ -88,7 +106,7 @@ public final class TestRuns {
     }
 
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
-        return store().findTestRun(testRunPath).map(this::withTestCasesShown);
+        return store().findTestRun(testRunPath).map(testRun -> withTestCasesShown(testRunPath, testRun));
     }
 
     public void changeTestRun(final @NotNull Path testRunPath, final @NotNull Consumer<TestRunDto> change) {
@@ -147,7 +165,7 @@ public final class TestRuns {
         return testRunWriter().readScreenshot(testRunPath, name);
     }
 
-    @TestOnly
+    // Rule-SHARE-130
     public void awaitWrites() {
         testRunWriter().awaitWrites();
     }

@@ -64,9 +64,9 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   item status onto another test case. While the filter hides the test case being
   executed, a run item status key records nothing and says so, and clearing the
   filter brings it back.
-- **Rule-EDITOR-PANEL-238** — A run item status records a copy of the test case
-  as it is at that moment, so a fix made to the test case while running it is
-  what the run item status keeps.
+- **Rule-EDITOR-PANEL-238** — A run item status records who gave it and when; it
+  keeps no copy of the test case. The text it was given against is read from Git
+  once its test run is Committed.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -85,6 +85,9 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-264** — When the test case the walk is on has been
+  deleted, a run item status key records nothing: a short message says so, and
+  the walk moves on to the next Pending test case.
 
 ## What the tester sees
 

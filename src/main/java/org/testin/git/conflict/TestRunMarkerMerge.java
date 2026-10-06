@@ -37,6 +37,7 @@ final class TestRunMarkerMerge {
     private static final @NotNull String STARTED = "executionStartedAt";
     private static final @NotNull String ENDED = "executionEndedAt";
     private static final @NotNull String STATUS = "status";
+    private static final @NotNull String COMMIT = "commit";
     private static final @NotNull String MODIFIED_AT = "modifiedAt";
     private static final @NotNull String MODIFIED_BY = "modifiedBy";
 
@@ -79,7 +80,11 @@ final class TestRunMarkerMerge {
         final @NotNull TestRunStatus yours = statusIn(merging.theirs());
         if (ours == yours) return;
 
-        if (yours.isFurtherThan(ours)) merging.merged().set(STATUS, merging.theirs().path(STATUS).deepCopy());
+        if (yours.isFurtherThan(ours)) {
+            merging.merged().set(STATUS, merging.theirs().path(STATUS).deepCopy());
+            // Rule-SHARE-130
+            if (merging.theirs().has(COMMIT)) merging.merged().set(COMMIT, merging.theirs().path(COMMIT).deepCopy());
+        }
         merging.settled().add(Bundle.message("git.merge.status"));
     }
 

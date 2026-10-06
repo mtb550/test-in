@@ -76,13 +76,19 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return true;
     }
 
-    public boolean isStillOpen() {
+    // Rule-TREE-PANEL-009
+    public boolean isOpen() {
         return !marker.getStatus().isTerminal();
     }
 
     // Rule-TREE-PANEL-009, Rule-PRODUCT-011
+    public boolean takesRunItemStatuses() {
+        return !marker.getStatus().isRecord();
+    }
+
+    // Rule-TREE-PANEL-009, Rule-PRODUCT-011
     public @NotNull Optional<String> whySignedOff() {
-        return isStillOpen() ? Optional.empty() : Optional.of(Bundle.message("run.item.status.test.run.signed.off", marker.getStatus().getLabel()));
+        return takesRunItemStatuses() ? Optional.empty() : Optional.of(Bundle.message("run.item.status.test.run.signed.off", marker.getStatus().getLabel()));
     }
 
     // UC-TREE-PANEL-001, Rule-INTERNAL-072
@@ -104,13 +110,13 @@ public class TestRunDirectoryDto extends DirectoryDto {
 
     @Override
     public boolean isOrderable() {
-        return isStillOpen();
+        return isOpen();
     }
 
     // UC-TREE-PANEL-025, Rule-TREE-PANEL-009
     @Override
     public boolean isRenamable() {
-        return isStillOpen();
+        return isOpen();
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-094, Rule-TREE-PANEL-009
@@ -122,6 +128,6 @@ public class TestRunDirectoryDto extends DirectoryDto {
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-009
     @Override
     public boolean isTransferable() {
-        return isStillOpen();
+        return isOpen();
     }
 }

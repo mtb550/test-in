@@ -52,7 +52,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, TreeValues.selected(tree, TestRunDirectoryDto.class).filter(TestRunDirectoryDto::isStillOpen).isPresent(),
+        GrayWithReason.unless(this, e, TreeValues.selected(tree, TestRunDirectoryDto.class).filter(TestRunDirectoryDto::isOpen).isPresent(),
                 Bundle.message("test.run.not.open.description"));
     }
 

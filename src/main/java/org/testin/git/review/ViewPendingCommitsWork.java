@@ -36,17 +36,24 @@ import org.testin.help.Hint;
 import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.indexer.Nodes;
+import org.testin.indexer.TestRuns;
+import org.testin.model.DirectoryType;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.status.TestRunStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.Display;
 import org.testin.util.FailureText;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier, @NotNull Nodes nodes) {
     private static @NotNull String commitLabel(final @NotNull String commitId) {
@@ -211,6 +218,7 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                     final @NotNull String commitId = commits.headCommitId(repoPath);
+                    recordCompletedTestRuns(repoPath);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (push) {
@@ -222,6 +230,27 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
                     });
                 },
                 ex -> GitFailure.show(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + FailureText.of(ex)));
+    }
+
+    // UC-SHARE-012, Rule-SHARE-130
+    private void recordCompletedTestRuns(final @NotNull Path repoPath) {
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+        final @NotNull List<TestRunDirectoryDto> completed = testRuns.getAllTestRuns().keySet().stream()
+                .filter(testRun -> testRun.startsWith(repoPath))
+                .map(testRuns::findTestRunDir)
+                .flatMap(Optional::stream)
+                .filter(testRun -> testRun.getMarker().getStatus() == TestRunStatus.COMPLETED)
+                .toList();
+        if (completed.isEmpty()) return;
+
+        final @NotNull String hash = commits.headHash(repoPath);
+        ApplicationManager.getApplication().invokeAndWait(() -> completed.forEach(testRun -> testRuns.changeTestRunMarker(testRun.getPath(), marker -> marker.recordCommit(hash))));
+        testRuns.awaitWrites();
+
+        final @NotNull List<String> names = completed.stream().map(TestRunDirectoryDto::getName).toList();
+        commits.commit(repoPath, Bundle.message("test.run.record.commit", Display.andJoin(names)), completed.stream()
+                .map(testRun -> repoPath.relativize(testRun.getPath().resolve(DirectoryType.TR.getMarker())).toString().replace('\\', '/'))
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     // UC-SHARE-009, Rule-SHARE-043, Rule-SHARE-127

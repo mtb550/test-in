@@ -46,9 +46,9 @@ Press the key for the right run item status on the test case.
   Enhancement and Low.
 - **Rule-EDITOR-PANEL-162** — Only passing clears anything. Failing and blocking
   clear nothing.
-- **Rule-EDITOR-PANEL-240** — Correcting a run item status keeps the test case
-  it was given against. Only three things change: the run item status, who gave
-  it and when.
+- **Rule-EDITOR-PANEL-240** — A run item status can be corrected until its test
+  run is Committed. Only three things change: the run item status, who gave it
+  and when.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.

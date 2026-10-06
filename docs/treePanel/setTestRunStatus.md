@@ -35,8 +35,10 @@ The status says how far the test run has got.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
-- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, run item statuses and configuration can no longer change.
+- **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** keeps
+  its test cases and configuration: Edit Test Run refuses it. Its run item
+  statuses can still be given and corrected until it is **Committed**. A
+  Committed test run changes no more.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -73,6 +75,13 @@ The status says how far the test run has got.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-135** — Committed is the last test run status, and only
+  Testin sets it. A Committed test run is read-only: no status, run item status
+  or edit changes it.
+- **Rule-TREE-PANEL-136** — When a test run becomes Completed, a notification
+  says to commit it to keep it as the record, and its View Pending Commits
+  button opens the review for that test project. It stays in the Notifications
+  list.
 
 ## The Set Test Run Status popup
 
@@ -106,7 +115,7 @@ The status says how far the test run has got.
 
 1. The tester selects a test run that is **Created**, **In Progress** or **Assigned**.
 2. The tester chooses **Set Status**.
-3. The **Set Test Run Status** popup lists the five statuses. Three of them
+3. The **Set Test Run Status** popup lists the statuses a tester sets. Three of them
    carry a key: `1` **Assigned**, `2` **Completed**, `3` **Closed**.
 4. The tester presses that key, or moves with `↑` `↓` and presses `Enter`, or
    clicks a row.
@@ -117,6 +126,10 @@ The status says how far the test run has got.
    which stays as the test run recorded it. Testin records the time the test run
    finished, but only if it had been started. From then on **Set Status**,
    **Edit Test Run** and **Run Tests** are gray on it.
+7. Setting **Completed** shows a notification instead of the status word: *Commit
+   <name> in View Pending Commits to keep it as the record.* Its **View Pending
+   Commits** button opens the review, and the commit makes the test run
+   **Committed** (Rule-TREE-PANEL-136, Rule-SHARE-130).
 
 **Signing off a test run cannot be undone.** A status change is not on the
 tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.

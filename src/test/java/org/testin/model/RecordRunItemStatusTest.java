@@ -56,7 +56,7 @@ public class RecordRunItemStatusTest {
     public void passingAFailedTestCaseClearsEverythingTheFailureDescribed() {
         final TestRunItems item = failedWithBug();
 
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
 
         assertEquals(item.getStatus(), RunItemStatus.PASSED);
         assertEquals(item.getBugSeverity(), BugSeverity.ENHANCEMENT);
@@ -72,7 +72,7 @@ public class RecordRunItemStatusTest {
     public void failingAgainKeepsTheBugTheDialogJustCollected() {
         final TestRunItems item = failedWithBug();
 
-        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.FAILED, "tester");
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR, "re-failing must not wipe the details");
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
@@ -88,7 +88,7 @@ public class RecordRunItemStatusTest {
                 .status(RunItemStatus.PENDING)
                 .build();
 
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
 
         assertEquals(item.getStatus(), RunItemStatus.PASSED);
         assertEquals(item.getBugSeverity(), BugSeverity.ENHANCEMENT);
@@ -100,7 +100,7 @@ public class RecordRunItemStatusTest {
     public void everyRunItemStatusRecordsWhoAndWhen() {
         final TestRunItems item = failedWithBug();
 
-        item.recordRunItemStatus(RunItemStatus.BLOCKED, "muteb", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.BLOCKED, "muteb");
 
         assertEquals(item.getStatus(), RunItemStatus.BLOCKED, "what it was");
         assertEquals(item.getExecutedBy(), "muteb");
@@ -111,8 +111,8 @@ public class RecordRunItemStatusTest {
     public void aTestCaseBlockedInBetweenStillClearsWhenItFinallyPasses() {
         final TestRunItems item = failedWithBug();
 
-        item.recordRunItemStatus(RunItemStatus.BLOCKED, "tester", new TestCaseDto());
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.BLOCKED, "tester");
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
 
         assertEquals(item.getBugSeverity(), BugSeverity.ENHANCEMENT);
         assertEquals(item.getBugPriority(), BugPriority.LOW);
@@ -126,7 +126,7 @@ public class RecordRunItemStatusTest {
     public void blockingAFailedTestCaseKeepsTheDetails() {
         final TestRunItems item = failedWithBug();
 
-        item.recordRunItemStatus(RunItemStatus.BLOCKED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.BLOCKED, "tester");
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR);
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
@@ -168,7 +168,7 @@ public class RecordRunItemStatusTest {
                 .executedAt(firstTime)
                 .build();
 
-        item.correctRunItemStatus(RunItemStatus.PASSED, "Omar", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "Omar");
 
         assertEquals(item.getStatus(), RunItemStatus.PASSED, "the run item status is simply written over");
         assertEquals(item.getExecutedBy(), "Omar", "the original tester is gone");

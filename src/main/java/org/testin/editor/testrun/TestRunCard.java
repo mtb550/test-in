@@ -17,11 +17,14 @@
 package org.testin.editor.testrun;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.card.BaseCard;
 import org.testin.model.result.TestRunItems;
+import org.testin.testrun.ChangedSinceCommit;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
+import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
 import java.util.ArrayList;
@@ -35,9 +38,12 @@ import java.util.Set;
 public class TestRunCard extends BaseCard {
     private final @NotNull List<Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
+    private final @NotNull JBLabel changedSince = createDetailLabel();
 
     public TestRunCard(final @NotNull Project p) {
         super(p);
+        changedSince.setText(Bundle.message("test.run.changed.since.commit"));
+        content.add(changedSince, 2);
     }
 
     // UC-EDITOR-PANEL-030
@@ -52,6 +58,9 @@ public class TestRunCard extends BaseCard {
                 .forEach(attr -> attr.applyToUI(runItem, badges, details));
 
         updateUI(index, title, badges, details);
+
+        // Rule-EDITOR-PANEL-263
+        changedSince.setVisible(ChangedSinceCommit.of(runItem));
 
         Optional.ofNullable(attributeLabels.get(TestRunEditorAttributes.RUN_STATUS.getName())).ifPresent(statusLabel -> {
             statusLabel.setFont(Fonts.strong());

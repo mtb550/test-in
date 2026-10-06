@@ -87,9 +87,9 @@ A small message appears at the bottom of the IDE and fades. It reads *Passed*.
 
 ## What Testin refuses
 
-**If the test run is completed or closed** — `P` is gray, and its tooltip
-reads *This test run is Completed, so it records nothing further.* Nothing is
-written.
+**If the test run is Committed** — `P` is gray, and its tooltip reads
+*This test run is Committed, so it records nothing further.* Nothing is
+written. A Completed or Closed test run still records it (Rule-TREE-PANEL-009).
 
 **If nothing is selected** — nothing happens, and nothing is said.
 

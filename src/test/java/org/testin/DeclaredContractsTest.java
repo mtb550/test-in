@@ -53,6 +53,7 @@ public class DeclaredContractsTest {
             entry("TransferListener.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeTransferHandler.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeDropHandler.handleDrop", "FileDropHandler is a Kotlin suspend function, whose Java face answers an Object that may be null"),
+            entry("SelectionTable.getToolTipText", "JComponent's contract: null is no tooltip"),
             entry("TreePanelStructure.getParentElement", "AbstractTreeStructure's contract: null is the root"),
             entry("TestinFileWatcher.prepareChange", "AsyncFileListener's contract: null is nothing to apply"),
             entry("ViewOnScreen.getActiveToolWindowId", "test fixture: ToolWindowManager's contract, null is no tool window active"),

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.DirectoryDto;
@@ -61,7 +62,7 @@ public final class EditShownTestCase {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
                 ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.getCurrentTestCase()
-                        .ifPresent(currentDto -> open(p, currentDto, viewPanel.getPage().getCurrentPath())));
+                        .ifPresent(currentDto -> openUnlessCommitted(p, currentDto, viewPanel.getPage().getCurrentPath())));
             }
 
             @Override
@@ -69,6 +70,17 @@ public final class EditShownTestCase {
                 return ActionUpdateThread.BGT;
             }
         }.registerCustomShortcutSet(Declared.shortcutSet("Testin.UpdateTestCase"), detailsTab);
+    }
+
+    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-110
+    static void openUnlessCommitted(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+        final boolean committed = !currentPath.isEmpty() && Services.getInstance(p, TestRuns.class)
+                .findTestRunDir(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
+                .filter(testRun -> !testRun.takesRunItemStatuses())
+                .isPresent();
+
+        if (committed) Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("details.committed.no.edit"));
+        else open(p, dto, currentPath);
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007

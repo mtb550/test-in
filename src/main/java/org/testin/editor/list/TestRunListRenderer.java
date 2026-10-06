@@ -39,7 +39,7 @@ public class TestRunListRenderer extends AbstractListRenderer<TestRunEditor> {
     @Override
     protected @NotNull TestRunCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
         final @NotNull TestRunItems runItem = editor.runItem(tc.getId())
-                .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
+                .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc), Optional.empty()));
 
         card.updateData(row, editor.getSelectedDetails(), runItem, editor.cardTitle(tc));
         card.setHoverButtons(CardHoverAction.onCard(editor.getProject(), editor.getParent(), tc));

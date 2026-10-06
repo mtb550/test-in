@@ -249,24 +249,29 @@ stateDiagram-v2
     Failed --> Removed: test case deleted
 ```
 
-### 5.2 Where a test run has got to — five values
+### 5.2 Where a test run has got to — six values
 
-| Status          | Meaning                             | Key | Signed off |
-|-----------------|-------------------------------------|-----|------------|
-| **Created**     | Set up, never started               | —   | no         |
-| **In Progress** | At least one test case has been run | —   | no         |
-| **Assigned**    | Handed to someone to run            | `1` | no         |
-| **Completed**   | Finished and signed off             | `2` | **yes**    |
-| **Closed**      | Ended without being finished        | `3` | **yes**    |
+| Status          | Meaning                                     | Key | Signed off |
+|-----------------|---------------------------------------------|-----|------------|
+| **Created**     | Set up, never started                       | —   | no         |
+| **In Progress** | At least one test case has been run         | —   | no         |
+| **Assigned**    | Handed to someone to run                    | `1` | no         |
+| **Completed**   | Finished and signed off                     | `2` | **yes**    |
+| **Closed**      | Ended without being finished                | `3` | **yes**    |
+| **Committed**   | Completed, and committed to Git: the record | —   | **yes**    |
 
-Created and In Progress carry no key, because the product sets them itself. A
+Created, In Progress and Committed carry no key, because the product sets them
+itself. A
 test run is Created when it is made. It moves to In Progress the moment
 anything in it is executed, however it was started.
 
-**A signed-off test run records nothing further.** Its run item statuses are
-history. It cannot be started, and any result arriving from anywhere else is
-refused. The one thing it still takes is the bug issue a failed test case is
-reported as. That changes no run item status. (UC-VIEW-PANEL-016)
+**A signed-off test run cannot be started or edited.** A Completed or Closed one
+still takes run item statuses and corrections. **A Committed test run records
+nothing further** (Rule-PRODUCT-011): it becomes Committed when a commit takes it
+while it is Completed, and from then on each run item shows its test case as
+that commit holds it. Any result arriving from anywhere else is refused. The one
+thing it still takes is the bug issue a failed test case is reported as. That
+changes no run item status. (UC-VIEW-PANEL-016)
 
 ```mermaid
 stateDiagram-v2
@@ -279,6 +284,7 @@ stateDiagram-v2
     Created --> Closed: 3
     Assigned --> Completed: 2
     Assigned --> Closed: 3
+    Completed --> Committed: a commit in View Pending Commits
 ```
 
 > ** Undecided. See section 9.** The diagram shows what the product *allows*.
@@ -455,13 +461,13 @@ Numbered so an issue or a commit can cite one.
 
 ### Test runs and history
 
-| BR                   | Rule                                                                                                                                                                                                                                                                                                 |
-|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a test run has judged it does not change what the test run recorded.                                                                                                          |
-| **Rule-PRODUCT-008** | A result is written into the test run the tester started, and no other. The same test case running in another test run does not affect this one.                                                                                                                                                     |
-| **Rule-PRODUCT-009** | A test case may belong to any number of test runs and carry a different run item status in each. The run item status belongs to the test run.                                                                                                                                                        |
-| **Rule-PRODUCT-010** | Every run item status records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                                         |
-| **Rule-PRODUCT-011** | A signed-off test run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no run item status (UC-VIEW-PANEL-016). |
+| BR                   | Rule                                                                                                                                                                                                                                                                                   |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a test run has judged it does not change what the test run recorded.                                                                                            |
+| **Rule-PRODUCT-008** | A result is written into the test run the tester started, and no other. The same test case running in another test run does not affect this one.                                                                                                                                       |
+| **Rule-PRODUCT-009** | A test case may belong to any number of test runs and carry a different run item status in each. The run item status belongs to the test run.                                                                                                                                          |
+| **Rule-PRODUCT-010** | Every run item status records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                           |
+| **Rule-PRODUCT-011** | A Committed test run records nothing further: no run item status is given or corrected on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no run item status (UC-VIEW-PANEL-016). |
 
 ### Run item statuses
 
