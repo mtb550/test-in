@@ -25,8 +25,11 @@ import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
+import javax.swing.Icon;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static org.testin.testcase.TestCaseDialogKey.ADD_GROUP;
@@ -143,5 +146,10 @@ public enum CreateTestCaseFields implements StatusBarItem {
     @Override
     public @NotNull String getShortcutText() {
         return shortcut.getShortcutText();
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-111
+    public static @NotNull Optional<Icon> iconOf(final @NotNull String field) {
+        return Arrays.stream(values()).filter(each -> each.name.equals(field)).findFirst().map(CreateTestCaseFields::getIcon);
     }
 }

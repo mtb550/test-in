@@ -216,8 +216,16 @@ public class ViewPanel implements Disposable {
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
     @NotNull Optional<TestCaseDto> shownTestCase() {
-        return getCurrentTestCase().map(shown -> shownRunItem().map(TestRunItems::shownTestCase)
-                .orElseGet(() -> testCases.findTestCase(shown.getId()).orElse(shown)));
+        return getCurrentTestCase().map(shown -> shownRunItem().map(TestRunItems::shownTestCase).orElseGet(() -> liveOf(shown)));
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-112
+    @NotNull Optional<TestCaseDto> liveTestCase() {
+        return getCurrentTestCase().map(this::liveOf);
+    }
+
+    private @NotNull TestCaseDto liveOf(final @NotNull TestCaseDto shown) {
+        return testCases.findTestCase(shown.getId()).orElse(shown);
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083

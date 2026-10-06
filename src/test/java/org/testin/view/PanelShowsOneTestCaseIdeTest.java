@@ -31,6 +31,7 @@ import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.testin.view.Drawn.holds;
 
@@ -231,5 +232,19 @@ public class PanelShowsOneTestCaseIdeTest extends AbstractViewPanelIdeTest {
         view.getPanel().refreshCurrentView();
 
         assertTrue("the panel did not read the run item again when it refreshed: " + details(), holds(details(), RunItemStatus.PASSED.getLabel()));
+    }
+
+    // Rule-VIEW-PANEL-112, Rule-EDITOR-PANEL-239
+    public void testFromACommittedTestRunTheDetailsShowTheCommitAndTheHistoryTheTestCaseNow() {
+        final @NotNull TestCaseDto tc = threeTestCases().getFirst();
+        final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(EditorFixtures.pending(tc)));
+        final @NotNull TestRuns testRuns = Services.getInstance(getProject(), TestRuns.class);
+        testRuns.changeTestRunMarker(tr.getPath(), marker -> marker.recordCommit("ea9a501"));
+        testRuns.rememberRecorded("ea9a501", Map.of(tc.getId(), handedCopy(tc, "As the commit recorded it")));
+
+        view.getPanel().show(List.of(tc), pathOf(tr));
+
+        assertEquals("the Details tab does not show the commit's text", "As the commit recorded it", view.getPanel().shownTestCase().orElseThrow().getDescription());
+        assertEquals("the History tab would compare the commit's text with the last commit", tc.getDescription(), view.getPanel().liveTestCase().orElseThrow().getDescription());
     }
 }

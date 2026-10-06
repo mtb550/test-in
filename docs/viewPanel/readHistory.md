@@ -92,6 +92,13 @@ There is no key for this. The tab is called **History**.
 - **Rule-VIEW-PANEL-109** — A bug card names its test run, and the name opens
   that test run with the run item selected. When the test run is no longer in
   the test project, its name is gray and its tooltip says so.
+- **Rule-VIEW-PANEL-111** — A change on a card names its field by the field's
+  icon, the one the update menu shows, with the field's name when the pointer
+  rests on it. A field with no icon is named in words.
+- **Rule-VIEW-PANEL-112** — The History tab reads the test case as it is now,
+  whether the view panel was opened from a test set or from a test run. A
+  Committed test run's run item shows its commit's text on the Details tab, and
+  that text never makes a Not committed yet card.
 
 ## The screen
 
@@ -122,8 +129,12 @@ There is no key for this. The tab is called **History**.
 2. **A committed entry** — when, who, the commit's short hash, and the commit's
    message. The full hash shows when the pointer rests on the short one.
 3. **Created** — the commit that first added the test case.
-4. **A field row** — the field, what it was, and what it became. A commit that
-   changed none of the fields reads *reordered or restamped*.
+4. **A field row** — the field, what it was, and what it became. The field is
+   its icon, the letter the update menu shows (**D** Description, **E** Expected
+   Result, **S** Steps, **P** Priority, **G** Group, **M** Module, **T** Test
+   Data, **B** Pre Conditions), with its name on hover; Status, Reference and the
+   run item's fields have no icon and are named in words (Rule-VIEW-PANEL-111). A
+   commit that changed none of the fields reads *reordered or restamped*.
 5. **A bug card** — a card of its own, marked by a bar in the bug's severity
    color, or in red when its run item did not fail and only has a filed issue. It opens with what happened, **Recorded**, then **Bug in** and the test
    run, who and when, and the commit's hash, or **Not committed yet**. Then the

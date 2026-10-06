@@ -43,7 +43,7 @@ public enum ViewTab {
             Bundle.message("view.tab.history"),
             ViewPanel::getHistoryScrollPane,
             ViewPanel::getHistoryTab,
-            panel -> new HistoryTab().load(panel.getP(), panel.getHistoryTab(), panel.shownTestCase())
+            panel -> new HistoryTab().load(panel.getP(), panel.getHistoryTab(), panel.liveTestCase())
     );
 
     private final @NotNull String displayName;

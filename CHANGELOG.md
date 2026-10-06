@@ -42,6 +42,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **History names a changed field by its icon:** the letter the update menu shows, with the field's name on hover, so
+  a long name no longer cuts off. A field without an icon is still named in words.
 - **A test run not committed shows every edit:** a run item shows its test case as it is now, judged or not. A
   Completed or Closed test run still takes run item statuses and corrections; only a Committed one refuses them.
 - **Every marker in View Pending Commits is ticked and stays ticked:** a node's own file always goes with the commit.
@@ -107,6 +109,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Fixed
 
+- History opened from a committed test run no longer shows a *Not committed yet* card made of the commit's own text:
+  the History tab always reads the test case as it is now.
 - **An imported test case is new:** a JSON file no longer brings its status and its order into the test set that imports
   it.
 - **Only what you remove goes to the recycle bin:** a cut and paste, or a file Testin replaced, no longer leaves test

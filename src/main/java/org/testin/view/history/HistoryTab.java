@@ -40,6 +40,7 @@ import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
@@ -271,11 +272,23 @@ public class HistoryTab {
         final @NotNull JBPanel<?> field = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 10, 2));
         field.setOpaque(false);
 
-        final @NotNull JBLabel caption = muted(name);
-        caption.setPreferredSize(new Dimension(JBUI.scale(FIELD_WIDTH), caption.getPreferredSize().height));
-        field.add(caption);
+        field.add(caption(name));
         field.add(value);
         return field;
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-111
+    private static @NotNull JBLabel caption(final @NotNull String name) {
+        final @NotNull JBLabel caption = CreateTestCaseFields.iconOf(name).map(JBLabel::new).orElseGet(() -> named(name));
+        Tooltip.set(caption, name);
+        caption.getAccessibleContext().setAccessibleName(name);
+        return caption;
+    }
+
+    private static @NotNull JBLabel named(final @NotNull String name) {
+        final @NotNull JBLabel caption = muted(name);
+        caption.setPreferredSize(new Dimension(JBUI.scale(FIELD_WIDTH), caption.getPreferredSize().height));
+        return caption;
     }
 
     private static @NotNull JComponent pill(final @NotNull Badge badge) {
