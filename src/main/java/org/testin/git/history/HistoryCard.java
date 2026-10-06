@@ -30,6 +30,11 @@ public sealed interface HistoryCard permits HistoryEntry, BugCard {
 
     // Rule-VIEW-PANEL-097
     default @NotNull String shortHash() {
-        return hash().substring(0, Math.min(SHORT_HASH, hash().length()));
+        return shortOf(hash());
+    }
+
+    // Rule-VIEW-PANEL-097, Rule-EDITOR-PANEL-265
+    static @NotNull String shortOf(final @NotNull String hash) {
+        return hash.substring(0, Math.min(SHORT_HASH, hash.length()));
     }
 }

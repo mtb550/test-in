@@ -42,6 +42,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **The test run status in the status bar is its icon:** the status is in its tooltip, and beside the icon is the
+  tester an Assigned test run is assigned to, or the commit a Committed one was recorded in.
 - **History names a changed field by its icon:** the letter the update menu shows, with the field's name on hover, so
   a long name no longer cuts off. A field without an icon is still named in words.
 - **A test run not committed shows every edit:** a run item shows its test case as it is now, judged or not. A

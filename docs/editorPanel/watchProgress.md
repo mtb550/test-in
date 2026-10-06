@@ -63,6 +63,10 @@ There is no key for this. The figures are in the status bar.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-265** — The test run status in the status bar is its icon
+  alone, with the status named when the pointer rests on it. Beside the icon it
+  shows the tester an Assigned test run is assigned to, and the commit a
+  Committed test run was recorded in; any other status shows the icon only.
 
 ## The screen
 
@@ -73,9 +77,11 @@ There is no key for this. The figures are in the status bar.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The test run status** — with the same icon the tree draws. Its tooltip
-   reads *This test run's status. A committed test run records no more run item
-   statuses*.
+1. **The test run status** — the same icon the tree draws, alone. Its tooltip
+   names the status: *Completed. A committed test run records no more run item
+   statuses*. Beside the icon: the tester's name when the test run is
+   **Assigned**, the short commit id when it is **Committed**, nothing otherwise
+   (Rule-EDITOR-PANEL-265).
 2. **The figures** — one for each run item status any test case carries, each
    in that run item status's own color, separated by a dot. Their tooltip reads
    *How this test run is going*.

@@ -399,7 +399,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     void showTestRunTotals() {
         final @NotNull TestRunStatus status = parent.getMarker().getStatus();
 
-        statusBar.showTestRunStatus(status);
+        statusBar.showTestRunStatus(parent.getMarker());
         statusBar.showRunItemStatuses(ResultAnalysis.segments(TestRunSummary.of(results()), status));
 
         showElapsed();

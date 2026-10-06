@@ -16,10 +16,8 @@
 
 package org.testin.editor.card;
 
-import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.IconUtil;
 import lombok.AccessLevel;
@@ -28,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.ui.Tooltip;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -51,10 +50,7 @@ public final class HoverButton {
         label.setIcon(base);
         label.setCursor(Cursor.getPredefinedCursor(offered.works() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(offered.whyNot().orElse(name)))
-                .setShortcut(offered.works() ? Declared.shortcutText(offered.action().getActionId()) : "")
-                .installOn(label);
+        Tooltip.set(label, offered.whyNot().orElse(name), offered.works() ? Declared.shortcutText(offered.action().getActionId()) : "");
 
         // Rule-INTERNAL-122
         label.getAccessibleContext().setAccessibleName(name);

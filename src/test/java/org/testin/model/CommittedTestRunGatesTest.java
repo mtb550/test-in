@@ -50,7 +50,7 @@ public class CommittedTestRunGatesTest {
     // Rule-TREE-PANEL-135, Rule-SHARE-130
     @Test
     public void committedIsTheLastStageAndOnlyACommitReachesIt() {
-        assertTrue(Arrays.stream(TestRunStatus.values()).filter(status -> status != TestRunStatus.COMMITTED).allMatch(status -> TestRunStatus.COMMITTED.isFurtherThan(status)));
+        assertTrue(Arrays.stream(TestRunStatus.values()).filter(status -> status != TestRunStatus.COMMITTED).allMatch(TestRunStatus.COMMITTED::isFurtherThan));
 
         final @NotNull TestRunMarker marker = new TestRunMarker();
         marker.recordCommit("ea9a50107afbbaa1831909436b781f0e3c2d1a55");

@@ -16,6 +16,7 @@
 
 package org.testin.ui;
 
+import com.intellij.ide.HelpTooltip;
 import com.intellij.ide.HelpTooltipKt;
 import com.intellij.openapi.util.text.HtmlChunk;
 import lombok.AccessLevel;
@@ -28,5 +29,13 @@ import javax.swing.JComponent;
 public final class Tooltip {
     public static void set(final @NotNull JComponent component, final @NotNull String text) {
         HelpTooltipKt.setToolTipText(component, text.isEmpty() ? null : HtmlChunk.text(text).wrapWith("html"));
+    }
+
+    public static void set(final @NotNull JComponent component, final @NotNull String text, final @NotNull String shortcut) {
+        HelpTooltip.dispose(component);
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text(text))
+                .setShortcut(shortcut)
+                .installOn(component);
     }
 }

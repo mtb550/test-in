@@ -16,8 +16,6 @@
 
 package org.testin.editor.statusbar;
 
-import com.intellij.ide.HelpTooltip;
-import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -28,10 +26,14 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
+import org.testin.git.history.HistoryCard;
 import org.testin.logger.Logger;
 import org.testin.model.Automated;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.model.result.Segment;
 import org.testin.model.status.TestRunStatus;
+import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 
@@ -87,24 +89,17 @@ public class StatusBar extends JBPanel<StatusBar> {
         testRunStatusLabel.setForeground(UIUtil.getContextHelpForeground());
         testRunStatusLabel.setBorder(JBUI.Borders.emptyRight(10));
         testRunStatusLabel.setIconTextGap(JBUI.scale(4));
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.test.run.status.tip")))
-                .installOn(testRunStatusLabel);
 
         runItemStatusesRow.setOpaque(false);
         runItemStatusesRow.setBorder(JBUI.Borders.emptyRight(10));
 
         executionTimeLabel.setForeground(UIUtil.getInactiveTextColor());
         executionTimeLabel.setBorder(JBUI.Borders.emptyRight(10));
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.test.run.time.tip")))
-                .installOn(executionTimeLabel);
+        Tooltip.set(executionTimeLabel, Bundle.message("statusbar.test.run.time.tip"));
 
         automatedLabel.setForeground(UIUtil.getInactiveTextColor());
         automatedLabel.setBorder(JBUI.Borders.emptyRight(10));
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.automated.tip")))
-                .installOn(automatedLabel);
+        Tooltip.set(automatedLabel, Bundle.message("statusbar.automated.tip"));
 
         testRunStatusLabel.setVisible(false);
         runItemStatusesRow.setVisible(false);
@@ -162,9 +157,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         final @NotNull JBLabel label = new JBLabel(text);
 
         label.setForeground(color);
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.test.run.progress.tip")))
-                .installOn(label);
+        Tooltip.set(label, Bundle.message("statusbar.test.run.progress.tip"));
 
         return label;
     }
@@ -257,11 +250,21 @@ public class StatusBar extends JBPanel<StatusBar> {
         repaint();
     }
 
-    // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-179
-    public void showTestRunStatus(final @NotNull TestRunStatus status) {
+    // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-179, Rule-EDITOR-PANEL-265
+    public void showTestRunStatus(final @NotNull TestRunMarker marker) {
+        final @NotNull TestRunStatus status = marker.getStatus();
         testRunStatusLabel.setIcon(status.getIcon());
-        testRunStatusLabel.setText(status.getLabel());
+        testRunStatusLabel.setText(besideTheIcon(marker));
+        Tooltip.set(testRunStatusLabel, Bundle.message("statusbar.test.run.status.tip", status.getLabel()));
+        testRunStatusLabel.getAccessibleContext().setAccessibleName(status.getLabel());
         testRunStatusLabel.setVisible(true);
+    }
+
+    // Rule-EDITOR-PANEL-265
+    static @NotNull String besideTheIcon(final @NotNull TestRunMarker marker) {
+        if (marker.getStatus() == TestRunStatus.ASSIGNED) return Services.getInstance(AppSettingsState.class).testerName;
+        if (marker.getStatus().isRecord()) return HistoryCard.shortOf(marker.getCommit());
+        return "";
     }
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102

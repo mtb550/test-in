@@ -17,13 +17,11 @@
 package org.testin.ui.framework;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionButtonComponent;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUiKind;
 import com.intellij.openapi.actionSystem.ex.ActionButtonLook;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.openapi.util.text.HtmlChunk;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.ActionSystem;
 import org.testin.ui.Tooltip;
@@ -108,13 +106,7 @@ public abstract class AbstractIconButton extends JButton {
     // Rule-INTERNAL-122
     protected final void describe(final @NotNull String text) {
         getAccessibleContext().setAccessibleName(text);
-        shortcutText.ifPresentOrElse(key -> {
-            HelpTooltip.dispose(this);
-            new HelpTooltip()
-                    .setDescription(HtmlChunk.text(text))
-                    .setShortcut(key)
-                    .installOn(this);
-        }, () -> Tooltip.set(this, text));
+        shortcutText.ifPresentOrElse(key -> Tooltip.set(this, text, key), () -> Tooltip.set(this, text));
     }
 
     @Override
