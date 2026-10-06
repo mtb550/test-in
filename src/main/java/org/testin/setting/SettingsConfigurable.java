@@ -32,6 +32,8 @@ import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
@@ -157,10 +159,11 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         if (refusal.isPresent()) throw refusal.get();
 
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
+        final @NotNull String level = Objects.requireNonNullElse((String) logLevelComboBox.getSelectedItem(), Level.INFO.name());
+        final boolean levelChanged = !level.equals(settings.logLevel);
 
         settings.rootTestinPath = testinPathPanel.getPathText().trim();
-        settings.logLevel = Objects.requireNonNullElse((String) logLevelComboBox.getSelectedItem(),
-                Level.INFO.name());
+        settings.logLevel = level;
         settings.testerName = testerNameField.getText().trim();
         settings.testerRole = testerRoleField.getText().trim();
         settings.defaultDownloadFolder = downloadFolderField.getText().trim();
@@ -169,6 +172,14 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         if (rootChanged) refreshEveryOpenProject();
+        if (levelChanged) offerTheLogsGuide();
+    }
+
+    // UC-SETTING-007, Rule-INTERNAL-129
+    private static void offerTheLogsGuide() {
+        for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
+            if (!open.isDisposed()) Services.getInstance(open, Guides.class).add(Guide.COLLECT_LOGS);
+        }
     }
 
     private void refreshEveryOpenProject() {

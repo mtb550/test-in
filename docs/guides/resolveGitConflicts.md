@@ -23,9 +23,9 @@
 
 ## If something goes wrong
 
-| What you see                     | What to do                                                  |
-|----------------------------------|-------------------------------------------------------------|
-| The conflict message comes back  | A file is still in conflict. Carry on again.                |
-| A step failed                    | Press **Show Git log** on its message to read what Git said. |
+| What you see                    | What to do                                                   |
+|---------------------------------|--------------------------------------------------------------|
+| The conflict message comes back | A file is still in conflict. Carry on again.                 |
+| A step failed                   | Press **Show Git log** on its message to read what Git said. |
 
 [Documentation](../README.md) › Task guides

@@ -1,4 +1,4 @@
-[Documentation](README.md) › First run
+[Documentation](../README.md) › Task guides
 
 # First run — ten minutes, install to a run item status
 
@@ -74,7 +74,7 @@ Set two things and leave the rest:
 | **Tester name**   | Your name. It is written into every test case and every run item status you record |
 
 Everything on this page belongs to this machine and this person. Nothing here is
-committed — [the settings page](setting/main.md) says where each value lives and
+committed — [the settings page](../setting/main.md) says where each value lives and
 why.
 
 ## 3. Create a test project
@@ -99,7 +99,7 @@ writes three lines into your repository saying that this code project is about
 `Demo`. Testin works fully without it, with one exception: the automation code
 in step 6 stays off until the file names the open test project. Press it once
 and the rest of this page works.
-[UC-TREE-PANEL-029](treePanel/saveTestinYml.md) draws what it shows first.
+[UC-TREE-PANEL-029](../treePanel/saveTestinYml.md) draws what it shows first.
 
 ## 4. Create a test set
 
@@ -221,13 +221,13 @@ five things.
 
 ## Where to go next
 
-| If you want to                    | Read                                        |
-|-----------------------------------|---------------------------------------------|
-| Know every key                    | [Every shortcut](shortcuts.md)              |
-| Understand the tree               | [The tree panel](treePanel/main.md)         |
-| Write and edit test cases in bulk | [The editor panel](editorPanel/main.md)     |
-| Share test data with your team    | [Sharing work with the team](share/main.md) |
-| See what the files look like      | [The formats on disk](formats.md)           |
+| If you want to                    | Read                                           |
+|-----------------------------------|------------------------------------------------|
+| Know every key                    | [Every shortcut](../shortcuts.md)              |
+| Understand the tree               | [The tree panel](../treePanel/main.md)         |
+| Write and edit test cases in bulk | [The editor panel](../editorPanel/main.md)     |
+| Share test data with your team    | [Sharing work with the team](../share/main.md) |
+| See what the files look like      | [The formats on disk](../formats.md)           |
 
 ## If you cloned this repository
 

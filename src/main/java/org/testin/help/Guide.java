@@ -26,6 +26,11 @@ import org.testin.util.Bundle;
 @Getter
 @AllArgsConstructor
 public enum Guide {
+    GETTING_STARTED(
+            Bundle.message("guide.getting.started"),
+            "guides/firstRun.md"
+    ),
+
     SET_UP_THIS_MACHINE(
             Bundle.message("guide.set.up.this.machine"),
             "guides/setUpThisMachine.md"
@@ -64,6 +69,11 @@ public enum Guide {
     TEST_RUN_EDITOR_SHORTCUTS(
             Bundle.message("guide.test.run.editor.shortcuts"),
             "guides/testRunEditorShortcuts.md"
+    ),
+
+    COLLECT_LOGS(
+            Bundle.message("guide.collect.logs"),
+            "guides/collectLogs.md"
     );
 
     private final @NotNull String title;

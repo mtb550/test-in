@@ -73,11 +73,11 @@ lists, not apologies.
 
 You installed the plugin and want to use it well.
 
-| Document                           | What it answers                                                       | Where it stands                                                           |
-|------------------------------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------|
-| **[Every shortcut](shortcuts.md)** | Every key Testin answers to, on every screen                          | Written                                                                   |
-| **Task guides**                    | How to set up what a feature needs by hand, reached from the IDE      | Planned, not built — [#307](https://github.com/mtb550/test-in/issues/307) |
-| **[First run](firstRun.md)**       | From installing the plugin to a first run item status, in ten minutes | Written                                                                   |
+| Document                            | What it answers                                                       | Where it stands                                                           |
+|-------------------------------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------|
+| **[Every shortcut](shortcuts.md)**  | Every key Testin answers to, on every screen                          | Written                                                                   |
+| **Task guides**                     | How to set up what a feature needs by hand, reached from the IDE      | Planned, not built — [#307](https://github.com/mtb550/test-in/issues/307) |
+| **[First run](guides/firstRun.md)** | From installing the plugin to a first run item status, in ten minutes | Written                                                                   |
 
 ## For contributors
 

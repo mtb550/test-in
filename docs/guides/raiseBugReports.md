@@ -52,14 +52,14 @@ Without it, a bug shows **Open**, **Fixed** or **Not planned**.
 
 ## If something goes wrong
 
-| What you see                                                       | What to do                                                   |
-|--------------------------------------------------------------------|--------------------------------------------------------------|
-| *Add bugRepoUrl to testin.yml*, on the gray **Send**               | Once per repository, step 2.                                 |
-| *bugRepoUrl is not a GitHub repository address*                    | Write it as `https://host/owner/repo`.                       |
-| *GitHub CLI (gh) is not installed, or the IDE cannot see it*       | Once per machine, steps 1 and 4.                             |
-| *gh \<version\> is too old to attach screenshots*                  | Install a newer `gh`, then restart the IDE.                  |
-| *Not signed in to \<host\>*                                        | Once per machine, step 3.                                    |
-| The red ? says the bug states could not be read                    | `gh` cannot be reached or is signed out. Steps 1 to 4.       |
-| The red ? names `gh auth refresh -s read:project`                  | See your team's board columns, above.                        |
+| What you see                                                 | What to do                                             |
+|--------------------------------------------------------------|--------------------------------------------------------|
+| *Add bugRepoUrl to testin.yml*, on the gray **Send**         | Once per repository, step 2.                           |
+| *bugRepoUrl is not a GitHub repository address*              | Write it as `https://host/owner/repo`.                 |
+| *GitHub CLI (gh) is not installed, or the IDE cannot see it* | Once per machine, steps 1 and 4.                       |
+| *gh \<version\> is too old to attach screenshots*            | Install a newer `gh`, then restart the IDE.            |
+| *Not signed in to \<host\>*                                  | Once per machine, step 3.                              |
+| The red ? says the bug states could not be read              | `gh` cannot be reached or is signed out. Steps 1 to 4. |
+| The red ? names `gh auth refresh -s read:project`            | See your team's board columns, above.                  |
 
 [Documentation](../README.md) › Task guides

@@ -36,7 +36,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.logger.Logger;
+import org.testin.services.Services;
 import org.testin.util.Html;
 
 import java.awt.Point;
@@ -155,8 +158,10 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR, actions);
     }
 
+    // Rule-EDITOR-PANEL-206, Rule-INTERNAL-129
     private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
-        // Rule-EDITOR-PANEL-206
+        if (type == NotificationType.ERROR) Services.getInstance(p, Guides.class).add(Guide.COLLECT_LOGS);
+
         final @NotNull String titleText = Html.ofText(title);
         final @NotNull String messageText = Html.ofText(message);
 

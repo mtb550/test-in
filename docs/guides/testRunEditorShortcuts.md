@@ -21,16 +21,16 @@
 
 ## Executing a test run
 
-| Key                                | What it does                                                     | Read more                                                             |
-|------------------------------------|------------------------------------------------------------------|-----------------------------------------------------------------------|
-| `P`                                | Records **Passed**                                               | [Record a pass](../editorPanel/recordPassed.md)                       |
-| `F`                                | Records **Failed**, and asks why                                 | [Record a failure](../editorPanel/recordFailed.md)                    |
-| `B`                                | Records **Blocked**                                              | [Record a block](../editorPanel/recordBlocked.md)                     |
-| `F2`                               | Changes the failure details without changing the run item status | [Change the failure details](../editorPanel/editFailureDetail.md)     |
-| `F5`                               | Runs the selected test cases, or stops them                      | [Run a test case](../editorPanel/runOneTestCase.md)                   |
-| `Shift+F5`                         | Goes to the automation code                                      | [Go to the code](../codegen/goToCode.md)                              |
-| `F12`, `Ctrl+Alt+Cmd+F12` on a Mac | Writes the method for a test case that has none                  | [Automate a test case](../codegen/automateTestCase.md)                |
-| `Ctrl+P`, `Ctrl+Alt+P` on a Mac    | Generates a report on this test run                              | [Generate a report](../report/generateReport.md)                      |
+| Key                                | What it does                                                     | Read more                                                         |
+|------------------------------------|------------------------------------------------------------------|-------------------------------------------------------------------|
+| `P`                                | Records **Passed**                                               | [Record a pass](../editorPanel/recordPassed.md)                   |
+| `F`                                | Records **Failed**, and asks why                                 | [Record a failure](../editorPanel/recordFailed.md)                |
+| `B`                                | Records **Blocked**                                              | [Record a block](../editorPanel/recordBlocked.md)                 |
+| `F2`                               | Changes the failure details without changing the run item status | [Change the failure details](../editorPanel/editFailureDetail.md) |
+| `F5`                               | Runs the selected test cases, or stops them                      | [Run a test case](../editorPanel/runOneTestCase.md)               |
+| `Shift+F5`                         | Goes to the automation code                                      | [Go to the code](../codegen/goToCode.md)                          |
+| `F12`, `Ctrl+Alt+Cmd+F12` on a Mac | Writes the method for a test case that has none                  | [Automate a test case](../codegen/automateTestCase.md)            |
+| `Ctrl+P`, `Ctrl+Alt+P` on a Mac    | Generates a report on this test run                              | [Generate a report](../report/generateReport.md)                  |
 
 **Start Manual Execution**, **Stop Execution** and **Result Analysis** have no
 key. They are on the editor's toolbar.

@@ -80,7 +80,7 @@ the automation project it tests, so test data and code have their own histories.
 Testin's settings are per-IDE, not per-project: the root you choose is the one
 every open project uses.
 
-**New to it?** [First run](docs/firstRun.md) takes ten minutes and ends at a
+**New to it?** [First run](docs/guides/firstRun.md) takes ten minutes and ends at a
 recorded run item status and a report. On the way: install, a test case you wrote, the Java
 method Testin wrote for it, and the document you send to someone who has no IDE.
 
@@ -137,7 +137,7 @@ checked against the code it describes.
 | **[Sharing work with the team](docs/share/main.md)**       | Export, import and Git                             |
 | **[Inside Testin](docs/internal/main.md)**                 | The search, and the one thing that owns every file |
 
-Seven pages sit outside the eight parts: [First run](docs/firstRun.md), [every
+Seven pages sit outside the eight parts: [First run](docs/guides/firstRun.md), [every
 shortcut](docs/shortcuts.md), [the formats on disk](docs/formats.md), [the
 standing decisions](docs/decisions.md), [how Testin is put
 together](docs/ARCHITECTURE.md), [the product](docs/product.md) and [how a

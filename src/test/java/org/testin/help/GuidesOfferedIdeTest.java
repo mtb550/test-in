@@ -26,6 +26,7 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.git.GitFailure;
 import org.testin.git.conflict.GitConflictOffer;
 import org.testin.model.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.status.RunItemStatus;
@@ -41,6 +42,17 @@ public class GuidesOfferedIdeTest extends AbstractTempRootIdeTest {
     }
 
     // Rule-INTERNAL-129
+    public void testAnErrorOffersTheLogsGuideAndARefusalDoesNot() {
+        guides().forgetAll();
+
+        Services.getInstance(getProject(), Notifier.class).softRefuse(getProject(), "Nothing to Sync");
+        assertFalse("a refusal offered the logs guide", guides().offered().contains(Guide.COLLECT_LOGS));
+
+        Services.getInstance(getProject(), Notifier.class).error(getProject(), "Push Failed", "fatal: could not read from remote repository");
+        assertTrue("an error did not offer the logs guide", guides().offered().contains(Guide.COLLECT_LOGS));
+    }
+
+    // Rule-INTERNAL-129
     public void testAGitFailureOffersGitSharingAndAConflictOffersConflicts() {
         guides().forgetAll();
 
@@ -50,7 +62,7 @@ public class GuidesOfferedIdeTest extends AbstractTempRootIdeTest {
         }, () -> {
         });
 
-        assertEquals(List.of(Guide.SHARE_OVER_GIT, Guide.RESOLVE_GIT_CONFLICTS), guides().offered());
+        assertEquals(List.of(Guide.SHARE_OVER_GIT, Guide.RESOLVE_GIT_CONFLICTS, Guide.COLLECT_LOGS), guides().offered());
     }
 
     // Rule-INTERNAL-129

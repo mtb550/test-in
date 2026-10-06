@@ -34,11 +34,11 @@ If a sync stops on a conflict, read
 
 ## If something goes wrong
 
-| What you see                                 | What to do                                                                  |
-|----------------------------------------------|-----------------------------------------------------------------------------|
-| The red ? says the project is not under Git  | Press **Initialize Git (git init)** in its hint, step 1.                    |
-| The red ? says no remote URL is configured   | Commit and push once, step 4. The push asks for the address.               |
-| *Git Plugin Not Available*                   | Turn on the Git plugin in **Settings \| Plugins**, then restart the IDE.    |
-| A Git step failed                            | Press **Show Git log** on its message to read what Git said.               |
+| What you see                                | What to do                                                               |
+|---------------------------------------------|--------------------------------------------------------------------------|
+| The red ? says the project is not under Git | Press **Initialize Git (git init)** in its hint, step 1.                 |
+| The red ? says no remote URL is configured  | Commit and push once, step 4. The push asks for the address.             |
+| *Git Plugin Not Available*                  | Turn on the Git plugin in **Settings \| Plugins**, then restart the IDE. |
+| A Git step failed                           | Press **Show Git log** on its message to read what Git said.             |
 
 [Documentation](../README.md) › Task guides

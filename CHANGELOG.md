@@ -32,6 +32,8 @@ than repairing it, and a team sharing a test project should update together.
 
 ### Changed
 
+- **Two more guides in Testin Help:** *How to get started*, the ten-minute first run, offered on a new machine, and
+  *How to collect Testin's logs*, offered when Testin shows an error or the log level changes.
 - **Testin Help covers Git and automation code too:** a missing Java, TestNG or Git plugin, a missing test source
   folder, a test project not under Git and a missing remote wait on the ? as hints; **Initialize Git** is in its hint.
   A key you press still answers with a short message. Three new guides: sharing test projects over Git, resolving Git

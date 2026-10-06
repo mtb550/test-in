@@ -294,6 +294,7 @@ public final class TreePanel implements Disposable {
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-002, Rule-INTERNAL-129
     void offerFirstProject(final @NotNull StatusText emptyText) {
+        Services.getInstance(p, Guides.class).add(Guide.GETTING_STARTED);
         Services.getInstance(p, Guides.class).add(Guide.SET_UP_THIS_MACHINE);
         emptyText.appendLine(
                 AllIcons.General.Add,
