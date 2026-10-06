@@ -30,7 +30,7 @@ public abstract class AbstractTempRootIdeTest extends BasePlatformTestCase {
     @Override
     protected void setUp() {
         try {
-            root = Files.createTempDirectory("testin-" + getClass().getSimpleName());
+            root = Files.createTempDirectory("testin-" + getClass().getSimpleName()).toRealPath();
             super.setUp();
         } catch (final Exception ex) {
             throw new AssertionError("Could not set up " + getName() + ": " + ex.getMessage(), ex);

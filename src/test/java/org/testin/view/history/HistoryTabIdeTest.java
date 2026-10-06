@@ -16,7 +16,6 @@
 
 package org.testin.view.history;
 
-import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;

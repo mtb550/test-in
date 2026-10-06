@@ -224,7 +224,7 @@ public class HistoryTab {
     // Rule-VIEW-PANEL-109
     private static @NotNull JComponent testRun(final @NotNull Project p, final @NotNull BugEvent event, final @NotNull TestCaseDto tc) {
         return Services.getInstance(p, TestRuns.class).findTestRunDir(event.testRun())
-                .<JComponent>map(dir -> {
+                .map(dir -> {
                     final @NotNull JComponent link = AbstractDetails.link(event.testRunName(), _ -> Services.getInstance(p, TestinEditors.class).openAndSelect(dir, tc));
                     link.setFont(Fonts.strong());
                     return link;

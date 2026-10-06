@@ -18,16 +18,10 @@ package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.ZonedDateTime;
-
 public sealed interface HistoryCard permits HistoryEntry, BugCard {
     int SHORT_HASH = 7;
 
     @NotNull String hash();
-
-    @NotNull String who();
-
-    @NotNull ZonedDateTime when();
 
     // Rule-VIEW-PANEL-098
     default boolean isCommitted() {

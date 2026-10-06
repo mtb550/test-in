@@ -3,8 +3,8 @@
 # UC-INTERNAL-009: Get help where Testin needs it
 
 **As a** tester, **I want** Testin to tell me what is not set up yet, and to
-offer the guide for the part I am using, **so that** I can fix it myself without
-searching the documentation or asking whoever installed the plugin.
+offer the guide for the part I am using, **so that** I can fix it myself. I do
+not have to search the documentation or ask whoever installed the plugin.
 
 Testin Help is the question mark at the right end of the IDE's status bar. It
 holds two lists that the rest of Testin fills: **hints**, for what needs doing

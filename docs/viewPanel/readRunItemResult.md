@@ -152,8 +152,8 @@ with neither a name nor a date the row is not drawn at all (Rule-VIEW-PANEL-031)
 
 The **Bug Severity** and **Bug Priority** rows say what *this* test run
 recorded. The [History tab](readHistory.md) shows every bug any test run
-recorded on this test case, each as a bug card of its own, so a test case that
-has failed in more than one cycle shows one bug here and all of them there.
+recorded on this test case, each as a bug card of its own. A test case that has
+failed in more than one cycle shows one bug here and all of them there.
 
 ---
 

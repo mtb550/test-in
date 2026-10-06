@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.change.FieldChange;
 import org.testin.git.GitFailed;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.change.TestCaseChangeComparator;

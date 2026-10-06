@@ -10,7 +10,7 @@ The History tab reads the test case's history from Git. Each commit that changed
 the test case's file is one entry. Testin stores no history of its own.
 
 The test case's bugs are read from Git too. A bug is what a run item records
-about a failure, so each time a test run recorded, changed or cleared a bug on
+about a failure. Each time a test run recorded, changed or cleared a bug on
 this test case, History shows a bug card of its own beside the test case's
 entries. The bug card opens with what happened and in which test run, and the
 test run's name opens that test run with the run item selected.
@@ -69,8 +69,8 @@ There is no key for this. The tab is called **History**.
   one test case's history is never drawn over another's.
 - **Rule-VIEW-PANEL-100** — A test project that is not under Git has no history.
   The tab lists the bugs its test runs hold now, each as a Not committed yet bug
-  card, then says in one line that it has no history, and names Initialize Git
-  (git init) in View Pending Commits as the way to start one.
+  card. Then it says in one line that it has no history, and names Initialize
+  Git (git init) in View Pending Commits as the way to start one.
 - **Rule-VIEW-PANEL-101** — The tab shows every commit that changed the test
   case. Git is read away from the screen, and the entries are drawn in groups,
   so the IDE never waits for a long history.

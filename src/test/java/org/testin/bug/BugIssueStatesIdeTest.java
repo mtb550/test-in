@@ -79,8 +79,8 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         }), getTestRootDisposable());
     }
 
-    private @NotNull List<List<String>> askedAbout(final @NotNull String repository) {
-        return asked.stream().filter(arguments -> arguments.contains("name=" + repository)).toList();
+    private @NotNull List<List<String>> askedAboutTest03() {
+        return asked.stream().filter(arguments -> arguments.contains("name=test-03")).toList();
     }
 
     private int readAndWait() {
@@ -107,7 +107,7 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
 
         readAndWait();
 
-        assertEquals("one repository is one request", 1, askedAbout("test-03").size());
+        assertEquals("one repository is one request", 1, askedAboutTest03().size());
         assertEquals(Bundle.message("bug.state.fixed"), states().of(FIXED).label());
         assertEquals(Bundle.message("bug.state.open"), states().of(OPEN).label());
 
@@ -142,7 +142,7 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         assertEquals(Bundle.message("bug.state.fixed"), states().of(FIXED).label());
         assertEquals("a message was raised for the board", List.of(), said.stream().map(Notification::getTitle).toList());
         assertEquals("the board did not wait as one hint", 1, hintsFor(SetupStep.BOARD_COLUMNS).size());
-        assertEquals("Refresh did not ask for the board again", 2, askedAbout("test-03").stream().filter(arguments -> arguments.contains("field=Status")).count());
+        assertEquals("Refresh did not ask for the board again", 2, askedAboutTest03().stream().filter(arguments -> arguments.contains("field=Status")).count());
 
         ghAnswers(ANSWER);
         readAndWait();

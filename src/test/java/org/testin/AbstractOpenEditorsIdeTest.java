@@ -38,7 +38,7 @@ public abstract class AbstractOpenEditorsIdeTest extends FileEditorManagerTestCa
     @Override
     public void setUp() {
         try {
-            root = Files.createTempDirectory("testin-" + getClass().getSimpleName());
+            root = Files.createTempDirectory("testin-" + getClass().getSimpleName()).toRealPath();
             super.setUp();
         } catch (final Exception ex) {
             throw new AssertionError("Could not set up " + getName() + ": " + ex.getMessage(), ex);

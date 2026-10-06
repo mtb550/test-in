@@ -104,7 +104,9 @@ public final class BugIssueStates {
 
         hints.clear(SetupStep.BUG_STATES);
         if (!asked.boardRefused()) hints.clear(SetupStep.BOARD_COLUMNS);
-        return numbers.stream().filter(number -> remember(repository, number, said.stateOf(number))).count() > 0;
+        boolean changed = false;
+        for (final int number : numbers) changed |= remember(repository, number, said.stateOf(number));
+        return changed;
     }
 
     // Rule-VIEW-PANEL-092
