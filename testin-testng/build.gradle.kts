@@ -38,15 +38,18 @@ dependencies {
     listOf(
         "compileOnly",
         "annotationProcessor",
-        "testCompileOnly",
         "testAnnotationProcessor"
     ).forEach { configuration ->
         add(configuration, libs.lombok)
     }
 
-    // The tests of this module's classes live here, as testin-java's do.
-    testImplementation(project(":"))
     testImplementation(libs.testng)
+}
+
+// The tests of this module's classes compile and run against what the classes
+// compile against, as testin-java's do.
+configurations.testImplementation {
+    extendsFrom(configurations.compileOnly.get())
 }
 
 tasks.withType<Test> {

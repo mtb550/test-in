@@ -44,16 +44,19 @@ dependencies {
     listOf(
         "compileOnly",
         "annotationProcessor",
-        "testCompileOnly",
         "testAnnotationProcessor"
     ).forEach { configuration ->
         add(configuration, libs.lombok)
     }
 
-    // The tests of this module's classes live here too, and they need the
-    // core on the classpath for the same reason the classes do.
-    testImplementation(project(":"))
     testImplementation(libs.testng)
+}
+
+// The tests of this module's classes live here too, and they need everything
+// the classes compile against - the core above all - on their classpath, where
+// it runs as well. One declaration for both, so the two cannot drift apart.
+configurations.testImplementation {
+    extendsFrom(configurations.compileOnly.get())
 }
 
 tasks.withType<Test> {
