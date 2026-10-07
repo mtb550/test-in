@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
@@ -109,17 +110,14 @@ public class TextSizeIdeTest extends AbstractTempRootIdeTest {
     }
 
     // Rule-SETTING-039
-    public void testTheGestureWorksOverTheTreeTheEditorAndTheViewPanel() {
+    public void testTheGestureWorksOverTheEditorAndTheViewPanel() {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull TestSetDirectoryDto login = EditorFixtures.testSet(getProject(), tp, "Login");
         EditorFixtures.testCases(getProject(), login, 2);
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), login, getTestRootDisposable());
-        final @NotNull TreePanelTree tree = new TreePanelTree(getProject());
-        Disposer.register(getTestRootDisposable(), tree);
         final @NotNull ViewPanel view = new ViewPanel(getProject());
 
         final @NotNull Map<String, JComponent> surfaces = new LinkedHashMap<>();
-        surfaces.put("the tree panel", tree.getMainTree());
         surfaces.put("the editor panel", Drawn.components(editor.getComponent()).stream().filter(JBList.class::isInstance).map(JBList.class::cast).findFirst().orElseThrow(() -> new AssertionError("the editor panel shows no list of test cases")));
         surfaces.put("the view panel", ViewTab.DETAILS.keyboardTargetOf(view));
 
@@ -133,16 +131,19 @@ public class TextSizeIdeTest extends AbstractTempRootIdeTest {
         grewBy.forEach((name, grown) -> assertEquals("Ctrl and the wheel over " + name + " did not change the text size: " + grewBy, 1.0f, grown, DELTA));
     }
 
-    // Rule-SETTING-037, Rule-SETTING-039
-    public void testTheTreesOwnTextFollowsTheGesture() {
+    // Rule-SETTING-039
+    public void testTheTreeKeepsTheIdesOwnTextSize() {
         final @NotNull TreePanelTree tree = new TreePanelTree(getProject());
         Disposer.register(getTestRootDisposable(), tree);
         final @NotNull JTree mainTree = tree.getMainTree();
+        final float treeSize = UIUtil.getTreeFont().getSize2D();
 
         wheeled(mainTree, -1);
+        wheeled(aPanel(), -1);
 
-        assertEquals("the tree's text did not change with the gesture", BASE + 1, mainTree.getFont().getSize2D(), DELTA);
+        assertEquals("Ctrl and the wheel over the tree changed the IDE's editor font", BASE + 1, global().getEditorFontSize2D(), DELTA);
+        assertEquals("the tree is not drawn in the IDE's own tree font", treeSize, mainTree.getFont().getSize2D(), DELTA);
         final @NotNull Component row = mainTree.getCellRenderer().getTreeCellRendererComponent(mainTree, "Login", false, false, true, 0, false);
-        assertEquals("a row of the tree is not drawn in the tree's text size", BASE + 1, row.getFont().getSize2D(), DELTA);
+        assertEquals("a row of the tree followed the gesture", treeSize, row.getFont().getSize2D(), DELTA);
     }
 }

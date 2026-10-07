@@ -28,14 +28,12 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 
 import javax.swing.AbstractAction;
@@ -113,11 +111,6 @@ public class TreePanelTree implements Disposable {
         Declared.bindTo("Testin.RemoveNode", mainTree);
 
         quietSwingsOwnClipboard(mainTree);
-
-        // UC-SETTING-011, Rule-SETTING-037, Rule-SETTING-039
-        FontSync.syncWithNativeEditor(p, mainTree, this, _ -> {
-        });
-        mainTree.addMouseWheelListener(WheelForwarding::forwardWheelToScrollPane);
     }
 
     // Rule-TREE-PANEL-006

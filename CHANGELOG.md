@@ -43,6 +43,9 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **The tree is drawn in the IDE's own interface font again,** like IntelliJ's own trees, rather than at the code
+  editor's size, and Ctrl and the mouse wheel over it no longer change the text size. The gesture still works over the
+  editor panel, the view panel and light mode.
 - **On an editor's card, a test case's priority is a short bar beside its description, not a badge:** red for High,
   blue for Medium, nothing for Low, while the Priority field is shown, in both editors. No text moves for it, and a
   screen reader still hears the priority. Light mode and the view panel keep the priority badge.

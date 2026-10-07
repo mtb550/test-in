@@ -5,8 +5,9 @@
 **As a** tester, **I want** Testin's text at the size I read code at, **so that** I can read a test case on a projector
 or on a small laptop screen.
 
-One gesture changes the size of the text in every Testin panel and in the code
-editor.
+One gesture changes the size of the text in the editor panel, the view panel,
+light mode and the code editor. The tree panel keeps the IDE's own interface
+font, as IntelliJ's own trees do.
 
 Hold `Ctrl` and turn the mouse wheel. On a Mac, hold `Cmd`.
 
@@ -20,11 +21,12 @@ Hold `Ctrl` and turn the mouse wheel. On a Mac, hold `Cmd`.
   a Git remote's credentials are kept by Git's own credential helper.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-037** — The gesture changes the IDE's own editor font size, so
-  every Testin surface and every code editor change together.
+  every Testin surface but the tree and every code editor change together.
 - **Rule-SETTING-038** — Nothing is drawn smaller than eight points, and nothing
   larger than 72.
-- **Rule-SETTING-039** — The gesture works over the tree panel, the editor
-  panel, the view panel and light mode.
+- **Rule-SETTING-039** — The gesture works over the editor panel, the view panel
+  and light mode. The tree panel is drawn in the IDE's own interface font, like
+  IntelliJ's own trees, and neither answers the gesture nor follows it.
 
 ## The screen
 
@@ -46,7 +48,8 @@ The bubble hides itself after five seconds.
 1. The tester holds `Ctrl` and turns the wheel over a Testin panel.
 2. The size moves one point for each notch.
 3. The bubble shows the new size.
-4. Every Testin surface and every open code editor redraws at the new size.
+4. Every Testin surface but the tree, and every open code editor, redraws at the
+   new size.
 5. Five seconds later the bubble goes.
 
 ## What Testin refuses

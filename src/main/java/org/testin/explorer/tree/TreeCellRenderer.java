@@ -38,10 +38,9 @@ import java.util.Set;
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final @NotNull Set<Path> selectedNodes;
 
-    // Rule-TREE-PANEL-008, Rule-SETTING-037
+    // Rule-TREE-PANEL-008
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-        setFont(tree.getFont());
         try {
             final @NotNull Optional<TreeLoadError> loadError = TreeValues.valueOf(value, TreeLoadError.class);
             if (loadError.isPresent()) {
