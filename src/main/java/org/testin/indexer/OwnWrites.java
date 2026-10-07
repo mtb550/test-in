@@ -26,9 +26,9 @@ import org.testin.logger.Logger;
 import org.testin.util.FailureText;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -38,15 +38,15 @@ import java.util.concurrent.atomic.AtomicLong;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Service(Service.Level.APP)
 public final class OwnWrites {
-    private static final byte[] NOTHING_TO_COMPARE = new byte[0];
+    private static final @NotNull ByteBuffer NOTHING_TO_COMPARE = ByteBuffer.allocate(0).asReadOnlyBuffer();
 
     private static final long SETTLES_IN_MILLIS = 5_000;
     private final @NotNull Map<String, Claim> written = new ConcurrentHashMap<>();
     private final @NotNull AtomicLong lastPurge = new AtomicLong();
 
-    private static boolean stillSays(final @NotNull Path path, final byte @NotNull [] ourContent) {
+    private static boolean stillSays(final @NotNull Path path, final @NotNull ByteBuffer ourContent) {
         try {
-            return Arrays.equals(Files.readAllBytes(path), ourContent);
+            return ByteBuffer.wrap(Files.readAllBytes(path)).equals(ourContent);
         } catch (final IOException stillSettling) {
             Logger.debug("Could not read " + path.getFileName() + " to tell our write from an edit: " + FailureText.of(stillSettling));
             return true;
@@ -76,7 +76,7 @@ public final class OwnWrites {
 
     void wrote(final @NotNull String window, final @NotNull Path path, final byte @NotNull [] content) {
         forgetOldEntries();
-        written.put(key(path), new Claim(System.currentTimeMillis(), content, window));
+        written.put(key(path), new Claim(System.currentTimeMillis(), ByteBuffer.wrap(content.clone()).asReadOnlyBuffer(), window));
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-064
@@ -92,9 +92,9 @@ public final class OwnWrites {
 
         if (claim.isEmpty()) return false;
 
-        final byte @NotNull [] ourContent = claim.orElseThrow().content();
+        final @NotNull ByteBuffer ourContent = claim.orElseThrow().content();
 
-        return ourContent.length == 0 || stillSays(path, ourContent);
+        return !ourContent.hasRemaining() || stillSays(path, ourContent);
     }
 
     private void forgetOldEntries() {

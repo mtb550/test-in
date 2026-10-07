@@ -167,17 +167,20 @@ jobs:
       - name: Build the jar the content modules compile against
         run: ./gradlew compileJava
 
+      # Into the runner's temp folder, not the checkout: Qodana inspects the
+      # whole checkout, and the build's HTML reports in it came back as 24,943
+      # findings in pages nobody writes.
       - name: Take the build's test coverage
         uses: actions/download-artifact@v7
         continue-on-error: true
         with:
           name: reports
-          path: build-reports
+          path: ${{ runner.temp }}/build-reports
 
       - name: Hand the coverage to Qodana
         run: |
           mkdir -p .qodana/code-coverage
-          cp build-reports/jacoco/test/jacocoTestReport.xml .qodana/code-coverage/ || echo "No coverage report from the build"
+          cp "${{ runner.temp }}/build-reports/jacoco/test/jacocoTestReport.xml" .qodana/code-coverage/ || echo "No coverage report from the build"
 
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2026.2.2

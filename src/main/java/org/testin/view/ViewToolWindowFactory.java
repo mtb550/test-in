@@ -68,10 +68,8 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     }
 
     public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
-        showPanel(p, testCases, path, ViewToolWindowFactory::nothingAfter);
-    }
-
-    private static void nothingAfter(final @NotNull ViewPanel shown) {
+        showPanel(p, testCases, path, _ -> {
+        });
     }
 
     // Rule-VIEW-PANEL-008

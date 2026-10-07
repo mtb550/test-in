@@ -19,6 +19,7 @@ package org.testin.explorer.tree;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.EmptyRunnable;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tree.AsyncTreeModel;
 import com.intellij.ui.tree.StructureTreeModel;
@@ -130,11 +131,8 @@ public class TreePanelTree implements Disposable {
         return (System.nanoTime() - started) / 1_000_000;
     }
 
-    private static void nothingAfter() {
-    }
-
     public void reveal(final @NotNull Path target) {
-        reveal(target, TreePanelTree::nothingAfter);
+        reveal(target, EmptyRunnable.getInstance());
     }
 
     public void reveal(final @NotNull Path target, final @NotNull Runnable afterFound) {

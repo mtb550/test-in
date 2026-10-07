@@ -127,7 +127,7 @@ public class BadgesTest {
         Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.HIGH));
 
         assertEquals(badges.getFirst().text(), "High", "the badge does not say the priority's word");
-        assertEquals(badges.getFirst().tooltip(), "Priority: High", "hovering the badge does not name the field, so it reads like the bug's priority");
+        assertTrue(badges.getFirst() instanceof Pill pill && pill.tooltip().equals("Priority: High"), "hovering the badge does not name the field, so it reads like the bug's priority");
     }
 
     // Rule-EDITOR-PANEL-267

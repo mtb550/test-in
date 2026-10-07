@@ -24,6 +24,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.EmptyRunnable;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -109,11 +110,11 @@ public final class BackgroundWork {
 
     public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull Consumer<@NotNull ProgressIndicator> work) {
         // Rule-SHARE-037
-        run(p, title, whatFailed, true, work, BackgroundWork::nothing, BackgroundWork::nothing);
+        run(p, title, whatFailed, true, work, EmptyRunnable.getInstance(), EmptyRunnable.getInstance());
     }
 
     public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onFinished) {
-        run(p, title, whatFailed, cancellable, work, BackgroundWork::nothing, onFinished);
+        run(p, title, whatFailed, cancellable, work, EmptyRunnable.getInstance(), onFinished);
     }
 
     public static <T> void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Function<@NotNull ProgressIndicator, @NotNull T> work, final @NotNull Consumer<@NotNull T> onSuccess, final @NotNull Runnable onFinished) {
@@ -151,9 +152,6 @@ public final class BackgroundWork {
                 onFinished.run();
             }
         });
-    }
-
-    private static void nothing() {
     }
 
     public static void logged(final @NotNull CompletionStage<?> stage, final @NotNull String what) {

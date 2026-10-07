@@ -16,14 +16,9 @@
 
 package org.testin.indexer;
 
-import lombok.Value;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-@Value
-@Accessors(fluent = true)
-class Claim {
-    long at;
-    byte @NotNull [] content;
-    @NotNull String by;
+import java.nio.ByteBuffer;
+
+record Claim(long at, @NotNull ByteBuffer content, @NotNull String by) {
 }

@@ -151,7 +151,7 @@ public final class Badges {
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, BADGE_PAD_H + badge.notch()));
 
             setFont(Fonts.badge());
-            Tooltip.set(this, badge.tooltip());
+            Tooltip.set(this, badge instanceof Pill pill ? pill.tooltip() : "");
 
             setVisible(true);
         }

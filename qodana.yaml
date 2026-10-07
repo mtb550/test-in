@@ -54,9 +54,18 @@ include:
 
 # The gate: any finding Qodana reports fails the run, the same zero the
 # inspection gate holds. A finding is fixed, or excused below with its reason.
+#
+# Info is the one level left out, because the coverage inspection reports at
+# it: it lists every method no test reaches, which is how the report shows
+# coverage, not a defect - 680 of them failed the first run with a zero for
+# every level. The coverage minimum is the build's own JaCoCo gate. Grammar
+# also reports at Info, and tools/inspect.ps1 fails on it.
 failureConditions:
   severityThresholds:
-    any: 0
+    critical: 0
+    high: 0
+    moderate: 0
+    low: 0
 
 # Testin is Apache-2.0. A dependency under a copyleft license would bind the
 # plugin to its terms, so those are refused outright; everything else follows

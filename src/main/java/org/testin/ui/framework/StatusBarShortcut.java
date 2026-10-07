@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.util.EmptyRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
 import org.testin.util.Bundle;
@@ -44,7 +45,7 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     }
 
     public static @NotNull StatusBarShortcut hint(final @NotNull String displayText, final @NotNull String name) {
-        return new StatusBarShortcut(Shortcuts.EMPTY, displayText, name, StatusBarShortcut::nothing);
+        return new StatusBarShortcut(Shortcuts.EMPTY, displayText, name, EmptyRunnable.getInstance());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
@@ -65,8 +66,6 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
         return hint("Tab", Bundle.message("shortcut.navigate"));
     }
 
-    private static void nothing() {
-    }
 
     public boolean isBindable() {
         return shortcut != Shortcuts.EMPTY;

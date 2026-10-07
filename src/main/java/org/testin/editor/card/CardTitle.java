@@ -97,9 +97,10 @@ public final class CardTitle {
 
         final @NotNull Rectangle margin = priorityMargin(c);
         final int width = Math.max(2, margin.height / 6);
+        final int arc = width;
         final int inset = margin.height / 8;
 
         g.setColor(priority.getColor());
-        g.fillRoundRect(margin.x + (margin.width - width) / 2, margin.y + inset, width, margin.height - 2 * inset, width, width);
+        g.fillRoundRect(margin.x + (margin.width - width) / 2, margin.y + inset, width, margin.height - 2 * inset, arc, arc);
     }
 }

@@ -80,7 +80,7 @@ java {
 // #377, #389: NullAway fails compileJava and compileTestJava on a null reaching
 // what the annotations say cannot take one, in all three modules. Error Prone's
 // own checks run beside it at their default severity since 7 October 2026: an
-// error stops the compile and a warning is fixed, not left standing.
+// error fails compilation and a warning is fixed, not left standing.
 // A test fills its fields in JUnit 3's setUp or TestNG's @BeforeMethod rather
 // than a constructor, so both are named as initializers.
 val errorprone = libs.errorprone
@@ -101,7 +101,7 @@ allprojects {
             check("NullAway", CheckSeverity.ERROR)
             // Error Prone 2.50.0, the newest, crashes in this check itself
             // (NoSuchElementException in StringConcatToTextBlock.matchLiteral) on
-            // ScreenshotsSection's Bundle.message call, which stops the compile.
+            // ScreenshotsSection's Bundle.message call, which fails compilation.
             // On again once a release fixes it.
             check("StringConcatToTextBlock", CheckSeverity.OFF)
             // Types an enum constant holds that Testin cannot annotate @Immutable:

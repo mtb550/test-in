@@ -17,6 +17,7 @@
 package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.EmptyRunnable;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
@@ -38,12 +39,12 @@ public class ShortcutStripIdeTest extends BasePlatformTestCase {
 
     private static @NotNull StatusBarItem @NotNull [] sixKeys() {
         return new StatusBarItem[]{
-                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", ShortcutStripIdeTest::nothing),
+                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", EmptyRunnable.getInstance()),
                 StatusBarShortcut.select(),
                 StatusBarShortcut.navigate(),
-                StatusBarShortcut.build(Shortcuts.FocusSearch, "Search", ShortcutStripIdeTest::nothing),
+                StatusBarShortcut.build(Shortcuts.FocusSearch, "Search", EmptyRunnable.getInstance()),
                 StatusBarShortcut.corrections(),
-                StatusBarShortcut.cancel(ShortcutStripIdeTest::nothing)};
+                StatusBarShortcut.cancel(EmptyRunnable.getInstance())};
     }
 
     private static void laidOut(final @NotNull Container container) {
@@ -70,9 +71,6 @@ public class ShortcutStripIdeTest extends BasePlatformTestCase {
 
     private static int middleOf(final @NotNull Component component, final @NotNull Component within) {
         return SwingUtilities.convertPoint(component.getParent(), component.getLocation(), within).y + component.getHeight() / 2;
-    }
-
-    private static void nothing() {
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-078
