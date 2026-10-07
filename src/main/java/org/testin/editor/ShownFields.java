@@ -45,7 +45,7 @@ public final class ShownFields {
                 .collect(Collectors.joining(","));
 
         final @NotNull Set<E> chosen = new HashSet<>();
-        for (final String s : PropertiesComponent.getInstance().getValue(propertyKey, defaults).split(",")) {
+        for (final String s : PropertiesComponent.getInstance().getValue(propertyKey, defaults).split(",", -1)) {
             if (s.isEmpty()) continue;
             try {
                 chosen.add(Enum.valueOf(attributes, s));

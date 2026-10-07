@@ -32,7 +32,7 @@ public final class Groups {
         if (raw.isBlank() || raw.trim().equalsIgnoreCase(NONE)) return new ArrayList<>();
 
         final @NotNull List<String> read = new ArrayList<>();
-        for (final String name : raw.split(",")) {
+        for (final String name : raw.split(",", -1)) {
             final @NotNull String group = name.trim();
 
             if (!group.isEmpty() && !read.contains(group)) read.add(group);

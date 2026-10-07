@@ -56,6 +56,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -99,7 +100,7 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
             field.setAccessible(true);
             return field.get(popup);
         } catch (final ReflectiveOperationException ex) {
-            throw new AssertionError("the popup no longer has " + name, ex);
+            throw new LinkageError("the popup no longer has " + name, ex);
         }
     }
 
@@ -138,7 +139,7 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
     }
 
     private static @NotNull ComponentDialogBase<TextInput> aField(final @NotNull String caption) {
-        return ComponentDialogBase.textField().caption(caption).placeholder("set " + caption.toLowerCase() + "..").build();
+        return ComponentDialogBase.textField().caption(caption).placeholder("set " + caption.toLowerCase(Locale.ROOT) + "..").build();
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-053
@@ -242,19 +243,19 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
     // UC-INTERNAL-007, Rule-INTERNAL-061
     public void testOnlyADialogThatAsksForASizeOrSaysItIsResizableCanBeMovedOrResized() {
         final @NotNull Form fitted = shown(new Form(getProject(), List.of(aField("Name"))));
-        assertEquals("a dialog sized by its contents can be resized", Boolean.FALSE, popupField(popupOf(fitted), "myResizable"));
-        assertEquals("a dialog sized by its contents can be moved", Boolean.FALSE, popupField(popupOf(fitted), "myMovable"));
+        assertEquals("a dialog sized by its contents can be resized", false, popupField(popupOf(fitted), "myResizable"));
+        assertEquals("a dialog sized by its contents can be moved", false, popupField(popupOf(fitted), "myMovable"));
         assertFalse("a dialog sized by its contents was given a size of its own", fitted.root().isPreferredSizeSet());
         fitted.closeCancel();
 
         final @NotNull Form tall = shown(new Form(getProject(), List.of(aField("Name")), false, DialogSize.TALL));
-        assertEquals("a dialog that asks for a size cannot be resized", Boolean.TRUE, popupField(popupOf(tall), "myResizable"));
-        assertEquals("a dialog that asks for a size cannot be moved", Boolean.TRUE, popupField(popupOf(tall), "myMovable"));
+        assertEquals("a dialog that asks for a size cannot be resized", true, popupField(popupOf(tall), "myResizable"));
+        assertEquals("a dialog that asks for a size cannot be moved", true, popupField(popupOf(tall), "myMovable"));
         tall.closeCancel();
 
         final @NotNull Form growing = shown(new Form(getProject(), List.of(aField("Name")), true, DialogSize.CONTENT));
-        assertEquals("a dialog that says it is resizable cannot be resized", Boolean.TRUE, popupField(popupOf(growing), "myResizable"));
-        assertEquals("a dialog that says it is resizable cannot be moved", Boolean.TRUE, popupField(popupOf(growing), "myMovable"));
+        assertEquals("a dialog that says it is resizable cannot be resized", true, popupField(popupOf(growing), "myResizable"));
+        assertEquals("a dialog that says it is resizable cannot be moved", true, popupField(popupOf(growing), "myMovable"));
         assertFalse("a resizable dialog that names no size does not keep the size its contents give", growing.root().isPreferredSizeSet());
     }
 
@@ -331,7 +332,7 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
 
         assertTrue("a dialog the tester can make smaller than its content clips it instead of scrolling", center instanceof JScrollPane);
         assertEquals("the scrollbar is not there only when it is needed", ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ((JScrollPane) center).getVerticalScrollBarPolicy());
-        assertEquals("the strip moved into what scrolls", BorderLayout.SOUTH, ((BorderLayout) resizable.root().getLayout()).getConstraints(Stream.of(resizable.root().getComponents()).filter(child -> child != center).findFirst().orElseThrow()));
+        assertEquals("the strip moved into what scrolls", BorderLayout.SOUTH, ((BorderLayout) resizable.root().getLayout()).getConstraints(Stream.of(resizable.root().getComponents()).filter(child -> !child.equals(center)).findFirst().orElseThrow()));
 
         final @NotNull Tree drawnTree = Drawn.components(tree.getPanel()).stream().filter(Tree.class::isInstance).map(Tree.class::cast).findFirst().orElseThrow();
         assertEquals("a tree does not ask for eight rows", 8, drawnTree.getVisibleRowCount());

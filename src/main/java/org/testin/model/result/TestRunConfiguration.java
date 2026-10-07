@@ -16,6 +16,8 @@
 
 package org.testin.model.result;
 
+import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.icons.AllIcons;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,7 +40,7 @@ public enum TestRunConfiguration {
     TEST_TYPE(
             Bundle.message("config.test.type"),
             AllIcons.Nodes.Type,
-            new String[]{"Functional Test", "Performance Test"},
+            ImmutableList.of("Functional Test", "Performance Test"),
             ShownWhen.ALWAYS,
             ""
     ),
@@ -46,7 +48,7 @@ public enum TestRunConfiguration {
     CHANGE_LOG(
             Bundle.message("config.change.log"),
             AllIcons.Nodes.Type,
-            Free.OPTIONS,
+            ImmutableList.of(),
             ShownWhen.ALWAYS,
             ""
     ),
@@ -54,7 +56,7 @@ public enum TestRunConfiguration {
     COMMIT_ID(
             Bundle.message("config.commit.id"),
             AllIcons.Nodes.Type,
-            Free.OPTIONS,
+            ImmutableList.of(),
             ShownWhen.ALWAYS,
             ""
     ),
@@ -62,7 +64,7 @@ public enum TestRunConfiguration {
     PLATFORM(
             Bundle.message("config.platform"),
             AllIcons.Nodes.PpLib,
-            new String[]{Answer.WEB, Answer.MOBILE},
+            ImmutableList.of(Answer.WEB, Answer.MOBILE),
             ShownWhen.ALWAYS,
             ""
     ),
@@ -70,7 +72,7 @@ public enum TestRunConfiguration {
     COMPONENT(
             Bundle.message("config.component"),
             AllIcons.Nodes.PpLib,
-            new String[]{Answer.FRONTEND, "Backend"},
+            ImmutableList.of(Answer.FRONTEND, "Backend"),
             ShownWhen.ALWAYS,
             ""
     ),
@@ -78,7 +80,7 @@ public enum TestRunConfiguration {
     LANGUAGE(
             Bundle.message("config.language"),
             AllIcons.Nodes.Lambda,
-            new String[]{"English", "Arabic", "French"},
+            ImmutableList.of("English", "Arabic", "French"),
             ShownWhen.ALWAYS,
             ""
     ),
@@ -86,7 +88,7 @@ public enum TestRunConfiguration {
     BROWSER(
             Bundle.message("config.browser"),
             AllIcons.Nodes.WebFolder,
-            new String[]{"Chrome", "Firefox", "Safari", "Edge"},
+            ImmutableList.of("Chrome", "Firefox", "Safari", "Edge"),
             chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND),
             "Chrome"
     ),
@@ -94,14 +96,14 @@ public enum TestRunConfiguration {
     DEVICE_TYPE(
             Bundle.message("config.device.type"),
             AllIcons.Nodes.Include,
-            new String[]{"iPhone", "Samsung", "Huawei"},
+            ImmutableList.of("iPhone", "Samsung", "Huawei"),
             chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND),
             ""
     );
 
     private final @NotNull String displayName;
     private final @NotNull Icon icon;
-    private final @NotNull String[] options;
+    private final @NotNull ImmutableList<String> options;
     @Getter(AccessLevel.NONE)
     private final @NotNull ShownWhen shownWhen;
     private final @NotNull String defaultAnswer;
@@ -128,7 +130,7 @@ public enum TestRunConfiguration {
     }
 
     public boolean isChoice() {
-        return options.length > 0;
+        return !options.isEmpty();
     }
 
     public boolean isShownFor(final @NotNull Chosen chosen) {
@@ -136,6 +138,7 @@ public enum TestRunConfiguration {
     }
 
     @FunctionalInterface
+    @Immutable
     public interface ShownWhen {
         @NotNull ShownWhen ALWAYS = _ -> true;
 
@@ -149,10 +152,6 @@ public enum TestRunConfiguration {
         default boolean is(final @NotNull TestRunConfiguration field, final @NotNull String answer) {
             return answer.equals(in(field));
         }
-    }
-
-    private static final class Free {
-        private static final String @NotNull [] OPTIONS = new String[0];
     }
 
     private static final class Answer {

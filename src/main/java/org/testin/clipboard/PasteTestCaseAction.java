@@ -56,7 +56,7 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
 
     private boolean clipboardHoldsTestCases(final @NotNull PasteTestCaseWork work) {
         return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
-                .map(contents -> answered.filter(last -> last.contents() == contents).orElseGet(() -> {
+                .map(contents -> answered.filter(last -> last.contents().equals(contents)).orElseGet(() -> {
                     final @NotNull Answered now = new Answered(contents, work.holdsTestCases(contents));
                     answered = Optional.of(now);
                     return now;

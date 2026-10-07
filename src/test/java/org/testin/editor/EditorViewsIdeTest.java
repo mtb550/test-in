@@ -93,7 +93,7 @@ public class EditorViewsIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static boolean holds(final @NotNull Component region, final @NotNull Class<?> kind) {
-        return kind.isInstance(region) || region instanceof final Container container && Drawn.components(container).stream().anyMatch(kind::isInstance);
+        return kind.isInstance(region) || (region instanceof final Container container && Drawn.components(container).stream().anyMatch(kind::isInstance));
     }
 
     private static @NotNull List<JBTable> tablesIn(final @NotNull AbstractTestinEditor<?, ?> editor) {
@@ -117,7 +117,7 @@ public class EditorViewsIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static int descriptionColumn(final @NotNull JBTable table) {
-        return table.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.ordinal());
+        return table.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.column());
     }
 
     private static @NotNull List<String> headers(final @NotNull JBTable table) {

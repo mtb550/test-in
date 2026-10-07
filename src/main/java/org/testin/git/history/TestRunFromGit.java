@@ -109,7 +109,7 @@ public final class TestRunFromGit {
 
     static @NotNull Map<String, UUID> lastVersions(final @NotNull String log, final @NotNull Map<String, UUID> wanted) {
         final @NotNull Map<String, UUID> found = new HashMap<>();
-        for (final String record : log.split(TestCaseHistory.RECORD)) {
+        for (final String record : log.split(TestCaseHistory.RECORD, -1)) {
             final @NotNull List<String> lines = record.lines().filter(line -> !line.isBlank()).toList();
             if (lines.isEmpty()) continue;
 

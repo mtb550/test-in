@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.jetbrains.annotations.NotNull;
 
 public class RescanKeepsTheIndexIdeTest extends AbstractTempRootIdeTest {
@@ -58,7 +57,7 @@ public class RescanKeepsTheIndexIdeTest extends AbstractTempRootIdeTest {
         assertTrue("the first pass did not index the project, so there is nothing to watch",
                 nodes().nodeExists(set) && indexedTestCases().findTestCase(testCase).isPresent());
 
-        final AtomicBoolean vanished = new AtomicBoolean(false);
+        boolean vanished = false;
         final CountDownLatch scanned = new CountDownLatch(1);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -70,7 +69,7 @@ public class RescanKeepsTheIndexIdeTest extends AbstractTempRootIdeTest {
         });
 
         while (scanned.getCount() > 0) {
-            if (!nodes().nodeExists(set) || indexedTestCases().findTestCase(testCase).isEmpty()) vanished.set(true);
+            if (!nodes().nodeExists(set) || indexedTestCases().findTestCase(testCase).isEmpty()) vanished = true;
             Thread.onSpinWait();
         }
 
@@ -78,7 +77,7 @@ public class RescanKeepsTheIndexIdeTest extends AbstractTempRootIdeTest {
 
         assertFalse("the project was emptied out of the index while it was being read again, so every "
                         + "surface asking about it in that window was answered as though it had been deleted",
-                vanished.get());
+                vanished);
 
         assertTrue("and it is there when the pass has finished",
                 nodes().nodeExists(set) && indexedTestCases().findTestCase(testCase).isPresent());

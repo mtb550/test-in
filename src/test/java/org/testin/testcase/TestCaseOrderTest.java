@@ -19,6 +19,7 @@ package org.testin.testcase;
 import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class TestCaseOrderTest {
                 .id(UUID.randomUUID())
                 .description(description)
                 .order(rank)
-                .createdAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .createdAt(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS))
                 .build();
     }
 
@@ -65,7 +66,7 @@ public class TestCaseOrderTest {
     // UC-INTERNAL-004, Rule-INTERNAL-030
     @Test
     public void testCasesWithNoRankComeLastWithTheOldestFirst() {
-        final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         final @NotNull TestCaseDto ranked = testCase("sign in", "c");
         final @NotNull TestCaseDto older = TestCaseDto.builder().id(UUID.randomUUID()).description("copied in last week").createdAt(now.minusDays(7)).build();
         final @NotNull TestCaseDto newer = TestCaseDto.builder().id(UUID.randomUUID()).description("copied in today").createdAt(now).build();
@@ -124,7 +125,7 @@ public class TestCaseOrderTest {
     // Rule-EDITOR-PANEL-013
     @Test
     public void testCasesWithNoPlaceComeAfterThePlacedOnesOldestFirst() {
-        final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         final @NotNull TestCaseDto placed = testCase("sign in", "c");
         final @NotNull TestCaseDto older = testCase("imported first", "");
         older.setCreatedAt(now.minusDays(2));

@@ -69,7 +69,7 @@ final class TestRunMarkerMerge {
         if (ours.equals(yours)) return;
 
         final boolean takeTheirs = Config.isNotExecuted(ours)
-                || !Config.isNotExecuted(yours) && (earliest ? yours.isBefore(ours) : yours.isAfter(ours));
+                || (!Config.isNotExecuted(yours) && (earliest ? yours.isBefore(ours) : yours.isAfter(ours)));
 
         if (takeTheirs) merging.merged().set(field, merging.theirs().path(field).deepCopy());
         merging.settled().add(said);

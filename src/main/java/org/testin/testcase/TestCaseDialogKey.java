@@ -16,6 +16,7 @@
 
 package org.testin.testcase;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
@@ -23,7 +24,6 @@ import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Getter
@@ -72,16 +72,16 @@ public enum TestCaseDialogKey implements StatusBarItem {
 
     private final @NotNull String name;
 
-    private final Shortcuts @NotNull [] keys;
+    private final @NotNull ImmutableList<Shortcuts> keys;
 
     TestCaseDialogKey(final @NotNull String name, final Shortcuts @NotNull ... keys) {
         this.name = name;
-        this.keys = keys;
+        this.keys = ImmutableList.copyOf(keys);
     }
 
     @Override
     public @NotNull String getShortcutText() {
-        return Arrays.stream(keys)
+        return keys.stream()
                 .map(Shortcuts::getShortcutText)
                 .collect(Collectors.joining(" / "));
     }

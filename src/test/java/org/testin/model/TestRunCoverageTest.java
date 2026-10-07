@@ -27,6 +27,7 @@ import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -56,7 +57,7 @@ public class TestRunCoverageTest {
                 .setBugPriority(BugPriority.HIGH)
                 .setDuration(Duration.ofSeconds(252))
                 .setExecutedBy("Muteb")
-                .setExecutedAt(ZonedDateTime.now())
+                .setExecutedAt(ZonedDateTime.now(ZoneId.systemDefault()))
                 .setStacktrace("java.lang.AssertionError: expected locked");
     }
 
@@ -137,7 +138,7 @@ public class TestRunCoverageTest {
 
     @Test
     public void whatATestRunCoversSaysNothingAboutItsOwnFacts() {
-        final @NotNull ZonedDateTime started = ZonedDateTime.now().minusHours(2);
+        final @NotNull ZonedDateTime started = ZonedDateTime.now(ZoneId.systemDefault()).minusHours(2);
 
         final @NotNull TestRunMarker marker = new TestRunMarker();
         marker.setExecutionStartedAt(started);

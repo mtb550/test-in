@@ -16,6 +16,7 @@
 
 package org.testin.codegen;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.UUID;
 
+@Immutable
 public record GenType<T>(@NotNull Class<T> payload, @NotNull String description, @NotNull CodeUpdate update) {
     public static final @NotNull GenType<DirectoryDto> REMOVE_TEST_PROJECT = new GenType<>(
             DirectoryDto.class,

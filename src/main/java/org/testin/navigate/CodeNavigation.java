@@ -24,6 +24,7 @@ import org.testin.util.FromContentModule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,8 +50,8 @@ public interface CodeNavigation {
     @NotNull Set<UUID> withAWrittenBody(@NotNull Project p, @NotNull List<TestCaseDto> testCases);
 
     @FromContentModule
-    boolean fillBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
+    @NotNull Optional<String> fillBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
 
     @FromContentModule
-    boolean replaceBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
+    @NotNull Optional<String> replaceBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
 }

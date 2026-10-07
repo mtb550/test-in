@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.result.TestRunConfiguration;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -93,8 +92,8 @@ public class TestRunFieldVisibilityTest {
 
     @Test
     public void theRulesLookForAnswersTheListsOffer() {
-        final @NotNull List<String> platforms = Arrays.asList(TestRunConfiguration.PLATFORM.getOptions());
-        final @NotNull List<String> components = Arrays.asList(TestRunConfiguration.COMPONENT.getOptions());
+        final @NotNull List<String> platforms = TestRunConfiguration.PLATFORM.getOptions();
+        final @NotNull List<String> components = TestRunConfiguration.COMPONENT.getOptions();
 
         assertTrue(platforms.contains(WEB) && platforms.contains(MOBILE),
                 "the platform list must still offer " + WEB + " and " + MOBILE + ", it offers " + platforms);
@@ -104,7 +103,7 @@ public class TestRunFieldVisibilityTest {
 
     @Test
     public void theDeviceListOffersTheThreeHandsets() {
-        assertEquals(Arrays.asList(TestRunConfiguration.DEVICE_TYPE.getOptions()),
+        assertEquals(TestRunConfiguration.DEVICE_TYPE.getOptions(),
                 List.of("iPhone", "Samsung", "Huawei"));
     }
 }

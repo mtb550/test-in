@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -47,7 +48,7 @@ public class ScanProgressTest {
     @Test
     public void theScanCanBeGivenAProgressBar() {
         try {
-            ProjectIndexer.class.getDeclaredMethod("scanSingleProject", Path.class, ProgressIndicator.class);
+            assertNotNull(ProjectIndexer.class.getDeclaredMethod("scanSingleProject", Path.class, ProgressIndicator.class));
         } catch (final NoSuchMethodException missing) {
             fail("ProjectIndexer has no scanSingleProject(Path, ProgressIndicator): "
                     + "a caller with a progress bar has nowhere to hand it, so the bar reports nothing");

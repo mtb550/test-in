@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -102,7 +103,7 @@ public class ImportExcel {
             final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();
             for (final TestCaseEditorAttributes reqCol : TestCaseEditorAttributes.all(Can.IMPORT)) {
                 if (reqCol.isColumn(headerName)) {
-                    headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
+                    headerIndexMap.put(reqCol.getName().toLowerCase(Locale.ROOT), cell.getColumnIndex());
                 }
             }
         }
@@ -114,7 +115,7 @@ public class ImportExcel {
         for (final Row row : sheet) {
             if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
 
-            final @NotNull ImportedRow imported = TestCaseEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+            final @NotNull ImportedRow imported = TestCaseEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase(Locale.ROOT)))
                     .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
                     .orElse(""));
 

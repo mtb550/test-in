@@ -46,7 +46,7 @@ import java.util.stream.IntStream;
 
 @AllArgsConstructor
 public final class GitHubCli {
-    static final @NotNull Duration TIMEOUT = Duration.ofSeconds(120);
+    static final @NotNull Duration TIMEOUT = Duration.ofMinutes(2);
     private static final @NotNull List<Integer> OLDEST = List.of(2, 99, 0);
     private static final @NotNull String BODY_FILE = "bug.md";
     private static final @NotNull String DEV_BUILD = "DEV";
@@ -91,7 +91,7 @@ public final class GitHubCli {
         final @NotNull String version = versionIn(versionOutput);
         if (version.equals(DEV_BUILD)) return true;
 
-        final @NotNull String[] parts = version.split("[.-]");
+        final @NotNull String[] parts = version.split("[.-]", -1);
         for (int index = 0; index < OLDEST.size(); index++) {
             final int have = index < parts.length && NUMBER.matcher(parts[index]).matches() ? Integer.parseInt(parts[index]) : -1;
             if (have != OLDEST.get(index)) return have > OLDEST.get(index);

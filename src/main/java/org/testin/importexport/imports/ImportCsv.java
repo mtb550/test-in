@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ public class ImportCsv {
         for (int i = 0; i < headers.size(); i++) {
             final @NotNull String headerName = headers.get(i).trim();
             for (final TestCaseEditorAttributes reqCol : TestCaseEditorAttributes.all(Can.IMPORT)) {
-                if (reqCol.isColumn(headerName)) byName.put(reqCol.getName().toLowerCase(), i);
+                if (reqCol.isColumn(headerName)) byName.put(reqCol.getName().toLowerCase(Locale.ROOT), i);
             }
         }
 
@@ -80,7 +81,7 @@ public class ImportCsv {
 
             if (values.stream().allMatch(String::isBlank)) continue;
 
-            final @NotNull ImportedRow imported = TestCaseEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+            final @NotNull ImportedRow imported = TestCaseEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase(Locale.ROOT)))
                     .filter(colIndex -> colIndex < values.size())
                     .map(colIndex -> values.get(colIndex).trim())
                     .orElse(""));

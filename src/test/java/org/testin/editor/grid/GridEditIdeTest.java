@@ -81,7 +81,7 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static int column(final @NotNull JBTable table, final @NotNull TestCaseEditorAttributes attribute) {
-        return table.convertColumnIndexToView(attribute.ordinal());
+        return table.convertColumnIndexToView(attribute.column());
     }
 
     private static void typeInto(final @NotNull JBTable table, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String typed) {

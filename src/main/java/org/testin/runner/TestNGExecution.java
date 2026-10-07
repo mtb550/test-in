@@ -40,6 +40,7 @@ import org.testin.util.FromContentModule;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -80,7 +81,7 @@ public final class TestNGExecution implements Disposable {
     }
 
     private static @NotNull String key(final @NotNull UUID id) {
-        return id.toString().toLowerCase();
+        return id.toString().toLowerCase(Locale.ROOT);
     }
 
     @Override

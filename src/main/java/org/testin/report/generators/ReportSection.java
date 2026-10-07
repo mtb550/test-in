@@ -16,6 +16,9 @@
 
 package org.testin.report.generators;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
@@ -26,9 +29,6 @@ import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 import java.util.function.ToLongFunction;
 
 enum ReportSection {
@@ -36,28 +36,28 @@ enum ReportSection {
             Bundle.message("report.section.failed.title"),
             Bundle.message("report.section.failed.description"),
             TestRunSummary::failed,
-            List.of(TestRunEditorAttributes.BUG_PRIORITY, TestRunEditorAttributes.BUG_SEVERITY),
+            ImmutableList.of(TestRunEditorAttributes.BUG_PRIORITY, TestRunEditorAttributes.BUG_SEVERITY),
             RunItemStatus.FAILED),
 
     PASSED(
             Bundle.message("report.section.passed.title"),
             Bundle.message("report.section.passed.description"),
             TestRunSummary::passed,
-            List.of(),
+            ImmutableList.of(),
             RunItemStatus.PASSED),
 
     BLOCKED(
             Bundle.message("report.section.blocked.title"),
             Bundle.message("report.section.blocked.description"),
             TestRunSummary::blocked,
-            List.of(),
+            ImmutableList.of(),
             RunItemStatus.BLOCKED),
 
     UNTESTED(
             Bundle.message("report.section.untested.title"),
             Bundle.message("report.section.untested.description"),
             TestRunSummary::untested,
-            List.of(),
+            ImmutableList.of(),
             RunItemStatus.PENDING,
             RunItemStatus.UNTESTED),
 
@@ -65,7 +65,7 @@ enum ReportSection {
             Bundle.message("report.section.removed.title"),
             Bundle.message("report.section.removed.description"),
             TestRunSummary::removed,
-            List.of(),
+            ImmutableList.of(),
             RunItemStatus.REMOVED);
 
     @Getter
@@ -75,16 +75,16 @@ enum ReportSection {
     private final @NotNull String hexColor;
     private final @NotNull ToLongFunction<TestRunSummary> count;
     @Getter
-    private final @NotNull List<TestRunEditorAttributes> failureDetailColumns;
-    private final @NotNull Set<RunItemStatus> statuses;
+    private final @NotNull ImmutableList<TestRunEditorAttributes> failureDetailColumns;
+    private final @NotNull ImmutableSet<RunItemStatus> statuses;
 
-    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull List<TestRunEditorAttributes> failureDetailColumns, final @NotNull RunItemStatus... statuses) {
+    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull ImmutableList<TestRunEditorAttributes> failureDetailColumns, final @NotNull RunItemStatus... statuses) {
         this.title = title;
         this.descriptionFmt = descriptionFmt;
         this.hexColor = statuses[0].getReportHex();
         this.count = count;
         this.failureDetailColumns = failureDetailColumns;
-        this.statuses = EnumSet.copyOf(Arrays.asList(statuses));
+        this.statuses = Sets.immutableEnumSet(Arrays.asList(statuses));
     }
 
     private static double contrast(final @NotNull String one, final @NotNull String other) {

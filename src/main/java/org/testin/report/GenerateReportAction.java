@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -101,7 +102,7 @@ public class GenerateReportAction extends AbstractProjectAction {
     // UC-REPORT-001
     public void execute() {
         selectedTestRun.get().ifPresent(tr -> new GenerateReportDialog(p,
-                ReportFileName.suggestedFor(p, tr, ZonedDateTime.now()),
+                ReportFileName.suggestedFor(p, tr, ZonedDateTime.now(ZoneId.systemDefault())),
                 (format, file) -> processAndSave(tr, format, file)).show());
     }
 

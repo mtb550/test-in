@@ -34,6 +34,7 @@ import org.testin.model.status.TestCaseStatus;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.util.Bundle;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -129,7 +130,7 @@ public final class TestCaseDto {
 
     public void stampCreated(final @NotNull String tester) {
         createdBy = tester;
-        createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        createdAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
 
         updatedBy = "";
         updatedAt = Config.NOT_EXECUTED;
@@ -137,7 +138,7 @@ public final class TestCaseDto {
 
     public void touch(final @NotNull String tester) {
         updatedBy = tester;
-        updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        updatedAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
     }
 
     public void takeAuditOf(final @NotNull TestCaseDto other) {

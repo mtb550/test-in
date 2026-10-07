@@ -16,12 +16,14 @@
 
 package org.testin.importexport;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestRunDirectoryDto;
 
 @FunctionalInterface
+@Immutable
 public interface ReportHandler {
     ReportHandler UNSUPPORTED = (_, _, _) -> {
         throw new IllegalStateException("This format has no report generator");

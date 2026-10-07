@@ -183,7 +183,7 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
         final @NotNull JComboBox<?> box = branchBox();
 
         assertEquals("a screen reader does not hear the branch box as Branch", Bundle.message("branch.box"), box.getAccessibleContext().getAccessibleName());
-        assertEquals("the arrow keys choose a branch as they move instead of only moving through the list", Boolean.TRUE, box.getClientProperty("JComboBox.isTableCellEditor"));
+        assertEquals("the arrow keys choose a branch as they move instead of only moving through the list", true, box.getClientProperty("JComboBox.isTableCellEditor"));
         assertEquals("the branch box does not show the branch checked out", "main", Objects.toString(box.getSelectedItem(), ""));
 
         box.setSelectedItem("feature");

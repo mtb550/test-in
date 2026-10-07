@@ -85,24 +85,30 @@ public class BugTemplateTest {
                 | 🟡 Minor | ⚪ Low | Mobile · Backend | n\\a | n\\a |
                 
                 ### Actual result
+                
                 backend does not store correct App_Version value in db after activate app.
                 
                 ### Expected result
+                
                 Backend should store the correct value as received from frontend.
                 
                 ### Steps to reproduce
+                
                 1. Activate the app from the frontend with version 11.3
                 2. Read App_Version from the database
                 
                 ### Test data
+                
                 ```
                 App_Version = 11.3
                 ```
                 
                 ### Impact
+                
                 n\\a
                 
                 ### Exception
+                
                 <details>
                 <summary>java.lang.AssertionError: expected [11.3] but found [11.300000190734863]</summary>
                 
@@ -113,9 +119,11 @@ public class BugTemplateTest {
                 </details>
                 
                 ### Screenshots
+                
                 ![Screenshot 1](./screenshot-1.png)
                 
                 ### Where it was found
+                
                 |                                 |                                      |
                 |:--------------------------------|:-------------------------------------|
                 | **Test run**                    | Sprint 7 Cycle 3                          |
@@ -152,6 +160,7 @@ public class BugTemplateTest {
 
         assertTrue(body.contains("""
                 ### Actual result
+                
                 {{severity}}
                 """));
     }
@@ -233,6 +242,7 @@ public class BugTemplateTest {
 
         assertTrue(BugTemplate.body(two, Optional.empty()).contains("""
                 ### Screenshots
+                
                 ![Screenshot 1](./screenshot-1.png)
                 ![Screenshot 2](./screenshot-2.png)
                 """));

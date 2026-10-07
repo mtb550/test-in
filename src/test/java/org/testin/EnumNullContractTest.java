@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.testng.Assert.fail;
 
@@ -39,7 +40,7 @@ public class EnumNullContractTest {
 
     private static @NotNull Throwable rootCause(final @NotNull Throwable t) {
         Throwable current = t;
-        while (current.getCause() != null && current.getCause() != current) current = current.getCause();
+        while (current.getCause() != null && !current.equals(current.getCause())) current = current.getCause();
         return current;
     }
 
@@ -56,7 +57,7 @@ public class EnumNullContractTest {
 
             for (final Class<?> type : enums) {
                 try {
-                    type.getEnumConstants();
+                    Objects.requireNonNull(type.getEnumConstants(), type.getName() + " is not an enum");
                 } catch (final Throwable t) {
                     final Throwable cause = rootCause(t);
                     if (isNullContractBreach(cause)) breaches.add(type.getName() + ": " + cause.getMessage());

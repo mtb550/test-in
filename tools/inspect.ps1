@@ -1602,7 +1602,7 @@ function Read-Exceptions {
         if ($line -match '^\s*- name:\s*(\S+)') {
             $exceptions += [pscustomobject]@{ Name = $Matches[1]; Paths = [System.Collections.Generic.List[string]]::new() }
         }
-        elseif ($line -match '^\s*- (\S+)\s*$' -and $exceptions) {
+        elseif ($line -match '^\s*- "?([^"]+?)"?\s*$' -and $exceptions) {
             $exceptions[-1].Paths.Add($Matches[1].TrimEnd('/'))
         }
     }

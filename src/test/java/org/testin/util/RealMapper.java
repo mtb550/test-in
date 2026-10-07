@@ -32,7 +32,7 @@ public final class RealMapper {
 
             return constructor.newInstance();
         } catch (final ReflectiveOperationException ex) {
-            throw new AssertionError("Could not build the real Mapper for a test", ex);
+            throw new LinkageError("Could not build the real Mapper for a test", ex);
         }
     }
 }

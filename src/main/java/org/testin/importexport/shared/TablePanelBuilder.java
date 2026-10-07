@@ -67,7 +67,7 @@ public class TablePanelBuilder {
         int index = 1;
         for (final TestCaseDto tc : testCases) {
             final Object @NotNull [] rowData = new Object[columns.length];
-            rowData[0] = Boolean.TRUE;
+            rowData[0] = true;
             rowData[1] = String.valueOf(index++);
 
             for (int i = 0; i < importAttributes.size(); i++) {
@@ -85,7 +85,7 @@ public class TablePanelBuilder {
         DialogStyle.asRow(table);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
-        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table.putClientProperty("terminateEditOnFocusLost", true);
 
         final @NotNull TableColumn importColumn = table.getColumnModel().getColumn(0);
 

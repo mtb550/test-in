@@ -58,7 +58,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -136,7 +135,7 @@ public class TreeTransferHandler extends TransferHandler {
         setDragImageOffset(new Point(JBUI.scale(-14), JBUI.scale(-10)));
 
         return new NodesTransferable(new TreeTransferPayload(
-                directories.toArray(DirectoryDto[]::new), clipboardAction));
+                List.copyOf(directories), clipboardAction));
     }
 
     private @NotNull BufferedImage createDragImage(final @NotNull String text) {
@@ -185,7 +184,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private @NotNull List<DirectoryDto> nodesOf(final @NotNull Transferable contents) {
-        return payloadOf(contents).map(payload -> List.of(payload.nodes())).orElseGet(List::of);
+        return payloadOf(contents).map(TreeTransferPayload::nodes).orElseGet(List::of);
     }
 
     private static @NotNull Optional<TreeTransferPayload> payloadOf(final @NotNull Transferable contents) {
@@ -223,7 +222,7 @@ public class TreeTransferHandler extends TransferHandler {
 
     private boolean anySourceLands(final @NotNull TransferSupport support, final @NotNull DirectoryDto target) {
         return payloadOf(support.getTransferable())
-                .map(payload -> Arrays.stream(payload.nodes()).anyMatch(source -> canTransferInto(source, target)))
+                .map(payload -> payload.nodes().stream().anyMatch(source -> canTransferInto(source, target)))
                 .orElse(true);
     }
 
@@ -265,12 +264,8 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
-        final @NotNull List<DirectoryDto> accepted = new ArrayList<>();
-        for (final DirectoryDto source : nodes) {
-            if (canTransferInto(source, target)) accepted.add(source);
-        }
-        return accepted;
+    private @NotNull List<DirectoryDto> transferableSources(final @NotNull List<DirectoryDto> nodes, final @NotNull DirectoryDto target) {
+        return nodes.stream().filter(source -> canTransferInto(source, target)).toList();
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045
@@ -287,7 +282,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004
-    public boolean notifyNameCollisions(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
+    public boolean notifyNameCollisions(final @NotNull List<DirectoryDto> nodes, final @NotNull DirectoryDto target) {
         final @NotNull List<DirectoryDto> collided = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
             if (isNameCollision(source, target)) collided.add(source);
@@ -309,7 +304,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private @NotNull Optional<TreePath> dropPath(final @NotNull TransferSupport support) {
-        if (support.getDropLocation() instanceof SimpleTree.DropLocation dropLocation) {
+        if (support.getDropLocation() instanceof JTree.DropLocation dropLocation) {
             return Optional.ofNullable(dropLocation.getPath());
         }
         if (support.getDropLocation() instanceof JTree.DropLocation dropLocation) {
@@ -351,7 +346,7 @@ public class TreeTransferHandler extends TransferHandler {
 
         final int action = cut ? MOVE : COPY;
         CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(
-                directories.toArray(DirectoryDto[]::new), action)));
+                List.copyOf(directories), action)));
         updateClipboardState(action, directories);
 
         notifier.softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());

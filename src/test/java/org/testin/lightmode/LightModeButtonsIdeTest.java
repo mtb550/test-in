@@ -127,7 +127,7 @@ public class LightModeButtonsIdeTest extends AbstractCodegenIdeTest {
             shortcut.setAccessible(true);
             return Objects.requireNonNullElse((String) shortcut.get(tooltip), "");
         } catch (final ReflectiveOperationException ex) {
-            throw new AssertionError("could not read the tooltip's key", ex);
+            throw new LinkageError("could not read the tooltip's key", ex);
         }
     }
 

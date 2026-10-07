@@ -39,11 +39,11 @@ public final class Fqcn {
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-002
-    public static @NotNull ArrayList<String> ofMethod(final @NotNull TestCaseDto tc) {
+    public static @NotNull List<String> ofMethod(final @NotNull TestCaseDto tc) {
         final @NotNull String methodName = NameSanitizer.methodName(tc.getDescription());
         if (methodName.isEmpty()) return new ArrayList<>();
 
-        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(tc.getParent().getPath2());
+        final @NotNull List<String> generatedFqcn = withoutTestCasesDir(tc.getParent().getPath2());
 
         if (generatedFqcn.isEmpty()) {
             generatedFqcn.add("DefaultTest");
@@ -84,7 +84,7 @@ public final class Fqcn {
     // UC-CODEGEN-001, Rule-CODEGEN-007
     @FromContentModule
     public static @NotNull List<String> ofClass(final @NotNull List<String> path2) {
-        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(path2);
+        final @NotNull List<String> generatedFqcn = withoutTestCasesDir(path2);
 
         if (generatedFqcn.isEmpty()) {
             Logger.info("No class name for '" + String.join("/", path2) + "': it is the test cases directory itself");
@@ -103,7 +103,7 @@ public final class Fqcn {
     // UC-CODEGEN-001, Rule-CODEGEN-008
     @FromContentModule
     public static @NotNull List<String> ofPackage(final @NotNull List<String> path2) {
-        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(path2);
+        final @NotNull List<String> generatedFqcn = withoutTestCasesDir(path2);
 
         if (generatedFqcn.isEmpty()) {
             generatedFqcn.add("generated");
@@ -113,13 +113,13 @@ public final class Fqcn {
         return generatedFqcn;
     }
 
-    private static @NotNull ArrayList<String> withoutTestCasesDir(final @NotNull List<String> path2) {
-        final @NotNull ArrayList<String> names = new ArrayList<>(path2);
+    private static @NotNull List<String> withoutTestCasesDir(final @NotNull List<String> path2) {
+        final @NotNull List<String> names = new ArrayList<>(path2);
         names.remove(DirectoryType.TCD.getFolderName());
         return names;
     }
 
-    private static void sanitizeTail(final @NotNull ArrayList<String> names) {
+    private static void sanitizeTail(final @NotNull List<String> names) {
         final int lastIdx = names.size() - 1;
         names.set(lastIdx, NameSanitizer.className(names.get(lastIdx)));
 

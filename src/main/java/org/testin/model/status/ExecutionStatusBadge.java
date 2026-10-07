@@ -16,11 +16,13 @@
 
 package org.testin.model.status;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
 
+@Immutable
 public record ExecutionStatusBadge(@NotNull String label, @NotNull Color color) {
     public static final @NotNull ExecutionStatusBadge NONE = new ExecutionStatusBadge("", JBColor.GRAY);
 }

@@ -379,7 +379,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static @NotNull Object nothingOf(final @NotNull Class<?> type) {
-        if (type == boolean.class) return Boolean.FALSE;
+        if (type == boolean.class) return false;
         if (type == double.class) return 0.0;
         if (type == int.class) return 0;
         return "";

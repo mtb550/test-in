@@ -52,7 +52,7 @@ public class CardMouseListener extends MouseAdapter {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
     private final @NotNull AbstractEditorContextMenu cm;
-    private final @NotNull ArrayList<String> path;
+    private final @NotNull List<String> path;
     private final @NotNull TestinEditor editor;
     private final @NotNull Notifier notifier;
 

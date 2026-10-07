@@ -30,6 +30,7 @@ import org.testin.model.markers.Marker;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -60,7 +61,7 @@ public class RetiredNodesTest {
     }
 
     private static <T extends DirectoryDto> T createdAt(final T node, final int daysAgo) {
-        node.getMarker().setCreatedAt(ZonedDateTime.now().minusDays(daysAgo));
+        node.getMarker().setCreatedAt(ZonedDateTime.now(ZoneId.systemDefault()).minusDays(daysAgo));
         return node;
     }
 

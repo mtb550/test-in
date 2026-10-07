@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 record ChangedFile(@NotNull String before, @NotNull String after) {
     static @NotNull ChangedFile of(final @NotNull String line) {
-        final String @NotNull [] parts = line.strip().split("\t");
+        final String @NotNull [] parts = line.strip().split("\t", -1);
         final @NotNull String path = parts[parts.length - 1];
 
         return switch (parts[0].charAt(0)) {

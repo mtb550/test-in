@@ -47,12 +47,17 @@ public class RightClickIdeTest extends AbstractTempRootIdeTest {
         return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
     }
 
-    private static void rightClick(final @NotNull Runnable press, final @NotNull BooleanSupplier movedFirst) {
+    private static boolean refusedForWantOfAScreen(final @NotNull Runnable press) {
         try {
             press.run();
+            return false;
         } catch (final IllegalArgumentException menuWithNoScreen) {
-            assertTrue("the menu opened before the selection moved to what was clicked", movedFirst.getAsBoolean());
+            return true;
         }
+    }
+
+    private static void rightClick(final @NotNull Runnable press, final @NotNull BooleanSupplier movedFirst) {
+        if (refusedForWantOfAScreen(press)) assertTrue("the menu opened before the selection moved to what was clicked", movedFirst.getAsBoolean());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
@@ -66,7 +71,7 @@ public class RightClickIdeTest extends AbstractTempRootIdeTest {
         table.setRowSelectionInterval(0, 1);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-        final @NotNull Rectangle row = table.getCellRect(3, table.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.ordinal()), true);
+        final @NotNull Rectangle row = table.getCellRect(3, table.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.column()), true);
         final @NotNull MouseEvent press = new MouseEvent(table, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), InputEvent.BUTTON3_DOWN_MASK, (int) row.getCenterX(), (int) row.getCenterY(), 1, true, MouseEvent.BUTTON3);
         final @NotNull BooleanSupplier moved = () -> Arrays.equals(new int[]{3}, table.getSelectedRows());
 

@@ -16,6 +16,7 @@
 
 package org.testin.importexport;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @FunctionalInterface
+@Immutable
 public interface ExportHandler {
     ExportHandler UNSUPPORTED = (_, _, _) -> {
         throw new IllegalStateException("This format cannot be exported to");

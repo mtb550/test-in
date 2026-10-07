@@ -43,8 +43,8 @@ public class GridRowsTest {
 
         assertEquals(rows.size(), 2, "the test cases are not one row each");
         assertEquals(rows.getFirst().length, TestCaseEditorAttributes.values().length, "a row does not hold one cell per column");
-        assertEquals(rows.getFirst()[TestCaseEditorAttributes.ORDER.ordinal()], "7", "the order column does not show the test case's place");
-        assertEquals(rows.get(1)[TestCaseEditorAttributes.DESCRIPTION.ordinal()], "Log out", "the description column does not show the description");
+        assertEquals(rows.getFirst()[TestCaseEditorAttributes.ORDER.column()], "7", "the order column does not show the test case's place");
+        assertEquals(rows.get(1)[TestCaseEditorAttributes.DESCRIPTION.column()], "Log out", "the description column does not show the description");
     }
 
     // Rule-EDITOR-PANEL-020
@@ -54,7 +54,7 @@ public class GridRowsTest {
 
         assertEquals(rows.size(), 1, "a test case with no run item yet has no row");
         assertEquals(rows.getFirst().length, TestRunEditorAttributes.values().length, "a row does not hold one cell per column");
-        assertEquals(rows.getFirst()[TestRunEditorAttributes.ORDER.ordinal()], "7", "the order column does not show the test case's place");
-        assertEquals(rows.getFirst()[TestRunEditorAttributes.DESCRIPTION.ordinal()], "Log in with a valid user", "the row does not show the test case it stands for");
+        assertEquals(rows.getFirst()[TestRunEditorAttributes.ORDER.column()], "7", "the order column does not show the test case's place");
+        assertEquals(rows.getFirst()[TestRunEditorAttributes.DESCRIPTION.column()], "Log in with a valid user", "the row does not show the test case it stands for");
     }
 }

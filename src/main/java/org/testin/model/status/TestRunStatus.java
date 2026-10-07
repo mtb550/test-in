@@ -121,6 +121,7 @@ public enum TestRunStatus implements MenuItem {
         return this == COMPLETED;
     }
 
+    @Override
     public @NotNull String getShortcutText() {
         return Shortcuts.shortcutText(shortcut);
     }
@@ -130,6 +131,7 @@ public enum TestRunStatus implements MenuItem {
         return label;
     }
 
+    @Override
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onAction) {
         if (Shortcuts.isNoKey(shortcut)) return;
 

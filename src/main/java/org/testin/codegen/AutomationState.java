@@ -30,6 +30,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
+import org.testin.services.BackgroundWork;
 import org.testin.util.FailureText;
 
 import java.util.LinkedHashMap;
@@ -93,12 +94,12 @@ public final class AutomationState implements Disposable {
         final @NotNull Map<UUID, Automated> asking = reading.stream()
                 .collect(Collectors.toMap(TestCaseDto::getId, tc -> of(tc.getId()), (first, _) -> first));
 
-        ReadAction.nonBlocking(() -> answer(p, reading))
+        BackgroundWork.logged(ReadAction.nonBlocking(() -> answer(p, reading))
                 .inSmartMode(p)
                 .coalesceBy(this, asking.keySet())
                 .expireWith(this)
                 .finishOnUiThread(ModalityState.defaultModalityState(), answer -> keep(p, answer, reading, asking, onAnswered))
-                .submit(AppExecutorUtil.getAppExecutorService());
+                .submit(AppExecutorUtil.getAppExecutorService()), "Reading which test cases are automated");
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197

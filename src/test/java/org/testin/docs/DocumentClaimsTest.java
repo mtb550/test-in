@@ -77,7 +77,7 @@ public class DocumentClaimsTest {
     private static @NotNull String longestLiteral(final @NotNull String sentence) {
         @NotNull String longest = "";
 
-        for (final String part : sentence.split("%s")) {
+        for (final String part : sentence.split("%s", -1)) {
             final @NotNull String trimmed = part.trim().replaceAll("^['\"]+|['\"]+$", "");
             if (trimmed.length() > longest.length()) longest = trimmed;
         }

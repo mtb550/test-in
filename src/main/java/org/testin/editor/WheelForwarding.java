@@ -34,7 +34,7 @@ public final class WheelForwarding {
             return;
 
         findScrollPane(e.getComponent())
-                .filter(scrollPane -> e.getComponent() != scrollPane)
+                .filter(scrollPane -> !scrollPane.equals(e.getComponent()))
                 .ifPresent(scrollPane -> {
                     final @NotNull MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
                     scrollPane.dispatchEvent(clonedEvent);

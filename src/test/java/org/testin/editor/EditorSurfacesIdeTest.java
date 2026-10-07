@@ -83,7 +83,7 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
         final @NotNull SearchTxt search = toolbar.getSearchTxt();
         final int wide = search.getWidth();
         for (final Component item : toolbar.getComponents()) {
-            if (item == search || !item.isVisible()) continue;
+            if (item.equals(search) || !item.isVisible()) continue;
             assertTrue("in the " + editor + " " + item.getClass().getSimpleName() + " is right of the search field", item.getX() + item.getWidth() <= search.getX());
             assertEquals("in the " + editor + " " + item.getClass().getSimpleName() + " is not on the one row", search.getBounds().getCenterY(), item.getBounds().getCenterY(), 2);
         }
@@ -127,7 +127,7 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final @NotNull JBTable grid = (JBTable) editor.getPreferredFocusedComponent();
-            final int description = TestCaseEditorAttributes.DESCRIPTION.ordinal();
+            final int description = TestCaseEditorAttributes.DESCRIPTION.column();
             grid.changeSelection(0, description, false, false);
             assertTrue(grid.editCellAt(0, description));
             grid.getEditorComponent().requestFocus();
@@ -145,7 +145,7 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
     public void testAGridRowIsDrawnInItsStripeOrTheSelectionColorAndNothingElse() {
         final @NotNull List<String[]> rows = List.of(rowReading("Log in"), rowReading("Pay by card"), rowReading("Log out"));
         final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(rows, Set.of(TestCaseEditorAttributes.DESCRIPTION));
-        final int column = TestCaseEditorAttributes.DESCRIPTION.ordinal();
+        final int column = TestCaseEditorAttributes.DESCRIPTION.column();
         final @NotNull JFrame frame = OnScreen.shown(new JBScrollPane(table), getTestRootDisposable());
 
         for (int row = 0; row < rows.size(); row++) {
@@ -165,7 +165,7 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
     private static @NotNull String[] rowReading(final @NotNull String description) {
         final String @NotNull [] row = new String[TestCaseEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.ordinal()] = description;
+        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
         return row;
     }
 

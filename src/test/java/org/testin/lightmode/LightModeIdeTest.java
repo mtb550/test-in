@@ -192,7 +192,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             duration.setAccessible(true);
             return duration.getInt(motion);
         } catch (final ReflectiveOperationException ex) {
-            throw new AssertionError("could not read how long the movement lasts", ex);
+            throw new LinkageError("could not read how long the movement lasts", ex);
         }
     }
 
@@ -540,7 +540,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             on.setAccessible(true);
             return on.getBoolean(customization);
         } catch (final ReflectiveOperationException ex) {
-            throw new AssertionError("the box was customized by something other than spell checking: " + customization.getClass().getName(), ex);
+            throw new LinkageError("the box was customized by something other than spell checking: " + customization.getClass().getName(), ex);
         }
     }
 

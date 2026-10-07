@@ -42,7 +42,7 @@ public final class Gestures {
     public static @NotNull AnAction boundTo(final @NotNull JComponent on, final @NotNull Class<? extends AnAction> kind) {
         final @NotNull List<AnAction> bound = ActionUtil.getActions(on);
         return bound.stream()
-                .filter(action -> kind.isInstance(action) || action instanceof final AnActionWrapper wrapper && kind.isInstance(wrapper.getDelegate()))
+                .filter(action -> kind.isInstance(action) || (action instanceof final AnActionWrapper wrapper && kind.isInstance(wrapper.getDelegate())))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("no " + kind.getSimpleName() + " is bound to the " + on.getClass().getSimpleName() + ": " + bound));
     }

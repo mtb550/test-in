@@ -16,12 +16,14 @@
 
 package org.testin.codegen.event;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 
 import java.util.List;
 
+@Immutable
 public interface CodeUpdate {
     <T> void execute(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull T payload);
 

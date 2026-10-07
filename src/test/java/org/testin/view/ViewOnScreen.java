@@ -32,6 +32,7 @@ import com.intellij.ui.content.ContentManager;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.StandIn;
 import org.testin.services.Services;
 
 import javax.swing.JComponent;
@@ -287,7 +288,7 @@ public final class ViewOnScreen {
                 case "getContentManager", "getContentManagerIfCreated" -> contents;
                 case "getComponent" -> component;
                 case "setTitleActions" -> titled((List<?>) arguments.getFirst());
-                case "equals" -> proxy == arguments.getFirst();
+                case "equals" -> StandIn.isItself(proxy, arguments.getFirst());
                 case "hashCode" -> System.identityHashCode(proxy);
                 case "toString" -> "a stand-in tool window";
                 default -> throw new UnsupportedOperationException("A stand-in tool window was asked " + method.getName());

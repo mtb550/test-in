@@ -42,7 +42,7 @@ public class TablePanelBuilderTest {
 
         assertEquals(model.getRowCount(), 2);
         for (int row = 0; row < model.getRowCount(); row++) {
-            assertEquals(model.getValueAt(row, 0), Boolean.TRUE, "row " + row + " arrived unticked");
+            assertEquals(model.getValueAt(row, 0), true, "row " + row + " arrived unticked");
         }
     }
 

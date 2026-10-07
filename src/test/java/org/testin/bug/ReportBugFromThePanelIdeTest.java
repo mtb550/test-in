@@ -179,7 +179,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull String besideSend(final @NotNull JComponent dialog) {
         final @NotNull JButton send = send(dialog);
-        return Arrays.stream(send.getParent().getComponents()).filter(part -> part != send).map(Drawn::text).filter(text -> !text.isEmpty()).findFirst().orElse("");
+        return Arrays.stream(send.getParent().getComponents()).filter(part -> !part.equals(send)).map(Drawn::text).filter(text -> !text.isEmpty()).findFirst().orElse("");
     }
 
     private void sentAndSettled() {

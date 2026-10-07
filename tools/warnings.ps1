@@ -14,8 +14,8 @@
     are the ones that fail a build:
 
       Inspections      tools/inspect.ps1, gated, runs in CI on every push
-      Plugin Verifier  gradlew verifyPlugin, gated against a baseline
-      Qodana           the cloud scan, CI only
+      Plugin Verifier  gradlew verifyPlugin, gated: any problem fails it
+      Qodana           the cloud scan, gated: any finding fails it, CI only
       Compiler         gradlew compileJava, -Xlint:deprecation,removal
       Gradle           --warning-mode all
 
@@ -82,14 +82,9 @@ if ($Full) {
     & ./gradlew verifyPlugin --console=plain | Out-Host
 }
 
-$baseline = Join-Path $repoRoot '.github\verification-baseline.txt'
-if (Test-Path $baseline) {
-    $counts = @(Get-Content $baseline | Where-Object { $_ -match '^\s*\w+-\d+\s+\d+\s*$' })
-    $total = ($counts | ForEach-Object { [int](($_ -split '\s+')[-1]) } | Measure-Object -Sum).Sum
-    Add-Row 'Plugin Verifier' "$total across $($counts.Count) IDEs" 'yes' '.github/verification-baseline.txt'
-} else {
-    Add-Row 'Plugin Verifier' '-' 'yes' 'no baseline file'
-}
+$run = Get-LastRun 'verify.yml'
+$said = if ($run) { "last CI run $($run.databaseId): $($run.conclusion)" } else { 'CI only; no answer without gh' }
+Add-Row 'Plugin Verifier' '-' 'yes' $said
 
 # --- Qodana ----------------------------------------------------------------
 $run = Get-LastRun 'build.yml'

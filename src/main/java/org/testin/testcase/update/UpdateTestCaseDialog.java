@@ -58,7 +58,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         for (final CreateTestCaseSection section : getAllSections()) {
             section.fillData(existingDto);
 
-            final boolean isTarget = (section == targetSection);
+            final boolean isTarget = section.equals(targetSection);
 
             if (isTarget) section.readyForEditing();
 

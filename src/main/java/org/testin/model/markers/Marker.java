@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.status.NoStatus;
 import org.testin.model.status.NodeStatus;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -53,7 +54,7 @@ public interface Marker {
     void setModifiedAt(@NotNull ZonedDateTime modifiedAt);
 
     default void stampCreated(final @NotNull String tester) {
-        final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         setCreatedBy(tester);
         setCreatedAt(now);
         setModifiedBy(tester);
@@ -62,7 +63,7 @@ public interface Marker {
 
     default void touch(final @NotNull String tester) {
         setModifiedBy(tester);
-        setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        setModifiedAt(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS));
     }
 
     default @NotNull NodeStatus status() {

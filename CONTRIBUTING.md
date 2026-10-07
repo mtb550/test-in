@@ -140,7 +140,11 @@ half that is checked: a null passed to a `@NotNull` parameter, returned from a
 method not marked `@Nullable`, or dereferenced where it may be null fails the
 build, in the production code and the tests of all three modules (#377, #389).
 A test's fields are filled in JUnit 3's `setUp` or TestNG's `@BeforeMethod`,
-and both are named as initializers. Every other Error Prone check is off. What
+and both are named as initializers. Error Prone's own checks run beside it at
+their default severity: an error stops the compile, and a warning is fixed
+rather than left standing. `build.gradle.kts` names the platform and JDK types
+an enum may hold that Testin cannot mark `@Immutable`, and the one check a crash
+in Error Prone keeps off until a release fixes it (#66, finding 372). What
 NullAway cannot see still throws in
 front of a tester: a null from platform or library code it has no model for,
 and a field Jackson or reflection left empty.
@@ -248,12 +252,13 @@ with its reason.** Qodana reads that list in CI and `tools/inspect.ps1` reads th
 same entries, so the two gates cannot disagree, and there is no second list to
 fall behind. Each entry names the narrowest path it can:
 
-| Exception                                       | Why nothing better is possible                                                                                                                     |
-|-------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| Files whose bytes something else owns           | The sample `.ts` markers (JSON that TypeScript claims by extension), the Gradle wrapper, JetBrains' agreements, the Jekyll files, the bug template |
-| `HardcodedPasswords` in `GitCommandRunnerTest`  | It proves a credential in a remote URL is masked, so its fake URLs carry a password                                                                |
-| `UndefinedParamsPresent` in `.github/workflows` | An action's inputs are declared in its `action.yml` online, which an offline inspector cannot fetch                                                |
-| `SameReturnValue` in `CodeNavigation`           | Its real implementation lives in `testin-java`, which the inspector cannot see, so it judges by the no-Java fallback alone                         |
+| Exception                                                               | Why nothing better is possible                                                                                     |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| Files whose bytes something else owns                                   | The two sample `.ts` markers (JSON that TypeScript claims by extension), the Gradle wrapper, JetBrains' agreements |
+| Four CSS inspections in `style.scss`                                    | The docs site's stylesheet is a Jekyll file: front matter, Liquid and `_sass` imports, and the theme's own classes |
+| `JSUnresolvedLibraryURL`, `JSUnresolvedReference` in `head-custom.html` | The docs site loads Mermaid from its CDN, and the inspector keeps no local copy of a library behind a URL          |
+| `HardcodedPasswords` in `GitCommandRunnerTest`                          | It proves a credential in a remote URL is masked, so its fake URLs carry a password                                |
+| `UndefinedParamsPresent` in `.github/workflows`                         | An action's inputs are declared in its `action.yml` online, which an offline inspector cannot fetch                |
 
 A core method that only a content module calls is marked `@FromContentModule`,
 which `.idea/misc.xml` names an entry point, so neither the IDE nor the
@@ -340,7 +345,7 @@ other finding.
 | Workflow           | When                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 |--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `build.yml`        | Every push to `main` and every pull request. Compiles, runs the unit tests, the complexity gate, the IDE tests and the coverage gate, and verifies against **IntelliJ IDEA** - the one result that turns a pull request red Then **Qodana**, as a second job: the whole project on `main` and only the changed files on a pull request (with a comment on it), the build's test coverage included, against the profile and the exceptions `qodana.yaml` lists. Any finding fails it, and every finding shows in Qodana Cloud and in GitHub's Code scanning |
-| `verify.yml`       | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install                                                                                                                                                                                                                                         |
+| `verify.yml`       | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - and any problem on any of them fails the run                                                                                                                                                                                                                                                                                                                                  |
 | `inspect.yml`      | Every push, on every branch, and on demand                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `dependencies.yml` | Every push to `main`. Submits the libraries the plugin ships - its `runtimeClasspath`, transitive ones included - to GitHub's dependency graph, so an advisory against any of them raises a Dependabot alert in the Security tab the day it is published                                                                                                                                                                                                                                                                                                   |
 

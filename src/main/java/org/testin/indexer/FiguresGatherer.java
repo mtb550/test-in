@@ -16,12 +16,14 @@
 
 package org.testin.indexer;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeFigures;
 import org.testin.model.node.DirectoryDto;
 
 @FunctionalInterface
+@Immutable
 public interface FiguresGatherer {
     @NotNull
     NodeFigures of(final @NotNull Project p, final @NotNull DirectoryDto dto);

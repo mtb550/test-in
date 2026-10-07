@@ -19,6 +19,7 @@ package org.testin.util;
 import org.testin.model.Config;
 import org.testng.annotations.Test;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -27,7 +28,7 @@ import static org.testng.Assert.assertTrue;
 
 public class TestDataParserDateTest {
 
-    private final ZonedDateTime when = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusMonths(7);
+    private final ZonedDateTime when = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS).minusMonths(7);
 
     // Rule-SHARE-121
     @Test

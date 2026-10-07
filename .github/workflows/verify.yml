@@ -7,10 +7,9 @@
 # The Marketplace runs this same verifier and shows its findings on the plugin
 # page, so the number here is the number a tester sees before installing.
 #
-# It is not always-green and is not meant to be yet. It fails when a count goes
-# up and reports when one goes down, against verification-baseline.txt, which
-# sits one folder above this file.
-# The target on every line of that file is 0.
+# Every target reports zero problems, so any problem on any of them fails the
+# run. It was compared against a baseline of known problems until they reached
+# zero on 7 October 2026.
 name: Verify
 
 on:
@@ -73,20 +72,13 @@ jobs:
           restore-keys: plugin-verifier-all-
 
       # -PverifyAllIdes adds PyCharm, GoLand and WebStorm to the IntelliJ IDEA
-      # that build.gradle.kts verifies by default. It exits non-zero while any
-      # of them reports a problem, which is today - the step after this one is
-      # what decides whether that is news.
+      # that build.gradle.kts verifies by default. Every target reports zero
+      # problems, so the step fails the run on the first new one. It used to
+      # be let through and compared against a baseline while 159 known
+      # problems stood; they are gone, and the baseline went with them.
       - name: Verify against all IDEs
-        id: verify
-        continue-on-error: true
         shell: bash
         run: ./gradlew verifyPlugin -PverifyAllIdes
-
-      # Beside inspect.ps1, because tools/ is where this repository keeps its
-      # scripts - and because .gitignore excludes *.py on purpose.
-      - name: Compare against the baseline
-        shell: bash
-        run: pwsh -NoProfile -File tools/verification-report.ps1
 
       - name: Keep the verification reports
         if: always()

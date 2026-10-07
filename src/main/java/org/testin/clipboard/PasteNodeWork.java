@@ -31,7 +31,6 @@ import org.testin.util.FailureText;
 import javax.swing.TransferHandler;
 import java.awt.datatransfer.Transferable;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,7 +44,7 @@ record PasteNodeWork(@NotNull Project p, @NotNull TreeTransferHandler transferHa
         try {
             final @NotNull TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
-            final @NotNull List<DirectoryDto> nodes = Arrays.stream(payload.nodes())
+            final @NotNull List<DirectoryDto> nodes = payload.nodes().stream()
                     .filter(node -> transferHandler.canTransferInto(node, target))
                     .toList();
 

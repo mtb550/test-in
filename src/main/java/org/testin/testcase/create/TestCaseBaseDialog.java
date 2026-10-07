@@ -159,11 +159,11 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-035
     protected void onlyEditable(final @NotNull CreateTestCaseSection target) {
         editableSection = Optional.of(target);
-        getAllSections().forEach(section -> section.setEditable(section == target));
+        getAllSections().forEach(section -> section.setEditable(section.equals(target)));
     }
 
     private boolean mayWrite(final @NotNull CreateTestCaseSection section) {
-        return section.isShown() && editableSection.map(target -> target == section).orElse(true);
+        return section.isShown() && editableSection.map(target -> target.equals(section)).orElse(true);
     }
 
     public @NotNull List<CreateTestCaseSection> getAllSections() {

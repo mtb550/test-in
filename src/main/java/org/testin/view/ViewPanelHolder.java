@@ -34,6 +34,6 @@ public final class ViewPanelHolder {
     }
 
     void release(final @NotNull ViewPanel closing) {
-        if (panel.filter(held -> held == closing).isPresent()) panel = Optional.empty();
+        if (panel.filter(held -> held.equals(closing)).isPresent()) panel = Optional.empty();
     }
 }

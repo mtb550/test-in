@@ -20,14 +20,13 @@ import org.testin.model.result.TestRunConfiguration;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 
-import java.util.List;
 import java.util.Map;
 
 public record ChoiceSection(@NotNull TestRunConfiguration field, @NotNull ComponentDialogBase<RadioSelection<String>> component) implements TestRunSection {
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-121
     public static @NotNull ChoiceSection of(final @NotNull TestRunConfiguration field, final @NotNull String answer, final @NotNull Runnable changed) {
         final @NotNull ComponentDialogBase<RadioSelection<String>> radios = ComponentDialogBase.<String>radios(field.getDisplayName())
-                .options(List.of(field.getOptions()), option -> option)
+                .options(field.getOptions(), option -> option)
                 .select(answer)
                 .build();
 

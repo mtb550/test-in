@@ -64,6 +64,6 @@ public enum ExecutionStatus {
     }
 
     public boolean hasBadge() {
-        return badge != ExecutionStatusBadge.NONE;
+        return !badge.equals(ExecutionStatusBadge.NONE);
     }
 }

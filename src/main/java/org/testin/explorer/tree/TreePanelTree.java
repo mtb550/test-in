@@ -24,7 +24,6 @@ import com.intellij.ui.tree.AsyncTreeModel;
 import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.tree.TreeVisitor;
 import com.intellij.ui.treeStructure.SimpleTree;
-import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +32,7 @@ import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.FontSync;
@@ -53,12 +53,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TreePanelTree implements Disposable {
-    private static final @NotNull Runnable NOTHING_AFTER = () -> {
-    };
     private static final long QUIET_MILLIS = 100;
 
     private final @NotNull Project p;
@@ -137,7 +134,7 @@ public class TreePanelTree implements Disposable {
     }
 
     public void reveal(final @NotNull Path target) {
-        reveal(target, NOTHING_AFTER);
+        reveal(target, TreePanelTree::nothingAfter);
     }
 
     public void reveal(final @NotNull Path target, final @NotNull Runnable afterFound) {
@@ -189,12 +186,12 @@ public class TreePanelTree implements Disposable {
 
         final long started = System.nanoTime();
 
-        structureModel.invalidateAsync().thenRun(() -> {
+        BackgroundWork.logged(structureModel.invalidateAsync().thenRun(() -> {
             if (disposed) return;
             Logger.debug("Tree rebuilt in " + millisSince(started) + " ms");
 
             ApplicationManager.getApplication().invokeLater(() -> expandAfterRebuild(projectChanged, started));
-        });
+        }), "Rebuilding the tree");
     }
 
     private void expandAfterRebuild(final boolean projectChanged, final long started) {
@@ -213,7 +210,7 @@ public class TreePanelTree implements Disposable {
         changedFolders.addAll(folders);
         if (!foldersBooked.compareAndSet(false, true)) return;
 
-        AppExecutorUtil.getAppScheduledExecutorService().schedule(this::redrawChangedFolders, QUIET_MILLIS, TimeUnit.MILLISECONDS);
+        BackgroundWork.after(QUIET_MILLIS, this::redrawChangedFolders, "Redrawing the changed folders");
     }
 
     private void redrawChangedFolders() {
@@ -232,12 +229,12 @@ public class TreePanelTree implements Disposable {
                 .map(folder -> structureModel.invalidateAsync(TreePanelNode.standingFor(p, root.get(), folder), true))
                 .toArray(CompletableFuture[]::new);
 
-        CompletableFuture.allOf(redrawn).thenRun(() -> ApplicationManager.getApplication().invokeLater(() -> {
+        BackgroundWork.logged(CompletableFuture.allOf(redrawn).thenRun(() -> ApplicationManager.getApplication().invokeLater(() -> {
             if (disposed) return;
 
             consumePendingReveal();
             Logger.debug("Tree redrew " + redrawn.length + " folder(s) in " + millisSince(started) + " ms");
-        }));
+        })), "Redrawing the changed folders");
     }
 
     private static long millisSince(final long started) {
@@ -265,5 +262,8 @@ public class TreePanelTree implements Disposable {
         mainTree.setModel(null);
         treeModel.dispose();
         structureModel.dispose();
+    }
+
+    private static void nothingAfter() {
     }
 }

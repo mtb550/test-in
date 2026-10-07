@@ -23,6 +23,7 @@ import org.testin.model.TestCaseDto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,14 +46,14 @@ public final class NoCodeNavigation implements CodeNavigation {
     }
 
     @Override
-    public boolean fillBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+    public @NotNull Optional<String> fillBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
         Logger.debug("No code navigation in this IDE; no body written for '" + tc.getDescription() + "'");
 
-        return false;
+        return Optional.empty();
     }
 
     @Override
-    public boolean replaceBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+    public @NotNull Optional<String> replaceBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
         return fillBody(p, tc, statements);
     }
 

@@ -16,6 +16,8 @@
 
 package org.testin.testcase;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -231,6 +233,8 @@ public enum TestCaseEditorAttributes implements ToolBarAttribute {
             Can.IMPORT, Can.EXPORT
     );
 
+    // Rule-EDITOR-PANEL-020
+    public static final @NotNull List<TestCaseEditorAttributes> COLUMNS = List.of(values());
     // Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005
     private static final @NotNull Set<TestCaseEditorAttributes> PROSE =
             EnumSet.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRE_CONDITIONS);
@@ -242,7 +246,7 @@ public enum TestCaseEditorAttributes implements ToolBarAttribute {
     private final @NotNull ImportSetter importSetter;
     private final @NotNull GenType<TestCaseDto> genType;
     @Getter(AccessLevel.NONE)
-    private final @NotNull Set<Can> can;
+    private final @NotNull ImmutableSet<Can> can;
 
     TestCaseEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType<TestCaseDto> genType, final @NotNull Can... can) {
         this.name = name;
@@ -250,7 +254,7 @@ public enum TestCaseEditorAttributes implements ToolBarAttribute {
         this.testValueExtractor = testValueExtractor;
         this.importSetter = importSetter;
         this.genType = genType;
-        this.can = can.length == 0 ? EnumSet.noneOf(Can.class) : EnumSet.copyOf(List.of(can));
+        this.can = Sets.immutableEnumSet(List.of(can));
     }
 
     // UC-EDITOR-PANEL-019, UC-INTERNAL-001, Rule-EDITOR-PANEL-091
@@ -299,6 +303,16 @@ public enum TestCaseEditorAttributes implements ToolBarAttribute {
         final @NotNull String wanted = header.trim();
 
         return name.equalsIgnoreCase(wanted) || TestDataParser.namesConstant(this, wanted);
+    }
+
+    // Rule-EDITOR-PANEL-020
+    public static @NotNull TestCaseEditorAttributes atColumn(final int column) {
+        return COLUMNS.get(column);
+    }
+
+    // Rule-EDITOR-PANEL-020
+    public int column() {
+        return COLUMNS.indexOf(this);
     }
 
     public boolean can(final @NotNull Can capability) {

@@ -16,6 +16,7 @@
 
 package org.testin.importexport.imports;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @FunctionalInterface
+@Immutable
 public interface ImportSetter {
     static @NotNull ImportSetter always(final @NotNull BiFunction<TestCaseDtoBuilder, String, TestCaseDtoBuilder> write) {
         return (_, tc, value) -> Optional.of(write.apply(tc.edit(), value).build());

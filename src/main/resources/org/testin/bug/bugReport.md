@@ -3,27 +3,35 @@
 | {{severity}} | {{priority}} | {{platform}} | {{notAvailable}} | {{notAvailable}} |
 
 ### Actual result
+
 {{actualResult}}
 
 ### Expected result
+
 {{expectedResult}}
 
 ### Steps to reproduce
+
 {{steps}}
 
 ### Test data
+
 {{testData}}
 
 ### Impact
+
 {{notAvailable}}
 
 ### Exception
+
 {{exception}}
 
 ### Screenshots
+
 {{screenshots}}
 
 ### Where it was found
+
 |                                 |                                      |
 |:--------------------------------|:-------------------------------------|
 | **Test run**                    | {{testRun}}                          |

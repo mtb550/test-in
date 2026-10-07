@@ -25,6 +25,7 @@ import com.intellij.testFramework.ServiceContainerUtil;
 import com.intellij.ui.popup.PopupFactoryImpl;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.StandIn;
 
 import javax.swing.JComponent;
 import java.awt.Dimension;
@@ -91,13 +92,13 @@ public final class PopupsBuilt {
                     popup = Optional.of(sized);
                     return sized;
                 }
-                return answer == real ? proxy : answer;
+                return real.equals(answer) ? proxy : answer;
             });
         }
 
         private static @NotNull JBPopup sizedOffScreen(final @NotNull JBPopup real) {
             return (JBPopup) Proxy.newProxyInstance(JBPopup.class.getClassLoader(), new Class<?>[]{JBPopup.class}, (proxy, method, args) -> {
-                if (method.getName().equals("equals")) return proxy == args[0];
+                if (method.getName().equals("equals")) return StandIn.isItself(proxy, args[0]);
                 if (method.getName().equals("hashCode")) return System.identityHashCode(proxy);
 
                 final Object answer;

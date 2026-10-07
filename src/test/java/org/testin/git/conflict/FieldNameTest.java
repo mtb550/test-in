@@ -33,7 +33,7 @@ public class FieldNameTest {
 
     @Test
     public void aTestRunsConfigurationKeyIsNamedByTheQuestionTheTesterAnswered() {
-        final TestRunConfiguration question = TestRunConfiguration.values()[0];
+        final TestRunConfiguration question = TestRunConfiguration.TEST_TYPE;
 
         assertEquals(FieldName.of("configuration." + question.name()), question.getDisplayName(),
                 "the key is named as the test run creation dialog names it");
@@ -41,7 +41,7 @@ public class FieldNameTest {
 
     @Test
     public void aResultAnalysisKeyIsNamedByItsHeading() {
-        final ResultAnalysis heading = ResultAnalysis.values()[0];
+        final ResultAnalysis heading = ResultAnalysis.PASSED;
 
         assertEquals(FieldName.of("resultAnalysis." + heading.name()), heading.getLabel(),
                 "the key is named as the analysis dialog heads it");

@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
@@ -136,7 +137,7 @@ public final class LogWriter implements Disposable {
     public void log(final @NotNull Level level, final @NotNull String callerClass, final @NotNull String message) {
         if (!writes(level)) return;
 
-        final @NotNull String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
+        final @NotNull String formattedMessage = "[" + LocalDateTime.now(ZoneId.systemDefault()).format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
 
         if (logQueue.offer(formattedMessage)) {
             dropping.set(false);

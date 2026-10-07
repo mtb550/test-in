@@ -186,6 +186,7 @@ public interface TestinEditor extends Disposable {
 
     void setHoveredIndex(final int index);
 
+    @Override
     default void dispose() {
         ViewToolWindowFactory.panel(getProject()).ifPresent(viewer -> viewer.hide(getParent().getPath2()));
     }

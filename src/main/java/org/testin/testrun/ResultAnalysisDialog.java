@@ -30,6 +30,7 @@ import org.testin.util.Bundle;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -50,7 +51,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
 
         for (final ResultAnalysis section : ResultAnalysis.values()) {
             final @NotNull ComponentDialogBase.TextAreaBuilder builder = ComponentDialogBase.textArea()
-                    .placeholder(Bundle.message("dialog.analysis.placeholder", section.getLabel().toLowerCase()))
+                    .placeholder(Bundle.message("dialog.analysis.placeholder", section.getLabel().toLowerCase(Locale.ROOT)))
                     .value(section.writtenIn(current))
                     .rows(3);
             final @NotNull ComponentDialogBase<TextArea> area = (readOnly ? builder.readOnly() : builder).build();

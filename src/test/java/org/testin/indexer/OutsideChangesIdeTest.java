@@ -42,11 +42,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class OutsideChangesIdeTest extends AbstractReadTheRootIdeTest {
@@ -218,21 +218,21 @@ public class OutsideChangesIdeTest extends AbstractReadTheRootIdeTest {
         written(doomed, "{}");
         onDisk(doomed);
 
-        final @NotNull AtomicReference<Boolean> claimedWhenItStarted = new AtomicReference<>();
+        final @NotNull CompletableFuture<Boolean> claimedWhenItStarted = new CompletableFuture<>();
         getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
             @Override
             public void before(final @NotNull List<? extends @NotNull VFileEvent> events) {
                 events.stream().filter(VFileDeleteEvent.class::isInstance).filter(event -> Path.of(event.getPath()).equals(doomed))
-                        .forEach(_ -> claimedWhenItStarted.set(ownWrites().areOurs(doomed, getProject())));
+                        .forEach(_ -> claimedWhenItStarted.complete(ownWrites().areOurs(doomed, getProject())));
             }
         });
 
-        final @NotNull AtomicReference<Boolean> deleted = new AtomicReference<>();
-        Services.getInstance(getProject(), VfsExecutor.class).removeVf(this, doomed, deleted::set);
-        Await.until("the delete never finished", () -> deleted.get() != null);
+        final @NotNull CompletableFuture<Boolean> deleted = new CompletableFuture<>();
+        Services.getInstance(getProject(), VfsExecutor.class).removeVf(this, doomed, deleted::complete);
+        Await.until("the delete never finished", deleted::isDone);
 
-        assertEquals("the delete did not happen", Boolean.TRUE, deleted.get());
-        assertEquals("the file system reported the delete before Testin had claimed it as its own", Boolean.TRUE, claimedWhenItStarted.get());
+        assertTrue("the delete did not happen", deleted.join());
+        assertTrue("the file system reported the delete before Testin had claimed it as its own", claimedWhenItStarted.getNow(false));
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-113

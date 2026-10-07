@@ -182,7 +182,7 @@ public class DifferenceNumbersTest {
 
         final List<String> dangling = new ArrayList<>();
         for (final Path main : mainPages()) {
-            final String live = RETIRED_FROM_HERE.split(read(main))[0];
+            final String live = RETIRED_FROM_HERE.split(read(main), -1)[0];
             final Matcher row = ROW.matcher(live);
 
             while (row.find()) {

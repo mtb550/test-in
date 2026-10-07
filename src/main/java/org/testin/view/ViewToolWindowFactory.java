@@ -36,8 +36,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
-    private static final @NotNull Consumer<ViewPanel> NOTHING_AFTER = _ -> {
-    };
 
     static void onPanelDisposed(final @NotNull Project p, final @NotNull ViewPanel panel) {
         Services.getInstance(p, ViewPanelHolder.class).release(panel);
@@ -70,7 +68,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     }
 
     public static void showPanel(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
-        showPanel(p, testCases, path, NOTHING_AFTER);
+        showPanel(p, testCases, path, ViewToolWindowFactory::nothingAfter);
     }
 
     // Rule-VIEW-PANEL-008
@@ -96,5 +94,8 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!p.isDisposed()) StartupActivity.execute(p);
         });
+    }
+
+    private static void nothingAfter(final @NotNull ViewPanel shown) {
     }
 }

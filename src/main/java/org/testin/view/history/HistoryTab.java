@@ -114,7 +114,7 @@ public class HistoryTab {
     }
 
     private static boolean isCurrent(final @NotNull JBPanel<?> historyTab, final @NotNull Object request) {
-        return historyTab.getClientProperty(REQUEST) == request;
+        return request.equals(historyTab.getClientProperty(REQUEST));
     }
 
     // Rule-VIEW-PANEL-100

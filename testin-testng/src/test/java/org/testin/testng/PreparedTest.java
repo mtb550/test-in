@@ -18,10 +18,14 @@ package org.testin.testng;
 
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -31,10 +35,16 @@ public class PreparedTest {
     private static @NotNull Module aModule(final @NotNull String name) {
         return (Module) Proxy.newProxyInstance(Module.class.getClassLoader(), new Class<?>[]{Module.class}, (proxy, method, args) -> switch (method.getName()) {
             case "getName" -> name;
-            case "equals" -> proxy == args[0];
+            case "equals" -> isItself(proxy, args[0]);
             case "hashCode" -> System.identityHashCode(proxy);
             default -> throw new UnsupportedOperationException("a stand-in module was asked " + method.getName());
         });
+    }
+
+    private static boolean isItself(final @NotNull Object proxy, final @Nullable Object other) {
+        final @NotNull Set<Object> itself = Collections.newSetFromMap(new IdentityHashMap<>());
+        itself.add(proxy);
+        return itself.contains(other);
     }
 
     private static @NotNull Prepared across(final @NotNull List<Module> modules) {

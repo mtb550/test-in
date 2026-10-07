@@ -24,8 +24,6 @@ import org.testin.util.Shortcuts;
 public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String displayText, @NotNull String name, @NotNull Runnable action) implements StatusBarItem {
     public static final @NotNull String SAVE = Bundle.message("shortcut.save");
     public static final @NotNull String SELECT = Bundle.message("shortcut.select");
-    private static final @NotNull Runnable NOTHING = () -> {
-    };
 
     // UC-INTERNAL-007, Rule-INTERNAL-054
     public static @NotNull StatusBarShortcut build(final @NotNull Shortcuts shortcut, final @NotNull String name, final @NotNull Runnable action) {
@@ -46,7 +44,7 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     }
 
     public static @NotNull StatusBarShortcut hint(final @NotNull String displayText, final @NotNull String name) {
-        return new StatusBarShortcut(Shortcuts.EMPTY, displayText, name, NOTHING);
+        return new StatusBarShortcut(Shortcuts.EMPTY, displayText, name, StatusBarShortcut::nothing);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
@@ -79,5 +77,8 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     @Override
     public @NotNull String getShortcutText() {
         return displayText;
+    }
+
+    private static void nothing() {
     }
 }

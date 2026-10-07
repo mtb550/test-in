@@ -40,6 +40,7 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
@@ -47,6 +48,10 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
     private TestProjectDirectoryDto tp;
 
     private final @NotNull Map<String, Boolean> cancelableByTitle = new ConcurrentHashMap<>();
+
+    private boolean isCancelable(final @NotNull String title) {
+        return Optional.ofNullable(cancelableByTitle.get(title)).orElseThrow(() -> new AssertionError("'" + title + "' never ran behind a progress bar"));
+    }
 
     private @NotNull String cancelTheOneTitled = "";
 
@@ -124,8 +129,8 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
         undoHistories().undo(UndoScope.TREE);
         Await.until("the test set was not put back", () -> nodes().nodeExists(login.getPath()));
 
-        assertEquals("keeping the copy aside is not behind a progress bar the tester can cancel", Boolean.TRUE, cancelableByTitle.get(Bundle.message("remove.progress")));
-        assertEquals("putting the copy back is not behind a progress bar, or it can be canceled", Boolean.FALSE, cancelableByTitle.get(Bundle.message("remove.undo.progress")));
+        assertTrue("keeping the copy aside is not behind a progress bar the tester can cancel", isCancelable(Bundle.message("remove.progress")));
+        assertFalse("putting the copy back is not behind a progress bar, or it can be canceled", isCancelable(Bundle.message("remove.undo.progress")));
     }
 
     // Rule-TREE-PANEL-041

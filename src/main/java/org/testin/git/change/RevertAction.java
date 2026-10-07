@@ -16,11 +16,13 @@
 
 package org.testin.git.change;
 
+import com.google.errorprone.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
 
 @FunctionalInterface
+@Immutable
 public interface RevertAction {
     RevertAction NONE = (_, _) -> {
     };

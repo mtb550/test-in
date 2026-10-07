@@ -49,7 +49,7 @@ import java.util.UUID;
 
 public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
 
-    private static final int ACTUAL_RESULT = TestRunEditorAttributes.ACTUAL_RESULT.ordinal();
+    private static final int ACTUAL_RESULT = TestRunEditorAttributes.ACTUAL_RESULT.column();
 
     private static @NotNull JBTable theGridOf(final @NotNull TestRunEditor editor) {
         editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();

@@ -29,26 +29,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class SyntheticTree {
 
-    private static final @NotNull String TEST_CASE = """
-            {
-              "order" : "%s",
-              "id" : "%s",
-              "description" : "Log in with a valid user and reach the dashboard",
-              "expectedResult" : "The dashboard opens and the user name is shown",
-              "status" : "REVIEWED",
-              "steps" : [ "Open the login page", "Enter a valid user", "Submit" ],
-              "priority" : "HIGH",
-              "reference" : "JIRA-1234",
-              "group" : [ "SMOKE" ],
-              "createdBy" : "Mohammed AlZamil",
-              "updatedBy" : "Mohammed AlZamil",
-              "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
-              "updatedAt" : "Monday 07-09-2026 At 06:49:39 [Asia/Riyadh]",
-              "module" : "Authentication",
-              "testData" : "user=valid.user password=****",
-              "preConditions" : "The user exists and is not locked"
-            }""";
-
     private static final @NotNull String MARKER = """
             {
               "createdBy" : "Mohammed AlZamil",
@@ -60,7 +40,25 @@ final class SyntheticTree {
             }""".formatted(TestProjectMarker.FORMAT);
 
     static @NotNull String testCase(final @NotNull UUID id, final @NotNull String order) {
-        return TEST_CASE.formatted(order, id);
+        return """
+                {
+                  "order" : "%s",
+                  "id" : "%s",
+                  "description" : "Log in with a valid user and reach the dashboard",
+                  "expectedResult" : "The dashboard opens and the user name is shown",
+                  "status" : "REVIEWED",
+                  "steps" : [ "Open the login page", "Enter a valid user", "Submit" ],
+                  "priority" : "HIGH",
+                  "reference" : "JIRA-1234",
+                  "group" : [ "SMOKE" ],
+                  "createdBy" : "Mohammed AlZamil",
+                  "updatedBy" : "Mohammed AlZamil",
+                  "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
+                  "updatedAt" : "Monday 07-09-2026 At 06:49:39 [Asia/Riyadh]",
+                  "module" : "Authentication",
+                  "testData" : "user=valid.user password=****",
+                  "preConditions" : "The user exists and is not locked"
+                }""".formatted(order, id);
     }
 
     static @NotNull String marker() {

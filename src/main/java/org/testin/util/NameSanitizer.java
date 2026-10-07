@@ -43,7 +43,7 @@ public final class NameSanitizer {
         final @NotNull String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
                 .replaceAll("").trim();
         final @NotNull StringBuilder result = new StringBuilder();
-        for (final String word : cleanName.split("[\\s_]+")) {
+        for (final String word : cleanName.split("[\\s_]+", -1)) {
             if (word.isEmpty()) continue;
             if (result.isEmpty()) {
                 result.append(word.toLowerCase(Locale.ROOT));
@@ -73,7 +73,7 @@ public final class NameSanitizer {
 
         final @NotNull String cleanName = INVALID_NAME.matcher(value).replaceAll("").trim();
         final @NotNull StringBuilder result = new StringBuilder();
-        for (final String word : cleanName.split("[\\s_]+")) {
+        for (final String word : cleanName.split("[\\s_]+", -1)) {
             if (!word.isEmpty()) {
                 result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
             }
@@ -89,7 +89,7 @@ public final class NameSanitizer {
 
     public static @NotNull String methodName(final @NotNull String description) {
         final @NotNull StringBuilder result = new StringBuilder();
-        for (final String word : description.split("[^a-zA-Z0-9]+")) {
+        for (final String word : description.split("[^a-zA-Z0-9]+", -1)) {
             if (word.isEmpty()) continue;
             if (result.isEmpty()) {
                 result.append(word.toLowerCase(Locale.ROOT));

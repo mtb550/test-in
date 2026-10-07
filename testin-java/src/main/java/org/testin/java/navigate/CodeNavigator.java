@@ -118,39 +118,39 @@ public final class CodeNavigator implements CodeNavigation {
 
     // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-089
     @Override
-    public boolean fillBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+    public @NotNull Optional<String> fillBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
         return write(p, tc, statements, true);
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-091
     @Override
-    public boolean replaceBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+    public @NotNull Optional<String> replaceBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
         return write(p, tc, statements, false);
     }
 
-    private boolean write(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
-        if (DumbService.isDumb(p)) return false;
+    private @NotNull Optional<String> write(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
+        if (DumbService.isDumb(p)) return Optional.empty();
 
-        return Boolean.TRUE.equals(WriteCommandAction.writeCommandAction(p)
+        return WriteCommandAction.writeCommandAction(p)
                 .withName(Bundle.message("agent.body.command"))
-                .compute(() -> written(p, tc, statements, onlyTheTodo)));
+                .compute(() -> written(p, tc, statements, onlyTheTodo));
     }
 
     // Rule-CODEGEN-003, Rule-CODEGEN-089
-    private boolean written(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
+    private @NotNull Optional<String> written(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
         final @NotNull Optional<PsiMethod> method = resolve(p, tc);
-        if (method.isEmpty()) return false;
-        if (onlyTheTodo && GeneratedMethod.holdsAWrittenBody(method.orElseThrow())) return false;
+        if (method.isEmpty()) return Optional.empty();
+        if (onlyTheTodo && GeneratedMethod.holdsAWrittenBody(method.orElseThrow())) return Optional.empty();
 
         try {
             final @NotNull PsiCodeBlock written = JavaPsiFacade.getElementFactory(p)
                     .createCodeBlockFromText("{\n" + statements + "\n}", method.orElseThrow());
 
             Optional.ofNullable(method.orElseThrow().getBody()).ifPresent(body -> body.replace(written));
-            return true;
+            return Optional.of(statements);
         } catch (final IncorrectOperationException notJava) {
             Logger.warn("The agent's answer for '" + tc.getDescription() + "' is not Java and was dropped: " + FailureText.of(notJava));
-            return false;
+            return Optional.empty();
         }
     }
 

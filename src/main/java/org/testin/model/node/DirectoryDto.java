@@ -38,7 +38,7 @@ import java.util.Optional;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@ToString()
+@ToString
 public abstract class DirectoryDto {
     @NonNull
     @Builder.Default
@@ -50,12 +50,12 @@ public abstract class DirectoryDto {
 
     @NonNull
     @Builder.Default
-    private ArrayList<String> path2 = new ArrayList<>();
+    private List<String> path2 = List.of();
 
     @ToString.Exclude
     private @Nullable DirectoryDto parent;
 
-    public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
+    public static @NotNull List<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
         final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
         path.add(name);
 

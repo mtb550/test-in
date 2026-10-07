@@ -114,8 +114,8 @@ public final class FontSync {
             Optional.ofNullable(child.getFont()).ifPresent(font ->
                     child.setFont(font.deriveFont(Math.max(Fonts.FLOOR, font.getSize2D() + delta))));
 
-            if (child instanceof Container)
-                applyDeltaRecursively((Container) child, delta);
+            if (child instanceof Container inner)
+                applyDeltaRecursively(inner, delta);
         }
     }
 

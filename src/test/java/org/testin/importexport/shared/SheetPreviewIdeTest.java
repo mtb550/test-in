@@ -85,7 +85,7 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
         final @NotNull TestCaseDto third = aTestCase("a locked account cannot log in");
         final @NotNull SheetPreview preview = shown(Can.EXPORT, sheets("Login", first, second, third));
 
-        table(preview).getModel().setValueAt(Boolean.FALSE, 1, 0);
+        table(preview).getModel().setValueAt(false, 1, 0);
 
         assertEquals(Map.of("Login", List.of(first, third)), preview.selected());
     }

@@ -16,6 +16,7 @@
 
 package org.testin.testcase;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.util.ui.EmptyIcon;
@@ -67,7 +68,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getDescriptionSection,
-            new TestCaseDialogKey[]{CORRECTIONS}
+            ImmutableList.of(CORRECTIONS)
     ),
 
     EXPECTED_RESULT(
@@ -78,7 +79,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getExpectedResultSection,
-            new TestCaseDialogKey[]{CORRECTIONS}
+            ImmutableList.of(CORRECTIONS)
     ),
 
     MODULE(
@@ -89,7 +90,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new ModuleBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getModuleSection,
-            new TestCaseDialogKey[]{CORRECTIONS}
+            ImmutableList.of(CORRECTIONS)
     ),
 
     TEST_DATA(
@@ -100,7 +101,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new TestDataBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getTestDataSection,
-            new TestCaseDialogKey[]{}
+            ImmutableList.of()
     ),
 
     PRE_CONDITIONS(
@@ -111,7 +112,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPreConditionsSection,
-            new TestCaseDialogKey[]{CORRECTIONS}
+            ImmutableList.of(CORRECTIONS)
     ),
 
     STEPS(
@@ -122,7 +123,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
-            new TestCaseDialogKey[]{CORRECTIONS, ADD_STEP, NAVIGATE_TAB, AUTO_COMPLETE}
+            ImmutableList.of(CORRECTIONS, ADD_STEP, NAVIGATE_TAB, AUTO_COMPLETE)
     ),
 
     PRIORITY(
@@ -133,7 +134,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
-            new TestCaseDialogKey[]{NAVIGATE_ARROWS}
+            ImmutableList.of(NAVIGATE_ARROWS)
     ),
 
     GROUP(
@@ -144,7 +145,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
-            new TestCaseDialogKey[]{ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB}
+            ImmutableList.of(ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB)
     ),
 
     ORDER(
@@ -155,7 +156,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.RE_SORTED,
             (p, _, _) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
-            new TestCaseDialogKey[]{}
+            ImmutableList.of()
     ),
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
@@ -167,7 +168,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStatusSection,
-            new TestCaseDialogKey[]{}
+            ImmutableList.of()
     ),
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
@@ -179,7 +180,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new ReferenceBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getReferenceSection,
-            new TestCaseDialogKey[]{CORRECTIONS}
+            ImmutableList.of(CORRECTIONS)
     );
 
     private final @NotNull String name;
@@ -190,11 +191,11 @@ public enum UpdateTestCaseFields implements MenuItem {
     private final @NotNull BulkEditorAction bulkAction;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
-    private final TestCaseDialogKey @NotNull [] ownKeys;
+    private final @NotNull ImmutableList<TestCaseDialogKey> ownKeys;
 
     // Rule-EDITOR-PANEL-199
     public StatusBarItem @NotNull [] getStatusBarItems() {
-        return ownKeys.clone();
+        return ownKeys.toArray(StatusBarItem[]::new);
     }
 
     @Override
@@ -202,6 +203,7 @@ public enum UpdateTestCaseFields implements MenuItem {
         return shortcut.getShortcutText();
     }
 
+    @Override
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onTrigger) {
         if (Shortcuts.isNoKey(shortcut.getKey())) return;
 

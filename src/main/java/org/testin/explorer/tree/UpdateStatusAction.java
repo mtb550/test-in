@@ -75,7 +75,7 @@ public class UpdateStatusAction extends AbstractAnyProjectAction {
         final @NotNull Optional<DirectoryDto> dir = selected(e);
 
         e.getPresentation().setVisible(dir.isPresent());
-        GrayWithReason.unless(this, e, dir.filter(node -> node.getMarker().status() != status).isPresent(),
+        GrayWithReason.unless(this, e, dir.filter(node -> !status.equals(node.getMarker().status())).isPresent(),
                 Bundle.message("status.already.description", status.getLabel()));
     }
 

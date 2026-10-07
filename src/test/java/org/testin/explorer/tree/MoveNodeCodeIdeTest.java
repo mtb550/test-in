@@ -68,7 +68,7 @@ public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
     }
 
     private void cutAndPasted(final @NotNull DirectoryDto node, final @NotNull DirectoryDto target) {
-        CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(new DirectoryDto[]{node}, TransferHandler.MOVE)));
+        CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(List.of(node), TransferHandler.MOVE)));
         handler.pasteFromClipboard(target);
     }
 

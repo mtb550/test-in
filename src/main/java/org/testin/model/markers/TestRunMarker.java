@@ -30,6 +30,7 @@ import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunExecution;
 import org.testin.model.status.TestRunStatus;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
@@ -88,13 +89,13 @@ public class TestRunMarker extends AbstractMarker {
 
     public void markExecutionStarted() {
         if (Config.isNotExecuted(executionStartedAt))
-            executionStartedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+            executionStartedAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
     }
 
     public void markExecutionEnded() {
         if (Config.isNotExecuted(executionStartedAt)) return;
 
-        executionEndedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        executionEndedAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-075

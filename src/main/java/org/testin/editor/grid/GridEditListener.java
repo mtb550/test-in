@@ -65,13 +65,13 @@ public class GridEditListener extends AbstractGridEditListener {
 
     @Override
     protected int columnCount() {
-        return TestCaseEditorAttributes.values().length;
+        return TestCaseEditorAttributes.COLUMNS.size();
     }
 
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-050
     @Override
     protected @NotNull GridEdit apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc, final int row, final int col) {
-        final @NotNull TestCaseEditorAttributes attr = TestCaseEditorAttributes.values()[col];
+        final @NotNull TestCaseEditorAttributes attr = TestCaseEditorAttributes.atColumn(col);
 
         if (!attr.can(Can.EDIT)) return GridEdit.UNCHANGED;
 

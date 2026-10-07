@@ -125,7 +125,7 @@ public class ReportSectionTest {
 
     @Test
     public void failuresArePrintedFirst() {
-        assertEquals(ReportSection.values()[0], ReportSection.FAILED);
+        assertEquals(List.of(ReportSection.values()).getFirst(), ReportSection.FAILED);
     }
 
     @Test

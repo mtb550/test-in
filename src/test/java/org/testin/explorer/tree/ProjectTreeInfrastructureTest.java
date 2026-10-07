@@ -26,6 +26,8 @@ import java.nio.file.Path;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+import java.util.List;
+
 public class ProjectTreeInfrastructureTest {
 
     @Test
@@ -38,17 +40,17 @@ public class ProjectTreeInfrastructureTest {
         final DirectoryDto directory = new TestSetDirectoryDto();
         directory.setPath(Path.of("project", "test-cases", "set"));
 
-        final TreeTransferPayload payload = new TreeTransferPayload(new DirectoryDto[]{directory}, TransferHandler.COPY);
+        final TreeTransferPayload payload = new TreeTransferPayload(List.of(directory), TransferHandler.COPY);
 
         assertNotNull(payload.nodes());
-        assertEquals(payload.nodes().length, 1);
-        assertEquals(payload.nodes()[0], directory);
+        assertEquals(payload.nodes().size(), 1);
+        assertEquals(payload.nodes().getFirst(), directory);
         assertEquals(payload.clipboardAction(), TransferHandler.COPY);
     }
 
     @Test
     public void transferPayloadPreservesCutOperation() {
-        final TreeTransferPayload payload = new TreeTransferPayload(new DirectoryDto[0], TransferHandler.MOVE);
+        final TreeTransferPayload payload = new TreeTransferPayload(List.of(), TransferHandler.MOVE);
 
         assertEquals(payload.clipboardAction(), TransferHandler.MOVE);
     }

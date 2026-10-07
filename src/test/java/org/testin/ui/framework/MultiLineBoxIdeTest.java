@@ -130,7 +130,7 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
         final @NotNull Editor editor = editorOf(box);
 
         assertFalse("the box offers corrections with a bulb", editor.getSettings().isShowIntentionBulb());
-        final @NotNull List<Component> extras = Drawn.components(box.getPanel()).stream().filter(component -> component instanceof AbstractButton || component instanceof JLabel && ((JLabel) component).getIcon() != null).toList();
+        final @NotNull List<Component> extras = Drawn.components(box.getPanel()).stream().filter(component -> component instanceof AbstractButton || (component instanceof final JLabel label && label.getIcon() != null)).toList();
         assertEquals("the box draws an icon or a button beside what is typed", List.of(), extras);
     }
 
@@ -155,7 +155,7 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
         }
 
         private @NotNull Optional<Runnable> bound(final @NotNull Component on, final @NotNull Shortcuts key) {
-            return bindings.stream().filter(binding -> binding.on() == on && key.is(binding.keys())).map(Binding::action).findFirst();
+            return bindings.stream().filter(binding -> binding.on().equals(on) && key.is(binding.keys())).map(Binding::action).findFirst();
         }
     }
 

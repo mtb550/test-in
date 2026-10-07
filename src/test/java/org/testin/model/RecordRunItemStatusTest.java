@@ -17,6 +17,7 @@
 package org.testin.model;
 
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
@@ -160,7 +161,7 @@ public class RecordRunItemStatusTest {
     // Rule-EDITOR-PANEL-160, Rule-EDITOR-PANEL-159
     @Test
     public void correctingARunItemStatusReStampsWhoAndWhen() {
-        final @NotNull ZonedDateTime firstTime = ZonedDateTime.now().minusDays(3).truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime firstTime = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(3).truncatedTo(ChronoUnit.SECONDS);
         final @NotNull TestRunItems item = TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(RunItemStatus.FAILED)

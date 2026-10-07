@@ -31,6 +31,7 @@ import org.testin.view.Drawn;
 
 import javax.swing.ListModel;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -80,8 +81,8 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
         final @NotNull JBTable grid = Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst()
                 .orElseThrow(() -> new AssertionError("the editor draws no grid"));
         for (int row = 0; row < grid.getModel().getRowCount(); row++) {
-            if (tc.getDescription().equals(grid.getModel().getValueAt(row, TestCaseEditorAttributes.DESCRIPTION.ordinal())))
-                return Integer.parseInt(String.valueOf(grid.getModel().getValueAt(row, TestCaseEditorAttributes.ORDER.ordinal())));
+            if (tc.getDescription().equals(grid.getModel().getValueAt(row, TestCaseEditorAttributes.DESCRIPTION.column())))
+                return Integer.parseInt(String.valueOf(grid.getModel().getValueAt(row, TestCaseEditorAttributes.ORDER.column())));
         }
         throw new AssertionError("the grid has no row for '" + tc.getDescription() + "'");
     }
@@ -127,7 +128,7 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
         editor.reloadData();
 
         Await.until("the test case was not renumbered when a test case was put above it", () -> numberOnTheCard(editor, declined) == 2);
-        assertEquals("a test case's file was written because another test case moved its number", new String(before), new String(fileOf(declined)));
+        assertEquals("a test case's file was written because another test case moved its number", new String(before, StandardCharsets.UTF_8), new String(fileOf(declined), StandardCharsets.UTF_8));
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-027

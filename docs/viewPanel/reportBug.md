@@ -124,6 +124,7 @@ After:
 │  │ | 🔴 Blocker | 🔴 High | Web · Backend | n\a |          │  │
 │  │                                                        │  │
 │  │ ### Actual result                                      │  │
+│  │                                                        │  │
 │  │ The session was dropped.                               │  │
 │  └────────────────────────────────────────────────────────┘  │
 │  SCREENSHOTS                                                 │

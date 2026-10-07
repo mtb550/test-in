@@ -16,6 +16,7 @@
 
 package org.testin.editor.open;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -29,6 +30,7 @@ import javax.swing.Icon;
 import java.util.function.BiFunction;
 
 @Getter
+@Immutable
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EditorType extends FakeFileType {
     private final @NotNull String name;

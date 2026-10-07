@@ -21,6 +21,7 @@ import org.testin.logger.Logger;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -33,8 +34,8 @@ public class OwnWritesTest {
 
     private static final @NotNull String ANOTHER_WINDOW = "window-b";
 
-    private static final byte @NotNull [] OURS = "{\"description\":\"Log in\"}".getBytes();
-    private static final byte @NotNull [] THEIRS = "{\"description\":\"Log in as admin\"}".getBytes();
+    private static final byte @NotNull [] OURS = "{\"description\":\"Log in\"}".getBytes(StandardCharsets.UTF_8);
+    private static final byte @NotNull [] THEIRS = "{\"description\":\"Log in as admin\"}".getBytes(StandardCharsets.UTF_8);
 
     private static @NotNull Path tempFile() {
         try {

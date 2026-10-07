@@ -95,7 +95,7 @@ public class ArchitectureTest {
         return new DescribedPredicate<>("not one of the " + frozen.size() + " frozen violations") {
             @Override
             public boolean test(final @NotNull JavaClass javaClass) {
-                final @NotNull String outermost = javaClass.getName().split("[$]")[0];
+                final @NotNull String outermost = javaClass.getName().split("[$]", -1)[0];
 
                 return !frozen.contains(outermost);
             }

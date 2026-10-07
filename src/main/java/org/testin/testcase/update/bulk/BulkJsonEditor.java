@@ -71,8 +71,8 @@ final class BulkJsonEditor {
         final @NotNull FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
         final @NotNull EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, jsonFileType);
 
-        if (editor instanceof EditorEx)
-            ((EditorEx) editor).setHighlighter(highlighter);
+        if (editor instanceof EditorEx editorEx)
+            editorEx.setHighlighter(highlighter);
 
         final @NotNull EditorColorsScheme scheme = editor.getColorsScheme();
         scheme.setEditorFontSize(15f);

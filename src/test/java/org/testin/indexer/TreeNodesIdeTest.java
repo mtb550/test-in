@@ -33,6 +33,7 @@ import org.testin.remove.Removals;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
+import java.time.ZoneId;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -180,7 +181,7 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
         try {
             settings().testerName = TESTER;
             final @NotNull TestSetDirectoryDto login = made().testSet(aTestProject().getTestCasesDirectory(), "Login");
-            final @NotNull ZonedDateTime yesterday = ZonedDateTime.now().minusDays(1);
+            final @NotNull ZonedDateTime yesterday = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(1);
             login.getMarker().setModifiedAt(yesterday);
 
             settings().testerName = "Muteb";

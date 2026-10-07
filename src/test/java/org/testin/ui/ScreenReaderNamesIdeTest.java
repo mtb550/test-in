@@ -101,7 +101,7 @@ public class ScreenReaderNamesIdeTest extends BasePlatformTestCase {
             assertTrue("a field without a caption is not named by its hint: " + names, names.contains("set path.."));
             final @NotNull List<Component> drawn = Drawn.components(dialog.root());
             final @NotNull Component steps = drawn.stream().filter(EditorTextField.class::isInstance).findFirst().orElseThrow();
-            final @NotNull List<String> stepsCaptions = drawn.stream().filter(JLabel.class::isInstance).map(JLabel.class::cast).filter(label -> label.getLabelFor() == steps).map(label -> spoken(label.getAccessibleContext())).toList();
+            final @NotNull List<String> stepsCaptions = drawn.stream().filter(JLabel.class::isInstance).map(JLabel.class::cast).filter(label -> steps.equals(label.getLabelFor())).map(label -> spoken(label.getAccessibleContext())).toList();
             assertEquals("a box of many lines does not hand its caption to the editor it opens", List.of("Steps"), stepsCaptions);
             assertTrue("a tree is not named by its caption: " + names, names.contains("Test cases"));
         } finally {
@@ -135,7 +135,7 @@ public class ScreenReaderNamesIdeTest extends BasePlatformTestCase {
     public void testAGridCellSaysTheValueItShows() {
         final String @NotNull [] row = new String[TestCaseEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.ordinal()] = "Log in with a valid user";
+        row[TestCaseEditorAttributes.DESCRIPTION.column()] = "Log in with a valid user";
 
         final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(List.<String[]>of(row), Set.of(TestCaseEditorAttributes.DESCRIPTION));
 
@@ -155,7 +155,7 @@ public class ScreenReaderNamesIdeTest extends BasePlatformTestCase {
 
     // Rule-INTERNAL-122
     public void testAHoverButtonIsNamedAndSaysWhyItIsGray() {
-        final @NotNull CardHoverAction action = CardHoverAction.values()[0];
+        final @NotNull CardHoverAction action = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
 
         final @NotNull JComponent works = HoverButton.of(getProject(), new Offered(action, Optional.empty()), AllIcons.Actions.Execute, "Run test case", () -> {
         });

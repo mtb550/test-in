@@ -41,6 +41,7 @@ import org.testin.util.Bundle;
 
 import java.awt.datatransfer.Transferable;
 import java.nio.file.Path;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -156,7 +157,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
 
         final @NotNull Set<UUID> arrived = new HashSet<>(TestCaseSnapshot.idsOf(pastedHere));
         sourceUI.getAllTestCases().removeAll(cutItems.stream().filter(tc -> arrived.contains(tc.getId())).toList());
-        if (sourceUI != destUI) sourceUI.reorderAndPersist();
+        if (!sourceUI.equals(destUI)) sourceUI.reorderAndPersist();
     }
 
     boolean holdsTestCases(final @NotNull Transferable contents) {
@@ -194,7 +195,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
             return moved;
         }
 
-        final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
 
         return draft.id(UUID.randomUUID())
                 .description(Bundle.message("paste.copy.suffix", original.getDescription()))

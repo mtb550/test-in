@@ -31,7 +31,9 @@ import org.testin.help.SetupStep;
 import org.testin.notifications.Notifier;
 import org.testin.util.Bundle;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public enum OptionalPlugin {
     JAVA(
@@ -59,7 +61,8 @@ public enum OptionalPlugin {
     private final @NotNull String label;
     private final @NotNull String requirement;
     private final @NotNull SetupStep step;
-    private volatile @NotNull Availability availability = Availability.UNKNOWN;
+
+    private static final @NotNull Map<OptionalPlugin, Boolean> AVAILABLE = new ConcurrentHashMap<>();
 
     OptionalPlugin(final @NotNull String pluginId, final @NotNull String label, final @NotNull String requirement, final @NotNull SetupStep step) {
         this.pluginId = pluginId;
@@ -70,12 +73,7 @@ public enum OptionalPlugin {
 
     // Rule-CODEGEN-005
     public boolean isAvailable() {
-        Availability known = availability;
-        if (known == Availability.UNKNOWN) {
-            known = isEnabledInIde() ? Availability.PRESENT : Availability.ABSENT;
-            availability = known;
-        }
-        return known == Availability.PRESENT;
+        return AVAILABLE.computeIfAbsent(this, OptionalPlugin::isEnabledInIde);
     }
 
     private boolean isEnabledInIde() {
@@ -126,7 +124,7 @@ public enum OptionalPlugin {
 
     @TestOnly
     public void missingUntil(final @NotNull Disposable restored) {
-        availability = Availability.ABSENT;
-        Disposer.register(restored, () -> availability = Availability.UNKNOWN);
+        AVAILABLE.put(this, false);
+        Disposer.register(restored, () -> AVAILABLE.remove(this));
     }
 }

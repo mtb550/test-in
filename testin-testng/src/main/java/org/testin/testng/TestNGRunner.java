@@ -37,6 +37,7 @@ import org.testin.model.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.runner.TestNGExecution;
 import org.testin.runner.TestRunner;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -81,12 +82,12 @@ public final class TestNGRunner implements TestRunner {
 
         testCases.forEach(execution::starting);
 
-        ReadAction.nonBlocking(() -> prepare(p, testCases))
+        BackgroundWork.logged(ReadAction.nonBlocking(() -> prepare(p, testCases))
                 .expireWith(execution)
                 .finishOnUiThread(ModalityState.nonModal(), prepared -> prepared.ifPresentOrElse(
                         ready -> start(p, ready),
                         () -> interrupted(p, testCases)))
-                .submit(AppExecutorUtil.getAppExecutorService());
+                .submit(AppExecutorUtil.getAppExecutorService()), "Preparing the TestNG run");
     }
 
     private @NotNull Optional<Prepared> prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {

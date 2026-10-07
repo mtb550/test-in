@@ -41,9 +41,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -187,7 +185,7 @@ public final class ProjectIndexer {
         if (projectsLeft.decrementAndGet() != 0) return false;
 
         passLatch.countDown();
-        return passLatch == indexingLatch;
+        return passLatch.equals(indexingLatch);
     }
 
     private void finishSuccessfully() {
@@ -322,28 +320,23 @@ public final class ProjectIndexer {
 
     // UC-INTERNAL-002, Rule-INTERNAL-003, Rule-INTERNAL-004
     private @NotNull List<Path> collectValidProjects(final @NotNull Path rootPath) {
-        if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return Collections.emptyList();
+        if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return List.of();
 
         final Path[] projectPaths;
         try (Stream<Path> dirs = Files.list(rootPath)) {
             projectPaths = dirs.filter(Files::isDirectory).toArray(Path[]::new);
         } catch (final IOException | UncheckedIOException ex) {
             Logger.error("Failed to list root directory: " + FailureText.of(ex));
-            return Collections.emptyList();
+            return List.of();
         }
 
-        if (projectPaths.length == 0) return Collections.emptyList();
+        return Arrays.stream(projectPaths).filter(this::isListedTestProject).toList();
+    }
 
-        final @NotNull List<Path> valid = new ArrayList<>();
-        Arrays.stream(projectPaths).forEach(folder -> {
-            if (isTestProjectFolder(folder)) {
-                valid.add(folder);
-            } else {
-                Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker()
-                        + " marker (not a test project): " + folder);
-            }
-        });
-        return valid;
+    private boolean isListedTestProject(final @NotNull Path folder) {
+        final boolean marked = isTestProjectFolder(folder);
+        if (!marked) Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker() + " marker (not a test project): " + folder);
+        return marked;
     }
 
     private boolean isTestProjectFolder(final @NotNull Path folder) {

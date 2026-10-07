@@ -106,7 +106,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
         ShownDialog.waitedFor(getProject(), PendingCommitsDialog.class);
 
         assertFalse("Git was never asked", onTheMainThread.isEmpty());
-        assertFalse("Git was read on the main thread", onTheMainThread.contains(Boolean.TRUE));
+        assertFalse("Git was read on the main thread", onTheMainThread.contains(true));
     }
 
     // UC-SHARE-016, Rule-SHARE-073

@@ -18,12 +18,12 @@ package org.testin.importexport.shared;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.ui.framework.TextValue;
 import org.testin.util.Bundle;
@@ -31,8 +31,8 @@ import org.testin.util.FailureText;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -72,8 +72,7 @@ public class PreviewLoader {
             return;
         }
 
-        AppExecutorUtil.getAppScheduledExecutorService()
-                .schedule(() -> readIfStillWanted(typed), QUIET_MILLIS, TimeUnit.MILLISECONDS);
+        BackgroundWork.after(QUIET_MILLIS, () -> readIfStillWanted(typed), "Reading the preview of " + typed);
     }
 
     private void readIfStillWanted(final @NotNull String typed) {
@@ -91,7 +90,7 @@ public class PreviewLoader {
     }
 
     private void loadFile(final @NotNull File importFile, final @NotNull String typed) {
-        FileTypes.importerFor(importFile.getName().toLowerCase())
+        FileTypes.importerFor(importFile.getName().toLowerCase(Locale.ROOT))
                 .ifPresentOrElse(format -> loadFile(importFile, format, typed),
                         () -> notifier.softRefuse(p, Bundle.message("import.cannot.title"),
                                 Bundle.message("import.cannot.message", importFile.getName(), FileTypes.importableExtensions())));

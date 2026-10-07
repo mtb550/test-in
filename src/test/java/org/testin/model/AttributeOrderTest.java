@@ -26,11 +26,11 @@ public class AttributeOrderTest {
 
     @Test
     public void orderIsTheFirstTestAttribute() {
-        assertSame(TestCaseEditorAttributes.values()[0], TestCaseEditorAttributes.ORDER);
+        assertSame(TestCaseEditorAttributes.atColumn(0), TestCaseEditorAttributes.ORDER);
     }
 
     @Test
     public void orderIsTheFirstTestRunAttribute() {
-        assertSame(TestRunEditorAttributes.values()[0], TestRunEditorAttributes.ORDER);
+        assertSame(TestRunEditorAttributes.atColumn(0), TestRunEditorAttributes.ORDER);
     }
 }

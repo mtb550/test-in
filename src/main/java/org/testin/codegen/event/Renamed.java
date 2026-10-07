@@ -53,7 +53,7 @@ public record Renamed(@NotNull DirectoryDto dir, @NotNull List<String> from, @No
 
     // Rule-CODEGEN-082
     public boolean movesCode(final @NotNull Project p) {
-        return CodeOn.isOn(p) || OptionalPlugin.JAVA.isAvailable() && toTheFilesName(p);
+        return CodeOn.isOn(p) || (OptionalPlugin.JAVA.isAvailable() && toTheFilesName(p));
     }
 
     // UC-CODEGEN-017, Rule-CODEGEN-080

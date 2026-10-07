@@ -16,6 +16,7 @@
 
 package org.testin.testcase;
 
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
@@ -123,7 +124,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     private final @NotNull String placeholder;
 
-    private final TestCaseDialogKey @NotNull [] ownKeys;
+    private final @NotNull ImmutableList<TestCaseDialogKey> ownKeys;
 
     CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final Icons.@NotNull LetterIcon icon, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
@@ -131,12 +132,12 @@ public enum CreateTestCaseFields implements StatusBarItem {
         this.icon = icon;
         this.sectionExtractor = sectionExtractor;
         this.placeholder = placeholder;
-        this.ownKeys = ownKeys;
+        this.ownKeys = ImmutableList.copyOf(ownKeys);
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-199
     public StatusBarItem @NotNull [] getStatusBarItems() {
-        final @NotNull List<StatusBarItem> items = new ArrayList<>(List.of(ownKeys));
+        final @NotNull List<StatusBarItem> items = new ArrayList<>(ownKeys);
 
         if (this == DESCRIPTION) items.addAll(JUMP_KEYS);
 

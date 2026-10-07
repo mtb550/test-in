@@ -34,7 +34,7 @@ public class SelectionListener implements ListSelectionListener {
     private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull TestinEditor editor;
-    private final @NotNull ArrayList<String> path;
+    private final @NotNull List<String> path;
 
     // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-113
     @Override

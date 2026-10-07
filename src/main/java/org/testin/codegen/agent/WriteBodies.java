@@ -50,10 +50,10 @@ public final class WriteBodies {
         final @NotNull AgentConnection connection = AgentConnection.stored();
         if (!connection.isConnected() || testCases.isEmpty()) return;
 
-        ReadAction.nonBlocking(() -> CodeNavigation.available().withAWrittenBody(p, testCases))
+        BackgroundWork.logged(ReadAction.nonBlocking(() -> CodeNavigation.available().withAWrittenBody(p, testCases))
                 .expireWith(ProjectLifetime.of(p))
                 .finishOnUiThread(ModalityState.defaultModalityState(), written -> askOrConfirm(p, connection, testCases, written, editor))
-                .submit(AppExecutorUtil.getAppExecutorService());
+                .submit(AppExecutorUtil.getAppExecutorService()), "Reading which test methods have a written body");
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-091
@@ -114,7 +114,7 @@ public final class WriteBodies {
         final @NotNull Optional<String> said = agent.ask(connection, prompt);
         final @NotNull Optional<String> statements = said.flatMap(AgentAnswer::statementsIn);
 
-        final boolean landed = statements.filter(written -> overWhatIsThere
+        final boolean landed = statements.flatMap(written -> overWhatIsThere
                 ? CodeNavigation.available().replaceBody(p, tc, written)
                 : CodeNavigation.available().fillBody(p, tc, written)).isPresent();
 

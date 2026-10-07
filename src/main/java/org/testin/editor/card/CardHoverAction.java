@@ -16,6 +16,7 @@
 
 package org.testin.editor.card;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
@@ -52,7 +53,7 @@ public enum CardHoverAction {
     NAVIGATE_TO_TEST_METHOD(
             Bundle.message("action.Testin.NavigateToTestMethod.text"),
             "Testin.NavigateToTestMethod",
-            List.of(OptionalPlugin.JAVA),
+            ImmutableList.of(OptionalPlugin.JAVA),
             Icons.TEST_CASE,
             (p, testCases) -> NavigateToTestMethodAction.execute(p, testCases.getFirst()),
             (_, _) -> Optional.empty()
@@ -61,7 +62,7 @@ public enum CardHoverAction {
     RUN_TEST_METHOD(
             Bundle.message("action.Testin.RunTestMethod.text"),
             "Testin.RunTestMethod",
-            List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
+            ImmutableList.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             ExecuteTestCases::run,
             (shownIn, _) -> shownIn.flatMap(DirectoryDto::whySignedOff)
@@ -70,7 +71,7 @@ public enum CardHoverAction {
     STOP_TEST_METHOD(
             Bundle.message("card.stop.test.method"),
             "",
-            List.of(OptionalPlugin.TESTNG),
+            ImmutableList.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
             CardHoverAction::stopExecution,
             (_, _) -> Optional.empty()
@@ -79,7 +80,7 @@ public enum CardHoverAction {
     NAVIGATE_TO_TEST_CASE(
             Bundle.message("action.Testin.NavigateToTestCase.text"),
             "Testin.NavigateToTestCase",
-            List.of(),
+            ImmutableList.of(),
             Icons.TEST_CASE_LETTER,
             (p, testCases) -> NavigateToTestCaseAction.execute(p, testCases.getFirst()),
             (_, tc) -> NavigateToTestCaseAction.whyNot(tc)
@@ -88,7 +89,7 @@ public enum CardHoverAction {
     private final @NotNull String tooltip;
     private final @NotNull String actionId;
     @Getter(AccessLevel.NONE)
-    private final @NotNull List<OptionalPlugin> requires;
+    private final @NotNull ImmutableList<OptionalPlugin> requires;
 
     private final @NotNull Icon icon;
 

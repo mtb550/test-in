@@ -94,7 +94,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     protected void collectNavigationMarkers(final @NotNull PsiElement element, final @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         final @NotNull Project p = element.getProject();
 
-        if (!(element instanceof PsiJavaToken token) || token.getTokenType() != JavaTokenType.STRING_LITERAL) {
+        if (!(element instanceof PsiJavaToken token) || !token.getTokenType().equals(JavaTokenType.STRING_LITERAL)) {
             return;
         }
 

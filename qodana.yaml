@@ -42,7 +42,7 @@ profile:
   path: .idea/inspectionProfiles/Testin.xml
 
 # Inspections Qodana runs beyond the profile. They are Qodana's alone, so the
-# IDE and tools/inspect.ps1 are unchanged: the licence audit of every
+# IDE and tools/inspect.ps1 are unchanged: the license audit of every
 # dependency, a dependency with a known vulnerability, copy-pasted code (one
 # owner for every fact, no second copy), and the test coverage the build hands
 # over in .qodana/code-coverage.
@@ -58,7 +58,7 @@ failureConditions:
   severityThresholds:
     any: 0
 
-# Testin is Apache-2.0. A dependency under a copyleft licence would bind the
+# Testin is Apache-2.0. A dependency under a copyleft license would bind the
 # plugin to its terms, so those are refused outright; everything else follows
 # Qodana's own compatibility table for Apache-2.0.
 licenseRules:
@@ -80,30 +80,57 @@ licenseRules:
 exclude:
   # Files whose bytes something else owns.
   #
-  # samples/testin-root marks a test set with a file named .ts, which is also
-  # TypeScript's extension. The marker is JSON, so reading it as TypeScript
-  # gives fifteen syntax errors per file. .ts is the marker Testin writes.
+  # The sample test project marks a test set with a file named .ts, which is
+  # also TypeScript's extension. The marker is JSON, so reading it as TypeScript
+  # gives fifteen syntax errors per file. .ts is the marker Testin writes, and
+  # an IDE maps a file name to a type in its own settings, never the project's,
+  # so the two markers are listed by name and the rest of samples is inspected.
   #
   # gradlew and gradlew.bat are written by Gradle's wrapper task. EULA.md and
   # PRIVACY_POLICY.md are JetBrains' agreements quoted verbatim.
-  #
-  # The documentation site's Jekyll files: the stylesheet opens with the front
-  # matter Jekyll needs and imports {{ site.theme }}, which is not CSS, and the
-  # head include loads Mermaid from its CDN, which is how a static page gets
-  # it.
-  #
-  # The bug report template is the body of every issue Testin files, pinned
-  # byte for byte by BugTemplateTest.
   - name: All
     paths:
-      - samples
+      - "samples/testin-root/Demo/Test Cases/Login/.ts"
+      - "samples/testin-root/Demo/Test Cases/Checkout/Payment/.ts"
       - gradlew
       - gradlew.bat
       - EULA.md
       - PRIVACY_POLICY.md
+
+  # The documentation site's stylesheet is a Jekyll file. It opens with the
+  # --- front matter Jekyll needs, read as a selector missing its comma; it
+  # imports {{ site.theme }} and palette from Jekyll's _sass folder, neither a
+  # path the inspector can follow; and it styles the classes the theme's own
+  # layout writes, which is not in this repository. Every other inspection
+  # reads the file.
+  - name: CssInvalidHtmlTagReference
+    paths:
       - docs/assets/css/style.scss
+
+  - name: CssMissingComma
+    paths:
+      - docs/assets/css/style.scss
+
+  - name: CssUnknownTarget
+    paths:
+      - docs/assets/css/style.scss
+
+  - name: CssUnusedSymbol
+    paths:
+      - docs/assets/css/style.scss
+
+  # The documentation site loads Mermaid from its CDN, which is how a static
+  # page gets it. The inspector keeps no local copy of a library behind a URL,
+  # so it reports the link and every use of the mermaid global the library
+  # defines. A local copy would need Jekyll's relative_url path, which the
+  # inspector cannot resolve either. Every other inspection reads the file.
+  - name: JSUnresolvedLibraryURL
+    paths:
       - docs/_includes/head-custom.html
-      - src/main/resources/org/testin/bug/bugReport.md
+
+  - name: JSUnresolvedReference
+    paths:
+      - docs/_includes/head-custom.html
 
   # GitCommandRunnerTest proves a credential in a remote URL is masked before
   # Git's message reaches the log, so its test data has to be a URL with a
@@ -117,10 +144,3 @@ exclude:
   - name: UndefinedParamsPresent
     paths:
       - .github/workflows
-
-  # CodeNavigation's real implementation lives in testin-java, a content module
-  # the inspector cannot see, so it judges "every implementation" by the
-  # no-Java fallback alone, which always answers false.
-  - name: SameReturnValue
-    paths:
-      - src/main/java/org/testin/navigate/CodeNavigation.java

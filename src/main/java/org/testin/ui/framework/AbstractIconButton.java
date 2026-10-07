@@ -46,7 +46,7 @@ public abstract class AbstractIconButton extends JButton {
 
     private boolean on;
 
-    private @NotNull Optional<String> shortcutText = Optional.empty();
+    private final @NotNull Optional<String> shortcutText;
 
     // Rule-INTERNAL-119
     public static @NotNull AbstractIconButton of(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Runnable onClick) {
@@ -57,7 +57,20 @@ public abstract class AbstractIconButton extends JButton {
     }
 
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
+        this(tooltip, icon, Optional.empty());
+    }
+
+    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
+        this(tooltip, icon, Optional.of(shortcut.getShortcutText()));
+    }
+
+    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull String shortcutText) {
+        this(tooltip, icon, Optional.of(shortcutText));
+    }
+
+    private AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Optional<String> shortcutText) {
         super(null, icon);
+        this.shortcutText = shortcutText;
         describe(tooltip);
         setFocusable(false);
         setBorderPainted(false);
@@ -90,17 +103,6 @@ public abstract class AbstractIconButton extends JButton {
                 setHovered(false);
             }
         });
-    }
-
-    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
-        this(tooltip, icon, shortcut.getShortcutText());
-    }
-
-    public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull String shortcutText) {
-        this("", icon);
-
-        this.shortcutText = Optional.of(shortcutText);
-        describe(tooltip);
     }
 
     // Rule-INTERNAL-122

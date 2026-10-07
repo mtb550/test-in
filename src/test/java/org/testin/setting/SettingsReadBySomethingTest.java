@@ -41,7 +41,7 @@ public class SettingsReadBySomethingTest {
         try (Stream<Path> files = Stream.of("src", "testin-java/src", "testin-testng/src")
                 .map(RepositoryRoot::resolve)
                 .map(tree -> tree.resolve("main").resolve("java"))
-                .flatMap(SettingsReadBySomethingTest::walked)) {
+                .flatMap(tree -> walked(tree).stream())) {
             return files.filter(file -> file.toString().endsWith(".java"))
                     .filter(file -> !THE_PAGES.contains(file.getFileName().toString()))
                     .map(SettingsReadBySomethingTest::read)
@@ -58,9 +58,9 @@ public class SettingsReadBySomethingTest {
                 """, load));
     }
 
-    private static @NotNull Stream<Path> walked(final @NotNull Path tree) {
-        try {
-            return Files.walk(tree);
+    private static @NotNull List<Path> walked(final @NotNull Path tree) {
+        try (Stream<Path> walk = Files.walk(tree)) {
+            return walk.toList();
         } catch (final IOException ex) {
             throw new AssertionError("could not walk " + tree + ": " + ex.getMessage(), ex);
         }

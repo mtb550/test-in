@@ -50,7 +50,6 @@ import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -307,7 +306,7 @@ public class GridPanelBuilder {
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020, Rule-TREE-PANEL-009
     public @NotNull JBTable buildTestRunTable(final @NotNull List<String[]> rows, final @NotNull Set<TestRunEditorAttributes> attributes, final @NotNull BooleanSupplier stillOpen) {
         Logger.debug("[GridPanelBuilder] buildRunTable: rows=" + rows.size() + ", attributes=" + attributes);
-        final @NotNull List<TestRunEditorAttributes> ordered = Arrays.stream(TestRunEditorAttributes.values()).toList();
+        final @NotNull List<TestRunEditorAttributes> ordered = TestRunEditorAttributes.COLUMNS;
 
         final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> stillOpen.getAsBoolean() && ordered.get(column).isEdited(), EditorKind.RUN);
         applyColumnVisibility(table, TestRunEditorAttributes.class, attributes);
@@ -317,7 +316,7 @@ public class GridPanelBuilder {
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
     public @NotNull JBTable buildTestTable(final @NotNull List<String[]> rows, final @NotNull Set<TestCaseEditorAttributes> attributes) {
         Logger.debug("[GridPanelBuilder] buildTestTable: rows=" + rows.size() + ", attributes=" + attributes);
-        final @NotNull List<TestCaseEditorAttributes> ordered = Arrays.stream(TestCaseEditorAttributes.values()).toList();
+        final @NotNull List<TestCaseEditorAttributes> ordered = TestCaseEditorAttributes.COLUMNS;
 
         final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> ordered.get(column).can(Can.EDIT), EditorKind.TEST);
         applyColumnVisibility(table, TestCaseEditorAttributes.class, attributes);
@@ -378,7 +377,7 @@ public class GridPanelBuilder {
         GridExcelBehavior.install(table);
         table.setSelectionBackground(SELECTION_BACKGROUND);
         table.setSelectionForeground(EditorColors.SELECTION_FOREGROUND);
-        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table.putClientProperty("terminateEditOnFocusLost", true);
         table.setDefaultRenderer(Object.class, wrappingRenderer());
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));

@@ -36,6 +36,7 @@ import org.testin.model.bug.BugSeverity;
 import org.testin.model.status.RunItemStatus;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -200,7 +201,7 @@ public class TestRunItems {
         if (clears(next)) FailureDetail.clearAll(this);
 
         status = next;
-        executedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        executedAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         executedBy = tester;
     }
 

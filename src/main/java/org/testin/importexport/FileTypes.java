@@ -144,15 +144,15 @@ public enum FileTypes {
     }
 
     public boolean isExportable() {
-        return exportHandler != ExportHandler.UNSUPPORTED;
+        return !exportHandler.equals(ExportHandler.UNSUPPORTED);
     }
 
     public boolean isImportable() {
-        return importHandler != ImportHandler.UNSUPPORTED;
+        return !importHandler.equals(ImportHandler.UNSUPPORTED);
     }
 
     public boolean isReportable() {
-        return reportHandler != ReportHandler.UNSUPPORTED;
+        return !reportHandler.equals(ReportHandler.UNSUPPORTED);
     }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {

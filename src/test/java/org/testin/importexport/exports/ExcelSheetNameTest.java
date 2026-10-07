@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -108,7 +109,7 @@ public class ExcelSheetNameTest {
                 workbook.createSheet(ExportExcel.uniqueSheetName(workbook, "Login"));
 
                 final String second = ExportExcel.uniqueSheetName(workbook, "login");
-                assertNotEquals(second.toLowerCase(), "login", "Excel refuses two sheets differing only in case");
+                assertNotEquals(second.toLowerCase(Locale.ROOT), "login", "Excel refuses two sheets differing only in case");
 
                 workbook.createSheet(second);
                 assertEquals(workbook.getNumberOfSheets(), 2);

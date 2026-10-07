@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public enum DirectoryType {
             TestProjectMarker.class,
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
             NodeStatistics.CHILDREN,
-            List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES, NodeCount.TEST_RUNS)
+            ImmutableList.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES, NodeCount.TEST_RUNS)
     ),
 
     TCD(
@@ -63,7 +64,7 @@ public enum DirectoryType {
             TestCasesMainDirectoryMarker.class,
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
             NodeStatistics.CHILDREN,
-            List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
+            ImmutableList.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
     ),
 
     TRD(
@@ -74,7 +75,7 @@ public enum DirectoryType {
             TestRunsMainDirectoryMarker.class,
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
             NodeStatistics.CHILDREN,
-            List.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
+            ImmutableList.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
     ),
 
     TSP(
@@ -85,7 +86,7 @@ public enum DirectoryType {
             TestSetPackageMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.CHILDREN,
-            List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
+            ImmutableList.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
     ),
 
     TRP(
@@ -96,7 +97,7 @@ public enum DirectoryType {
             TestRunPackageMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.CHILDREN,
-            List.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
+            ImmutableList.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
     ),
 
     TS(
@@ -107,7 +108,7 @@ public enum DirectoryType {
             TestSetMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.CHILDREN,
-            List.of(NodeCount.TEST_CASES)
+            ImmutableList.of(NodeCount.TEST_CASES)
     ),
 
     TR(
@@ -118,7 +119,7 @@ public enum DirectoryType {
             TestRunMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.RUN_ITEM_STATUSES,
-            List.of(NodeCount.TOTAL)
+            ImmutableList.of(NodeCount.TOTAL)
     );
 
     public static final @NotNull List<DirectoryType> UNDER_TEST_CASES = List.of(TS, TSP);
@@ -143,7 +144,7 @@ public enum DirectoryType {
     private final @NotNull Class<? extends AbstractMarker> markerClass;
     private final @NotNull SimpleTextAttributes attributes;
     private final @NotNull NodeStatistics statistics;
-    private final @NotNull List<NodeCount> counts;
+    private final @NotNull ImmutableList<NodeCount> counts;
 
     public static boolean isOneFolderName(final @NotNull String name) {
         final @NotNull String trimmed = name.trim();

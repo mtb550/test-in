@@ -157,7 +157,7 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
     }
 
     private static @NotNull JLabel captionOf(final @NotNull JComponent panel, final @NotNull Component field) {
-        return drawn(panel, JLabel.class).stream().filter(label -> label.getLabelFor() == field).findFirst().orElseThrow(() -> new AssertionError("the field has no caption"));
+        return drawn(panel, JLabel.class).stream().filter(label -> field.equals(label.getLabelFor())).findFirst().orElseThrow(() -> new AssertionError("the field has no caption"));
     }
 
     private static @NotNull List<Icon> extensionIconsOf(final @NotNull Component field) {
@@ -420,7 +420,7 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         for (final Component component : Drawn.components(everyField())) {
             if (!(component instanceof final JComponent drawn)) continue;
             final boolean ours = drawn.getClass().getName().startsWith("org.testin");
-            if (!ours && (drawn.getClass().getName().contains("$") || !(drawn instanceof JPanel) && !(drawn instanceof JLabel))) continue;
+            if (!ours && (drawn.getClass().getName().contains("$") || (!(drawn instanceof JPanel) && !(drawn instanceof JLabel)))) continue;
 
             if (drawn.getBorder() instanceof final EmptyBorder padding) {
                 final @NotNull Insets insets = padding.getBorderInsets();

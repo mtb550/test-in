@@ -134,6 +134,6 @@ public enum ChangeType {
     private final @NotNull RevertAction revertAction;
 
     public boolean isRevertible() {
-        return revertAction != RevertAction.NONE;
+        return !revertAction.equals(RevertAction.NONE);
     }
 }

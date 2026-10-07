@@ -147,7 +147,7 @@ public final class DialogStyle {
     public static void setDecorations(final @NotNull ExtendableTextField textField, final @NotNull Icon icon, final @NotNull String note, final @NotNull Optional<Runnable> browse) {
         final @NotNull List<ExtendableTextComponent.Extension> extensions = new ArrayList<>();
 
-        if (icon != NO_ICON) extensions.add(leading(icon));
+        if (!icon.equals(NO_ICON)) extensions.add(leading(icon));
         if (!note.isEmpty()) extensions.add(trailing(note, textField));
         browse.ifPresent(open -> extensions.add(browsing(open)));
 

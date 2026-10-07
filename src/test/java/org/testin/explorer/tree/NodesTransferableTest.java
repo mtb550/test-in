@@ -35,7 +35,7 @@ public class NodesTransferableTest {
         final @NotNull DirectoryDto testSet = new TestSetDirectoryDto();
         testSet.setPath(Path.of("root", "NAFATH", "Test Cases", "Login"));
 
-        return new NodesTransferable(new TreeTransferPayload(new DirectoryDto[]{testSet}, TransferHandler.MOVE));
+        return new NodesTransferable(new TreeTransferPayload(List.of(testSet), TransferHandler.MOVE));
     }
 
     // Rule-TREE-PANEL-105

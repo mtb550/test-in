@@ -19,5 +19,7 @@ package org.testin.explorer.tree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.node.DirectoryDto;
 
-public record TreeTransferPayload(@NotNull DirectoryDto[] nodes, int clipboardAction) {
+import java.util.List;
+
+public record TreeTransferPayload(@NotNull List<DirectoryDto> nodes, int clipboardAction) {
 }

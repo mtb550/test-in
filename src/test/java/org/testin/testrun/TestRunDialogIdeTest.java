@@ -130,7 +130,7 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
     private static @NotNull Map<TestRunConfiguration, String> everyQuestionAnswered() {
         final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            if (field.isChoice()) answers.put(field, field.getOptions()[0]);
+            if (field.isChoice()) answers.put(field, field.getOptions().getFirst());
         }
         return answers;
     }
@@ -310,7 +310,7 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
         });
         final @NotNull TestRunDirectoryDto source = cycle1In(sprint, List.of(new TestRunItems().setId(first.getId()).setStatus(RunItemStatus.FAILED).setDuration(Duration.ofSeconds(5)).setActualResult("The dashboard never opened").setStacktrace("java.lang.AssertionError")));
         final @NotNull Map<TestRunConfiguration, String> configuration = everyQuestionAnswered();
-        configuration.put(TestRunConfiguration.TEST_TYPE, TestRunConfiguration.TEST_TYPE.getOptions()[1]);
+        configuration.put(TestRunConfiguration.TEST_TYPE, TestRunConfiguration.TEST_TYPE.getOptions().get(1));
         indexedTestRuns().changeTestRunMarker(source.getPath(), marker -> marker.configure(configuration));
 
         new ReCreateTestRunWork(getProject()).reCreateAt(new TreePath(new Object[]{new DefaultMutableTreeNode(sprint), new DefaultMutableTreeNode(source)}));
@@ -327,6 +327,6 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
         assertEquals("the duration was carried over", Duration.ZERO, carried.getDuration());
         assertEquals("the failure was carried over", "", carried.getActualResult());
         assertEquals("the failure was carried over", "", carried.getStacktrace());
-        assertEquals("the configuration was not carried over", TestRunConfiguration.TEST_TYPE.getOptions()[1], TestRunConfiguration.TEST_TYPE.valueIn(((TestRunDirectoryDto) made).getMarker()));
+        assertEquals("the configuration was not carried over", TestRunConfiguration.TEST_TYPE.getOptions().get(1), TestRunConfiguration.TEST_TYPE.valueIn(((TestRunDirectoryDto) made).getMarker()));
     }
 }

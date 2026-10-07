@@ -71,8 +71,8 @@ public class CodeNavigationIdeTest extends AbstractCodegenIdeTest {
     public void testAnAgentWritesTheBodyOnlyWhereTheTodoStillStands() {
         final @NotNull TestCaseDto tc = createdTestCase(createdTestSet("Login"), "Log in with a valid user", "b");
 
-        assertTrue("the agent's body did not replace the TODO", CodeNavigation.available().fillBody(getProject(), tc, "int signedIn = 1;"));
-        assertFalse("the agent wrote over a body that was already written", CodeNavigation.available().fillBody(getProject(), tc, "int signedOut = 0;"));
+        assertTrue("the agent's body did not replace the TODO", CodeNavigation.available().fillBody(getProject(), tc, "int signedIn = 1;").isPresent());
+        assertFalse("the agent wrote over a body that was already written", CodeNavigation.available().fillBody(getProject(), tc, "int signedOut = 0;").isPresent());
 
         final @NotNull String body = writtenMethodOf(LOGIN_TEST, tc).getText();
         assertTrue("the first body is gone", body.contains("int signedIn = 1;"));

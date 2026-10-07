@@ -28,6 +28,7 @@ import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestSetDirectoryDto;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
@@ -87,7 +88,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
 
         final @NotNull String annotation = writtenMethodOf(LOGIN_TEST, tc).getModifierList().getText();
         assertEquals("the test case's High was written as the execution position", "1", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "priority"));
-        assertFalse("the test case's own priority reached the code: " + annotation, annotation.toLowerCase().contains("high"));
+        assertFalse("the test case's own priority reached the code: " + annotation, annotation.toLowerCase(Locale.ROOT).contains("high"));
     }
 
     // Rule-CODEGEN-082

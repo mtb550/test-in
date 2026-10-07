@@ -18,6 +18,7 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import org.jetbrains.annotations.NotNull;
+import org.testin.StandIn;
 import org.testng.annotations.Test;
 
 import java.awt.Dimension;
@@ -44,7 +45,7 @@ public class MaximizedTest {
                 bounds.setLocation((Point) args[0]);
                 yield bounds;
             }
-            case "equals" -> proxy == args[0];
+            case "equals" -> StandIn.isItself(proxy, args[0]);
             case "hashCode" -> System.identityHashCode(proxy);
             default -> throw new UnsupportedOperationException("a stand-in popup was asked " + method.getName());
         });

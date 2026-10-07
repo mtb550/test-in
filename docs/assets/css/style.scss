@@ -7,8 +7,8 @@
 @import "{{ site.theme }}";
 
 /* ---------------------------------------------------------------------------
-   Every colour lives in _sass/palette.scss and nowhere else. This file is the
-   rules; that one is the colours. To change how the site looks, edit that file
+   Every color lives in _sass/palette.scss and nowhere else. This file is the
+   rules; that one is the colors. To change how the site looks, edit that file
    and nothing here.
    --------------------------------------------------------------------------- */
 
@@ -62,7 +62,7 @@ body {
 
      Selector matched to the theme's own, deliberately. The theme styles these
      as `.markdown-body .highlight pre` - two classes and an element - so a rule
-     written as `.markdown-body pre` loses on specificity and only the colour
+     written as `.markdown-body pre` loses on specificity and only the color
      lands. That is worse than doing nothing: the block keeps the theme's light
      background and takes the dark theme's light text, which is unreadable. */
   .highlight pre,
@@ -74,7 +74,7 @@ body {
     border-radius: 6px;
   }
 
-  /* The sketch is one drawing, so nothing inside it takes a colour of its own. */
+  /* The sketch is one drawing, so nothing inside it takes a color of its own. */
   pre > code,
   pre code,
   pre code span {

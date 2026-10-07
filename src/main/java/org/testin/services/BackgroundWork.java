@@ -24,11 +24,13 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
+import org.jetbrains.concurrency.Promise;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.util.FailureText;
@@ -36,7 +38,10 @@ import org.testin.util.FailureText;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -45,8 +50,6 @@ import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BackgroundWork {
-    private static final @NotNull Runnable NOTHING = () -> {
-    };
 
     private static final @NotNull List<Predicate<Task>> WATCHERS = new CopyOnWriteArrayList<>();
 
@@ -106,11 +109,11 @@ public final class BackgroundWork {
 
     public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull Consumer<@NotNull ProgressIndicator> work) {
         // Rule-SHARE-037
-        run(p, title, whatFailed, true, work, NOTHING, NOTHING);
+        run(p, title, whatFailed, true, work, BackgroundWork::nothing, BackgroundWork::nothing);
     }
 
     public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onFinished) {
-        run(p, title, whatFailed, cancellable, work, NOTHING, onFinished);
+        run(p, title, whatFailed, cancellable, work, BackgroundWork::nothing, onFinished);
     }
 
     public static <T> void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Function<@NotNull ProgressIndicator, @NotNull T> work, final @NotNull Consumer<@NotNull T> onSuccess, final @NotNull Runnable onFinished) {
@@ -148,5 +151,20 @@ public final class BackgroundWork {
                 onFinished.run();
             }
         });
+    }
+
+    private static void nothing() {
+    }
+
+    public static void logged(final @NotNull CompletionStage<?> stage, final @NotNull String what) {
+        stage.whenComplete((_, failure) -> Optional.ofNullable(failure).ifPresent(cause -> Logger.error(what + " failed: " + FailureText.of(cause))));
+    }
+
+    public static void logged(final @NotNull Promise<?> promise, final @NotNull String what) {
+        promise.onError(cause -> Logger.error(what + " failed: " + FailureText.of(cause)));
+    }
+
+    public static void after(final long millis, final @NotNull Runnable work, final @NotNull String what) {
+        logged(CompletableFuture.runAsync(work, CompletableFuture.delayedExecutor(millis, TimeUnit.MILLISECONDS, AppExecutorUtil.getAppExecutorService())), what);
     }
 }

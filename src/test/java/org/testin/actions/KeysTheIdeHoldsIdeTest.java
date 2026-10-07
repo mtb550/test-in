@@ -73,7 +73,7 @@ public class KeysTheIdeHoldsIdeTest extends BasePlatformTestCase {
         final boolean clipboard = modifiers == Shortcuts.menuMask() && List.of(KeyEvent.VK_C, KeyEvent.VK_X, KeyEvent.VK_V).contains(key.getKeyCode());
         final boolean gesture = List.of(KeyEvent.VK_ENTER, KeyEvent.VK_DELETE, KeyEvent.VK_BACK_SPACE).contains(key.getKeyCode());
         final boolean letter = key.getKeyCode() >= KeyEvent.VK_A && key.getKeyCode() <= KeyEvent.VK_Z;
-        return bare && (gesture || letter) || clipboard;
+        return (bare && (gesture || letter)) || clipboard;
     }
 
     private static @NotNull String pluginXml() {

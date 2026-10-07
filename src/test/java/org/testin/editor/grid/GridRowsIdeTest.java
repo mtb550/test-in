@@ -30,7 +30,7 @@ public class GridRowsIdeTest extends BasePlatformTestCase {
     private static String @NotNull [] aRow(final String description) {
         final String[] row = new String[TestCaseEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.ordinal()] = description;
+        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
         return row;
     }
 
@@ -41,7 +41,7 @@ public class GridRowsIdeTest extends BasePlatformTestCase {
         GridPanelBuilder.replaceRows(table, List.<String[]>of(aRow("Reset the password")));
 
         assertEquals("the new page did not replace the rows", 1, table.getRowCount());
-        assertEquals("Reset the password", table.getModel().getValueAt(0, TestCaseEditorAttributes.DESCRIPTION.ordinal()));
+        assertEquals("Reset the password", table.getModel().getValueAt(0, TestCaseEditorAttributes.DESCRIPTION.column()));
         assertEquals("a new page brought back columns the tester had hidden", shownColumns, table.getColumnCount());
     }
 }

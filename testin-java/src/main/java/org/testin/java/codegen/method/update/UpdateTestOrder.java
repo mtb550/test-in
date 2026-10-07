@@ -49,7 +49,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction<TestCas
 
     // UC-CODEGEN-011, Rule-CODEGEN-067
     private static @NotNull PsiElement placeFirst(final @NotNull PsiClass pc, final @NotNull PsiMethod pm) {
-        final @NotNull Optional<PsiMethod> first = firstGenerated(pc).filter(found -> found != pm);
+        final @NotNull Optional<PsiMethod> first = firstGenerated(pc).filter(found -> !found.equals(pm));
         if (first.isEmpty()) return pm;
 
         final @NotNull PsiElement moved = pc.addBefore(pm, first.get());
@@ -59,7 +59,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction<TestCas
 
     // UC-CODEGEN-011, Rule-CODEGEN-067
     private static @NotNull PsiElement placeAfter(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @NotNull PsiElement after) {
-        if (nextAfter(after).filter(next -> next == pm).isPresent()) return pm;
+        if (nextAfter(after).filter(next -> next.equals(pm)).isPresent()) return pm;
 
         final @NotNull PsiElement moved = pc.addAfter(pm, after);
         pm.delete();

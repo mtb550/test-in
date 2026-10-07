@@ -16,11 +16,13 @@
 
 package org.testin.model;
 
+import com.google.errorprone.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 
+@Immutable
 public record MenuEntry(@NotNull KeyStroke shortcut) {
     public static final @NotNull MenuEntry NONE =
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0));

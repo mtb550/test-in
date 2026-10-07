@@ -176,6 +176,9 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
             item -> String.join(" > ", Fqcn.ofMethod(item.liveTestCase()))
     );
 
+    // Rule-EDITOR-PANEL-020
+    public static final @NotNull List<TestRunEditorAttributes> COLUMNS = List.of(values());
+
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
     private final @NotNull Function<TestRunItems, String> runItemValueExtractor;
@@ -186,8 +189,18 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
         this(name, toolBarDefault, runItemValueExtractor, RunItemValueSetter.NONE);
     }
 
+    // Rule-EDITOR-PANEL-020
+    public static @NotNull TestRunEditorAttributes atColumn(final int column) {
+        return COLUMNS.get(column);
+    }
+
+    // Rule-EDITOR-PANEL-020
+    public int column() {
+        return COLUMNS.indexOf(this);
+    }
+
     public boolean isEdited() {
-        return runItemValueSetter != RunItemValueSetter.NONE;
+        return !runItemValueSetter.equals(RunItemValueSetter.NONE);
     }
 
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {

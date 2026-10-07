@@ -24,6 +24,7 @@ import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunExecution;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -72,9 +73,7 @@ public class MarkerDetailRowsTest {
     public void theCaptionsAreTheNamesTheFormUsed() {
         final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunMarker());
 
-        for (int at = 0; at < TestRunConfiguration.values().length; at++) {
-            assertEquals(rows.get(at).caption(), TestRunConfiguration.values()[at].getDisplayName());
-        }
+        assertEquals(rows.stream().map(DetailRow::caption).toList(), Arrays.stream(TestRunConfiguration.values()).map(TestRunConfiguration::getDisplayName).toList());
     }
 
     @Test

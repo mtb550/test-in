@@ -84,7 +84,7 @@ public class UndoMenuIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         final @NotNull JBTable grid = Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst().orElseThrow();
 
-        assertTrue(grid.editCellAt(0, grid.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.ordinal())));
+        assertTrue(grid.editCellAt(0, grid.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.column())));
         ((JTextComponent) grid.getEditorComponent()).setText("Sign in");
         assertTrue(grid.getCellEditor().stopCellEditing());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();

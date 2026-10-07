@@ -56,7 +56,7 @@ public class UpdateTestBase {
 
         return Optional.ofNullable(pm.getContainingClass()).stream()
                 .flatMap(pc -> Arrays.stream(pc.getMethods()))
-                .anyMatch(other -> other != pm && key.equals(NameSanitizer.methodKey(other.getName())));
+                .anyMatch(other -> !other.equals(pm) && key.equals(NameSanitizer.methodKey(other.getName())));
     }
 
     private static void keptItsName(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String why) {

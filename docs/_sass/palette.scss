@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
-// The palette. Every colour on the documentation site is here and nowhere else.
+// The palette. Every color on the documentation site is here and nowhere else.
 //
 // To change how the site looks, change a value in this file. Nothing below is a
 // selector, so there is no CSS to understand and nothing to break: each name is
-// a role, and every rule elsewhere asks for the role rather than the colour.
+// a role, and every rule elsewhere asks for the role rather than the color.
 //
 //   ground      the page itself
 //   surface     anything raised off it - code blocks, table headers, asides
@@ -15,7 +15,7 @@
 //   accent      links, and the bar down the left of an aside
 //   code-ink    the window sketches and inline code
 //
-// Both themes define all nine. A colour that exists in one and not the other is
+// Both themes define all nine. A color that exists in one and not the other is
 // how a page ends up readable in daylight and invisible at night, so the two
 // blocks below are kept the same length on purpose.
 // ---------------------------------------------------------------------------

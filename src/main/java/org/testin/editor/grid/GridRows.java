@@ -36,12 +36,12 @@ public final class GridRows {
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
     public static @NotNull List<String[]> ofTestCases(final @NotNull List<TestCaseDto> testCases, final @NotNull ToIntFunction<TestCaseDto> position) {
-        return rows(testCases, List.of(TestCaseEditorAttributes.values()), TestCaseEditorAttributes.ORDER, position, tc -> attribute -> attribute.gridValue(tc));
+        return rows(testCases, TestCaseEditorAttributes.COLUMNS, TestCaseEditorAttributes.ORDER, position, tc -> attribute -> attribute.gridValue(tc));
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
     public static @NotNull List<String[]> ofRunItems(final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, TestRunItems> runItems, final @NotNull ToIntFunction<TestCaseDto> position) {
-        return rows(testCases, List.of(TestRunEditorAttributes.values()), TestRunEditorAttributes.ORDER, position, tc -> {
+        return rows(testCases, TestRunEditorAttributes.COLUMNS, TestRunEditorAttributes.ORDER, position, tc -> {
             final @NotNull TestRunItems runItem = runItemOf(tc, runItems);
             return attribute -> attribute.gridValue(runItem);
         });
@@ -55,7 +55,7 @@ public final class GridRows {
         return testCases.stream()
                 .map(tc -> {
                     final @NotNull Function<A, String> value = valuesOf.apply(tc);
-                    return columns.stream().map(column -> column == order ? String.valueOf(position.applyAsInt(tc)) : value.apply(column)).toArray(String[]::new);
+                    return columns.stream().map(column -> column.equals(order) ? String.valueOf(position.applyAsInt(tc)) : value.apply(column)).toArray(String[]::new);
                 })
                 .toList();
     }

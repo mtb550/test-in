@@ -51,6 +51,6 @@ public class LeavingACellIdeTest extends BasePlatformTestCase {
         assertTrue("the expected result cell could not be reached", table.editCellAt(0, column(TestCaseEditorAttributes.EXPECTED_RESULT)));
 
         assertEquals("log in with a remembered device", Objects.requireNonNull(preview.selected().get("Login"), "no Login sheet is selected").getFirst().getDescription());
-        assertEquals("leaving the table by focus would drop what was typed", Boolean.TRUE, table.getClientProperty("terminateEditOnFocusLost"));
+        assertEquals("leaving the table by focus would drop what was typed", true, table.getClientProperty("terminateEditOnFocusLost"));
     }
 }

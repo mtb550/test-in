@@ -78,7 +78,7 @@ public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
 
         assertTrue("the description is not shown", dialog.getDescriptionSection().isShown());
         for (final CreateTestCaseSection section : dialog.getAllSections())
-            if (section != dialog.getDescriptionSection()) assertFalse(section.getClass().getSimpleName() + " is shown before its key was pressed", section.isShown());
+            if (!section.equals(dialog.getDescriptionSection())) assertFalse(section.getClass().getSimpleName() + " is shown before its key was pressed", section.isShown());
 
         press(CreateTestCaseFields.EXPECTED_RESULT);
 

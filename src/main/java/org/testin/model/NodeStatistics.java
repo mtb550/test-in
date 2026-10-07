@@ -16,21 +16,21 @@
 
 package org.testin.model;
 
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public enum NodeStatistics {
     CHILDREN(
-            List.of()
+            ImmutableList.of()
     ),
 
-    RUN_ITEM_STATUSES(List.of(
+    RUN_ITEM_STATUSES(ImmutableList.of(
             NodeCount.PASSED, NodeCount.FAILED, NodeCount.BLOCKED, NodeCount.UNTESTED, NodeCount.REMOVED));
 
-    private final @NotNull List<NodeCount> slices;
+    private final @NotNull ImmutableList<NodeCount> slices;
 }

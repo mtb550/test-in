@@ -79,8 +79,8 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
         return (JBTable) editor.getPreferredFocusedComponent();
     }
 
-    private static void typed(final @NotNull JBTable grid, final int row, final @NotNull TestCaseEditorAttributes column, final @NotNull String value) {
-        grid.getModel().setValueAt(value, row, column.ordinal());
+    private static void typed(final @NotNull JBTable grid, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String value) {
+        grid.getModel().setValueAt(value, row, attribute.column());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
@@ -98,7 +98,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
 
             typed(grid, 0, TestCaseEditorAttributes.PRIORITY, "Urgent");
 
-            assertEquals("the cell kept a value Testin could not read", Priority.MEDIUM.getLabel(), grid.getModel().getValueAt(0, TestCaseEditorAttributes.PRIORITY.ordinal()));
+            assertEquals("the cell kept a value Testin could not read", Priority.MEDIUM.getLabel(), grid.getModel().getValueAt(0, TestCaseEditorAttributes.PRIORITY.column()));
             assertEquals("what the test case had did not stay", Priority.MEDIUM, stored(testCases.getFirst()).getPriority());
             assertEquals("the tester was not told once", List.of(unreadable(Bundle.message("grid.refused.as", "Urgent", TestCaseEditorAttributes.PRIORITY.getName()))), balloons);
         } finally {

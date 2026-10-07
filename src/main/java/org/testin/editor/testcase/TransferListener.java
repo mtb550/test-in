@@ -31,6 +31,7 @@ import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.swing.TransferHandler;
 import java.awt.datatransfer.DataFlavor;
@@ -182,7 +183,7 @@ public class TransferListener extends TransferHandler {
 
     // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-059
     int dropIndex(final @NotNull TransferSupport support) {
-        return ((JBList.DropLocation) support.getDropLocation()).getIndex();
+        return ((JList.DropLocation) support.getDropLocation()).getIndex();
     }
 
     private @NotNull Optional<TestCaseDto> anchorBelowDrop(final @NotNull TransferSupport support, final @NotNull Set<UUID> movedIds) {

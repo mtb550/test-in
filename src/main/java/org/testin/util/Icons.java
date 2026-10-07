@@ -16,6 +16,7 @@
 
 package org.testin.util;
 
+import com.google.errorprone.annotations.Immutable;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.scale.JBUIScale;
@@ -135,6 +136,7 @@ public final class Icons {
         };
     }
 
+    @Immutable
     public interface LetterIcon extends Icon {
         @NotNull String letter();
     }

@@ -286,7 +286,19 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             assertTrue("the box did not grow as lines were added", box.getPreferredSize().height > oneLine);
 
-            box.setText(String.join("\n", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"));
+            box.setText("""
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+                10
+                11
+                12""");
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final int sixLines = box.getFontMetrics(box.getFont()).getHeight() * 6;
             assertTrue("the box grew past six lines: " + box.getPreferredSize().height + " > " + sixLines, box.getPreferredSize().height <= sixLines + oneLine);
@@ -411,7 +423,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 1);
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(
                 EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.FAILED).setActualResult("It froze").setStacktrace("java.lang.IllegalStateException")
-                        .setBugSeverity(BugSeverity.values()[0]).setBugPriority(BugPriority.values()[0])), testCases);
+                        .setBugSeverity(BugSeverity.BLOCKER).setBugPriority(BugPriority.HIGH)), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         try {
             editor.getList().setSelectedIndex(0);
@@ -422,7 +434,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             assertEquals("It froze", actualResultBox(dialog).getText());
             assertEquals("java.lang.IllegalStateException", TestRunFixture.boxesOf(dialog).get(1).getText());
             assertTrue("the severity recorded is not the one chosen", Drawn.components(dialog).stream()
-                    .anyMatch(component -> component instanceof final JRadioButton radio && radio.isSelected() && radio.getText().equals(BugSeverity.values()[0].getLabel())));
+                    .anyMatch(component -> component instanceof final JRadioButton radio && radio.isSelected() && radio.getText().equals(BugSeverity.BLOCKER.getLabel())));
         } finally {
             Disposer.dispose(editor);
         }

@@ -66,10 +66,10 @@ public class GridIdeTest extends BasePlatformTestCase {
     private static String @NotNull [] aRow(final int order, final @NotNull String description, final @NotNull String expected, final @NotNull String id) {
         final String[] row = new String[TestCaseEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.ORDER.ordinal()] = String.valueOf(order);
-        row[TestCaseEditorAttributes.DESCRIPTION.ordinal()] = description;
-        row[TestCaseEditorAttributes.EXPECTED_RESULT.ordinal()] = expected;
-        row[TestCaseEditorAttributes.ID.ordinal()] = id;
+        row[TestCaseEditorAttributes.ORDER.column()] = String.valueOf(order);
+        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
+        row[TestCaseEditorAttributes.EXPECTED_RESULT.column()] = expected;
+        row[TestCaseEditorAttributes.ID.column()] = id;
         return row;
     }
 
@@ -182,7 +182,7 @@ public class GridIdeTest extends BasePlatformTestCase {
         final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(List.<String[]>of(aRow(1, "Log in", "The dashboard opens", "id-1")), EnumSet.allOf(TestCaseEditorAttributes.class));
 
         for (int column = 0; column < table.getColumnCount(); column++) {
-            final @NotNull TestCaseEditorAttributes attribute = TestCaseEditorAttributes.values()[table.convertColumnIndexToModel(column)];
+            final @NotNull TestCaseEditorAttributes attribute = TestCaseEditorAttributes.atColumn(table.convertColumnIndexToModel(column));
             assertEquals(attribute.getName() + " opens for typing or does not as it should", attribute.can(Can.EDIT), table.editCellAt(0, column));
             if (table.isEditing()) table.getCellEditor().cancelCellEditing();
         }
@@ -191,7 +191,7 @@ public class GridIdeTest extends BasePlatformTestCase {
         final @NotNull JBTable open = new GridPanelBuilder().buildTestRunTable(runRow, EnumSet.allOf(TestRunEditorAttributes.class), () -> true);
         final @NotNull JBTable closed = new GridPanelBuilder().buildTestRunTable(runRow, EnumSet.allOf(TestRunEditorAttributes.class), () -> false);
         for (int column = 0; column < open.getColumnCount(); column++) {
-            final @NotNull TestRunEditorAttributes attribute = TestRunEditorAttributes.values()[open.convertColumnIndexToModel(column)];
+            final @NotNull TestRunEditorAttributes attribute = TestRunEditorAttributes.atColumn(open.convertColumnIndexToModel(column));
             assertEquals(attribute.getName() + " in an open test run", attribute.isEdited(), open.isCellEditable(0, column));
             assertFalse(attribute.getName() + " opens in a test run that is closed", closed.isCellEditable(0, column));
         }

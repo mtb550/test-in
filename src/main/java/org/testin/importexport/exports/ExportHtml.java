@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +128,7 @@ public class ExportHtml {
             writer.write("<p><em>" + Bundle.message("export.html.total", String.valueOf(totalExported)) + "</em></p>");
             writer.newLine();
 
-            final @NotNull String exportDate = Display.formatDate(ZonedDateTime.now());
+            final @NotNull String exportDate = Display.formatDate(ZonedDateTime.now(ZoneId.systemDefault()));
             writer.write("<p><em>" + Bundle.message("export.html.on", StringUtil.escapeXmlEntities(exportDate)) + "</em></p>");
             writer.newLine();
 

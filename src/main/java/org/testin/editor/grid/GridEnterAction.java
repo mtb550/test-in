@@ -40,9 +40,9 @@ import java.util.Optional;
 public final class GridEnterAction extends AbstractProjectAction {
     private final @NotNull JBTable table;
     private final @NotNull List<TestCaseDto> pageItems;
-    private final @NotNull ArrayList<String> path;
+    private final @NotNull List<String> path;
 
-    public GridEnterAction(final @NotNull Project p, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems, final @NotNull ArrayList<String> path) {
+    public GridEnterAction(final @NotNull Project p, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems, final @NotNull List<String> path) {
         super(p, Bundle.message("grid.enter.text"), Bundle.message("grid.enter.description"), AllIcons.Actions.PreviewDetails);
         this.table = table;
         this.pageItems = pageItems;

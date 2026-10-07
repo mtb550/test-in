@@ -28,14 +28,13 @@ import org.testin.util.Bundle;
 import java.nio.file.Path;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public final class ScreenshotsSection implements FailureSection {
     private final @NotNull ComponentDialogBase<Screenshots> component;
 
-    private final @NotNull Map<byte[], String> named = new IdentityHashMap<>();
+    private final @NotNull IdentityHashMap<byte[], String> named = new IdentityHashMap<>();
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     public ScreenshotsSection(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull TestRunItems runItem) {

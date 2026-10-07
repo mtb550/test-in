@@ -51,7 +51,7 @@ public final class EditShownTestCase {
     public static void bindTo(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab) {
         if (Boolean.TRUE.equals(detailsTab.getClientProperty(SHORTCUT_REGISTERED_KEY))) return;
 
-        detailsTab.putClientProperty(SHORTCUT_REGISTERED_KEY, Boolean.TRUE);
+        detailsTab.putClientProperty(SHORTCUT_REGISTERED_KEY, true);
 
         new DumbAwareAction() {
             // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-044

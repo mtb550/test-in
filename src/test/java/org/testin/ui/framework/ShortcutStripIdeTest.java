@@ -35,17 +35,15 @@ import java.util.List;
 
 public class ShortcutStripIdeTest extends BasePlatformTestCase {
 
-    private static final @NotNull Runnable NOTHING = () -> {
-    };
 
     private static @NotNull StatusBarItem @NotNull [] sixKeys() {
         return new StatusBarItem[]{
-                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", NOTHING),
+                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", ShortcutStripIdeTest::nothing),
                 StatusBarShortcut.select(),
                 StatusBarShortcut.navigate(),
-                StatusBarShortcut.build(Shortcuts.FocusSearch, "Search", NOTHING),
+                StatusBarShortcut.build(Shortcuts.FocusSearch, "Search", ShortcutStripIdeTest::nothing),
                 StatusBarShortcut.corrections(),
-                StatusBarShortcut.cancel(NOTHING)};
+                StatusBarShortcut.cancel(ShortcutStripIdeTest::nothing)};
     }
 
     private static void laidOut(final @NotNull Container container) {
@@ -132,5 +130,8 @@ public class ShortcutStripIdeTest extends BasePlatformTestCase {
         @Override
         protected void submit() {
         }
+    }
+
+    private static void nothing() {
     }
 }

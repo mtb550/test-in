@@ -168,10 +168,12 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
     protected abstract void loadDataAsync(final @NotNull Runnable onLoaded);
 
+    @Override
     public @NotNull JComponent getComponent() {
         return mainPanel;
     }
 
+    @Override
     public @NotNull JComponent getPreferredFocusedComponent() {
         if (getToolBar().getCurrentView() != ViewMode.GRID_VIEW) return list;
 

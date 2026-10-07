@@ -101,6 +101,6 @@ public enum RunItemStatus {
     }
 
     public boolean isRunItemStatus() {
-        return menuEntry != MenuEntry.NONE;
+        return !menuEntry.equals(MenuEntry.NONE);
     }
 }

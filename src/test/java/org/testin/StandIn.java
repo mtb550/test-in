@@ -19,18 +19,28 @@ package org.testin;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StandIn {
     public static <T> @NotNull T of(final @NotNull Class<T> type) {
         return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, (proxy, method, args) -> switch (method.getName()) {
-            case "equals" -> proxy == args[0];
+            case "equals" -> isItself(proxy, args[0]);
             case "hashCode" -> System.identityHashCode(proxy);
             case "toString" -> "a stand-in " + type.getSimpleName();
             default ->
                     throw new UnsupportedOperationException("A stand-in " + type.getSimpleName() + " was asked " + method.getName());
         }));
+    }
+
+    public static boolean isItself(final @NotNull Object proxy, final @Nullable Object other) {
+        final @NotNull Set<Object> itself = Collections.newSetFromMap(new IdentityHashMap<>());
+        itself.add(proxy);
+        return itself.contains(other);
     }
 }

@@ -52,7 +52,7 @@ public class MapperFailureTest {
         final byte[] testCase = RealMapper.build().writeValueAsBytes(TestCaseDto.builder().description("a case").build());
 
         assertTrue(testCase.length > 0);
-        assertTrue(new String(testCase).contains("a case"));
+        assertTrue(new String(testCase, StandardCharsets.UTF_8).contains("a case"));
     }
 
     @Test

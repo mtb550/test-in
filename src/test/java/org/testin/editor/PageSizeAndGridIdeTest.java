@@ -112,7 +112,7 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final @NotNull JBTable grid = (JBTable) editor.getPreferredFocusedComponent();
-            final int module = grid.convertColumnIndexToView(TestCaseEditorAttributes.MODULE.ordinal());
+            final int module = grid.convertColumnIndexToView(TestCaseEditorAttributes.MODULE.column());
 
             CopyPasteManager.getInstance().setContents(new StringSelection("""
                     Login

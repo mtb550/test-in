@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString()
+@ToString
 public class TestRunDto {
     @NotNull
     @Builder.Default
