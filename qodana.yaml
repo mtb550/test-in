@@ -41,8 +41,37 @@ linter: qodana-jvm
 profile:
   path: .idea/inspectionProfiles/Testin.xml
 
+# Inspections Qodana runs beyond the profile. They are Qodana's alone, so the
+# IDE and tools/inspect.ps1 are unchanged: the licence audit of every
+# dependency, a dependency with a known vulnerability, copy-pasted code (one
+# owner for every fact, no second copy), and the test coverage the build hands
+# over in .qodana/code-coverage.
 include:
   - name: CheckDependencyLicenses
+  - name: VulnerableLibrariesLocal
+  - name: DuplicatedCode
+  - name: JvmCoverageInspection
+
+# The gate: any finding Qodana reports fails the run, the same zero the
+# inspection gate holds. A finding is fixed, or excused below with its reason.
+failureConditions:
+  severityThresholds:
+    any: 0
+
+# Testin is Apache-2.0. A dependency under a copyleft licence would bind the
+# plugin to its terms, so those are refused outright; everything else follows
+# Qodana's own compatibility table for Apache-2.0.
+licenseRules:
+  - keys:
+      - "Apache-2.0"
+    prohibited:
+      - "GPL-2.0-only"
+      - "GPL-2.0-or-later"
+      - "GPL-3.0-only"
+      - "GPL-3.0-or-later"
+      - "AGPL-3.0-only"
+      - "AGPL-3.0-or-later"
+      - "SSPL-1.0"
 
 # The one list of exceptions. Qodana reads it here, and tools/inspect.ps1 reads
 # the same entries, so the CI report and the inspection gate cannot disagree

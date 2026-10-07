@@ -92,10 +92,10 @@ if (Test-Path $baseline) {
 }
 
 # --- Qodana ----------------------------------------------------------------
-$run = Get-LastRun 'qodana_code_quality.yml'
+$run = Get-LastRun 'build.yml'
 if ($run) {
-    $said = "run $($run.databaseId) on $($run.headSha.Substring(0,8)): $($run.conclusion)"
-    Add-Row 'Qodana' 'see run summary' 'no' $said
+    $said = "Qodana job of Build run $($run.databaseId) on $($run.headSha.Substring(0,8)): $($run.conclusion)"
+    Add-Row 'Qodana' 'see run summary' 'yes' $said
 } else {
     Add-Row 'Qodana' '-' 'no' 'CI only; no answer without gh'
 }
