@@ -168,7 +168,8 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
     }
 
     protected @NotNull PsiMethod writtenMethodOf(final @NotNull String qualifiedName, final @NotNull TestCaseDto tc) {
-        return methodOf(qualifiedName, tc).orElseThrow(() -> new AssertionError("'" + tc.getDescription() + "' has no method in " + qualifiedName));
+        Await.until("'" + tc.getDescription() + "' has no method in " + qualifiedName, () -> methodOf(qualifiedName, tc).isPresent());
+        return methodOf(qualifiedName, tc).orElseThrow();
     }
 
     protected static @NotNull String attributeOf(final @NotNull PsiMethod pm, final @NotNull String attribute) {

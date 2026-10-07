@@ -80,6 +80,18 @@ jobs:
           key: plugin-verifier-${{ hashFiles('build.gradle.kts', 'gradle.properties') }}
           restore-keys: plugin-verifier-
 
+      # Windows Defender scans every file the tests write and holds it open
+      # while it does. A test's temp folder can still be in use when the test
+      # framework deletes it, and every write waits. On 6 and 7 October 2026
+      # three runs failed this way, a different test each time and never on
+      # a developer's machine: the test run writer still busy after 10 s, a
+      # temp folder "used by another process", and an indexing race. The
+      # checkout, the temp folder and the Gradle cache are left out of the
+      # real-time scan; nothing in them comes from outside the repository.
+      - name: Leave the build out of Defender's real-time scan
+        shell: pwsh
+        run: Add-MpPreference -ExclusionPath "${{ github.workspace }}", "$env:TEMP", "$env:USERPROFILE\.gradle"
+
       # One invocation, so it stops at the first thing that is wrong. The
       # reports below are uploaded either way.
       #
