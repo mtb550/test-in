@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.card.BaseCard;
+import org.testin.model.Priority;
 import org.testin.model.result.TestRunItems;
 import org.testin.testrun.ChangedSinceCommit;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -49,6 +50,7 @@ public class TestRunCard extends BaseCard {
     // UC-EDITOR-PANEL-030
     public void updateData(final @NotNull Integer index, final @NotNull Set<TestRunEditorAttributes> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
         this.automation = automationState.of(runItem.getId());
+        this.priority = activeDetails.contains(TestRunEditorAttributes.PRIORITY) ? runItem.shownTestCase().getPriority() : Priority.DEFAULT;
 
         badges.clear();
         details.clear();

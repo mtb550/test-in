@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.EditorColors;
 import org.testin.model.Automated;
+import org.testin.model.Priority;
 import org.testin.services.Services;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
@@ -36,6 +37,7 @@ import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Fonts;
 
+import java.awt.Rectangle;
 import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JTextArea;
@@ -48,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.swing.SwingUtilities;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull JTextArea titleArea = Prose.of("");
@@ -61,6 +64,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected boolean isRowHovered;
     protected @NotNull String hoveredAction = "";
     protected @NotNull Automated automation = Automated.UNKNOWN;
+    protected @NotNull Priority priority = Priority.DEFAULT;
     @Setter
     private @NotNull List<Offered> hoverButtons = List.of();
     private @NotNull String plainTitle = "";
@@ -179,8 +183,21 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     @Override
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
+        drawPriorityTouch(g);
         if (isRowHovered) {
             CardTitle.drawDescriptionActionIcons(this, g, titleWidth, hoveredAction, hoverButtons, automation);
         }
+    }
+
+    private void drawPriorityTouch(final @NotNull Graphics g) {
+        if (priority == Priority.DEFAULT) return;
+
+        final @NotNull Rectangle title = SwingUtilities.convertRectangle(titleArea.getParent(), titleArea.getBounds(), this);
+        final int line = titleArea.getFontMetrics(titleArea.getFont()).getHeight();
+        final int width = Math.max(2, line / 6);
+        final int inset = line / 8;
+
+        g.setColor(priority.getColor());
+        g.fillRoundRect((title.x - width) / 2, title.y + inset, width, line - 2 * inset, width, width);
     }
 }

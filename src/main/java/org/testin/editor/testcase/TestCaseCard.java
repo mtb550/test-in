@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
 import org.testin.editor.card.BaseCard;
+import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.runner.TestNGExecution;
@@ -57,6 +58,7 @@ public class TestCaseCard extends BaseCard {
         this.isPendingCut = cutState.isPending(tc.getId());
 
         this.automation = automationState.of(tc.getId());
+        this.priority = activeDetails.contains(TestCaseEditorAttributes.PRIORITY) ? tc.getPriority() : Priority.DEFAULT;
 
         Arrays.stream(TestCaseEditorAttributes.values())
                 .filter(activeDetails::contains)

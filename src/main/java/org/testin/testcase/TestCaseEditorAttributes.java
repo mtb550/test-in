@@ -116,7 +116,6 @@ public enum TestCaseEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addPriorityBadge(badges, tc);
         }
     },
 

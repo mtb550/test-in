@@ -84,7 +84,6 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addPriorityBadge(badges, runItem.shownTestCase());
         }
     },
 
