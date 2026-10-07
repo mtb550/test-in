@@ -153,3 +153,11 @@ exclude:
   - name: UndefinedParamsPresent
     paths:
       - .github/workflows
+
+  # The same lookup for the action itself: it asks GitHub's API without signing
+  # in, and on a shared CI runner the anonymous rate limit runs out, so all 15
+  # uses: lines came back unresolved on 7 October 2026 with nothing wrong in
+  # them. Dependabot keeps the action versions real.
+  - name: UndefinedAction
+    paths:
+      - .github/workflows
