@@ -77,9 +77,10 @@ public final class TestRunStatusChange {
     private void offerTheCommit(final @NotNull TestRunDirectoryDto testRun) {
         WatchedPath.testProjectOf(testRun.getPath(), Services.getInstance(p, TestinRoot.class).absolutePath())
                 .filter(testProject -> !new GitRepositoryService(p).isNotRepository(testProject))
-                .ifPresent(testProject ->
-                        notifier.infoWithActions(p, TestRunStatus.COMPLETED.getLabel(), Bundle.message("test.run.completed.commit", testRun.getName()),
-                                notifier.action(Bundle.message("action.Testin.ViewPendingCommits.text"), () -> new ViewPendingCommitsWork(p).openFor(testProject))));
+                .ifPresentOrElse(testProject ->
+                                notifier.infoWithActions(p, TestRunStatus.COMPLETED.getLabel(), Bundle.message("test.run.completed.commit", testRun.getName()),
+                                        notifier.action(Bundle.message("action.Testin.ViewPendingCommits.text"), () -> new ViewPendingCommitsWork(p).openFor(testProject))),
+                        () -> notifier.softShow(p, TestRunStatus.COMPLETED.getLabel()));
     }
 
     private void persist(final @NotNull TestRunDirectoryDto testRun, final @NotNull Optional<TestRunEditor> open) {

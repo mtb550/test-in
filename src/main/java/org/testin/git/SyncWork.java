@@ -62,6 +62,8 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
             return;
         }
 
+        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY, repoPath);
+
         // Rule-SHARE-005, Rule-SHARE-072
         GitBackgroundTask.run(p, Bundle.message("git.task.syncing"), false,
                 indicator -> {
@@ -71,13 +73,13 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
 
                     final @NotNull Hints hints = Services.getInstance(p, Hints.class);
                     if (remoteUrl.isEmpty()) {
-                        hints.fire(Hint.of(SetupStep.GIT_REMOTE, Bundle.message("git.sync.aborted.message")));
+                        hints.fire(Hint.of(SetupStep.GIT_REMOTE, Bundle.message("git.sync.aborted.message")).about(repoPath));
                         ApplicationManager.getApplication().invokeLater(() ->
                                 notifier.softRefuse(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
                         );
                         return;
                     }
-                    hints.clear(SetupStep.GIT_REMOTE);
+                    hints.clear(SetupStep.GIT_REMOTE, repoPath);
 
                     final @NotNull String branch = git.syncBranch(repoPath);
                     if (branch.isBlank()) {

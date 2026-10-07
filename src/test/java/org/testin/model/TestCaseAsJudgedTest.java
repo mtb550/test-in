@@ -51,7 +51,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
 
-        item.showing(Optional.of(testCaseReading(id, "after")), Optional.empty(), Optional.empty());
+        item.showing(Optional.of(testCaseReading(id, "after")), Optional.empty(), Optional.empty(), false);
 
         assertEquals(item.shownTestCase().getDescription(), "after", "a test run not committed shows the test case as it is now");
     }
@@ -62,7 +62,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
 
-        item.showing(Optional.of(testCaseReading(id, "after")), Optional.of(testCaseReading(id, "before")), Optional.empty());
+        item.showing(Optional.of(testCaseReading(id, "after")), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
         assertEquals(item.shownTestCase().getDescription(), "before", "the run item shows what its commit holds");
         assertEquals(item.liveTestCase().getDescription(), "after", "actions still reach the test case as it is now");
@@ -73,7 +73,7 @@ public class TestCaseAsJudgedTest {
     public void aCorrectionChangesOnlyTheRunItemStatusWhoAndWhen() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
-        item.showing(Optional.of(testCaseReading(id, "now")), Optional.empty(), Optional.empty());
+        item.showing(Optional.of(testCaseReading(id, "now")), Optional.empty(), Optional.empty(), false);
 
         item.recordRunItemStatus(RunItemStatus.FAILED, "other tester");
 
@@ -88,7 +88,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
 
-        item.showing(Optional.empty(), Optional.empty(), Optional.of(testCaseReading(id, "as Git last held it")));
+        item.showing(Optional.empty(), Optional.empty(), Optional.of(testCaseReading(id, "as Git last held it")), false);
 
         assertTrue(item.isRemoved(), "nothing may act on the run item of a test case that no longer exists");
         assertEquals(item.shownStatus(), RunItemStatus.REMOVED, "a deleted test case reads Removed while its test run is not Committed");
@@ -102,7 +102,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
 
-        item.showing(Optional.empty(), Optional.empty(), Optional.empty());
+        item.showing(Optional.empty(), Optional.empty(), Optional.empty(), false);
 
         assertEquals(item.shownTestCase().getDescription(), TestCaseDto.deleted(id).getDescription());
     }
@@ -113,7 +113,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
 
-        item.showing(Optional.empty(), Optional.of(testCaseReading(id, "before")), Optional.empty());
+        item.showing(Optional.empty(), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
         assertFalse(item.isRemoved(), "a committed test run keeps every run item it recorded");
         assertEquals(item.shownStatus(), RunItemStatus.PASSED);
@@ -126,7 +126,7 @@ public class TestCaseAsJudgedTest {
         final TestSetDirectoryDto set = new TestSetDirectoryDto();
         final TestRunItems item = passed(id);
 
-        item.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()), Optional.of(testCaseReading(id, "before")), Optional.empty());
+        item.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
         assertSame(item.shownTestCase().getParent(), set, "where the test case sits is the live test case's, so navigation still works");
     }
@@ -136,7 +136,7 @@ public class TestCaseAsJudgedTest {
     public void aRunItemIsWrittenWithoutATestCase() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = passed(id);
-        item.showing(Optional.of(testCaseReading(id, "now")), Optional.of(testCaseReading(id, "before")), Optional.empty());
+        item.showing(Optional.of(testCaseReading(id, "now")), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
         final String written = MAPPER.writeValueAsString(item);
 
@@ -149,7 +149,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems read = MAPPER.readValue("{\"id\":\"" + id + "\",\"status\":\"PASSED\",\"testCase\":{\"id\":\"" + id + "\",\"description\":\"old copy\"}}", TestRunItems.class);
 
-        read.showing(Optional.of(testCaseReading(id, "live")), Optional.empty(), Optional.empty());
+        read.showing(Optional.of(testCaseReading(id, "live")), Optional.empty(), Optional.empty(), false);
 
         assertEquals(read.shownTestCase().getDescription(), "live", "an old copy in the file is not read");
     }

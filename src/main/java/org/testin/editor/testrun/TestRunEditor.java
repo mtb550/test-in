@@ -225,7 +225,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         refreshView();
     }
 
-    // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191
+    // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191, Rule-TREE-PANEL-135
     @Override
     public void onToolBarResultAnalysisClicked() {
         run().ifPresent(testRunData -> new ResultAnalysisDialog(p,
@@ -233,6 +233,11 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
                 parent.getMarker().getResultAnalysis(),
                 parent.getMarker().getStatus().isRecord(),
                 analysis -> {
+                    if (testRuns.findTestRunDir(parent.getPath()).map(testRun -> testRun.getMarker().getStatus().isRecord()).orElse(false)) {
+                        notifier.softRefuse(p, Bundle.message("run.item.status.test.run.signed.off", TestRunStatus.COMMITTED.getLabel()));
+                        return;
+                    }
+
                     testRuns.changeTestRunMarker(parent.getPath(),
                             marker -> marker.recordAnalysis(ResultAnalysis.written(analysis)));
                     notifier.softShow(p, Done.SAVED);

@@ -24,6 +24,7 @@ import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitBackgroundTask;
 import org.testin.git.GitCommits;
+import org.testin.git.GitFailed;
 import org.testin.git.GitFailure;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.RepositoryRefresh;
@@ -38,6 +39,8 @@ import org.testin.help.SetupStep;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.status.TestRunStatus;
 import org.testin.notifications.Notifier;
@@ -52,6 +55,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -72,14 +76,14 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
             return;
         }
 
-        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY);
+        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY, path);
         scanForChanges(path);
     }
 
     // UC-SHARE-009, Rule-SHARE-042, Rule-INTERNAL-127
     public void hintNotUnderGit(final @NotNull Path path) {
         Services.getInstance(p, Hints.class).fire(Hint.of(SetupStep.GIT_REPOSITORY, Bundle.message("git.no.repository.message", path.getFileName()),
-                Bundle.message("git.no.repository.action"), () -> initializeGitRepository(path)));
+                Bundle.message("git.no.repository.action"), () -> initializeGitRepository(path)).about(path));
     }
 
     // UC-SHARE-010, Rule-SHARE-050, Rule-SHARE-127
@@ -218,7 +222,11 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                     final @NotNull String commitId = commits.headCommitId(repoPath);
-                    recordCompletedTestRuns(repoPath);
+                    try {
+                        recordCompletedTestRuns(repoPath);
+                    } catch (final GitFailed ex) {
+                        GitFailure.show(p, Bundle.message("git.record.failed.title"), Bundle.message("git.record.failed.message", commitLabel(commitId)) + System.lineSeparator() + FailureText.of(ex));
+                    }
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (push) {
@@ -235,11 +243,13 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
     // UC-SHARE-012, Rule-SHARE-130
     private void recordCompletedTestRuns(final @NotNull Path repoPath) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+        final @NotNull List<String> leftOut = git.status(repoPath).stream().filter(change -> change.length() > 3).map(change -> change.substring(3)).toList();
         final @NotNull List<TestRunDirectoryDto> completed = testRuns.getAllTestRuns().keySet().stream()
                 .filter(testRun -> testRun.startsWith(repoPath))
                 .map(testRuns::findTestRunDir)
                 .flatMap(Optional::stream)
                 .filter(testRun -> testRun.getMarker().getStatus() == TestRunStatus.COMPLETED)
+                .filter(testRun -> isWholeInTheCommit(repoPath, testRun, leftOut))
                 .toList();
         if (completed.isEmpty()) return;
 
@@ -253,13 +263,23 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
+    // Rule-SHARE-130
+    private boolean isWholeInTheCommit(final @NotNull Path repoPath, final @NotNull TestRunDirectoryDto testRun, final @NotNull List<String> leftOut) {
+        final @NotNull String folder = repoPath.relativize(testRun.getPath()).toString().replace('\\', '/') + "/";
+        final @NotNull Set<String> testCaseFiles = Services.getInstance(p, TestRuns.class).findTestRun(testRun.getPath()).map(TestRunDto::coveredIds).orElse(Set.of()).stream()
+                .map(FileKind.TEST_CASE::fileName)
+                .collect(Collectors.toSet());
+
+        return leftOut.stream().noneMatch(path -> path.startsWith(folder) || testCaseFiles.contains(path.substring(path.lastIndexOf('/') + 1)));
+    }
+
     // UC-SHARE-009, Rule-SHARE-043, Rule-SHARE-127
     private void initializeGitRepository(final @NotNull Path repoPath) {
         GitBackgroundTask.run(p, Bundle.message("git.task.init"), false,
                 _ -> {
                     git.initialize(repoPath);
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY);
+                        Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REPOSITORY, repoPath);
                         notifier.softShow(p, Bundle.message("git.initialized"));
 
                         scanForChanges(repoPath);
@@ -308,7 +328,7 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
         GitBackgroundTask.run(p, Bundle.message("git.task.configuring.remote"), false,
                 _ -> {
                     git.configureRemote(repoPath, remoteName, remoteUrl);
-                    Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REMOTE);
+                    Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REMOTE, repoPath);
                     ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, remoteUrl, branch, commitId));
                 },
                 ex -> GitFailure.show(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", FailureText.of(ex))));
@@ -320,6 +340,7 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
                 indicator -> {
                     indicator.setText(Bundle.message("git.progress.pull.rebase"));
                     commits.pullAndPush(repoPath, remote, remoteUrl, branch);
+                    Services.getInstance(p, Hints.class).clear(SetupStep.GIT_REMOTE, repoPath);
 
                     RepositoryRefresh.after(p, repoPath);
                     ApplicationManager.getApplication().invokeLater(() ->

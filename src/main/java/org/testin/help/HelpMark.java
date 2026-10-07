@@ -180,7 +180,7 @@ public final class HelpMark implements CustomStatusBarWidget {
             if (page.getComponentCount() > 0) page.add(Box.createVerticalStrut(JBUI.scale(GAP * 2)));
 
             final @NotNull Optional<JComponent> row = hint.form().map(Supplier::get);
-            page.add(left(wrapped(hint.text(), row.map(shown -> shown.getPreferredSize().width).orElse(hintWidth))));
+            page.add(left(wrapped(hint.text(), row.map(shown -> Math.max(shown.getPreferredSize().width, hintWidth)).orElse(hintWidth))));
             row.ifPresent(shown -> page.add(left(shown)));
             page.add(left(guideLink(hint.step().getGuide())));
         }

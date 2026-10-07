@@ -22,9 +22,11 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.services.Services;
 
+import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
 public final class Hints {
@@ -47,6 +49,13 @@ public final class Hints {
     public synchronized void clear(final @NotNull SetupStep step) {
         waiting.remove(step);
         HelpMark.redraw(p);
+    }
+
+    // UC-INTERNAL-009, Rule-INTERNAL-127
+    public synchronized void clear(final @NotNull SetupStep step, final @NotNull Path subject) {
+        Optional.ofNullable(waiting.get(step))
+                .filter(hint -> hint.subject().isEmpty() || hint.subject().equals(subject.toString()))
+                .ifPresent(_ -> clear(step));
     }
 
     public synchronized @NotNull List<Hint> waiting() {

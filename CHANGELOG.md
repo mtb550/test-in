@@ -49,9 +49,9 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 - **On an editor's card, a test case's priority is a short bar beside its description, not a badge:** red for High,
   blue for Medium, nothing for Low, while the Priority field is shown, in both editors. No text moves for it, and a
   screen reader still hears the priority. Light mode and the view panel keep the priority badge.
-- **A priority is named High, Medium or Low everywhere, never P1, P2 or P3:** the badge, the Priority column, the
+- **A priority is named High, Medium or Low everywhere:** the badge, the Priority column, the
   import and export columns, the Filter menu, the test case dialogs, the history and the HTML report. An import cell
-  reading P1 is not understood any more and is refused like any other unreadable value. Hovering the bar or the
+  reading anything else is refused like any other value Testin cannot read. Hovering the bar or the
   priority badge says *Priority: High*, so it is not read as the bug's priority, which uses the same words.
 - **A committed test run stays read-only everywhere:** Run on its test cases is gray and says why, and Result Analysis
   opens read-only. Completing a test run offers the commit only when its test project is under Git.
@@ -130,6 +130,22 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Fixed
 
+- **Every test run recorded in one commit shows its own test cases from it,** not only the first one read. A Committed
+  test run whose commit is not read yet keeps the run item status of a deleted test case instead of reading Removed,
+  and a commit that Git failed to read once is read again rather than remembered as empty.
+- **A Committed test run is read from the right commit after a rebase:** when a pull rewrote the commit it names, as
+  Commit & Push and Sync do once a teammate pushed first, it is read from the commit the rebase made, on every clone.
+- **A record commit that fails says your commit is in,** instead of reporting the whole commit as failed.
+- **A test run becomes Committed only with all of it in the commit:** its own files and its test cases' changes. One
+  with a change left unticked stays Completed until a later commit holds it.
+- **Result Analysis saves nothing onto a test run that became Committed** while the dialog was open, and completing a
+  test run in a test project not under Git says Completed.
+- **The ? keeps a hint until its own step is done:** a bug repository read fine no longer clears the hint another
+  could not be read for, no bug link left clears it, a Git hint about one test project is not cleared by another,
+  Sync clears the no-repository hint once the folder is a repository, and choosing the test project testin.yml names
+  clears the code-off hint. A hint with a link wraps to the hint's own width.
+- **A read the IDE cancelled is no longer logged as an error.**
+- **The Medium introduction links to the First run guide where it is now.**
 - History opened from a committed test run no longer shows a *Not committed yet* card made of the commit's own text:
   the History tab always reads the test case as it is now.
 - **An imported test case is new:** a JSON file no longer brings its status and its order into the test set that imports

@@ -112,7 +112,7 @@ public class ScreenReaderNamesIdeTest extends BasePlatformTestCase {
     // Rule-INTERNAL-122
     public void testACardSaysItsTitleThenTheRunItemStatusItShows() {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
-        final @NotNull TestRunItems runItem = new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.FAILED).showing(Optional.of(tc), Optional.empty(), Optional.empty());
+        final @NotNull TestRunItems runItem = new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.FAILED).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
         final @NotNull TestRunCard card = new TestRunCard(getProject());
 
         final @NotNull ListView view = ListPanelBuilder.build(getProject(), getTestRootDisposable(), StandIn.of(TestinEditor.class));

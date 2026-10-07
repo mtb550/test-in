@@ -163,4 +163,34 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         assertEquals(List.of(Bundle.message("bug.reason.no.gh")), hintsFor(SetupStep.BUG_STATES));
         nothingWaits();
     }
+
+    // Rule-VIEW-PANEL-093, Rule-INTERNAL-127
+    public void testARepositoryThatCannotBeReadKeepsItsHintWhileAnotherIsRead() {
+        nothingWaits();
+        twoBugsFiled();
+        filed("Cycle 5", "https://github.com/mtb550/elsewhere/issues/3");
+        states().answerWith(new GitHubCli((arguments, _) -> Optional.of(arguments.contains("name=elsewhere")
+                ? new ProcessOutput("", "Could not resolve to a Repository with the name 'mtb550/elsewhere'.", 1, false, false)
+                : new ProcessOutput(ANSWER, "", 0, false, false))), getTestRootDisposable());
+
+        readAndWait();
+
+        assertEquals(Bundle.message("bug.state.fixed"), states().of(FIXED).label());
+        assertEquals("a repository read fine cleared the hint another could not be read for", 1, hintsFor(SetupStep.BUG_STATES).size());
+        nothingWaits();
+    }
+
+    // Rule-VIEW-PANEL-093, Rule-INTERNAL-127
+    public void testNoBugLinkLeftClearsTheHint() {
+        nothingWaits();
+        twoBugsFiled();
+        states().answerWith(new GitHubCli((_, _) -> Optional.empty()), getTestRootDisposable());
+        readAndWait();
+        assertEquals(1, hintsFor(SetupStep.BUG_STATES).size());
+
+        Services.getInstance(getProject(), TestRuns.class).getAllTestRuns().keySet().forEach(testRun -> Services.getInstance(getProject(), TestRuns.class).putTestRun(testRun, TestRunDto.builder().results(new ArrayList<>()).build()));
+        readAndWait();
+
+        assertEquals("the hint waited on bug links nobody has any more", List.of(), hintsFor(SetupStep.BUG_STATES));
+    }
 }

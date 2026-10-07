@@ -118,16 +118,16 @@ public class TestRunItems {
 
     // UC-EDITOR-PANEL-030
     public static @NotNull TestRunItems pendingFor(final @NotNull TestCaseDto tc) {
-        return TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc), Optional.empty(), Optional.empty());
+        return TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
-    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now, final @NotNull Optional<TestCaseDto> inCommit, final @NotNull Optional<TestCaseDto> lastVersion) {
+    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now, final @NotNull Optional<TestCaseDto> inCommit, final @NotNull Optional<TestCaseDto> lastVersion, final boolean committed) {
         live = now;
         recorded = inCommit;
         lastInGit = lastVersion;
-        removed = now.isEmpty() && inCommit.isEmpty();
-        inCommit.ifPresent(committed -> now.ifPresent(tc -> committed.setParent(tc.getParent())));
+        removed = now.isEmpty() && inCommit.isEmpty() && !committed;
+        inCommit.ifPresent(asCommitted -> now.ifPresent(tc -> asCommitted.setParent(tc.getParent())));
         return this;
     }
 

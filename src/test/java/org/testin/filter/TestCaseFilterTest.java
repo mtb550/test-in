@@ -69,7 +69,7 @@ public class TestCaseFilterTest {
                 .id(passed.getId())
                 .status(RunItemStatus.PASSED)
                 .build()
-                .showing(Optional.of(passed), Optional.empty(), Optional.empty());
+                .showing(Optional.of(passed), Optional.empty(), Optional.empty(), false);
 
         final Map<UUID, TestRunItems> recorded = Map.of(passed.getId(), item);
 

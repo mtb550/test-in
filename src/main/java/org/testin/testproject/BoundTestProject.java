@@ -25,6 +25,8 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.git.GitRefs;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -106,8 +108,9 @@ public final class BoundTestProject {
         refreshGutter();
     }
 
-    // Rule-CODEGEN-082
+    // Rule-CODEGEN-082, Rule-INTERNAL-127
     public void refreshGutter() {
+        if (TestinYml.names(p, name())) Services.getInstance(p, Hints.class).clear(SetupStep.TEST_PROJECT_LINK);
         ApplicationManager.getApplication().invokeLater(() ->
                 DaemonCodeAnalyzer.getInstance(p).restart("Whether Testin's code is on may have changed"), p.getDisposed());
     }

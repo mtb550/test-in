@@ -65,6 +65,7 @@ public final class TestDataParser {
         return constant.name().equalsIgnoreCase(wanted) || constant.name().replace('_', ' ').equalsIgnoreCase(wanted);
     }
 
+    // UC-SHARE-006, Rule-SHARE-106
     public static @NotNull Optional<Priority> priority(final @NotNull String value, final @NotNull Priority current) {
         final @NotNull String wanted = value.trim();
         if (wanted.isEmpty()) return Optional.of(current);

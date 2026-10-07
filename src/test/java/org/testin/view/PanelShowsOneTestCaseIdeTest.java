@@ -32,6 +32,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.testin.view.Drawn.holds;
 
@@ -240,7 +241,7 @@ public class PanelShowsOneTestCaseIdeTest extends AbstractViewPanelIdeTest {
         final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(EditorFixtures.pending(tc)));
         final @NotNull TestRuns testRuns = Services.getInstance(getProject(), TestRuns.class);
         testRuns.changeTestRunMarker(tr.getPath(), marker -> marker.recordCommit("ea9a501"));
-        testRuns.rememberRecorded("ea9a501", Map.of(tc.getId(), handedCopy(tc, "As the commit recorded it")));
+        testRuns.rememberRecorded("ea9a501", Map.of(tc.getId(), Optional.of(handedCopy(tc, "As the commit recorded it"))));
 
         view.getPanel().show(List.of(tc), pathOf(tr));
 

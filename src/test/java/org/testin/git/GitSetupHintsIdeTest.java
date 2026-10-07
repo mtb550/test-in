@@ -73,4 +73,21 @@ public class GitSetupHintsIdeTest extends AbstractGitRemoteIdeTest {
         assertEquals("the gesture raised a lasting notification", List.of(), said.notifications());
         Services.getInstance(getProject(), Hints.class).clear(SetupStep.GIT_REMOTE);
     }
+
+    // UC-SHARE-009, Rule-SHARE-042, Rule-INTERNAL-127
+    public void testAnotherTestProjectUnderGitLeavesTheHintAndSyncAfterGitInitClearsIt() {
+        final @NotNull Path notARepository = directory("not-a-repository");
+        write(notARepository, ".tp", "{}");
+        final @NotNull Path repository = directory("a-repository");
+        mustGit(repository, "init", "-q");
+        new ViewPendingCommitsWork(getProject()).openFor(notARepository);
+
+        new ViewPendingCommitsWork(getProject()).openFor(repository);
+        assertEquals("another test project under Git cleared the hint", 1, hintsFor(SetupStep.GIT_REPOSITORY).size());
+
+        mustGit(notARepository, "init", "-q");
+        new SyncWork(getProject()).syncRepository(notARepository);
+        Await.until("Sync on the repository the hint named did not clear it", () -> hintsFor(SetupStep.GIT_REPOSITORY).isEmpty());
+        Services.getInstance(getProject(), Hints.class).clear(SetupStep.GIT_REMOTE);
+    }
 }

@@ -34,7 +34,14 @@ public class TestRunStatusLabelIdeTest extends BasePlatformTestCase {
 
     // Rule-EDITOR-PANEL-265
     public void testAnAssignedTestRunShowsTheTesterBesideItsIcon() {
-        assertEquals(Services.getInstance(AppSettingsState.class).testerName, StatusBar.besideTheIcon(aTestRunMarkerIn(TestRunStatus.ASSIGNED)));
+        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
+        final @NotNull String was = settings.testerName;
+        settings.testerName = "Sara";
+        try {
+            assertEquals("Sara", StatusBar.besideTheIcon(aTestRunMarkerIn(TestRunStatus.ASSIGNED)));
+        } finally {
+            settings.testerName = was;
+        }
     }
 
     // Rule-EDITOR-PANEL-265

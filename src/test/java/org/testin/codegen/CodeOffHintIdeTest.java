@@ -20,11 +20,16 @@ package org.testin.codegen;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Said;
+import org.testin.config.TestinYml;
 import org.testin.help.Hint;
 import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 public class CodeOffHintIdeTest extends BasePlatformTestCase {
@@ -50,5 +55,29 @@ public class CodeOffHintIdeTest extends BasePlatformTestCase {
         assertEquals("the key was not answered", 1, said.size());
         assertEquals("code off did not wait as one hint", 1, waiting().size());
         Services.getInstance(getProject(), Hints.class).clear(SetupStep.TEST_PROJECT_LINK);
+    }
+
+    // Rule-CODEGEN-082, Rule-INTERNAL-127
+    public void testChoosingTheTestProjectTestinYmlNamesClearsTheHint() {
+        final @NotNull Path folder = TestinYml.savePath(getProject()).map(Path::getParent).orElseThrow(() -> new AssertionError("the project has no folder for " + TestinYml.fileName()));
+        try {
+            Files.createDirectories(folder);
+        } catch (final IOException ex) {
+            throw new AssertionError("could not make the project's folder " + folder + ": " + ex.getMessage(), ex);
+        }
+        assertTrue("could not write " + TestinYml.fileName(), TestinYml.save(getProject(), TestinYml.lines("NAFATH")));
+        final @NotNull BoundTestProject bound = Services.getInstance(getProject(), BoundTestProject.class);
+        try {
+            bound.choose("Shop");
+            assertFalse("code is on for a test project testin.yml does not name", CodeOn.isOnOrHinted(getProject()));
+            assertEquals(1, waiting().size());
+
+            bound.choose("NAFATH");
+
+            assertEquals("choosing the test project testin.yml names left the hint waiting", List.of(), waiting());
+        } finally {
+            TestinYml.save(getProject(), TestinYml.lines(""));
+            Services.getInstance(getProject(), Hints.class).clear(SetupStep.TEST_PROJECT_LINK);
+        }
     }
 }

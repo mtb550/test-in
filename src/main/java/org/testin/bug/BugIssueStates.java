@@ -39,6 +39,7 @@ import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -47,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
 public final class BugIssueStates {
@@ -79,18 +81,27 @@ public final class BugIssueStates {
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-092
     public void readAll(final @NotNull Runnable redraw) {
         final @NotNull Map<BugRepository, Set<Integer>> filed = filedIn(Services.getInstance(p, TestRuns.class).getAllTestRuns().values());
-        if (filed.isEmpty() || gh.isEmpty() || !reading.compareAndSet(false, true)) return;
+        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
+        if (filed.isEmpty()) {
+            hints.clear(SetupStep.BUG_STATES);
+            hints.clear(SetupStep.BOARD_COLUMNS);
+            return;
+        }
+        if (gh.isEmpty() || !reading.compareAndSet(false, true)) return;
 
         final @NotNull Function<ProgressIndicator, GitHubCli> cli = gh.orElseThrow();
         final @NotNull AtomicBoolean changed = new AtomicBoolean();
         BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("bug.states.reading"), true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
+                final @NotNull Set<SetupStep> raised = EnumSet.noneOf(SetupStep.class);
                 for (final Map.Entry<BugRepository, Set<Integer>> repository : filed.entrySet()) {
                     indicator.checkCanceled();
                     indicator.setText2(repository.getKey().displayName());
-                    if (read(cli.apply(indicator), repository.getKey(), repository.getValue())) changed.set(true);
+                    if (read(cli.apply(indicator), repository.getKey(), repository.getValue(), raised))
+                        changed.set(true);
                 }
+                Stream.of(SetupStep.BUG_STATES, SetupStep.BOARD_COLUMNS).filter(step -> !raised.contains(step)).forEach(hints::clear);
             }
 
             @Override
@@ -102,19 +113,18 @@ public final class BugIssueStates {
     }
 
     // Rule-VIEW-PANEL-093, Rule-VIEW-PANEL-094, Rule-INTERNAL-127
-    private boolean read(final @NotNull GitHubCli cli, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
+    private boolean read(final @NotNull GitHubCli cli, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers, final @NotNull Set<SetupStep> raised) {
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
-        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
         final @NotNull IssueStates asked = cli.states(mapper, repository, numbers, true);
+        if (asked.boardRefused()) raised.add(SetupStep.BOARD_COLUMNS);
         final @NotNull IssueStates said = asked.boardRefused() ? withoutBoards(cli, mapper, repository, numbers) : asked;
 
         if (!said.problem().isEmpty()) {
-            hints.fire(Hint.of(SetupStep.BUG_STATES, said.problem()));
+            raised.add(SetupStep.BUG_STATES);
+            Services.getInstance(p, Hints.class).fire(Hint.of(SetupStep.BUG_STATES, said.problem()));
             return false;
         }
 
-        hints.clear(SetupStep.BUG_STATES);
-        if (!asked.boardRefused()) hints.clear(SetupStep.BOARD_COLUMNS);
         boolean changed = false;
         for (final int number : numbers) changed |= remember(repository, number, said.stateOf(number));
         return changed;

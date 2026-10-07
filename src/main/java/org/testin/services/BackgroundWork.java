@@ -39,7 +39,9 @@ import org.testin.util.FailureText;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -155,11 +157,18 @@ public final class BackgroundWork {
     }
 
     public static void logged(final @NotNull CompletionStage<?> stage, final @NotNull String what) {
-        stage.whenComplete((_, failure) -> Optional.ofNullable(failure).ifPresent(cause -> Logger.error(what + " failed: " + FailureText.of(cause))));
+        stage.whenComplete((_, failure) -> Optional.ofNullable(failure).ifPresent(cause -> logFailure(what, cause)));
     }
 
     public static void logged(final @NotNull Promise<?> promise, final @NotNull String what) {
-        promise.onError(cause -> Logger.error(what + " failed: " + FailureText.of(cause)));
+        promise.onError(cause -> logFailure(what, cause));
+    }
+
+    private static void logFailure(final @NotNull String what, final @NotNull Throwable cause) {
+        final @NotNull Throwable reason = cause instanceof CompletionException wrapped ? Optional.ofNullable(wrapped.getCause()).orElse(cause) : cause;
+        if (reason instanceof CancellationException || reason instanceof ProcessCanceledException) return;
+
+        Logger.error(what + " failed: " + FailureText.of(reason));
     }
 
     public static void after(final long millis, final @NotNull Runnable work, final @NotNull String what) {

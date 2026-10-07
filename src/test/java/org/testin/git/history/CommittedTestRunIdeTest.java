@@ -125,7 +125,11 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     }
 
     private void theTestCaseReads(final @NotNull String description) {
-        final @NotNull Path file = testSet.resolve(FileKind.TEST_CASE.fileName(id));
+        theTestCaseReads(id, description);
+    }
+
+    private void theTestCaseReads(final @NotNull UUID testCaseId, final @NotNull String description) {
+        final @NotNull Path file = testSet.resolve(FileKind.TEST_CASE.fileName(testCaseId));
         write(file, read(file).replaceFirst("\"description\" : \"[^\"]*\"", "\"description\" : \"" + description + "\""));
     }
 
@@ -142,13 +146,17 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     }
 
     private @NotNull TestRunItems theRunItemOf(final @NotNull Path testRun) {
+        return theRunItemOf(testRun, id);
+    }
+
+    private @NotNull TestRunItems theRunItemOf(final @NotNull Path testRun, final @NotNull UUID testCaseId) {
         try {
             ApplicationManager.getApplication().executeOnPooledThread(() -> TestRunFromGit.read(getProject(), testRun)).get();
         } catch (final InterruptedException | ExecutionException ex) {
             throw new AssertionError("the commit of " + testRun.getFileName() + " was never read", ex);
         }
         final @NotNull TestRunDto held = indexedTestRuns().getTestRunByPath(testRun);
-        return held.resultOf(id).orElseThrow(() -> new AssertionError(testRun.getFileName() + " does not cover the test case"));
+        return held.resultOf(testCaseId).orElseThrow(() -> new AssertionError(testRun.getFileName() + " does not cover the test case"));
     }
 
     private void reviewed(final @NotNull String message, final @NotNull Consumer<JComponent> button) {
@@ -403,10 +411,11 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     public void testACommitThisMachineDoesNotHaveShowsTheTestCaseAsItIsNow() {
         final @NotNull Path committed = aCommittedTestRunFrom("0123456789abcdef0123456789abcdef01234567");
         committedAsItIs();
+        theTestCaseReads("Press Pay");
         readEverything();
 
         final @NotNull TestRunItems runItem = theRunItemOf(committed);
-        assertEquals(DESCRIPTION, runItem.shownTestCase().getDescription());
+        assertEquals("Press Pay", runItem.shownTestCase().getDescription());
         assertFalse(ChangedSinceCommit.of(runItem));
         assertTrue("a Committed test run took a run item status", Services.getInstance(getProject(), RunItemStatusService.class).heldTestRun(committed).isEmpty());
     }
@@ -414,9 +423,86 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239
     public void testATestProjectNotUnderGitShowsTheTestCaseAsItIsNow() {
         final @NotNull Path committed = aCommittedTestRunFrom("ea9a50107afbbaa1831909436b781f0e3c2d1a55");
+        theTestCaseReads("Press Pay");
         readEverything();
 
-        assertEquals(DESCRIPTION, theRunItemOf(committed).shownTestCase().getDescription());
+        assertEquals("Press Pay", theRunItemOf(committed).shownTestCase().getDescription());
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239
+    public void testEveryTestRunRecordedInOneCommitShowsItsOwnTestCasesFromIt() {
+        final @NotNull Path first = aTestRun(COMPLETED, TestRunStatus.COMPLETED);
+        final @NotNull UUID other = aTestCaseIn(testSet);
+        final @NotNull Path second = theTestRunsOf(testProject).resolve("Cycle 5");
+        write(second.resolve(DirectoryType.TR.getMarker()), aTestRunMarker(TestRunStatus.COMPLETED));
+        resultIn(second, FileKind.RUN_ITEM.fileName(other), other);
+        committedAsItIs();
+        committedWithTheReview();
+
+        theTestCaseReads("Edited after the commit");
+        theTestCaseReads(other, "Edited after the commit");
+        readEverything();
+
+        assertEquals("Press Pay", theRunItemOf(first).shownTestCase().getDescription());
+        assertEquals("the second test run of the commit shows its test case as it is now", DESCRIPTION, theRunItemOf(second, other).shownTestCase().getDescription());
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239, Rule-SHARE-130
+    public void testATestRunRecordedBeforeARebaseIsReadFromTheCommitTheRebaseMade() {
+        final @NotNull Path completed = aTestRun(COMPLETED, TestRunStatus.COMPLETED);
+        committedAsItIs();
+        final @NotNull Path remote = aRemote();
+        final @NotNull Path teammate = root.resolve("teammate");
+        mustGit(root, "clone", "-q", remote.toUri().toString(), teammate.toString());
+        mustGit(teammate, "config", "user.name", "Omar");
+        mustGit(teammate, "config", "user.email", "omar@example.invalid");
+        write(teammate.resolve("README.md"), "A teammate's change");
+        mustGit(teammate, "add", "-A");
+        mustGit(teammate, "commit", "-q", "-m", "teammate");
+        mustGit(teammate, "push", "-q", "origin", "main");
+        committedWithTheReview();
+
+        final @NotNull String recorded = theTestRunAt(completed).getMarker().getCommit();
+        mustGit(testProject, "pull", "-q", "--rebase", "origin", "main");
+        git(testProject, "update-ref", "-d", "ORIG_HEAD");
+        mustGit(testProject, "reflog", "expire", "--expire=now", "--all");
+        mustGit(testProject, "gc", "-q", "--prune=now");
+        assertTrue("the rebase kept the recorded commit, so this test proves nothing", git(testProject, "cat-file", "-e", recorded + "^{commit}").isEmpty());
+        theTestCaseReads("Edited after the commit");
+        readEverything();
+
+        assertEquals("the test run is read as it is now once its commit was rewritten", "Press Pay", theRunItemOf(completed).shownTestCase().getDescription());
+    }
+
+    // UC-SHARE-012, Rule-SHARE-127, Rule-SHARE-130
+    public void testARecordCommitThatFailsSaysTheTestersCommitIsIn() {
+        aTestRun(COMPLETED, TestRunStatus.COMPLETED);
+        committedAsItIs();
+        write(testProject.resolve(".git/hooks/commit-msg"), """
+                #!/bin/sh
+                grep -q 'Record test run' "$1" && exit 1
+                exit 0
+                """);
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
+
+        theTestCaseReads("Press Pay");
+        readEverything();
+        reviewed(MESSAGE, ShareGestures::commitOnly);
+
+        Await.until("a record commit that failed was not reported on its own", () -> said.stream().anyMatch(notification -> notification.getTitle().contains(Bundle.message("git.record.failed.title"))));
+        assertEquals("the tester's commit did not land", MESSAGE, subject("HEAD"));
+        assertTrue("the record failure was reported as the tester's commit failing", said.stream().noneMatch(notification -> notification.getTitle().contains(Bundle.message("git.commit.failed.title"))));
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
+    public void testACommittedTestRunWhoseCommitIsNotReadYetKeepsTheRunItemStatusOfADeletedTestCase() {
+        final @NotNull Path committed = aCommittedTestRunFrom("0123456789abcdef0123456789abcdef01234567");
+        committedAsItIs();
+        theTestCaseIsDeleted();
+
+        final @NotNull TestRunItems runItem = indexedTestRuns().getTestRunByPath(committed).resultOf(id).orElseThrow();
+        assertFalse("a Committed test run reads Removed for a test case it has not read from its commit yet", runItem.isRemoved());
+        assertEquals(RunItemStatus.PASSED, runItem.shownStatus());
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
@@ -433,14 +519,16 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
-    public void testCompletingATestRunNotUnderGitOffersNoCommit() {
+    public void testCompletingATestRunNotUnderGitOffersNoCommitButSaysItIsCompleted() {
         final @NotNull Path testRun = aTestRun(COMPLETED, TestRunStatus.IN_PROGRESS);
         readEverything();
-        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
+        final @NotNull Said listening = Said.listening(getProject(), getTestRootDisposable());
+        final @NotNull List<Notification> said = listening.notifications();
 
         Services.getInstance(getProject(), TestRunStatusChange.class).apply(theTestRunAt(testRun), TestRunStatus.COMPLETED);
 
         assertTrue("a test project not under Git was offered a commit", said.stream().noneMatch(notification -> notification.getActions().stream().anyMatch(action -> Bundle.message("action.Testin.ViewPendingCommits.text").equals(action.getTemplateText()))));
+        Await.until("completing a test run not under Git said nothing", () -> listening.shown().contains(TestRunStatus.COMPLETED.getLabel()));
     }
 
     // Rule-EDITOR-PANEL-266
@@ -481,5 +569,22 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
         assertTrue("the marker was unticked", changes.getSelectedRowCount() > 0);
         assertTrue("the test case could not be unticked", changes.getSelectedRowCount() < changes.getRowCount());
+    }
+
+    // UC-SHARE-012, Rule-SHARE-130
+    public void testACompletedTestRunWithAChangeLeftOutOfTheCommitStaysCompleted() {
+        final @NotNull Path completed = aTestRun(COMPLETED, TestRunStatus.COMPLETED);
+        committedAsItIs();
+        write(completed.resolve(DirectoryType.TR.getMarker()), aTestRunMarker(TestRunStatus.COMPLETED).replace("\"modifiedBy\" : \"Sara\"", "\"modifiedBy\" : \"Omar\""));
+        theTestCaseReads("Press Pay");
+        readEverything();
+
+        final @NotNull JComponent review = ShareGestures.theReviewOf(getProject(), testProject);
+        ShareGestures.table(review).clearSelection();
+        ShareGestures.type(review, MESSAGE);
+        ShareGestures.commitOnly(review);
+        Await.until("the tester's commit never landed", () -> isTheSubjectOf("HEAD", MESSAGE));
+
+        assertEquals("a test run whose test case change was left out became the record", TestRunStatus.COMPLETED, theTestRunAt(completed).getMarker().getStatus());
     }
 }

@@ -38,9 +38,11 @@ There is no key for this. **Commit** is behind the arrow of the split button.
   none of them on its own, and committing the test run commits the screenshots its
   folder gained or lost.
 - **Rule-SHARE-130** — A commit makes every Completed test run of the test
-  project Committed: Testin writes the commit's id into the test run and commits
-  it straight after, as Record test run <name> as committed. With Commit & Push
-  both commits go out in one push.
+  project Committed whose own files and whose test cases' changes are all in it:
+  Testin writes the commit's id into the test run and commits it straight after,
+  as Record test run <name> as committed. A Completed test run with a change left
+  out of the commit stays Completed, and a later commit records it. With Commit &
+  Push both commits go out in one push.
 
 ## The screen
 

@@ -45,8 +45,9 @@ import java.util.stream.Collectors;
 public final class TestRuns {
     private final @NotNull Project p;
     private final @NotNull ProjectIndexer indexer;
-    private final @NotNull Map<String, Map<UUID, TestCaseDto>> recorded = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, Map<UUID, Optional<TestCaseDto>>> recorded = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, TestCaseDto> lastInGit = new ConcurrentHashMap<>();
+    private final @NotNull Map<Path, String> recordedAt = new ConcurrentHashMap<>();
 
     public TestRuns(final @NotNull Project p) {
         this.p = p;
@@ -68,8 +69,9 @@ public final class TestRuns {
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
     private @NotNull TestRunDto withTestCasesShown(final @NotNull Path testRunPath, final @NotNull TestRunDto testRun) {
         final @NotNull IndexerDataStore store = store();
-        final @NotNull Map<UUID, TestCaseDto> inCommit = recorded.getOrDefault(commitOf(testRunPath), Map.of());
-        testRun.getResults().forEach(item -> item.showing(store.findTestCase(item.getId()), Optional.ofNullable(inCommit.get(item.getId())), Optional.ofNullable(lastInGit.get(item.getId()))));
+        final @NotNull String commit = commitOf(testRunPath);
+        final @NotNull Map<UUID, Optional<TestCaseDto>> inCommit = recorded.getOrDefault(recordedAt.getOrDefault(testRunPath, commit), Map.of());
+        testRun.getResults().forEach(item -> item.showing(store.findTestCase(item.getId()), inCommit.getOrDefault(item.getId(), Optional.empty()), Optional.ofNullable(lastInGit.get(item.getId())), !commit.isEmpty()));
         return testRun;
     }
 
@@ -78,9 +80,15 @@ public final class TestRuns {
         return store().findTestRunDir(testRunPath).map(dir -> dir.getMarker().getCommit()).orElse("");
     }
 
+    // Rule-EDITOR-PANEL-239, Rule-SHARE-130
+    public void rememberRecordedAt(final @NotNull Path testRunPath, final @NotNull String revision) {
+        recordedAt.put(testRunPath, revision);
+    }
+
     // Rule-EDITOR-PANEL-239
-    public boolean hasRecorded(final @NotNull String commit) {
-        return recorded.containsKey(commit);
+    public @NotNull Set<UUID> notReadFrom(final @NotNull String commit, final @NotNull Set<UUID> testCaseIds) {
+        final @NotNull Map<UUID, Optional<TestCaseDto>> read = recorded.getOrDefault(commit, Map.of());
+        return testCaseIds.stream().filter(id -> !read.containsKey(id)).collect(Collectors.toSet());
     }
 
     // Rule-EDITOR-PANEL-126
@@ -89,8 +97,8 @@ public final class TestRuns {
     }
 
     // Rule-EDITOR-PANEL-239
-    public void rememberRecorded(final @NotNull String commit, final @NotNull Map<UUID, TestCaseDto> testCases) {
-        recorded.put(commit, testCases);
+    public void rememberRecorded(final @NotNull String commit, final @NotNull Map<UUID, Optional<TestCaseDto>> testCases) {
+        recorded.computeIfAbsent(commit, _ -> new ConcurrentHashMap<>()).putAll(testCases);
     }
 
     // Rule-VIEW-PANEL-092
