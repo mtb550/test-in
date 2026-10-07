@@ -37,7 +37,8 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-189** — The analysis can be written only once the test run
-  is **Completed**.
+  is **Completed**. A **Committed** test run shows it read-only: the same
+  dialog, with nothing to save.
 - **Rule-EDITOR-PANEL-190** — There are four sections, one for each run item
   status, each carrying its own count in the heading.
 - **Rule-EDITOR-PANEL-191** — A section left blank is not saved, and does not
@@ -110,9 +111,12 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 
 ## What Testin refuses
 
-**If the test run is not exactly Completed** — the button is gray. Its tooltip
-reads *Result Analysis is written once the test run is completed — it is*, then
-the status. A **Closed** test run is refused as well.
+**If the test run is neither Completed nor Committed** — the button is gray. Its
+tooltip reads *Result Analysis is written once the test run is completed — it
+is*, then the status. A **Closed** test run is refused as well.
+
+**If the test run is Committed** — the dialog opens read-only, with no Save: the
+analysis is part of the record (Rule-EDITOR-PANEL-189).
 
 **If a section is left blank** — it is dropped, and the report leaves that
 heading out.

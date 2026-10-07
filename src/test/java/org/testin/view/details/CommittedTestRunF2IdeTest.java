@@ -57,8 +57,25 @@ public class CommittedTestRunF2IdeTest extends AbstractReadTheRootIdeTest {
         readEverything();
         final @NotNull TestCaseDto shown = Services.getInstance(getProject(), TestCases.class).findTestCase(id).orElseThrow();
 
-        final @NotNull List<String> said = Said.during(getProject(), () -> EditShownTestCase.openUnlessCommitted(getProject(), shown, List.of("Shop", "Test Runs", "Cycle 4")));
+        final @NotNull List<String> said = Said.during(getProject(), () -> EditShownTestCase.openIfEditable(getProject(), shown, List.of("Shop", "Test Runs", "Cycle 4")));
 
         assertTrue("F2 did not say the test run keeps the test case: " + said, said.stream().anyMatch(line -> line.contains(Bundle.message("details.committed.no.edit"))));
+    }
+
+    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-110
+    public void testF2OnADeletedTestCaseChangesNothingAndSaysWhy() {
+        final @NotNull Path testProject = aTestProjectAt(root.resolve("Shop"));
+        final @NotNull Path login = marked(theTestCasesOf(testProject).resolve("Login"), DirectoryType.TS);
+        final @NotNull UUID id = aTestCaseIn(login);
+        try {
+            Files.delete(login.resolve(FileKind.TEST_CASE.fileName(id)));
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not delete the test case: " + ex.getMessage(), ex);
+        }
+        readEverything();
+
+        final @NotNull List<String> said = Said.during(getProject(), () -> EditShownTestCase.openIfEditable(getProject(), TestCaseDto.deleted(id), List.of("Shop", "Test Cases", "Login")));
+
+        assertTrue("F2 did not say the test case was deleted: " + said, said.stream().anyMatch(line -> line.contains(Bundle.message("details.deleted.no.edit"))));
     }
 }

@@ -32,6 +32,7 @@ import javax.swing.Icon;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -116,6 +117,11 @@ public abstract class DirectoryDto {
 
     public boolean isTestCaseContainer() {
         return false;
+    }
+
+    // Rule-TREE-PANEL-009, Rule-PRODUCT-011
+    public @NotNull Optional<String> whySignedOff() {
+        return Optional.empty();
     }
 
     public boolean isOpenableInEditor() {

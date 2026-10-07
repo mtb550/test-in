@@ -24,18 +24,25 @@ import org.testin.git.GitFailed;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.change.TestCaseChangeComparator;
 import org.testin.indexer.TestCaseFile;
+import org.testin.model.Config;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseHistory {
@@ -43,8 +50,26 @@ public final class TestCaseHistory {
     static final @NotNull String FIELD = Character.toString(0x1F);
     private static final @NotNull String FORMAT = "--format=%x1e%H%x1f%an%x1f%aI%x1f%s";
 
-    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-099, Rule-VIEW-PANEL-100, Rule-VIEW-PANEL-101
-    public static @NotNull History read(final @NotNull Project p, final @NotNull TestCaseFile file, final @NotNull TestCaseDto now) {
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-113
+    public static @NotNull Optional<TestCaseFile> deletedFile(final @NotNull Project p, final @NotNull UUID testCaseId) {
+        final @NotNull GitRepositoryService git = new GitRepositoryService(p);
+        return Services.getInstance(p, BoundTestProject.class).get()
+                .map(DirectoryDto::getPath)
+                .filter(testProject -> !git.isNotRepository(testProject))
+                .flatMap(testProject -> {
+                    try {
+                        return git.log(testProject, "-1", "--format=", "--name-only", "--", BugHistory.pathspec(DirectoryType.TCD, FileKind.TEST_CASE, testCaseId)).lines()
+                                .filter(line -> !line.isBlank())
+                                .findFirst()
+                                .map(path -> new TestCaseFile(testProject, Path.of(path.strip())));
+                    } catch (final GitFailed ex) {
+                        return Optional.empty();
+                    }
+                });
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-099, Rule-VIEW-PANEL-100, Rule-VIEW-PANEL-101, Rule-VIEW-PANEL-113
+    public static @NotNull History read(final @NotNull Project p, final @NotNull TestCaseFile file, final @NotNull Optional<TestCaseDto> now) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         if (git.isNotRepository(file.testProject())) return History.NOT_UNDER_GIT;
 
@@ -72,19 +97,22 @@ public final class TestCaseHistory {
         return new HistoryCommit(fields[0], fields[1], ZonedDateTime.parse(fields[2]), fields.length > 3 ? fields[3] : "", lines.size() > 1 ? lines.getLast().strip() : path);
     }
 
-    // Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-098
-    static @NotNull List<HistoryEntry> entries(final @NotNull Mapper mapper, final @NotNull List<HistoryCommit> commits, final @NotNull Map<String, String> versions, final @NotNull TestCaseDto now) {
+    // Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-098, Rule-VIEW-PANEL-113
+    static @NotNull List<HistoryEntry> entries(final @NotNull Mapper mapper, final @NotNull List<HistoryCommit> commits, final @NotNull Map<String, String> versions, final @NotNull Optional<TestCaseDto> now) {
         final @NotNull List<Optional<TestCaseDto>> read = commits.stream().map(commit -> parsed(mapper, versions.getOrDefault(commit.objectName(), ""))).toList();
         final @NotNull List<HistoryEntry> entries = new ArrayList<>();
 
         uncommitted(read, now).ifPresent(entries::add);
         for (int at = 0; at < commits.size(); at++) {
-            entries.add(entry(commits.get(at), read.get(at), at + 1 < read.size() ? read.get(at + 1) : Optional.empty(), at + 1 == commits.size()));
+            entries.add(entry(commits.get(at), read.get(at), at + 1 < read.size() ? read.get(at + 1) : Optional.empty(), at + 1 == commits.size(), at == 0 && now.isEmpty()));
         }
         return entries;
     }
 
-    private static @NotNull Optional<HistoryEntry> uncommitted(final @NotNull List<Optional<TestCaseDto>> read, final @NotNull TestCaseDto now) {
+    private static @NotNull Optional<HistoryEntry> uncommitted(final @NotNull List<Optional<TestCaseDto>> read, final @NotNull Optional<TestCaseDto> present) {
+        if (present.isEmpty()) return read.isEmpty() || read.getFirst().isEmpty() ? Optional.empty() : Optional.of(new HistoryEntry(HistoryEntryKind.REMOVED, "", "", Config.NOT_EXECUTED, "", List.of()));
+
+        final @NotNull TestCaseDto now = present.orElseThrow();
         if (read.isEmpty()) {
             return Optional.of(new HistoryEntry(HistoryEntryKind.CREATED, "", now.getCreatedBy(), now.getCreatedAt(), "", List.of()));
         }
@@ -95,8 +123,8 @@ public final class TestCaseHistory {
                 .map(changes -> new HistoryEntry(HistoryEntryKind.CHANGED, "", lastEditor(now), lastEdited(now), "", changes));
     }
 
-    private static @NotNull HistoryEntry entry(final @NotNull HistoryCommit commit, final @NotNull Optional<TestCaseDto> version, final @NotNull Optional<TestCaseDto> before, final boolean oldest) {
-        if (version.isEmpty()) return HistoryEntry.of(HistoryEntryKind.UNREADABLE, commit, List.of());
+    private static @NotNull HistoryEntry entry(final @NotNull HistoryCommit commit, final @NotNull Optional<TestCaseDto> version, final @NotNull Optional<TestCaseDto> before, final boolean oldest, final boolean removedHere) {
+        if (version.isEmpty()) return HistoryEntry.of(removedHere ? HistoryEntryKind.REMOVED : HistoryEntryKind.UNREADABLE, commit, List.of());
         if (oldest) return HistoryEntry.of(HistoryEntryKind.CREATED, commit, List.of());
 
         return before.map(older -> HistoryEntry.of(HistoryEntryKind.CHANGED, commit, TestCaseChangeComparator.compare(older, version.orElseThrow())))

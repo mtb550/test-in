@@ -28,7 +28,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.editor.TestinEditor;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.git.history.CommittedTestRun;
+import org.testin.git.history.TestRunFromGit;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.exports.ExportNotice;
 import org.testin.indexer.TestRuns;
@@ -120,7 +120,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         final @NotNull Path dirPath = tr.getPath();
 
         // Rule-EDITOR-PANEL-239
-        CommittedTestRun.read(p, dirPath);
+        TestRunFromGit.read(p, dirPath);
         final @NotNull TestRunDto testRunData = testRuns.getTestRunByPath(dirPath);
 
         final byte[] fileBytes = format.generateReport(p, tr, testRunData);

@@ -35,16 +35,15 @@ One field, one small dialog. The rest of the test case is left alone.
   does nothing while the panel is empty.
 - **Rule-VIEW-PANEL-045** — The panel always changes exactly one test case,
   because it only ever shows one.
-- **Rule-VIEW-PANEL-046** — An edit Testin can find no test set to write to is
-  refused, and says so. That happens to a test case opened from a search result,
-  which arrives without its test set.
+- **Rule-VIEW-PANEL-046** — An edit is written to the test set that holds the
+  test case, wherever the view panel was opened from, a search result included.
 - **Rule-VIEW-PANEL-047** — A save that would leave the file as it is writes
   nothing, and raises no message.
 - **Rule-VIEW-PANEL-048** — A saved change is one entry on the undo history.
 - **Rule-VIEW-PANEL-049** — Saving a change rewrites the automation code for
   that field, where the field has any.
-- **Rule-VIEW-PANEL-110** — F2 changes nothing from a run item of a Committed
-  test run: a short message says the test run keeps the test case as it was, and
+- **Rule-VIEW-PANEL-110** — `F2` changes nothing from a run item of a Committed
+  test run, or from a test case that was deleted: a short message says why, and
   to change the test case in its test set.
 
 ## The screen
@@ -99,6 +98,12 @@ starts working the first time a test case is drawn.
 
 **If the save would change nothing** — nothing is written, no message is raised,
 and nothing goes on the undo history.
+
+**If the test case was deleted** — `F2` opens nothing and says *This test case
+was deleted, so it cannot be changed.* (Rule-VIEW-PANEL-110)
+
+**If the test run is Committed** — `F2` opens nothing and says the test run
+keeps the test case as it was. (Rule-VIEW-PANEL-110)
 
 ## Closing the panel afterward
 

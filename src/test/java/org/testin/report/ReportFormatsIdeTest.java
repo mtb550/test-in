@@ -317,7 +317,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
         for (final String report : List.of(pdf(testRun), word(testRun), excel(testRun))) {
             assertTrue("a description was run together onto one line", report.lines().anyMatch(line -> line.strip().endsWith("Open the app")));
-            assertTrue("an actual result was run together onto one line", report.lines().anyMatch(line -> line.strip().endsWith("The account")));
+            assertTrue("an actual result was run together onto one line", report.lines().anyMatch(line -> line.strip().startsWith("stayed open")));
         }
 
         final @NotNull String html = html(testRun);

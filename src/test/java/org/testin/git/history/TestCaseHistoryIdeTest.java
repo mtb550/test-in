@@ -26,6 +26,7 @@ import org.testin.util.Mapper;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -46,7 +47,7 @@ public class TestCaseHistoryIdeTest extends AbstractGitRemoteIdeTest {
 
     private @NotNull History historyOf(final @NotNull Path testProject, final @NotNull String relativePath, final @NotNull TestCaseDto now) {
         try {
-            return ApplicationManager.getApplication().executeOnPooledThread(() -> TestCaseHistory.read(getProject(), new TestCaseFile(testProject, Path.of(relativePath)), now)).get();
+            return ApplicationManager.getApplication().executeOnPooledThread(() -> TestCaseHistory.read(getProject(), new TestCaseFile(testProject, Path.of(relativePath)), Optional.of(now))).get();
         } catch (final InterruptedException | ExecutionException ex) {
             throw new AssertionError("the history was never read", ex);
         }

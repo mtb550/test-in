@@ -155,7 +155,7 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
         assertEquals("the card's buttons are named otherwise", List.of(TO_THE_METHOD, RUN, TO_THE_TEST_CASE),
                 Arrays.asList(CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(), CardHoverAction.RUN_TEST_METHOD.getTooltip(), CardHoverAction.NAVIGATE_TO_TEST_CASE.getTooltip()));
 
-        final @NotNull JComponent viewPanel = ActionIcons.of(getProject(), testCases.getFirst());
+        final @NotNull JComponent viewPanel = ActionIcons.of(getProject(), testCases.getFirst(), Optional.empty());
         final @NotNull List<String> named = Arrays.stream(viewPanel.getComponents())
                 .filter(JComponent.class::isInstance).map(JComponent.class::cast)
                 .map(button -> Objects.requireNonNullElse(button.getAccessibleContext().getAccessibleName(), ""))

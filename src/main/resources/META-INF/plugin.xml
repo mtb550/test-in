@@ -505,6 +505,11 @@
                 topic="org.testin.indexer.IndexChanged"
         />
 
+        <listener
+                class="org.testin.git.history.RecordsFollowTheIndex"
+                topic="org.testin.indexer.IndexChanged"
+        />
+
     </projectListeners>
 
 </idea-plugin>

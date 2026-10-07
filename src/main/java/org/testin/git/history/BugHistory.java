@@ -82,7 +82,7 @@ public final class BugHistory {
         }
     }
 
-    private static @NotNull String pathspec(final @NotNull DirectoryType folder, final @NotNull FileKind kind, final @NotNull UUID testCaseId) {
+    static @NotNull String pathspec(final @NotNull DirectoryType folder, final @NotNull FileKind kind, final @NotNull UUID testCaseId) {
         return ":(glob)" + folder.getFolderName() + "/**/" + kind.fileName(testCaseId);
     }
 

@@ -26,13 +26,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -62,7 +58,7 @@ public final class EditShownTestCase {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
                 ViewToolWindowFactory.panel(p).ifPresent(viewPanel -> viewPanel.getCurrentTestCase()
-                        .ifPresent(currentDto -> openUnlessCommitted(p, currentDto, viewPanel.getPage().getCurrentPath())));
+                        .ifPresent(currentDto -> openIfEditable(p, currentDto, viewPanel.getPage().getCurrentPath())));
             }
 
             @Override
@@ -73,62 +69,50 @@ public final class EditShownTestCase {
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-110
-    static void openUnlessCommitted(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+    static void openIfEditable(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+        whyNotEditable(p, dto, currentPath).ifPresentOrElse(reason -> Services.getInstance(p, Notifier.class).softRefuse(p, reason), () -> open(p, dto));
+    }
+
+    // Rule-VIEW-PANEL-110
+    private static @NotNull Optional<String> whyNotEditable(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+        if (Services.getInstance(p, TestCases.class).findTestCase(dto.getId()).isEmpty()) return Optional.of(Bundle.message("details.deleted.no.edit"));
+
         final boolean committed = !currentPath.isEmpty() && Services.getInstance(p, TestRuns.class)
                 .findTestRunDir(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(testRun -> !testRun.takesRunItemStatuses())
                 .isPresent();
-
-        if (committed) Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("details.committed.no.edit"));
-        else open(p, dto, currentPath);
+        return committed ? Optional.of(Bundle.message("details.committed.no.edit")) : Optional.empty();
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
-    private static void open(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+    private static void open(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull List<TestCaseDto> items = List.of(dto);
-
         final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(items);
-        final @NotNull Optional<Path> undoPath = writesTo(p, dto, currentPath);
-        final @NotNull Optional<TestCaseSnapshot> before = undoPath.map(editPath -> TestCaseSnapshot.of(p, editPath, ids));
+        final @NotNull Optional<TestCaseSnapshot> before = testSetOf(p, dto).map(testSet -> TestCaseSnapshot.of(p, testSet, ids));
 
-        new TestCaseUpdateMenuDialog(p, items, (tcs, field) -> save(p, dto, currentPath, tcs, field, ids, before)).show();
+        new TestCaseUpdateMenuDialog(p, items, (tcs, field) -> save(p, dto, tcs, field, ids, before)).show();
     }
 
-    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
-    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull UpdateTestCaseFields field, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
+    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007, Rule-VIEW-PANEL-046
+    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<TestCaseDto> tcs, final @NotNull UpdateTestCaseFields field, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
-        writesTo(p, dto, currentPath).ifPresentOrElse(editPath -> {
+        testSetOf(p, dto).ifPresentOrElse(testSet -> {
             boolean changed = false;
-            for (final TestCaseDto tc : tcs) changed |= testCases.putTestCase(editPath, tc);
+            for (final TestCaseDto tc : tcs) changed |= testCases.putTestCase(testSet, tc);
 
             if (!changed) return;
 
-            before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
+            before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, testSet, ids)));
 
             Services.getInstance(p, Notifier.class).softShow(p, field.getDone());
 
             ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, field.getGt()));
-        }, () -> nowhereToWrite(p, dto));
+        }, () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("details.deleted.no.edit")));
     }
 
-    private static void nowhereToWrite(final @NotNull Project p, final @NotNull TestCaseDto dto) {
-        Logger.warn("No test set to write '" + dto.getDescription() + "' to - the edit was not saved");
-
-        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("details.not.saved.title"),
-                Bundle.message("details.not.saved.message"));
-    }
-
-    private static @NotNull Optional<Path> writesTo(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        final @NotNull DirectoryDto parent = dto.getParent();
-        if (!parent.getPath().toString().isEmpty()) return Optional.of(parent.getPath());
-
-        if (currentPath.isEmpty()) return Optional.empty();
-
-        final @NotNull Path resolved = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
-
-        return Services.getInstance(p, Nodes.class).find(resolved)
-                .filter(TestSetDirectoryDto.class::isInstance)
-                .map(DirectoryDto::getPath);
+    // Rule-VIEW-PANEL-046
+    private static @NotNull Optional<Path> testSetOf(final @NotNull Project p, final @NotNull TestCaseDto dto) {
+        return Services.getInstance(p, TestCases.class).findTestCase(dto.getId()).map(held -> held.getParent().getPath());
     }
 }

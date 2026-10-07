@@ -38,10 +38,10 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
     // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-189
     public void updateEnabledState() {
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
-        final boolean completed = status == TestRunStatus.COMPLETED;
+        final boolean shown = status == TestRunStatus.COMPLETED || status.isRecord();
 
-        setEnabled(completed);
-        describe(completed
+        setEnabled(shown);
+        describe(shown
                 ? Bundle.message("toolbar.analysis")
                 : Bundle.message("toolbar.analysis.disabled", status.getLabel()));
     }

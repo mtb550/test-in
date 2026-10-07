@@ -189,7 +189,7 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
         execution().starting(tc);
 
         assertEquals("the run button on the card did not become the stop", CardHoverAction.STOP_TEST_METHOD, CardHoverAction.onCard(getProject(), tc.getParent(), tc).get(1).action());
-        assertEquals("the run button on the view panel did not become the stop", CardHoverAction.STOP_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD.offer(getProject(), tc).action());
+        assertEquals("the run button on the view panel did not become the stop", CardHoverAction.STOP_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD.offer(getProject(), Optional.empty(), tc).action());
         final @NotNull AnActionEvent menu = theRunEntryFor(tc);
         assertEquals("the menu entry did not become the stop", Bundle.message("card.stop.test.method"), menu.getPresentation().getText());
         assertEquals("the menu entry still shows the run icon", CardHoverAction.STOP_TEST_METHOD.getIcon(), menu.getPresentation().getIcon());

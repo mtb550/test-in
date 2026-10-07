@@ -111,14 +111,25 @@ public class ChangeOneFieldIdeTest extends AbstractViewPanelIdeTest {
     }
 
     // Rule-VIEW-PANEL-046
-    public void testAnEditWithNoTestSetToWriteToIsRefusedAndSaysSo() {
+    public void testAnEditOfACopyHandedOverWithoutItsTestSetIsWrittenToTheTestSetThatHoldsIt() {
+        final @NotNull TestCaseDto tc = aTestCase(ts, "Log in with a valid user", "a");
+        final @NotNull TestCaseDto handed = TestCaseDto.builder().id(tc.getId()).description(tc.getDescription()).build();
+        view.getPanel().show(List.of(handed), List.of());
+
+        changeTheDescriptionTo("Sign in with a valid user");
+
+        assertEquals("the edit did not reach the test set that holds the test case", "Sign in with a valid user", descriptionOf(tc));
+    }
+
+    // Rule-VIEW-PANEL-110
+    public void testAnEditOfATestCaseTestinDoesNotHoldIsRefusedAndSaysSo() {
         final @NotNull TestCaseDto found = TestCaseDto.builder().description("Log in with a valid user").build();
         view.getPanel().show(List.of(found), List.of());
 
-        final @NotNull List<String> said = Said.during(getProject(), () -> changeTheDescriptionTo("Sign in with a valid user"));
+        final @NotNull List<String> said = Said.during(getProject(), () -> FieldChange.pressF2(getProject(), view));
 
-        assertTrue("the refused edit said nothing: " + said, said.stream().anyMatch(words -> words.contains(Bundle.message("details.not.saved.title")) && words.contains(Bundle.message("details.not.saved.message"))));
-        assertTrue("the refused edit was written", Services.getInstance(getProject(), TestCases.class).findTestCase(found.getId()).isEmpty());
+        assertTrue("the refused edit said nothing: " + said, said.stream().anyMatch(words -> words.contains(Bundle.message("details.deleted.no.edit"))));
+        assertEquals("F2 opened the update menu for a test case Testin does not hold", List.of(), popups.all());
     }
 
     // Rule-VIEW-PANEL-047

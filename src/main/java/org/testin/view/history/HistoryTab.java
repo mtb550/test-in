@@ -100,8 +100,10 @@ public class HistoryTab {
 
         final @NotNull Map<Path, String> runItemsNow = BugHistory.runItemsNow(p, tc.getId());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull History history = Services.getInstance(p, TestCases.class).testCaseFile(tc)
-                    .map(file -> BugHistory.addTo(TestCaseHistory.read(p, file, tc), p, file, tc.getId(), runItemsNow))
+            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+            final @NotNull History history = testCases.testCaseFile(tc)
+                    .or(() -> TestCaseHistory.deletedFile(p, tc.getId()))
+                    .map(file -> BugHistory.addTo(TestCaseHistory.read(p, file, testCases.findTestCase(tc.getId())), p, file, tc.getId(), runItemsNow))
                     .orElseGet(() -> History.failed(Bundle.message("view.history.no.file")));
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -185,6 +187,7 @@ public class HistoryTab {
         if (entry.kind() == HistoryEntryKind.UNREADABLE) return List.of(muted(Bundle.message("view.history.unreadable")));
         if (entry.kind() == HistoryEntryKind.UNCOMPARED) return List.of(muted(Bundle.message("view.history.uncompared")));
         if (entry.kind() == HistoryEntryKind.CREATED) return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(Bundle.message("view.history.created"), RunItemStatus.PASSED.getRowColor()))));
+        if (entry.kind() == HistoryEntryKind.REMOVED) return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(RunItemStatus.REMOVED.getLabel(), RunItemStatus.REMOVED.getRowColor()))));
         if (entry.changes().isEmpty()) return List.of(muted(Bundle.message("git.change.reordered")));
 
         return entry.changes().stream().map(change -> field(change.fieldName(), change(change))).toList();

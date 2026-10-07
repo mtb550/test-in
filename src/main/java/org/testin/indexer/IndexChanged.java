@@ -33,4 +33,7 @@ public interface IndexChanged {
 
     default void readAgain() {
     }
+
+    default void indexed() {
+    }
 }

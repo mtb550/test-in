@@ -44,7 +44,7 @@ import javax.swing.Icon;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Getter
 @AllArgsConstructor
@@ -55,7 +55,7 @@ public enum CardHoverAction {
             List.of(OptionalPlugin.JAVA),
             Icons.TEST_CASE,
             (p, testCases) -> NavigateToTestMethodAction.execute(p, testCases.getFirst()),
-            _ -> Optional.empty()
+            (_, _) -> Optional.empty()
     ),
 
     RUN_TEST_METHOD(
@@ -64,7 +64,7 @@ public enum CardHoverAction {
             List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             ExecuteTestCases::run,
-            _ -> Optional.empty()
+            (shownIn, _) -> shownIn.flatMap(DirectoryDto::whySignedOff)
     ),
 
     STOP_TEST_METHOD(
@@ -73,7 +73,7 @@ public enum CardHoverAction {
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
             CardHoverAction::stopExecution,
-            _ -> Optional.empty()
+            (_, _) -> Optional.empty()
     ),
 
     NAVIGATE_TO_TEST_CASE(
@@ -82,7 +82,7 @@ public enum CardHoverAction {
             List.of(),
             Icons.TEST_CASE_LETTER,
             (p, testCases) -> NavigateToTestCaseAction.execute(p, testCases.getFirst()),
-            NavigateToTestCaseAction::whyNot
+            (_, tc) -> NavigateToTestCaseAction.whyNot(tc)
     );
 
     private final @NotNull String tooltip;
@@ -96,7 +96,7 @@ public enum CardHoverAction {
     private final @NotNull BiConsumer<Project, List<TestCaseDto>> onClick;
 
     @Getter(AccessLevel.NONE)
-    private final @NotNull Function<TestCaseDto, Optional<String>> whyNotOnCard;
+    private final @NotNull BiFunction<Optional<DirectoryDto>, TestCaseDto, Optional<String>> whyNotHere;
 
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-235
     public static @NotNull List<Offered> onCard(final @NotNull Project p, final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
@@ -105,7 +105,7 @@ public enum CardHoverAction {
                 : List.of(NAVIGATE_TO_TEST_METHOD, RUN_TEST_METHOD, NAVIGATE_TO_TEST_CASE);
 
         return buttons.stream()
-                .map(button -> button.offer(p, tc))
+                .map(button -> button.offer(p, Optional.of(openOn), tc))
                 .toList();
     }
 
@@ -129,11 +129,16 @@ public enum CardHoverAction {
                 : RUN_TEST_METHOD;
     }
 
-    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234
-    public @NotNull Offered offer(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-266
+    public @NotNull Offered offer(final @NotNull Project p, final @NotNull Optional<DirectoryDto> shownIn, final @NotNull TestCaseDto tc) {
         final @NotNull CardHoverAction now = gestureOn(p, tc);
 
-        return new Offered(now, now.whyNotOffered(p).or(() -> now.whyNotOnCard.apply(tc)));
+        return new Offered(now, now.whyNotOffered(p).or(() -> now.whyNotHere(shownIn, tc)));
+    }
+
+    // Rule-EDITOR-PANEL-266
+    public @NotNull Optional<String> whyNotHere(final @NotNull Optional<DirectoryDto> shownIn, final @NotNull TestCaseDto tc) {
+        return whyNotHere.apply(shownIn, tc);
     }
 
     // UC-EDITOR-PANEL-043

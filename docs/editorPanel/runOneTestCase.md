@@ -74,6 +74,9 @@ press `P` or `F`.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-266** — Run on a test case of a Committed test run is gray
+  and says why, on its card, in the context menu and in the view panel: a
+  Committed test run records no result.
 
 ## What the tester sees
 

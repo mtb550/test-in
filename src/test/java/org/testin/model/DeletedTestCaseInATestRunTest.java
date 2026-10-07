@@ -79,7 +79,7 @@ public class DeletedTestCaseInATestRunTest {
 
     // Rule-EDITOR-PANEL-126
     @Test
-    public void aJudgedRowOfADeletedTestCaseShowsItsRunItemStatusAndIsWrittenWithIt() {
+    public void aJudgedRunItemOfADeletedTestCaseShowsRemovedAndKeepsItsRunItemStatusInTheFile() {
         final TestRunItems item = TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(RunItemStatus.PASSED)
@@ -87,7 +87,7 @@ public class DeletedTestCaseInATestRunTest {
                 .build();
 
         assertTrue(item.isRemoved(), "the run item status path, the details editor and the walker refuse it");
-        assertEquals(item.shownStatus(), RunItemStatus.PASSED, "a recorded result is shown whatever happened to the test case (#306)");
+        assertEquals(item.shownStatus(), RunItemStatus.REMOVED, "a deleted test case reads Removed while its test run is not Committed");
 
         try {
             final String written = new String(RealMapper.build().writeValueAsBytes(TestRunDto.builder().results(List.of(item)).build()), StandardCharsets.UTF_8);

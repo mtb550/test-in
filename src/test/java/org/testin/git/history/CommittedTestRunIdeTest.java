@@ -21,17 +21,22 @@ import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.Said;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.git.ShareGestures;
 import org.testin.git.review.PendingCommitsDialog;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
+import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
+import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.ChangedSinceCommit;
 import org.testin.testrun.RunItemStatusService;
 import org.testin.testrun.TestRunStatusChange;
@@ -45,6 +50,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -137,7 +143,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
     private @NotNull TestRunItems theRunItemOf(final @NotNull Path testRun) {
         try {
-            ApplicationManager.getApplication().executeOnPooledThread(() -> CommittedTestRun.read(getProject(), testRun)).get();
+            ApplicationManager.getApplication().executeOnPooledThread(() -> TestRunFromGit.read(getProject(), testRun)).get();
         } catch (final InterruptedException | ExecutionException ex) {
             throw new AssertionError("the commit of " + testRun.getFileName() + " was never read", ex);
         }
@@ -232,7 +238,61 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
         final @NotNull TestRunItems committed = theRunItemOf(completed);
         assertFalse("a committed test run lost a run item", committed.isRemoved());
+        assertEquals("a Committed test run changed the run item status its commit recorded", RunItemStatus.PASSED, committed.shownStatus());
         assertEquals("Press Pay", committed.shownTestCase().getDescription());
+    }
+
+    private void theTestCaseIsDeleted() {
+        try {
+            Files.delete(testSet.resolve(FileKind.TEST_CASE.fileName(id)));
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not delete the test case: " + ex.getMessage(), ex);
+        }
+        readEverything();
+    }
+
+    private @NotNull List<HistoryEntry> theHistoryOfTheDeletedTestCase() {
+        Services.getInstance(getProject(), BoundTestProject.class).choose(String.valueOf(testProject.getFileName()));
+        try {
+            return ApplicationManager.getApplication().executeOnPooledThread(() -> TestCaseHistory.deletedFile(getProject(), id)
+                    .map(file -> TestCaseHistory.read(getProject(), file, Optional.empty()).entries())
+                    .orElseThrow(() -> new AssertionError("Git was not asked where the deleted test case was"))).get();
+        } catch (final InterruptedException | ExecutionException ex) {
+            throw new AssertionError("the history was never read", ex);
+        }
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
+    public void testADeletedTestCaseInATestRunNotCommittedReadsRemovedWithItsLastTextInGit() {
+        final @NotNull Path inProgress = aTestRun(COMPLETED, TestRunStatus.IN_PROGRESS);
+        committedAsItIs();
+        theTestCaseIsDeleted();
+
+        final @NotNull TestRunItems runItem = theRunItemOf(inProgress);
+        assertEquals("a deleted test case was not Removed", RunItemStatus.REMOVED, runItem.shownStatus());
+        assertEquals("the run item did not show the last text Git holds", DESCRIPTION, runItem.shownTestCase().getDescription());
+        assertTrue("a deleted test case took a run item status", Services.getInstance(getProject(), RunItemStatusService.class).heldTestRun(inProgress).flatMap(testRun -> testRun.resultOf(id)).filter(TestRunItems::isRemoved).isPresent());
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-113
+    public void testTheHistoryOfATestCaseDeletedAndNotCommittedEndsWithARemovedCardNotCommittedYet() {
+        committedAsItIs();
+        theTestCaseIsDeleted();
+
+        final @NotNull List<HistoryEntry> entries = theHistoryOfTheDeletedTestCase();
+        assertEquals(List.of(HistoryEntryKind.REMOVED, HistoryEntryKind.CREATED), entries.stream().map(HistoryEntry::kind).toList());
+        assertFalse("the deletion is not committed yet", entries.getFirst().isCommitted());
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-113
+    public void testTheHistoryOfATestCaseWhoseDeletionIsCommittedEndsWithTheCommitThatRemovedIt() {
+        committedAsItIs();
+        theTestCaseIsDeleted();
+        mustGit(testProject, "commit", "-q", "-am", "Remove the login test case");
+
+        final @NotNull List<HistoryEntry> entries = theHistoryOfTheDeletedTestCase();
+        assertEquals(List.of(HistoryEntryKind.REMOVED, HistoryEntryKind.CREATED), entries.stream().map(HistoryEntry::kind).toList());
+        assertEquals("Remove the login test case", entries.getFirst().message());
     }
 
     // Rule-TREE-PANEL-009, Rule-PRODUCT-011
@@ -362,6 +422,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
     public void testCompletingATestRunOffersTheCommit() {
         final @NotNull Path testRun = aTestRun(COMPLETED, TestRunStatus.IN_PROGRESS);
+        committedAsItIs();
         readEverything();
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
@@ -369,6 +430,42 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
         Await.until("completing the test run did not offer the commit", () -> said.stream().anyMatch(notification -> notification.getContent().contains(COMPLETED)
                 && notification.getActions().stream().anyMatch(action -> Bundle.message("action.Testin.ViewPendingCommits.text").equals(action.getTemplateText()))));
+    }
+
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
+    public void testCompletingATestRunNotUnderGitOffersNoCommit() {
+        final @NotNull Path testRun = aTestRun(COMPLETED, TestRunStatus.IN_PROGRESS);
+        readEverything();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
+
+        Services.getInstance(getProject(), TestRunStatusChange.class).apply(theTestRunAt(testRun), TestRunStatus.COMPLETED);
+
+        assertTrue("a test project not under Git was offered a commit", said.stream().noneMatch(notification -> notification.getActions().stream().anyMatch(action -> Bundle.message("action.Testin.ViewPendingCommits.text").equals(action.getTemplateText()))));
+    }
+
+    // Rule-EDITOR-PANEL-266
+    public void testRunIsRefusedOnACommittedTestRunAndOfferedOnACompletedOne() {
+        final @NotNull Path committed = aTestRun(COMPLETED, TestRunStatus.COMMITTED);
+        final @NotNull Path completed = aTestRun("Cycle 5", TestRunStatus.COMPLETED);
+        readEverything();
+        final @NotNull TestCaseDto tc = Services.getInstance(getProject(), TestCases.class).findTestCase(id).orElseThrow();
+
+        assertTrue("Run was offered on a Committed test run", CardHoverAction.RUN_TEST_METHOD.whyNotHere(Optional.of(theTestRunAt(committed)), tc).isPresent());
+        assertTrue("Run was refused on a Completed test run", CardHoverAction.RUN_TEST_METHOD.whyNotHere(Optional.of(theTestRunAt(completed)), tc).isEmpty());
+        assertTrue("Run was refused outside any test run", CardHoverAction.RUN_TEST_METHOD.whyNotHere(Optional.empty(), tc).isEmpty());
+    }
+
+    // UC-INTERNAL-002, Rule-EDITOR-PANEL-239
+    public void testACommittedTestRunShowsItsRecordAsSoonAsTheIndexIsReadWithoutOpeningIt() {
+        committedAsItIs();
+        final @NotNull String commit = mustGit(testProject, "rev-parse", "HEAD").trim();
+        final @NotNull Path committed = aCommittedTestRunFrom(commit);
+        theTestCaseReads("Press Pay now");
+
+        readEverything();
+
+        Await.until("the record was not read once the index was", () -> indexedTestRuns().getTestRunByPath(committed).resultOf(id)
+                .map(runItem -> runItem.shownTestCase().getDescription().equals(DESCRIPTION)).orElse(false));
     }
 
     // UC-SHARE-010, Rule-SHARE-129

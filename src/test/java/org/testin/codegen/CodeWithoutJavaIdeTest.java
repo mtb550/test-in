@@ -82,7 +82,7 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
     }
 
     private @NotNull JBLabel theClassButtonOnTheViewPanel(final @NotNull TestCaseDto tc) {
-        return (JBLabel) Drawn.components(ActionIcons.of(getProject(), tc)).stream()
+        return (JBLabel) Drawn.components(ActionIcons.of(getProject(), tc, Optional.empty())).stream()
                 .filter(JBLabel.class::isInstance)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the view panel left the class button out"));

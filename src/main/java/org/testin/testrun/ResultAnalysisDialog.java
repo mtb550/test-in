@@ -36,22 +36,24 @@ import java.util.function.Consumer;
 public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
     private final @NotNull Map<ResultAnalysis, TextArea> written = new EnumMap<>(ResultAnalysis.class);
     private final @NotNull Consumer<@NotNull Map<ResultAnalysis, String>> onSave;
+    private final boolean readOnly;
 
     // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-190
-    public ResultAnalysisDialog(final @NotNull Project p, final @NotNull TestRunSummary summary, final @NotNull Map<ResultAnalysis, String> current, final @NotNull Consumer<@NotNull Map<ResultAnalysis, String>> onSave) {
+    public ResultAnalysisDialog(final @NotNull Project p, final @NotNull TestRunSummary summary, final @NotNull Map<ResultAnalysis, String> current, final boolean readOnly, final @NotNull Consumer<@NotNull Map<ResultAnalysis, String>> onSave) {
         super(p);
         this.onSave = onSave;
+        this.readOnly = readOnly;
 
         title = Bundle.message("dialog.analysis.title");
 
         final @NotNull List<ComponentDialogBase<?>> parts = new ArrayList<>();
 
         for (final ResultAnalysis section : ResultAnalysis.values()) {
-            final @NotNull ComponentDialogBase<TextArea> area = ComponentDialogBase.textArea()
+            final @NotNull ComponentDialogBase.TextAreaBuilder builder = ComponentDialogBase.textArea()
                     .placeholder(Bundle.message("dialog.analysis.placeholder", section.getLabel().toLowerCase()))
                     .value(section.writtenIn(current))
-                    .rows(3)
-                    .build();
+                    .rows(3);
+            final @NotNull ComponentDialogBase<TextArea> area = (readOnly ? builder.readOnly() : builder).build();
 
             written.put(section, area.getComponent());
 
@@ -59,7 +61,8 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
             parts.add(area);
         }
 
-        parts.add(ComponentDialogBase.button(StatusBarShortcut.SAVE));
+        // Rule-EDITOR-PANEL-189
+        if (!readOnly) parts.add(ComponentDialogBase.button(StatusBarShortcut.SAVE));
 
         components = List.copyOf(parts);
 
@@ -73,6 +76,11 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
     // UC-EDITOR-PANEL-045
     @Override
     protected void submit() {
+        if (readOnly) {
+            closeOk();
+            return;
+        }
+
         final @NotNull Map<ResultAnalysis, String> analysis = new EnumMap<>(ResultAnalysis.class);
 
         written.forEach((section, area) -> analysis.put(section, area.getText().trim()));

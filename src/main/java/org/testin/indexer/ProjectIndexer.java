@@ -196,6 +196,12 @@ public final class ProjectIndexer {
         indexing.set(false);
         logSummary();
         restoreOpenEditorsOnce();
+        announceIndexed();
+    }
+
+    // UC-INTERNAL-002, Rule-EDITOR-PANEL-239
+    private void announceIndexed() {
+        if (!p.isDisposed()) p.getMessageBus().syncPublisher(IndexChanged.TOPIC).indexed();
     }
 
     // UC-INTERNAL-002

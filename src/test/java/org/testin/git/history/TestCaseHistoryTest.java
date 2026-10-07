@@ -27,6 +27,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -80,7 +81,7 @@ public class TestCaseHistoryTest {
         final @NotNull List<HistoryCommit> commits = List.of(commit(2, "Cycle 4 review"), commit(1, "UC-10"));
         final @NotNull TestCaseDto now = version("The dashboard opens within 2 seconds");
 
-        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, version("The dashboard opens"))), now);
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, version("The dashboard opens"))), Optional.of(now));
 
         assertEquals(entries.size(), 2, "nothing uncommitted, so no Not committed yet entry: " + entries);
         assertEquals(entries.getFirst().kind(), HistoryEntryKind.CHANGED);
@@ -99,7 +100,7 @@ public class TestCaseHistoryTest {
         now.setPriority(Priority.HIGH);
         now.setUpdatedBy("Muteb");
 
-        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(version("The dashboard opens"))), now);
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(version("The dashboard opens"))), Optional.of(now));
 
         assertFalse(entries.getFirst().isCommitted());
         assertEquals(entries.getFirst().hash(), "");
@@ -110,7 +111,7 @@ public class TestCaseHistoryTest {
     // Rule-VIEW-PANEL-098
     @Test
     public void aTestCaseNeverCommittedIsOneUncommittedEntryMarkedCreated() {
-        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, List.of(), Map.of(), version("The dashboard opens"));
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, List.of(), Map.of(), Optional.of(version("The dashboard opens")));
 
         assertEquals(entries.size(), 1);
         assertEquals(entries.getFirst().kind(), HistoryEntryKind.CREATED);
@@ -126,7 +127,7 @@ public class TestCaseHistoryTest {
         final @NotNull Map<String, String> versions = versions(commits, List.of(now, now));
         versions.put(commits.getFirst().objectName(), "{ not a test case");
 
-        final @NotNull HistoryEntry broken = TestCaseHistory.entries(MAPPER, commits, versions, now).getFirst();
+        final @NotNull HistoryEntry broken = TestCaseHistory.entries(MAPPER, commits, versions, Optional.of(now)).getFirst();
 
         assertEquals(broken.kind(), HistoryEntryKind.UNREADABLE);
         assertEquals(broken.who(), "Sara");
@@ -141,7 +142,7 @@ public class TestCaseHistoryTest {
         final @NotNull Map<String, String> versions = versions(commits, List.of(now, now, now));
         versions.put(commits.get(1).objectName(), "{ not a test case");
 
-        final @NotNull HistoryEntry after = TestCaseHistory.entries(MAPPER, commits, versions, now).getFirst();
+        final @NotNull HistoryEntry after = TestCaseHistory.entries(MAPPER, commits, versions, Optional.of(now)).getFirst();
 
         assertEquals(after.kind(), HistoryEntryKind.UNCOMPARED);
         assertEquals(after.message(), "Cycle 4 review");
@@ -153,7 +154,7 @@ public class TestCaseHistoryTest {
         final @NotNull List<HistoryCommit> commits = List.of(commit(2, "Reordered"), commit(1, "UC-10"));
         final @NotNull TestCaseDto now = version("The dashboard opens");
 
-        final @NotNull HistoryEntry reordered = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, now)), now).getFirst();
+        final @NotNull HistoryEntry reordered = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, now)), Optional.of(now)).getFirst();
 
         assertEquals(reordered.kind(), HistoryEntryKind.CHANGED);
         assertTrue(reordered.changes().isEmpty());
@@ -166,6 +167,6 @@ public class TestCaseHistoryTest {
         final @NotNull List<TestCaseDto> versions = new ArrayList<>();
         commits.forEach(commit -> versions.add(version(commit.message())));
 
-        assertEquals(TestCaseHistory.entries(MAPPER, commits, versions(commits, versions), versions.getFirst()).size(), 200);
+        assertEquals(TestCaseHistory.entries(MAPPER, commits, versions(commits, versions), Optional.of(versions.getFirst())).size(), 200);
     }
 }

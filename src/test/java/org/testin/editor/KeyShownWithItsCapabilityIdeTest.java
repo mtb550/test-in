@@ -39,7 +39,7 @@ public class KeyShownWithItsCapabilityIdeTest extends AbstractCodegenIdeTest {
             final @NotNull String key = KeymapUtil.getFirstKeyboardShortcutText(action);
             assertFalse(button.getTooltip() + " has no key in the menu, so this proves nothing", key.isEmpty());
 
-            final @NotNull Offered onCard = button.offer(getProject(), tc);
+            final @NotNull Offered onCard = button.offer(getProject(), Optional.empty(), tc);
             assertTrue("the card offers " + button.getTooltip() + " without the key the menu shows: " + onCard.hintText(), onCard.hintText().endsWith(key));
         }
     }

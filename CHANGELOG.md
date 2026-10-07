@@ -42,6 +42,12 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **A committed test run stays read-only everywhere:** Run on its test cases is gray and says why, and Result Analysis
+  opens read-only. Completing a test run offers the commit only when its test project is under Git.
+- **A test case opened from a search result can be edited:** F2 writes it to the test set that holds it.
+- **A deleted test case keeps its text and its history:** its run item shows the last version Git holds instead of a
+  placeholder, reads **Removed** while the test run is not committed, and cannot be changed. Its History tab shows every
+  card it had, the newest one **Removed**.
 - **The test run status in the status bar is its icon:** the status is in its tooltip, and beside the icon is the
   tester an Assigned test run is assigned to, or the commit a Committed one was recorded in.
 - **History names a changed field by its icon:** the letter the update menu shows, with the field's name on hover, so

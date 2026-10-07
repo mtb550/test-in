@@ -62,6 +62,13 @@ public class TestRunItems {
     @Setter(AccessLevel.NONE)
     @Builder.Default
     private @NotNull Optional<TestCaseDto> recorded = Optional.empty();
+
+    // Rule-EDITOR-PANEL-126
+    @JsonIgnore
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @Builder.Default
+    private @NotNull Optional<TestCaseDto> lastInGit = Optional.empty();
     @NotNull
     @Builder.Default
     private UUID id = new UUID(0L, 0L);
@@ -108,10 +115,16 @@ public class TestRunItems {
         return next == RunItemStatus.PASSED;
     }
 
+    // UC-EDITOR-PANEL-030
+    public static @NotNull TestRunItems pendingFor(final @NotNull TestCaseDto tc) {
+        return TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc), Optional.empty(), Optional.empty());
+    }
+
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
-    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now, final @NotNull Optional<TestCaseDto> inCommit) {
+    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now, final @NotNull Optional<TestCaseDto> inCommit, final @NotNull Optional<TestCaseDto> lastVersion) {
         live = now;
         recorded = inCommit;
+        lastInGit = lastVersion;
         removed = now.isEmpty() && inCommit.isEmpty();
         inCommit.ifPresent(committed -> now.ifPresent(tc -> committed.setParent(tc.getParent())));
         return this;
@@ -124,7 +137,7 @@ public class TestRunItems {
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
     public @NotNull RunItemStatus shownStatus() {
-        return isRemoved() && !status.isRunItemStatus() ? RunItemStatus.REMOVED : status;
+        return isRemoved() ? RunItemStatus.REMOVED : status;
     }
 
     // Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-105
@@ -197,7 +210,7 @@ public class TestRunItems {
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
     public @NotNull TestCaseDto shownTestCase() {
-        return recorded.orElseGet(this::liveTestCase);
+        return recorded.or(() -> live).or(() -> lastInGit).orElseGet(() -> TestCaseDto.deleted(id));
     }
 
     // Rule-EDITOR-PANEL-263

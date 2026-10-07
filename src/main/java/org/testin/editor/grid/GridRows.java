@@ -48,7 +48,7 @@ public final class GridRows {
     }
 
     private static @NotNull TestRunItems runItemOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, TestRunItems> runItems) {
-        return Optional.ofNullable(runItems.get(tc.getId())).orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc), Optional.empty()));
+        return Optional.ofNullable(runItems.get(tc.getId())).orElseGet(() -> TestRunItems.pendingFor(tc));
     }
 
     private static <A> @NotNull List<String[]> rows(final @NotNull List<TestCaseDto> testCases, final @NotNull List<A> columns, final @NotNull A order, final @NotNull ToIntFunction<TestCaseDto> position, final @NotNull Function<TestCaseDto, Function<A, String>> valuesOf) {

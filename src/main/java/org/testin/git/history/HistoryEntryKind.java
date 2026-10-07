@@ -20,5 +20,6 @@ public enum HistoryEntryKind {
     CHANGED,
     CREATED,
     UNREADABLE,
-    UNCOMPARED
+    UNCOMPARED,
+    REMOVED
 }

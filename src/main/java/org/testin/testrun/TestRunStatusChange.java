@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
+import org.testin.git.GitRepositoryService;
 import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.indexer.TestRuns;
 import org.testin.indexer.WatchedPath;
@@ -74,7 +75,9 @@ public final class TestRunStatusChange {
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
     private void offerTheCommit(final @NotNull TestRunDirectoryDto testRun) {
-        WatchedPath.testProjectOf(testRun.getPath(), Services.getInstance(p, TestinRoot.class).absolutePath()).ifPresent(testProject ->
+        WatchedPath.testProjectOf(testRun.getPath(), Services.getInstance(p, TestinRoot.class).absolutePath())
+                .filter(testProject -> !new GitRepositoryService(p).isNotRepository(testProject))
+                .ifPresent(testProject ->
                 notifier.infoWithActions(p, TestRunStatus.COMPLETED.getLabel(), Bundle.message("test.run.completed.commit", testRun.getName()),
                         notifier.action(Bundle.message("action.Testin.ViewPendingCommits.text"), () -> new ViewPendingCommitsWork(p).openFor(testProject))));
     }

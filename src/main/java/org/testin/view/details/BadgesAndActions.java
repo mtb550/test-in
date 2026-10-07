@@ -20,14 +20,24 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.Nodes;
 import org.testin.model.TestCaseDto;
+import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 
 import java.awt.GridBagConstraints;
 
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public final class BadgesAndActions extends AbstractDetails {
     private static final int GAP = 8;
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;
+
+    private final @NotNull List<String> currentPath;
 
     // UC-VIEW-PANEL-004, UC-VIEW-PANEL-012, Rule-VIEW-PANEL-085
     @Override
@@ -35,7 +45,7 @@ public final class BadgesAndActions extends AbstractDetails {
         final @NotNull JBPanel<?> line = row(GAP);
 
         line.add(TestCaseBadges.of(p, dto));
-        line.add(ActionIcons.of(p, dto));
+        line.add(ActionIcons.of(p, dto, Services.getInstance(p, Nodes.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))));
 
         return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
     }

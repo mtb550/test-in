@@ -63,7 +63,7 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
 
     private void edit(final @NotNull TestRunDirectoryDto testRun) {
         final @NotNull TestRunDto held = testRuns.getTestRunByPath(testRun.getPath());
-        final @NotNull List<TestCaseDto> deleted = held.getResults().stream().filter(TestRunItems::isRemoved).map(TestRunItems::liveTestCase).toList();
+        final @NotNull List<TestCaseDto> deleted = held.getResults().stream().filter(TestRunItems::isRemoved).map(TestRunItems::shownTestCase).toList();
 
         boundTestProject.get().ifPresentOrElse(
                 tp -> new TestRunForm(p).open(tp.getTestCasesDirectory(), testRun.getName(), held.coveredIds(), deleted, testRun.getMarker().getConfiguration(), saves(testRun)),

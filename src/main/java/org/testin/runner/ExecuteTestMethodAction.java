@@ -22,10 +22,12 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
+import org.testin.editor.TestinEditor;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.model.TestCaseDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ExecuteTestMethodAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
@@ -47,7 +49,10 @@ public class ExecuteTestMethodAction extends AbstractAnyProjectAction {
 
         if (!offered.enableOrExplain(p, e.getPresentation())) return;
 
-        e.getPresentation().setEnabled(!selected.isEmpty());
+        // Rule-EDITOR-PANEL-266
+        final @NotNull Optional<String> refused = selected.isEmpty() ? Optional.empty() : offered.whyNotHere(TestinData.editor(e).map(TestinEditor::getParent), selected.getFirst());
+        refused.ifPresent(e.getPresentation()::setDescription);
+        e.getPresentation().setEnabled(!selected.isEmpty() && refused.isEmpty());
     }
 
     @Override

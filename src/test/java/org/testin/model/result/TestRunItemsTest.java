@@ -34,7 +34,7 @@ public class TestRunItemsTest {
     @Test
     public void shownTestCaseIsTheWiredTestCase() {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
-        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build().showing(Optional.of(tc), Optional.empty());
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build().showing(Optional.of(tc), Optional.empty(), Optional.empty());
 
         assertSame(item.shownTestCase(), tc);
         assertFalse(item.isRemoved(), "a row showing a live test case is not removed");
@@ -44,8 +44,8 @@ public class TestRunItemsTest {
     public void showingNoTestCaseMarksTheRowRemovedAndNamesIt() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build()
-                .showing(Optional.of(TestCaseDto.builder().id(id).build()), Optional.empty())
-                .showing(Optional.empty(), Optional.empty());
+                .showing(Optional.of(TestCaseDto.builder().id(id).build()), Optional.empty(), Optional.empty())
+                .showing(Optional.empty(), Optional.empty(), Optional.empty());
 
         assertTrue(item.isRemoved(), "the live test case and the removed mark are set by one call, so they cannot disagree");
         assertEquals(item.shownTestCase().getDescription(), TestCaseDto.deleted(id).getDescription());

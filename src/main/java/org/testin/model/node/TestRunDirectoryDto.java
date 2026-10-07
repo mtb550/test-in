@@ -87,6 +87,7 @@ public class TestRunDirectoryDto extends DirectoryDto {
     }
 
     // Rule-TREE-PANEL-009, Rule-PRODUCT-011
+    @Override
     public @NotNull Optional<String> whySignedOff() {
         return takesRunItemStatuses() ? Optional.empty() : Optional.of(Bundle.message("run.item.status.test.run.signed.off", marker.getStatus().getLabel()));
     }

@@ -78,10 +78,11 @@ The status says how far the test run has got.
 - **Rule-TREE-PANEL-135** — Committed is the last test run status, and only
   Testin sets it. A Committed test run is read-only: no status, run item status
   or edit changes it.
-- **Rule-TREE-PANEL-136** — When a test run becomes Completed, a notification
-  says to commit it to keep it as the record, and its View Pending Commits
-  button opens the review for that test project. It stays in the Notifications
-  list.
+- **Rule-TREE-PANEL-136** — When a test run of a test project under Git becomes
+  Completed, a notification says to commit it to keep it as the record, and its
+  View Pending Commits button opens the review for that test project. It stays
+  in the Notifications list. A test project not under Git gets no such
+  notification.
 
 ## The Set Test Run Status popup
 

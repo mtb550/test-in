@@ -57,16 +57,16 @@ public class TestRunSummaryTest {
 
     // Rule-EDITOR-PANEL-126
     @Test
-    public void aDeletedTestCaseCountsUnderItsRunItemStatusOnceJudgedAndUnderRemovedOtherwise() {
+    public void aDeletedTestCaseCountsUnderRemovedWhateverItWasGiven() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 item(RunItemStatus.PASSED),
                 item(RunItemStatus.FAILED),
                 TestRunItems.builder().id(UUID.randomUUID()).status(RunItemStatus.PASSED).removed(true).build(),
                 TestRunItems.builder().id(UUID.randomUUID()).status(RunItemStatus.PENDING).removed(true).build()));
 
-        assertEquals(summary.passed(), 2, "the deleted test case's Passed is still a result");
-        assertEquals(summary.removed(), 1, "only the row never judged is Removed");
-        assertEquals(summary.passRate(), 67, "two passed of the three judged");
+        assertEquals(summary.passed(), 1, "a deleted test case's Passed counted");
+        assertEquals(summary.removed(), 2, "a deleted test case is Removed, judged or not");
+        assertEquals(summary.passRate(), 50, "one passed of the two still standing");
         assertEquals(summary.total(), 4, "the total still counts every row");
     }
 

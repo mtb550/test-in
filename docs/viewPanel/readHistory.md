@@ -99,6 +99,9 @@ There is no key for this. The tab is called **History**.
   whether the view panel was opened from a test set or from a test run. A
   Committed test run's run item shows its commit's text on the Details tab, and
   that text never makes a Not committed yet card.
+- **Rule-VIEW-PANEL-113** — The history of a deleted test case is read from Git
+  like any other's. Its newest card is Removed: marked Not committed yet until
+  the deletion is committed, then with the commit that deleted it.
 
 ## The screen
 
