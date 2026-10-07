@@ -22,8 +22,11 @@ import org.testin.clipboard.CopyChoice;
 import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -34,17 +37,22 @@ public class UpdateMenuLettersTest {
 
     // Rule-EDITOR-PANEL-194
     @Test
-    public void statusAndReferenceSitLastWithNoLetterAndNoIcon() {
+    public void statusSitsLastWithNoLetterAndNoIcon() {
         final @NotNull List<UpdateTestCaseFields> menu = List.of(UpdateTestCaseFields.values());
 
-        assertEquals(menu.subList(menu.size() - 2, menu.size()), List.of(UpdateTestCaseFields.STATUS, UpdateTestCaseFields.REFERENCE), "the two without a letter sit last");
-        for (final UpdateTestCaseFields field : List.of(UpdateTestCaseFields.STATUS, UpdateTestCaseFields.REFERENCE)) {
-            assertTrue(Shortcuts.isNoKey(field.getShortcut().getKey()), field + " has a letter");
-            assertSame(field.getIcon(), EmptyIcon.ICON_16, field + " has an icon");
+        assertEquals(menu.getLast(), UpdateTestCaseFields.STATUS, "the one without a letter sits last");
+        assertTrue(Shortcuts.isNoKey(UpdateTestCaseFields.STATUS.getShortcut().getKey()), "Status has a letter");
+        assertSame(UpdateTestCaseFields.STATUS.getIcon(), EmptyIcon.ICON_16, "Status has an icon");
+        for (final UpdateTestCaseFields field : menu.subList(0, menu.size() - 1)) {
+            assertFalse(Shortcuts.isNoKey(field.getShortcut().getKey()), field + " sits above the one without a letter, so it needs one");
         }
-        for (final UpdateTestCaseFields field : menu.subList(0, menu.size() - 2)) {
-            assertFalse(Shortcuts.isNoKey(field.getShortcut().getKey()), field + " sits above the two without a letter, so it needs one");
-        }
+    }
+
+    // Rule-EDITOR-PANEL-194
+    @Test
+    public void referenceIsOpenedByRAndDrawsR() {
+        assertEquals(UpdateTestCaseFields.REFERENCE.getShortcut().getKey(), KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "Reference is not opened by R");
+        assertEquals(UpdateTestCaseFields.iconOf(TestCaseEditorAttributes.REFERENCE.getName()), Optional.of(CopyChoice.REFERENCE.getIcon()), "Reference does not draw the R the copy menu draws");
     }
 
     // Rule-EDITOR-PANEL-209

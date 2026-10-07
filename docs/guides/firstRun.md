@@ -132,7 +132,7 @@ Write two more, so the test run in step 8 has something to move through.
 > `.tc` file if you want to check — it is yours, in plain text.
 
 Press `F2` on a card to change one field, or any of `D` `E` `M` `T` `B` `S` `P`
-`G` `O` to open that field straight away.
+`G` `O` `R` to open that field straight away.
 
 ## 6. Testin has already written the Java
 

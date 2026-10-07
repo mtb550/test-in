@@ -32,7 +32,7 @@ import org.testin.editor.EditorColors;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
 import org.testin.services.Services;
-import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
@@ -170,7 +170,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
                 return newLbl;
             });
 
-            final @NotNull Optional<Icon> icon = CreateTestCaseFields.iconOf(attrName);
+            final @NotNull Optional<Icon> icon = UpdateTestCaseFields.iconOf(attrName);
             lbl.setIcon(icon.orElse(EmptyIcon.ICON_0));
             lbl.setText(icon.isPresent() ? value : attrName + ": " + value);
             lbl.setVisible(true);
@@ -212,7 +212,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
                 return shownBadges.get(i).tooltip();
         }
         return attributeLabels.entrySet().stream()
-                .filter(line -> line.getValue().isVisible() && CreateTestCaseFields.iconOf(line.getKey()).isPresent())
+                .filter(line -> line.getValue().isVisible() && UpdateTestCaseFields.iconOf(line.getKey()).isPresent())
                 .filter(line -> iconOf(line.getValue()).contains(at))
                 .map(Map.Entry::getKey)
                 .findFirst()

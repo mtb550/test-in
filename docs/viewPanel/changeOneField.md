@@ -61,8 +61,8 @@ One field, one small dialog. The rest of the test case is left alone.
 │  [P] Priority            P             │
 │  [G] Group               G             │
 │  [O] Order               O             │
+│  [R] Reference           R             │
 │      Status                            │
-│      Reference                         │
 └────────────────────────────────────────┘
 ```
 
@@ -70,8 +70,8 @@ One field, one small dialog. The rest of the test case is left alone.
    The icon is that letter in a rounded frame, the same icon the field has
    wherever it is offered.
 2. **The first row** — selected when the menu opens.
-3. **Status** and **Reference** — the two rows with no letter and no icon,
-   reached with the arrow keys.
+3. **Status** — the one row with no letter and no icon, reached with the arrow
+   keys. **Reference** has the letter `R`.
 
 Choosing a row opens that field's own small dialog. Those dialogs belong to the
 editor panel. They are drawn on

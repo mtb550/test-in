@@ -123,15 +123,15 @@ the same rows, a filter, a search, and a key for every gesture.
 
 **Writing test cases**
 
-| Key                                 | What it does                                    | The page that owns it                     |
-|-------------------------------------|-------------------------------------------------|-------------------------------------------|
-| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac | Creates a test case                             | [UC-EDITOR-PANEL-005](createTestCase.md)  |
-| `F2`                                | Opens the menu of fields to change              | [UC-EDITOR-PANEL-006](changeOneField.md)  |
-| `D` `E` `M` `T` `B` `S` `P` `G` `O` | Opens that one field straight away              | [UC-EDITOR-PANEL-006](changeOneField.md)  |
-| `Delete`                            | Removes the selected test cases                 | [UC-EDITOR-PANEL-011](removeTestCases.md) |
-| `Ctrl+Z`                            | Takes back the last change                      | [UC-EDITOR-PANEL-012](undoChange.md)      |
-| `Ctrl+Y`                            | Puts it back                                    | [UC-EDITOR-PANEL-013](redoChange.md)      |
-| `Ctrl+Enter`                        | A line break inside a grid cell or a long field | [UC-EDITOR-PANEL-008](editGridCell.md)    |
+| Key                                     | What it does                                    | The page that owns it                     |
+|-----------------------------------------|-------------------------------------------------|-------------------------------------------|
+| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac     | Creates a test case                             | [UC-EDITOR-PANEL-005](createTestCase.md)  |
+| `F2`                                    | Opens the menu of fields to change              | [UC-EDITOR-PANEL-006](changeOneField.md)  |
+| `D` `E` `M` `T` `B` `S` `P` `G` `O` `R` | Opens that one field straight away              | [UC-EDITOR-PANEL-006](changeOneField.md)  |
+| `Delete`                                | Removes the selected test cases                 | [UC-EDITOR-PANEL-011](removeTestCases.md) |
+| `Ctrl+Z`                                | Takes back the last change                      | [UC-EDITOR-PANEL-012](undoChange.md)      |
+| `Ctrl+Y`                                | Puts it back                                    | [UC-EDITOR-PANEL-013](redoChange.md)      |
+| `Ctrl+Enter`                            | A line break inside a grid cell or a long field | [UC-EDITOR-PANEL-008](editGridCell.md)    |
 
 **The clipboard**
 

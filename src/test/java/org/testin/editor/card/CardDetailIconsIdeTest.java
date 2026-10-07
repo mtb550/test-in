@@ -25,6 +25,7 @@ import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Display;
 import org.testin.view.Drawn;
@@ -41,6 +42,7 @@ import java.util.UUID;
 
 public class CardDetailIconsIdeTest extends BasePlatformTestCase {
     private static final @NotNull String EXPECTED = "The dashboard opens.";
+    private static final @NotNull String REFERENCE = "JIRA-412";
     private static final @NotNull Dimension CELL = new Dimension(900, 120);
 
     private static @NotNull JBLabel theLineSaying(final @NotNull BaseCard card, final @NotNull String words) {
@@ -64,6 +66,18 @@ public class CardDetailIconsIdeTest extends BasePlatformTestCase {
         assertEquals("the line still names its field", EXPECTED, line.getText());
         assertTrue("a screen reader no longer hears the field's name: " + card.getAccessibleContext().getAccessibleDescription(),
                 Objects.requireNonNullElse(card.getAccessibleContext().getAccessibleDescription(), "").contains(TestCaseEditorAttributes.EXPECTED_RESULT.getName() + ": " + EXPECTED));
+    }
+
+    // Rule-EDITOR-PANEL-269
+    public void testAReferenceLineLeadsWithItsR() {
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").reference(REFERENCE).build();
+        final @NotNull TestCaseCard card = new TestCaseCard(getProject());
+        card.updateData(0, tc, Set.of(TestCaseEditorAttributes.REFERENCE), BaseCard.titleText(1, true, tc.getDescription()));
+        card.layOutAs(CELL);
+
+        final @NotNull JBLabel line = theLineSaying(card, REFERENCE);
+        assertSame("the reference line does not lead with its R", UpdateTestCaseFields.REFERENCE.getIcon(), line.getIcon());
+        assertEquals("the reference line shows the value alone, with no caption", REFERENCE, line.getText());
     }
 
     // Rule-EDITOR-PANEL-269

@@ -135,9 +135,10 @@ There is no key for this. The tab is called **History**.
 4. **A field row** — the field, what it was, and what it became. The field is
    its icon, the letter the update menu shows (**D** Description, **E** Expected
    Result, **S** Steps, **P** Priority, **G** Group, **M** Module, **T** Test
-   Data, **B** Pre Conditions), with its name on hover; Status, Reference and the
-   run item's fields have no icon and are named in words (Rule-VIEW-PANEL-111). A
-   commit that changed none of the fields reads *reordered or restamped*.
+   Data, **B** Pre Conditions, **R** Reference), with its name on hover; Status
+   and the run item's fields have no icon and are named in words
+   (Rule-VIEW-PANEL-111). A commit that changed none of the fields reads
+   *reordered or restamped*.
 5. **A bug card** — a card of its own, marked by a bar in the bug's severity
    color, or in red when its run item did not fail and only has a filed issue. It opens with what happened,
    **Recorded**, then **Bug in** and the test

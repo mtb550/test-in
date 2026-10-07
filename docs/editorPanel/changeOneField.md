@@ -44,9 +44,9 @@ One field, one small dialog. The rest of the test case is left alone.
   however many test cases it changed.
 - **Rule-EDITOR-PANEL-039** — Undo puts the test case back exactly, including
   who last changed it and when.
-- **Rule-EDITOR-PANEL-194** — Status and Reference are on the update menu with
-  no letter and no icon. They sit last, and the tester reaches them with the
-  arrow keys.
+- **Rule-EDITOR-PANEL-194** — Reference is on the update menu with the letter
+  `R` and its icon, after Order. Status is on it with no letter and no icon. It
+  sits last, and the tester reaches it with the arrow keys.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -88,8 +88,8 @@ One field, one small dialog. The rest of the test case is left alone.
 │  [P] Priority            P             │
 │  [G] Group               G             │
 │  [O] Order               O             │
+│  [R] Reference           R             │
 │      Status                            │
-│      Reference                         │
 └────────────────────────────────────────┘
 ```
 
@@ -97,9 +97,9 @@ One field, one small dialog. The rest of the test case is left alone.
    The icon is that letter in a rounded frame, the same icon the field has
    wherever it is offered.
 2. **The first row** — selected when the menu opens.
-3. **Status** and **Reference** — the two rows with no letter and no icon,
-   reached with the arrow keys. Reference is one line of text. Status is four
-   radio buttons, as **Priority** is, and `Enter` saves the dialog from either.
+3. **Reference** — `R`, one line of text. **Status** is the one row with no
+   letter and no icon, reached with the arrow keys. It is four radio buttons, as
+   **Priority** is, and `Enter` saves the dialog from either.
 
 Pressing the letter on the card skips this menu and opens the field straight
 away.

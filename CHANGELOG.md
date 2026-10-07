@@ -43,6 +43,9 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **Reference has its letter:** the update menu opens Reference with **R**, as the copy menu already copies it, and a
+  card line or a History row for Reference leads with its **R** icon, as every other field does. Status, the one field
+  with no letter, now sits last on the update menu.
 - **A run item's duration is a badge on its card,** the same clock badge the view panel draws, beside the run item
   status, instead of a Duration line. Hovering it says Duration, on the card and in the view panel.
 - **A card's detail lines lead with the field's icon, not its name:** E for Expected Result, S for Steps, T for Test

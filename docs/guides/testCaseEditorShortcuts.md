@@ -21,15 +21,15 @@
 
 ## Writing test cases
 
-| Key                                 | What it does                                    | Read more                                              |
-|-------------------------------------|-------------------------------------------------|--------------------------------------------------------|
-| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac | Creates a test case                             | [Create a test case](../editorPanel/createTestCase.md) |
-| `F2`                                | Opens the menu of fields to change              | [Change one field](../editorPanel/changeOneField.md)   |
-| `D` `E` `M` `T` `B` `S` `P` `G` `O` | Opens that one field straight away              | [Change one field](../editorPanel/changeOneField.md)   |
-| `Delete`                            | Removes the selected test cases                 | [Remove test cases](../editorPanel/removeTestCases.md) |
-| `Ctrl+Z`                            | Takes back the last change                      | [Undo a change](../editorPanel/undoChange.md)          |
-| `Ctrl+Y`                            | Puts it back                                    | [Redo a change](../editorPanel/redoChange.md)          |
-| `Ctrl+Enter`                        | A line break inside a grid cell or a long field | [Edit a grid cell](../editorPanel/editGridCell.md)     |
+| Key                                     | What it does                                    | Read more                                              |
+|-----------------------------------------|-------------------------------------------------|--------------------------------------------------------|
+| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac     | Creates a test case                             | [Create a test case](../editorPanel/createTestCase.md) |
+| `F2`                                    | Opens the menu of fields to change              | [Change one field](../editorPanel/changeOneField.md)   |
+| `D` `E` `M` `T` `B` `S` `P` `G` `O` `R` | Opens that one field straight away              | [Change one field](../editorPanel/changeOneField.md)   |
+| `Delete`                                | Removes the selected test cases                 | [Remove test cases](../editorPanel/removeTestCases.md) |
+| `Ctrl+Z`                                | Takes back the last change                      | [Undo a change](../editorPanel/undoChange.md)          |
+| `Ctrl+Y`                                | Puts it back                                    | [Redo a change](../editorPanel/redoChange.md)          |
+| `Ctrl+Enter`                            | A line break inside a grid cell or a long field | [Edit a grid cell](../editorPanel/editGridCell.md)     |
 
 The letters open one field each:
 
@@ -44,6 +44,7 @@ The letters open one field each:
 | `P`    | Priority        |
 | `G`    | Group           |
 | `O`    | Order           |
+| `R`    | Reference       |
 
 ## The clipboard
 

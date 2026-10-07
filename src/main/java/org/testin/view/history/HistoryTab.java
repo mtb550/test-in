@@ -40,7 +40,7 @@ import org.testin.model.TestCaseDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
-import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
@@ -254,7 +254,7 @@ public class HistoryTab {
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-111
     private static @NotNull JBLabel caption(final @NotNull String name) {
-        final @NotNull JBLabel caption = CreateTestCaseFields.iconOf(name).map(JBLabel::new).orElseGet(() -> named(name));
+        final @NotNull JBLabel caption = UpdateTestCaseFields.iconOf(name).map(JBLabel::new).orElseGet(() -> named(name));
         Tooltip.set(caption, name);
         caption.getAccessibleContext().setAccessibleName(name);
         return caption;

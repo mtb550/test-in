@@ -269,6 +269,10 @@ public enum Shortcuts {
 
     UpdateTestCaseOrder(
             KeyStroke.getKeyStroke(KeyEvent.VK_O, 0)
+    ),
+
+    UpdateTestCaseReference(
+            KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)
     );
 
     public static final @NotNull KeyStroke NO_KEY = EMPTY.key;

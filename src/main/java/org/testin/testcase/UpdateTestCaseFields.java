@@ -23,6 +23,7 @@ import com.intellij.util.ui.EmptyIcon;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CopyChoice;
 import org.testin.codegen.GenType;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
@@ -48,6 +49,8 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static org.testin.testcase.TestCaseDialogKey.ADD_GROUP;
@@ -160,6 +163,18 @@ public enum UpdateTestCaseFields implements MenuItem {
     ),
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
+    REFERENCE(
+            TestCaseEditorAttributes.REFERENCE.getName(),
+            Shortcuts.UpdateTestCaseReference,
+            CopyChoice.REFERENCE.getIcon(),
+            GenType.NO_CODE_CHANGE,
+            Done.UPDATED,
+            (p, items, updatedItems) -> new ReferenceBulkSectionDialog(p, items, updatedItems).open(),
+            TestCaseBaseDialog::getReferenceSection,
+            ImmutableList.of(CORRECTIONS)
+    ),
+
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
     STATUS(
             TestCaseEditorAttributes.STATUS.getName(),
             Shortcuts.EMPTY,
@@ -169,18 +184,6 @@ public enum UpdateTestCaseFields implements MenuItem {
             (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStatusSection,
             ImmutableList.of()
-    ),
-
-    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
-    REFERENCE(
-            TestCaseEditorAttributes.REFERENCE.getName(),
-            Shortcuts.EMPTY,
-            EmptyIcon.ICON_16,
-            GenType.NO_CODE_CHANGE,
-            Done.UPDATED,
-            (p, items, updatedItems) -> new ReferenceBulkSectionDialog(p, items, updatedItems).open(),
-            TestCaseBaseDialog::getReferenceSection,
-            ImmutableList.of(CORRECTIONS)
     );
 
     private final @NotNull String name;
@@ -192,6 +195,11 @@ public enum UpdateTestCaseFields implements MenuItem {
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
     private final @NotNull ImmutableList<TestCaseDialogKey> ownKeys;
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-111, Rule-EDITOR-PANEL-269
+    public static @NotNull Optional<Icon> iconOf(final @NotNull String field) {
+        return Arrays.stream(values()).filter(each -> each.name.equals(field)).findFirst().map(UpdateTestCaseFields::getIcon).filter(Icons.LetterIcon.class::isInstance);
+    }
 
     // Rule-EDITOR-PANEL-199
     public StatusBarItem @NotNull [] getStatusBarItems() {
