@@ -41,8 +41,8 @@ import org.testin.help.Guides;
 import org.testin.indexer.IndexChanged;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.status.ProjectStatus;
 import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.setting.SettingsConfigurable;
@@ -63,7 +63,8 @@ import java.util.Set;
 public final class TreePanel implements Disposable {
     private static final int INLINE_CHOICES = 6;
 
-    private static final @NotNull @NlsSafe String AUTHOR = "Muteb Almughyiri";
+    private static final @NotNull
+    @NlsSafe String AUTHOR = "Muteb Almughyiri";
     private final @NotNull Project p;
     private final @NotNull TestinRoot testinRoot;
     private final @NotNull ProjectIndexer indexer;

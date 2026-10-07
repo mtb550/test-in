@@ -40,71 +40,14 @@ import java.awt.LayoutManager;
 import java.util.Arrays;
 
 public class StatusBarBase {
-    // Rule-INTERNAL-104
-    private static final class OneLine extends JBPanel<OneLine> {
-        private OneLine() {
-            super(new KeysThatFit());
-        }
-
-        @Override
-        public @NotNull Dimension getPreferredSize() {
-            return new Dimension(0, super.getPreferredSize().height);
-        }
-    }
-
-    // Rule-INTERNAL-078, Rule-INTERNAL-104
-    private static final class KeysThatFit implements LayoutManager {
-        @Override
-        public void addLayoutComponent(final @NotNull String name, final @NotNull Component key) {
-        }
-
-        @Override
-        public void removeLayoutComponent(final @NotNull Component key) {
-        }
-
-        @Override
-        public @NotNull Dimension preferredLayoutSize(final @NotNull Container strip) {
-            final @NotNull Insets insets = strip.getInsets();
-            final int wide = Arrays.stream(strip.getComponents()).mapToInt(key -> key.getPreferredSize().width).sum();
-            final int tall = Arrays.stream(strip.getComponents()).mapToInt(key -> key.getPreferredSize().height).max().orElse(0);
-            return new Dimension(insets.left + wide + insets.right, insets.top + tall + insets.bottom);
-        }
-
-        @Override
-        public @NotNull Dimension minimumLayoutSize(final @NotNull Container strip) {
-            return preferredLayoutSize(strip);
-        }
-
-        @Override
-        public void layoutContainer(final @NotNull Container strip) {
-            final @NotNull Insets insets = strip.getInsets();
-            final int room = strip.getWidth() - insets.right;
-            final int tall = strip.getHeight() - insets.top - insets.bottom;
-
-            int x = insets.left;
-            boolean fits = true;
-            for (final Component key : strip.getComponents()) {
-                final @NotNull Dimension wanted = key.getPreferredSize();
-                fits = fits && x + wanted.width <= room;
-                key.setBounds(fits ? x : strip.getWidth(), insets.top + (tall - wanted.height) / 2, wanted.width, wanted.height);
-                x += wanted.width;
-            }
-        }
-    }
-
     private static final @NotNull String INNER_SEPARATOR = " ";
     private static final @NotNull String OUTER_SEPARATOR = "       ";
-
     private final @NotNull JBPanel<?> statusBar;
-
     private final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
     private final @NotNull Color labelColor = JBUI.CurrentTheme.Label.foreground();
     private final @NotNull Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     private final @NotNull Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
-
     private final @NotNull Font font = Fonts.small();
-
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
     private final @NotNull Border border = JBUI.Borders.emptyRight(Spacing.S);
 
@@ -176,5 +119,57 @@ public class StatusBarBase {
 
     public @NotNull JBPanel<?> getPanel() {
         return statusBar;
+    }
+
+    // Rule-INTERNAL-104
+    private static final class OneLine extends JBPanel<OneLine> {
+        private OneLine() {
+            super(new KeysThatFit());
+        }
+
+        @Override
+        public @NotNull Dimension getPreferredSize() {
+            return new Dimension(0, super.getPreferredSize().height);
+        }
+    }
+
+    // Rule-INTERNAL-078, Rule-INTERNAL-104
+    private static final class KeysThatFit implements LayoutManager {
+        @Override
+        public void addLayoutComponent(final @NotNull String name, final @NotNull Component key) {
+        }
+
+        @Override
+        public void removeLayoutComponent(final @NotNull Component key) {
+        }
+
+        @Override
+        public @NotNull Dimension preferredLayoutSize(final @NotNull Container strip) {
+            final @NotNull Insets insets = strip.getInsets();
+            final int wide = Arrays.stream(strip.getComponents()).mapToInt(key -> key.getPreferredSize().width).sum();
+            final int tall = Arrays.stream(strip.getComponents()).mapToInt(key -> key.getPreferredSize().height).max().orElse(0);
+            return new Dimension(insets.left + wide + insets.right, insets.top + tall + insets.bottom);
+        }
+
+        @Override
+        public @NotNull Dimension minimumLayoutSize(final @NotNull Container strip) {
+            return preferredLayoutSize(strip);
+        }
+
+        @Override
+        public void layoutContainer(final @NotNull Container strip) {
+            final @NotNull Insets insets = strip.getInsets();
+            final int room = strip.getWidth() - insets.right;
+            final int tall = strip.getHeight() - insets.top - insets.bottom;
+
+            int x = insets.left;
+            boolean fits = true;
+            for (final Component key : strip.getComponents()) {
+                final @NotNull Dimension wanted = key.getPreferredSize();
+                fits = fits && x + wanted.width <= room;
+                key.setBounds(fits ? x : strip.getWidth(), insets.top + (tall - wanted.height) / 2, wanted.width, wanted.height);
+                x += wanted.width;
+            }
+        }
     }
 }

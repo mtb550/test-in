@@ -56,6 +56,11 @@ public class TextSizeIdeTest extends AbstractTempRootIdeTest {
         return EditorColorsManager.getInstance().getGlobalScheme();
     }
 
+    private static void wheeled(final @NotNull JComponent over, final int notches) {
+        over.dispatchEvent(new MouseWheelEvent(over, MouseEvent.MOUSE_WHEEL, System.currentTimeMillis(), InputEvent.CTRL_DOWN_MASK, 1, 1, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, notches));
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -70,11 +75,6 @@ public class TextSizeIdeTest extends AbstractTempRootIdeTest {
         } finally {
             super.tearDown();
         }
-    }
-
-    private static void wheeled(final @NotNull JComponent over, final int notches) {
-        over.dispatchEvent(new MouseWheelEvent(over, MouseEvent.MOUSE_WHEEL, System.currentTimeMillis(), InputEvent.CTRL_DOWN_MASK, 1, 1, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, notches));
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
     private @NotNull JComponent aPanel() {

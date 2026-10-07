@@ -24,13 +24,13 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.status.TestRunStatus;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
 
 import java.util.ArrayList;
@@ -39,6 +39,10 @@ import java.util.List;
 public class TestRunStatusFollowsIdeTest extends AbstractOpenEditorsIdeTest {
 
     private TestRunDirectoryDto testRun;
+
+    private static @NotNull TestRunStatus inTheEditor(final @NotNull TestRunEditor editor) {
+        return editor.shownTestRun().orElseThrow(() -> new AssertionError("the editor shows no test run")).getMarker().getStatus();
+    }
 
     @Override
     public void setUp() {
@@ -59,10 +63,6 @@ public class TestRunStatusFollowsIdeTest extends AbstractOpenEditorsIdeTest {
     private @NotNull TestRunStatus inTheTree() {
         final @NotNull DirectoryDto row = Services.getInstance(getProject(), Nodes.class).find(testRun.getPath()).orElseThrow(() -> new AssertionError("the test run is not in the tree"));
         return ((TestRunDirectoryDto) row).getMarker().getStatus();
-    }
-
-    private static @NotNull TestRunStatus inTheEditor(final @NotNull TestRunEditor editor) {
-        return editor.shownTestRun().orElseThrow(() -> new AssertionError("the editor shows no test run")).getMarker().getStatus();
     }
 
     // Rule-TREE-PANEL-091

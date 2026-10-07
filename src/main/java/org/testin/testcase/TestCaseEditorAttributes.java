@@ -26,10 +26,10 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
 import org.testin.importexport.imports.ImportSetter;
 import org.testin.model.Groups;
-import org.testin.model.ToolBarAttribute;
-import org.testin.model.ToolBarDefault;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
+import org.testin.model.ToolBarAttribute;
+import org.testin.model.ToolBarDefault;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -298,16 +298,16 @@ public enum TestCaseEditorAttributes implements ToolBarAttribute {
         return BY_CAPABILITY.getOrDefault(capability, List.of());
     }
 
+    // Rule-EDITOR-PANEL-020
+    public static @NotNull TestCaseEditorAttributes atColumn(final int column) {
+        return COLUMNS.get(column);
+    }
+
     // UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110
     public boolean isColumn(final @NotNull String header) {
         final @NotNull String wanted = header.trim();
 
         return name.equalsIgnoreCase(wanted) || TestDataParser.namesConstant(this, wanted);
-    }
-
-    // Rule-EDITOR-PANEL-020
-    public static @NotNull TestCaseEditorAttributes atColumn(final int column) {
-        return COLUMNS.get(column);
     }
 
     // Rule-EDITOR-PANEL-020

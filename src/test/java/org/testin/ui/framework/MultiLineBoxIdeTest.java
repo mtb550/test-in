@@ -40,6 +40,12 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
 
     private final @NotNull List<EditorTextField> realized = new ArrayList<>();
 
+    private static @NotNull String lines(final int count) {
+        final @NotNull StringBuilder text = new StringBuilder("Open the login page");
+        for (int line = 1; line < count; line++) text.append("\nStep ").append(line);
+        return text.toString();
+    }
+
     @Override
     protected void tearDown() {
         try {
@@ -61,12 +67,6 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
         field.addNotify();
         realized.add(field);
         return Optional.ofNullable(field.getEditor(true)).orElseThrow(() -> new AssertionError("the box of many lines has no editor"));
-    }
-
-    private static @NotNull String lines(final int count) {
-        final @NotNull StringBuilder text = new StringBuilder("Open the login page");
-        for (int line = 1; line < count; line++) text.append("\nStep ").append(line);
-        return text.toString();
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-097

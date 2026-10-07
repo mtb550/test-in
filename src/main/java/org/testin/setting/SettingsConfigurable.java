@@ -66,6 +66,13 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         this.logLevelComboBox = new ComboBox<>(Arrays.stream(Level.values()).map(Level::name).toArray(String[]::new));
     }
 
+    // UC-SETTING-007, Rule-INTERNAL-129
+    private static void offerTheLogsGuide() {
+        for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
+            if (!open.isDisposed()) Services.getInstance(open, Guides.class).add(Guide.COLLECT_LOGS);
+        }
+    }
+
     @Override
     public @NotNull String getDisplayName() {
         return Bundle.getPluginName();
@@ -173,13 +180,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
 
         if (rootChanged) refreshEveryOpenProject();
         if (levelChanged) offerTheLogsGuide();
-    }
-
-    // UC-SETTING-007, Rule-INTERNAL-129
-    private static void offerTheLogsGuide() {
-        for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
-            if (!open.isDisposed()) Services.getInstance(open, Guides.class).add(Guide.COLLECT_LOGS);
-        }
     }
 
     private void refreshEveryOpenProject() {

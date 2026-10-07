@@ -18,12 +18,12 @@ package org.testin.editor.grid;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
 
 public class GridRowsIdeTest extends BasePlatformTestCase {
 

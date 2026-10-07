@@ -41,8 +41,8 @@ import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testcase.Can;
 import org.testin.testcase.Rank;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.NameSanitizer;
@@ -62,6 +62,10 @@ import java.util.stream.Collectors;
 record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestinEditors editors, @NotNull Nodes nodes, @NotNull TestCases indexedTestCases) {
     private static final int METHODS_PER_COMMAND = 200;
 
+    ImportWork(final @NotNull Project p) {
+        this(p, Services.getInstance(p, Notifier.class), Services.getInstance(p, TestinEditors.class), Services.getInstance(p, Nodes.class), Services.getInstance(p, TestCases.class));
+    }
+
     private static void report(final int testCases, final long startedAt, final long readyAt) {
         final long finishedAt = System.currentTimeMillis();
         Logger.info("Import: " + testCases + " test cases in " + (finishedAt - startedAt) + "ms"
@@ -80,8 +84,10 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
         return answer.getFirst();
     }
 
-    ImportWork(final @NotNull Project p) {
-        this(p, Services.getInstance(p, Notifier.class), Services.getInstance(p, TestinEditors.class), Services.getInstance(p, Nodes.class), Services.getInstance(p, TestCases.class));
+    // UC-SHARE-006, Rule-SHARE-031, Rule-SHARE-128
+    private static @NotNull String testSetNameOf(final @NotNull String sheetName) {
+        final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName).trim();
+        return name.isEmpty() ? Bundle.message("import.sheet.no.name") : name;
     }
 
     void openImportDialog(final @NotNull DirectoryDto dirDto) {
@@ -212,12 +218,6 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
         });
 
         return sets;
-    }
-
-    // UC-SHARE-006, Rule-SHARE-031, Rule-SHARE-128
-    private static @NotNull String testSetNameOf(final @NotNull String sheetName) {
-        final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName).trim();
-        return name.isEmpty() ? Bundle.message("import.sheet.no.name") : name;
     }
 
     void generateTestMethods(final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {

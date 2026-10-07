@@ -40,14 +40,14 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
+    private static @NotNull Path kept(final @NotNull Path node) {
+        return deletedNodes().keep(node).orElseThrow(() -> new AssertionError("no copy was kept of " + node));
+    }
+
     private @NotNull Path aTestSet(final @NotNull String project, final @NotNull String content) {
         final @NotNull Path testSet = root.resolve(project).resolve("Test Cases").resolve("Login");
         SyntheticTree.write(testSet.resolve("case.tc"), content);
         return testSet;
-    }
-
-    private static @NotNull Path kept(final @NotNull Path node) {
-        return deletedNodes().keep(node).orElseThrow(() -> new AssertionError("no copy was kept of " + node));
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-038

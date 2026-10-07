@@ -41,6 +41,14 @@ public class MergeNotStagedIdeTest extends AbstractGitRemoteIdeTest {
         return "{\"id\":\"" + id + "\",\"description\":\"" + description + "\",\"expectedResult\":\"" + expected + "\"}";
     }
 
+    private static void deleteTheLock(final @NotNull Path lock) {
+        try {
+            Files.deleteIfExists(lock);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not remove the index lock: " + ex.getMessage(), ex);
+        }
+    }
+
     private void bothChangeTheTestCase() {
         final @NotNull String id = UUID.randomUUID().toString();
         write(work, TEST_CASE, oneLine(id, "Log in", "The dashboard opens"));
@@ -55,14 +63,7 @@ public class MergeNotStagedIdeTest extends AbstractGitRemoteIdeTest {
         write(work, TEST_CASE, oneLine(id, "Log in", "The account page opens"));
         commitAll(work, "my expected result");
         assertTrue("the pull did not stop on the test case", git(work, "pull", "--rebase", "origin", MAIN).isEmpty());
-        assertEquals(List.of(TEST_CASE), new GitRepositoryService(getProject()).conflictingPaths(work));    }
-
-    private static void deleteTheLock(final @NotNull Path lock) {
-        try {
-            Files.deleteIfExists(lock);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not remove the index lock: " + ex.getMessage(), ex);
-        }
+        assertEquals(List.of(TEST_CASE), new GitRepositoryService(getProject()).conflictingPaths(work));
     }
 
     // UC-SHARE-017, Rule-SHARE-074

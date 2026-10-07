@@ -21,6 +21,11 @@ import org.jetbrains.annotations.NotNull;
 public sealed interface HistoryCard permits HistoryEntry, BugCard {
     int SHORT_HASH = 7;
 
+    // Rule-VIEW-PANEL-097, Rule-EDITOR-PANEL-265
+    static @NotNull String shortOf(final @NotNull String hash) {
+        return hash.substring(0, Math.min(SHORT_HASH, hash.length()));
+    }
+
     @NotNull String hash();
 
     // Rule-VIEW-PANEL-098
@@ -31,10 +36,5 @@ public sealed interface HistoryCard permits HistoryEntry, BugCard {
     // Rule-VIEW-PANEL-097
     default @NotNull String shortHash() {
         return shortOf(hash());
-    }
-
-    // Rule-VIEW-PANEL-097, Rule-EDITOR-PANEL-265
-    static @NotNull String shortOf(final @NotNull String hash) {
-        return hash.substring(0, Math.min(SHORT_HASH, hash.length()));
     }
 }

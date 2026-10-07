@@ -41,6 +41,10 @@ public final class GitRepositoryService {
 
     private final @NotNull Project p;
 
+    private static @NotNull List<String> branchNames(final @NotNull String refNames) {
+        return refNames.lines().filter(name -> !name.isBlank()).distinct().sorted().toList();
+    }
+
     // UC-SHARE-009
     public void initialize(final @NotNull Path repositoryPath) {
         GitCommandRunner.execute(p, repositoryPath, GitCommand.INIT);
@@ -171,10 +175,6 @@ public final class GitRepositoryService {
     // UC-SHARE-014, Rule-SHARE-063
     public @NotNull List<String> getLocalBranches(final @NotNull Path path) {
         return branchNames(run(path, GitCommand.FOR_EACH_REF, BRANCH_NAMES, "refs/heads").orElse(""));
-    }
-
-    private static @NotNull List<String> branchNames(final @NotNull String refNames) {
-        return refNames.lines().filter(name -> !name.isBlank()).distinct().sorted().toList();
     }
 
     // UC-SHARE-010, Rule-SHARE-044

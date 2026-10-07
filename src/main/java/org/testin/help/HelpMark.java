@@ -89,6 +89,33 @@ public final class HelpMark implements CustomStatusBarWidget {
                 .ifPresent(HelpMark::redraw), p.getDisposed());
     }
 
+    private static @NotNull JBPanel<?> page() {
+        final @NotNull JBPanel<?> page = new JBPanel<>();
+        page.setLayout(new BoxLayout(page, BoxLayout.Y_AXIS));
+        page.setBorder(JBUI.Borders.empty(GAP, GAP * 2));
+        return page;
+    }
+
+    private static @NotNull JComponent wrapped(final @NotNull String text, final int width) {
+        final @NotNull JTextArea area = new JTextArea(text);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setEditable(false);
+        area.setOpaque(false);
+        area.setBorder(JBUI.Borders.empty());
+        area.setFont(UIUtil.getLabelFont());
+        area.setForeground(UIUtil.getLabelForeground());
+        area.setSize(width, Short.MAX_VALUE);
+        area.setPreferredSize(new Dimension(width, area.getPreferredSize().height));
+        area.setMaximumSize(area.getPreferredSize());
+        return area;
+    }
+
+    private static @NotNull JComponent left(final @NotNull JComponent component) {
+        component.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return component;
+    }
+
     @Override
     public @NotNull String ID() {
         return HelpMarkFactory.ID;
@@ -164,32 +191,5 @@ public final class HelpMark implements CustomStatusBarWidget {
     private int hintWidth() {
         final int characters = entry.getFontMetrics(UIUtil.getLabelFont()).charWidth('m') * HINT_CHARACTERS;
         return Math.min(characters, (int) (ScreenUtil.getScreenRectangle(entry).width * SCREEN_PART));
-    }
-
-    private static @NotNull JBPanel<?> page() {
-        final @NotNull JBPanel<?> page = new JBPanel<>();
-        page.setLayout(new BoxLayout(page, BoxLayout.Y_AXIS));
-        page.setBorder(JBUI.Borders.empty(GAP, GAP * 2));
-        return page;
-    }
-
-    private static @NotNull JComponent wrapped(final @NotNull String text, final int width) {
-        final @NotNull JTextArea area = new JTextArea(text);
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        area.setEditable(false);
-        area.setOpaque(false);
-        area.setBorder(JBUI.Borders.empty());
-        area.setFont(UIUtil.getLabelFont());
-        area.setForeground(UIUtil.getLabelForeground());
-        area.setSize(width, Short.MAX_VALUE);
-        area.setPreferredSize(new Dimension(width, area.getPreferredSize().height));
-        area.setMaximumSize(area.getPreferredSize());
-        return area;
-    }
-
-    private static @NotNull JComponent left(final @NotNull JComponent component) {
-        component.setAlignmentX(Component.LEFT_ALIGNMENT);
-        return component;
     }
 }

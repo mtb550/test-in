@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-044: Run everything not yet judged
 
-**As a** tester, **I want** to set the whole test run going and come back later,
-**so that** a regression test run of 200 test cases happens while I do something
+**As a** tester, **I want** to set the whole test run going and come back later, **so that** a regression test run of
+200 test cases happens while I do something
 else.
 
 Testin runs every test case that has no run item status yet, in one go.
@@ -106,8 +106,8 @@ test cases to run*.
 **A pass clears what a tester wrote by hand.** A test case is failed and written
 up in the morning. It is re-run in the afternoon and passes. The actual result,
 the error, the screenshots and the bug issue link all go, and the severity and
-priority go back to Enhancement and Low, with no dialog. A message titled
-*Failure detail cleared* names them afterward. That is difference 26.
+priority go back to Enhancement and Low, with no dialog. A message titled *Failure detail cleared* names them afterward.
+That is difference 26.
 
 ---
 

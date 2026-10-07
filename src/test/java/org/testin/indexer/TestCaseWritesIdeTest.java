@@ -73,6 +73,25 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         return ts.getPath().resolve(tc.getId() + ".tc");
     }
 
+    private static byte @NotNull [] bytesOf(final @NotNull Path file) {
+        try {
+            return Files.readAllBytes(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + file.getFileName(), ex);
+        }
+    }
+
+    private static void asTester(final @NotNull Runnable work) {
+        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
+        final @NotNull String was = settings.testerName;
+        settings.testerName = "Muteb Almughyiri";
+        try {
+            work.run();
+        } finally {
+            settings.testerName = was;
+        }
+    }
+
     private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
@@ -293,25 +312,6 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
         assertFalse("the file filed under the id was left beside the hand-named one", Files.exists(set.resolve(tc.getId() + ".tc")));
         assertTrue("the hand-named file went although its delete was refused", Files.exists(set.resolve(HAND_NAMED)));
-    }
-
-    private static byte @NotNull [] bytesOf(final @NotNull Path file) {
-        try {
-            return Files.readAllBytes(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + file.getFileName(), ex);
-        }
-    }
-
-    private static void asTester(final @NotNull Runnable work) {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-        final @NotNull String was = settings.testerName;
-        settings.testerName = "Muteb Almughyiri";
-        try {
-            work.run();
-        } finally {
-            settings.testerName = was;
-        }
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-125

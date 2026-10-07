@@ -38,22 +38,42 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
 
-$gh = if (Get-Command gh -ErrorAction SilentlyContinue) { 'gh' } else { 'C:\Program Files\GitHub CLI\gh.exe' }
+$gh = if (Get-Command gh -ErrorAction SilentlyContinue)
+{
+    'gh'
+}
+else
+{
+    'C:\Program Files\GitHub CLI\gh.exe'
+}
 $rows = [System.Collections.Generic.List[object]]::new()
 
-function Add-Row {
+function Add-Row
+{
     param([string] $Source, [string] $Count, [string] $Gated, [string] $Where)
     $rows.Add([pscustomobject]@{ Source = $Source; Count = $Count; Gated = $Gated; Where = $Where })
 }
 
-function Get-LastRun {
+function Get-LastRun
+{
     param([string] $Workflow)
-    if ($NoCi) { return $null }
-    try {
-        $json = & $gh run list --repo mtb550/test-in --workflow $Workflow --limit 1 --json databaseId,conclusion,status,headSha 2>$null
-        if (-not $json) { return $null }
+    if ($NoCi)
+    {
+        return $null
+    }
+    try
+    {
+        $json = & $gh run list --repo mtb550/test-in --workflow $Workflow --limit 1 --json databaseId,conclusion,status,headSha 2> $null
+        if (-not $json)
+        {
+            return $null
+        }
         return ($json | ConvertFrom-Json)[0]
-    } catch { return $null }
+    }
+    catch
+    {
+        return $null
+    }
 }
 
 Write-Host ''
@@ -61,67 +81,92 @@ Write-Host 'Gathering warnings. Nothing here changes a file.' -ForegroundColor C
 Write-Host ''
 
 # --- Inspections -----------------------------------------------------------
-if ($Full) {
+if ($Full)
+{
     Write-Host '  inspections: running the IDE, this takes about twenty minutes...' -ForegroundColor DarkGray
     & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'inspect.ps1') | Out-Host
 }
 
 $findings = Join-Path $repoRoot '.inspection\findings.txt'
-if (Test-Path $findings) {
+if (Test-Path $findings)
+{
     $lines = @(Get-Content $findings | Where-Object { $_ -match '\S' })
-    Add-Row 'Inspections' "$($lines.Count)" 'yes' '.inspection/findings.txt'
-} else {
+    Add-Row 'Inspections' "$( $lines.Count )" 'yes' '.inspection/findings.txt'
+}
+else
+{
     $run = Get-LastRun 'inspect.yml'
-    $said = if ($run) { "last CI run $($run.databaseId): $($run.conclusion)" } else { 'never run here; no CI answer' }
+    $said = if ($run)
+    {
+        "last CI run $( $run.databaseId ): $( $run.conclusion )"
+    }
+    else
+    {
+        'never run here; no CI answer'
+    }
     Add-Row 'Inspections' '-' 'yes' $said
 }
 
 # --- Plugin Verifier -------------------------------------------------------
-if ($Full) {
+if ($Full)
+{
     Write-Host '  verifier: downloading IDEs and verifying...' -ForegroundColor DarkGray
     & ./gradlew verifyPlugin --console=plain | Out-Host
 }
 
 $run = Get-LastRun 'verify.yml'
-$said = if ($run) { "last CI run $($run.databaseId): $($run.conclusion)" } else { 'CI only; no answer without gh' }
+$said = if ($run)
+{
+    "last CI run $( $run.databaseId ): $( $run.conclusion )"
+}
+else
+{
+    'CI only; no answer without gh'
+}
 Add-Row 'Plugin Verifier' '-' 'yes' $said
 
 # --- Qodana ----------------------------------------------------------------
 $run = Get-LastRun 'build.yml'
-if ($run) {
-    $said = "Qodana job of Build run $($run.databaseId) on $($run.headSha.Substring(0,8)): $($run.conclusion)"
+if ($run)
+{
+    $said = "Qodana job of Build run $( $run.databaseId ) on $($run.headSha.Substring(0, 8) ): $( $run.conclusion )"
     Add-Row 'Qodana' 'see run summary' 'yes' $said
-} else {
+}
+else
+{
     Add-Row 'Qodana' '-' 'no' 'CI only; no answer without gh'
 }
 
 # --- Compiler --------------------------------------------------------------
 $compile = & ./gradlew compileJava --rerun-tasks --console=plain 2>&1
 $compilerWarnings = @($compile | Where-Object { $_ -match 'warning:|^Note:' })
-Add-Row 'Compiler' "$($compilerWarnings.Count)" 'no' 'gradlew compileJava, -Xlint:deprecation,removal'
+Add-Row 'Compiler' "$( $compilerWarnings.Count )" 'no' 'gradlew compileJava, -Xlint:deprecation,removal'
 
 # --- Gradle ----------------------------------------------------------------
 $gradle = & ./gradlew help --warning-mode all --console=plain 2>&1
 $gradleWarnings = @($gradle | Where-Object { $_ -match 'Deprecated Gradle features|has been deprecated' })
-Add-Row 'Gradle' "$($gradleWarnings.Count)" 'no' 'gradlew --warning-mode all'
+Add-Row 'Gradle' "$( $gradleWarnings.Count )" 'no' 'gradlew --warning-mode all'
 
 # --- The report ------------------------------------------------------------
 Write-Host ''
 $rows | Format-Table -AutoSize Source, Count, Gated, Where | Out-Host
 
-if ($compilerWarnings.Count -gt 0) {
+if ($compilerWarnings.Count -gt 0)
+{
     Write-Host 'Compiler:' -ForegroundColor Yellow
     $compilerWarnings | ForEach-Object { Write-Host "  $_" }
     Write-Host ''
 }
 
-if ($gradleWarnings.Count -gt 0) {
+if ($gradleWarnings.Count -gt 0)
+{
     Write-Host 'Gradle:' -ForegroundColor Yellow
     $gradleWarnings | ForEach-Object { Write-Host "  $_" }
     Write-Host ''
 }
 
-if (-not $Full) {
+if (-not $Full)
+{
     Write-Host 'Read, not run: the inspection and the verifier report their last result.' -ForegroundColor DarkGray
     Write-Host 'Run them here with -Full.' -ForegroundColor DarkGray
     Write-Host ''

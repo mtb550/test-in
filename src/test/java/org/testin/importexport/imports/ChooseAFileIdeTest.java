@@ -55,6 +55,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ChooseAFileIdeTest extends AbstractTempRootIdeTest {
     private final @NotNull List<Consumer<? super List<VirtualFile>>> asked = new CopyOnWriteArrayList<>();
 
+    private static @NotNull JBTabbedPane tabsIn(final @NotNull JComponent content) {
+        return Drawn.first(content, JBTabbedPane.class);
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -65,10 +69,6 @@ public class ChooseAFileIdeTest extends AbstractTempRootIdeTest {
     protected void tearDown() {
         ShownDialog.close(getProject(), ImportDialog.class);
         super.tearDown();
-    }
-
-    private static @NotNull JBTabbedPane tabsIn(final @NotNull JComponent content) {
-        return Drawn.first(content, JBTabbedPane.class);
     }
 
     // UC-SHARE-007, Rule-SHARE-035

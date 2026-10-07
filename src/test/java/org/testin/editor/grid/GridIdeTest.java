@@ -53,16 +53,6 @@ public class GridIdeTest extends BasePlatformTestCase {
 
     private static final @NotNull String DESCRIPTION_WIDTH = EditorKind.TEST.columnWidthKey(TestCaseEditorAttributes.DESCRIPTION.getName());
 
-    @Override
-    protected void tearDown() {
-        try {
-            PropertiesComponent.getInstance().unsetValue(DESCRIPTION_WIDTH);
-            super.tearDown();
-        } catch (final Exception ex) {
-            throw new AssertionError("Could not tear down " + getName(), ex);
-        }
-    }
-
     private static String @NotNull [] aRow(final int order, final @NotNull String description, final @NotNull String expected, final @NotNull String id) {
         final String[] row = new String[TestCaseEditorAttributes.values().length];
         Arrays.fill(row, "");
@@ -120,6 +110,16 @@ public class GridIdeTest extends BasePlatformTestCase {
         final @NotNull MouseEvent press = new MouseEvent(table, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), InputEvent.BUTTON1_DOWN_MASK | modifiers, (int) cell.getCenterX(), (int) cell.getCenterY(), 1, false, MouseEvent.BUTTON1);
         for (final MouseListener listener : table.getMouseListeners())
             if (listener instanceof SequenceColumnRowSelector) listener.mousePressed(press);
+    }
+
+    @Override
+    protected void tearDown() {
+        try {
+            PropertiesComponent.getInstance().unsetValue(DESCRIPTION_WIDTH);
+            super.tearDown();
+        } catch (final Exception ex) {
+            throw new AssertionError("Could not tear down " + getName(), ex);
+        }
     }
 
     // Rule-EDITOR-PANEL-086

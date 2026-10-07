@@ -106,6 +106,14 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
         return annotation + "\npublic void " + methodName + "() " + GeneratedMethod.emptyBody(methodName);
     }
 
+    // Rule-CODEGEN-095
+    private static @NotNull Optional<PsiMethod> theTestersOwn(final @NotNull Optional<String> owner, final @NotNull Optional<PsiMethod> sameName, final @NotNull Map<String, PsiMethod> describedByHand, final @NotNull TestCaseDto tc) {
+        if (owner.isPresent())
+            return sameName.filter(pm -> owner.orElseThrow().isEmpty() && GeneratedMethod.testAnnotationOf(pm).isPresent());
+
+        return Optional.ofNullable(describedByHand.remove(tc.getDescription()));
+    }
+
     // UC-CODEGEN-002
     @Override
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
@@ -144,13 +152,6 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
                 targetClass -> injectAsText(p, targetClass, testCases),
                 () -> testCases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
                         Fqcn.methodNameOf(tc), tc)));
-    }
-
-    // Rule-CODEGEN-095
-    private static @NotNull Optional<PsiMethod> theTestersOwn(final @NotNull Optional<String> owner, final @NotNull Optional<PsiMethod> sameName, final @NotNull Map<String, PsiMethod> describedByHand, final @NotNull TestCaseDto tc) {
-        if (owner.isPresent()) return sameName.filter(pm -> owner.orElseThrow().isEmpty() && GeneratedMethod.testAnnotationOf(pm).isPresent());
-
-        return Optional.ofNullable(describedByHand.remove(tc.getDescription()));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-016

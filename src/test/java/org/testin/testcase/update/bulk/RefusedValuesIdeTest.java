@@ -45,6 +45,23 @@ import java.util.UUID;
 
 public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
 
+    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+
+    private static @NotNull JBTable theGridOf(final @NotNull TestCaseEditor editor) {
+        editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+        return (JBTable) editor.getPreferredFocusedComponent();
+    }
+
+    private static void typed(final @NotNull JBTable grid, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String value) {
+        grid.getModel().setValueAt(value, row, attribute.column());
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    private static @NotNull String unreadable(final @NotNull String what) {
+        return Refused.UNREADABLE.about(what);
+    }
+
     @Override
     protected void tearDown() {
         for (final Editor open : EditorFactory.getInstance().getAllEditors()) {
@@ -52,8 +69,6 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
         }
         super.tearDown();
     }
-
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
     private @NotNull List<TestCaseDto> aTestSetHolding(final @NotNull String... descriptions) {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
@@ -71,21 +86,6 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestCaseDto stored(final @NotNull TestCaseDto tc) {
         return Services.getInstance(getProject(), TestCases.class).findTestCase(tc.getId()).orElseThrow();
-    }
-
-    private static @NotNull JBTable theGridOf(final @NotNull TestCaseEditor editor) {
-        editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-        return (JBTable) editor.getPreferredFocusedComponent();
-    }
-
-    private static void typed(final @NotNull JBTable grid, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String value) {
-        grid.getModel().setValueAt(value, row, attribute.column());
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-    }
-
-    private static @NotNull String unreadable(final @NotNull String what) {
-        return Refused.UNREADABLE.about(what);
     }
 
     // Rule-EDITOR-PANEL-206

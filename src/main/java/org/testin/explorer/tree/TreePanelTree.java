@@ -133,6 +133,13 @@ public class TreePanelTree implements Disposable {
         }
     }
 
+    private static long millisSince(final long started) {
+        return (System.nanoTime() - started) / 1_000_000;
+    }
+
+    private static void nothingAfter() {
+    }
+
     public void reveal(final @NotNull Path target) {
         reveal(target, TreePanelTree::nothingAfter);
     }
@@ -237,10 +244,6 @@ public class TreePanelTree implements Disposable {
         })), "Redrawing the changed folders");
     }
 
-    private static long millisSince(final long started) {
-        return (System.nanoTime() - started) / 1_000_000;
-    }
-
     private void consumePendingReveal() {
         final @NotNull Optional<Path> target = revealAfterRebuild;
         revealAfterRebuild = Optional.empty();
@@ -262,8 +265,5 @@ public class TreePanelTree implements Disposable {
         mainTree.setModel(null);
         treeModel.dispose();
         structureModel.dispose();
-    }
-
-    private static void nothingAfter() {
     }
 }

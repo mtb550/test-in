@@ -23,9 +23,9 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.model.status.NodeStatus;
-import org.testin.model.node.DirectoryDto;
 import org.testin.model.markers.Marker;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.status.NodeStatus;
 
 import java.util.List;
 

@@ -108,23 +108,31 @@ allprojects {
             // the platform's Icon, KeyStroke, Font and SimpleTextAttributes, and
             // the JDK's function interfaces, every one of which Testin fills with
             // a method reference or a lambda capturing nothing that changes.
-            option("Immutable:KnownImmutable", listOf(
-                "javax.swing.Icon",
-                "java.awt.Font",
-                "javax.swing.KeyStroke",
-                "com.intellij.ui.SimpleTextAttributes",
-                "java.util.function.Function",
-                "java.util.function.BiFunction",
-                "java.util.function.Consumer",
-                "java.util.function.BiConsumer",
-                "java.util.function.Predicate",
-                "java.util.function.BiPredicate",
-                "java.util.function.ToLongFunction",
-                "java.util.function.LongFunction"
-            ).joinToString(","))
+            option(
+                "Immutable:KnownImmutable", listOf(
+                    "javax.swing.Icon",
+                    "java.awt.Font",
+                    "javax.swing.KeyStroke",
+                    "com.intellij.ui.SimpleTextAttributes",
+                    "java.util.function.Function",
+                    "java.util.function.BiFunction",
+                    "java.util.function.Consumer",
+                    "java.util.function.BiConsumer",
+                    "java.util.function.Predicate",
+                    "java.util.function.BiPredicate",
+                    "java.util.function.ToLongFunction",
+                    "java.util.function.LongFunction"
+                ).joinToString(",")
+            )
             option("NullAway:AnnotatedPackages", "org.testin")
-            option("NullAway:KnownInitializers", "junit.framework.TestCase.setUp,com.intellij.testFramework.UsefulTestCase.setUp,com.intellij.testFramework.fixtures.BasePlatformTestCase.setUp")
-            option("NullAway:CustomInitializerAnnotations", "org.testng.annotations.BeforeMethod,org.testng.annotations.BeforeClass")
+            option(
+                "NullAway:KnownInitializers",
+                "junit.framework.TestCase.setUp,com.intellij.testFramework.UsefulTestCase.setUp,com.intellij.testFramework.fixtures.BasePlatformTestCase.setUp"
+            )
+            option(
+                "NullAway:CustomInitializerAnnotations",
+                "org.testng.annotations.BeforeMethod,org.testng.annotations.BeforeClass"
+            )
         }
     }
 }
@@ -325,7 +333,8 @@ intellijPlatform {
         // Unreleased stands in until `./gradlew patchChangelog` names it.
         changeNotes.set(provider {
             changelog.renderItem(
-                (changelog.getOrNull(pluginVersion) ?: changelog.getUnreleased()).withHeader(false).withEmptySections(false),
+                (changelog.getOrNull(pluginVersion) ?: changelog.getUnreleased()).withHeader(false)
+                    .withEmptySections(false),
                 Changelog.OutputType.HTML
             )
         })
@@ -488,7 +497,12 @@ tasks {
         // The same for the markers: a // Rule- or // UC- line compiles to
         // nothing, so an edit to one leaves the class files byte for byte the
         // same, and RuleNumbersTest would not run against the new marker.
-        inputs.files(listOf("src", "testin-java/src", "testin-testng/src").map { layout.projectDirectory.dir("$it/main/java") })
+        inputs.files(
+            listOf(
+                "src",
+                "testin-java/src",
+                "testin-testng/src"
+            ).map { layout.projectDirectory.dir("$it/main/java") })
             .withPropertyName("markedSources")
             .withPathSensitivity(PathSensitivity.RELATIVE)
 
@@ -586,7 +600,9 @@ intellijPlatformTesting {
 ideTestShares.forEach { (share, packages) ->
     tasks.named<Test>(share) {
         group = "verification"
-        description = "The tests that need a running IDE, in " + packages.ifEmpty { listOf("every package the other shares leave") }.joinToString()
+        description =
+            "The tests that need a running IDE, in " + packages.ifEmpty { listOf("every package the other shares leave") }
+                .joinToString()
 
         useJUnit()
 

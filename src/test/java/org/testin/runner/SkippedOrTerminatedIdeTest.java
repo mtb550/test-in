@@ -29,6 +29,12 @@ public class SkippedOrTerminatedIdeTest extends BasePlatformTestCase {
 
     private final @NotNull Map<String, String> recorded = new ConcurrentHashMap<>();
 
+    private static @NotNull SMTestProxy started(final @NotNull String name) {
+        final @NotNull SMTestProxy test = new SMTestProxy(name, false, "java:test://LoginTest/" + name);
+        test.setStarted();
+        return test;
+    }
+
     private @NotNull String finished(final @NotNull SMTestProxy test) {
         getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(TestCaseExecutionListener.TOPIC,
                 (TestCaseExecutionListener) (testName, status, _, failure) -> recorded.put(testName, status + ": " + failure.message()));
@@ -36,12 +42,6 @@ public class SkippedOrTerminatedIdeTest extends BasePlatformTestCase {
         TestCaseExecutionTracker.finished(getProject(), test);
 
         return recorded.getOrDefault(test.getPresentableName(), "nothing");
-    }
-
-    private static @NotNull SMTestProxy started(final @NotNull String name) {
-        final @NotNull SMTestProxy test = new SMTestProxy(name, false, "java:test://LoginTest/" + name);
-        test.setStarted();
-        return test;
     }
 
     // Rule-CODEGEN-075

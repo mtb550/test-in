@@ -56,7 +56,8 @@ public class RuleCoverageTest {
 
             while (marker.find()) {
                 final @NotNull Matcher rule = RULE.matcher(marker.group());
-                while (rule.find()) proven.computeIfAbsent(rule.group(), _ -> new TreeSet<>()).add(test.getFileName().toString());
+                while (rule.find())
+                    proven.computeIfAbsent(rule.group(), _ -> new TreeSet<>()).add(test.getFileName().toString());
             }
         }
 
@@ -79,6 +80,15 @@ public class RuleCoverageTest {
         return files;
     }
 
+    private static void writeReport(final @NotNull String text) {
+        try {
+            Files.createDirectories(REPORT.getParent());
+            Files.writeString(REPORT, text);
+        } catch (final IOException ex) {
+            fail("Could not write " + REPORT + ": " + ex.getMessage());
+        }
+    }
+
     @Test
     public void everyRuleATestNamesExists() {
         final @NotNull Set<String> written = DocumentedRules.names();
@@ -88,7 +98,8 @@ public class RuleCoverageTest {
             if (!written.contains(rule)) dangling.add(rule + " in " + tests);
         });
 
-        if (!dangling.isEmpty()) fail("These test markers name rules no document writes:\n  " + String.join("\n  ", dangling));
+        if (!dangling.isEmpty())
+            fail("These test markers name rules no document writes:\n  " + String.join("\n  ", dangling));
     }
 
     @Test
@@ -127,22 +138,13 @@ public class RuleCoverageTest {
         final @NotNull String summary = "Rules a test proves: " + covered + " of " + total;
         writeReport("""
                 # %s
-
+                
                 A rule is proven when a test method carries its marker - `// Rule-PART-NNN` above the method. A retired rule is not counted.
-
+                
                 %s
                 # The rules no test proves
                 %s""".formatted(summary, parts, unproven));
 
         Logger.info(summary + " - the rules no test proves are listed in " + REPORT);
-    }
-
-    private static void writeReport(final @NotNull String text) {
-        try {
-            Files.createDirectories(REPORT.getParent());
-            Files.writeString(REPORT, text);
-        } catch (final IOException ex) {
-            fail("Could not write " + REPORT + ": " + ex.getMessage());
-        }
     }
 }

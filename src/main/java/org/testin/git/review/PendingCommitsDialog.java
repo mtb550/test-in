@@ -26,8 +26,8 @@ import org.testin.git.change.PendingChange;
 import org.testin.git.change.TestCaseChangeComparator;
 import org.testin.indexer.TestCases;
 import org.testin.model.DirectoryType;
-import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.model.TestCaseDto;
+import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
@@ -124,7 +124,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
             for (final FieldChange change : diff.fieldChanges()) {
                 final Object @NotNull [] cells = {change.changeType().getLabel(), diff.testSet(), diff.name(), change.oldValue(), change.newValue()};
                 // Rule-SHARE-129
-                if (diff.subject() == ChangeSubject.MARKER) changes.addFixedRow(Bundle.message("dialog.pending.marker.fixed"), cells);
+                if (diff.subject() == ChangeSubject.MARKER)
+                    changes.addFixedRow(Bundle.message("dialog.pending.marker.fixed"), cells);
                 else changes.addRow(cells);
                 rowDifferences.add(new Row(diff, change));
             }

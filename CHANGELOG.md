@@ -16,7 +16,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 ### Added
 
 - **A committed test run is the record:** committing in View Pending Commits makes every Completed test run of the test
-  project **Committed**, and Testin commits its `.tr` with the commit's id straight after, in the same push. From then on
+  project **Committed**, and Testin commits its `.tr` with the commit's id straight after, in the same push. From then
+  on
   its run items show each test case as that commit holds it, edited or deleted since, and say *Changed since this test
   run was committed* where it differs today. A Committed test run takes nothing more; F2 on one of its run items says to
   change the test case in its test set.
@@ -56,14 +57,15 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
   Completed or Closed test run still takes run item statuses and corrections; only a Committed one refuses them.
 - **Every marker in View Pending Commits is ticked and stays ticked:** a node's own file always goes with the commit.
 - **The walk moves past a deleted test case:** the run item status key records nothing on it, says so, and goes on.
-- **Two more guides in Testin Help:** *How to get started*, the ten-minute first run, offered on a new machine, and
-  *How to collect Testin's logs*, offered when Testin shows an error or the log level changes.
+- **Two more guides in Testin Help:** *How to get started*, the ten-minute first run, offered on a new machine, and *How
+  to collect Testin's logs*, offered when Testin shows an error or the log level changes.
 - **Testin Help covers Git and automation code too:** a missing Java, TestNG or Git plugin, a missing test source
   folder, a test project not under Git and a missing remote wait on the ? as hints; **Initialize Git** is in its hint.
   A key you press still answers with a short message. Three new guides: sharing test projects over Git, resolving Git
   conflicts, and generating and running automation code. Sync and View Pending Commits offer the Git guide; Select Test
   Project and Save to testin.yml offer the linking guide.
-- **Testin Help says what is not set up, instead of messages:** the ? at the end of the status bar shows in every project.
+- **Testin Help says what is not set up, instead of messages:** the ? at the end of the status bar shows in every
+  project.
   It turns red, with the fix and its guide, when the Testin folder is not set, when testin.yml does not name the test
   project, when bug states cannot be read, or when board columns need gh's read:project permission; the four messages
   that said so are gone. Guides are offered where you meet their part: Sync, a failed run item, a test run opened, which
@@ -77,7 +79,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 - **Escape drops test cases you copied,** as it drops the ones you cut, so nothing is left waiting to be pasted. The
   tree already did this.
 - **The report footer no longer prints a date,** in the web page, the PDF and the Word document.
-- **The Details tab shows the fields the editor's Fields list shows,** from a test set or a test run, and changes as soon as Fields does. A field the list does not offer is always shown.
+- **The Details tab shows the fields the editor's Fields list shows,** from a test set or a test run, and changes as
+  soon as Fields does. A field the list does not offer is always shown.
 - **A test case the filter hides is named in a red refusal,** not in a blue notice that looked like the success just
   before it.
 - **A choice from a fixed list is radio buttons:** the six questions of Create Test Run, Priority — P3 (Low), P2
@@ -169,8 +172,10 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
   class, Testin tags that method with the test case. It no longer writes an empty method beside it.
 - **Removing a test case, test set or package waits for indexing to finish** when it has automation code. It used to
   remove the test case and leave its **@Test** method behind.
-- **A rename whose folder cannot be renamed changes nothing:** the automation code takes its old name back and the test project keeps its name. It used to leave the code renamed and the folder not.
-- **A test run's details that could not be saved do not linger:** the test run shows what is on disk again and says it was not saved.
+- **A rename whose folder cannot be renamed changes nothing:** the automation code takes its old name back and the test
+  project keeps its name. It used to leave the code renamed and the folder not.
+- **A test run's details that could not be saved do not linger:** the test run shows what is on disk again and says it
+  was not saved.
 - **A move the tree refuses leaves the automation code where it was:** the class goes back to the package of the test
   set it belongs to, rather than staying in the package the test set was never moved to.
 - **An imported sheet's test set is named without its special characters:** a sheet called Log/in: Flow is

@@ -27,10 +27,6 @@ import org.testin.Said;
 import org.testin.config.TestinYml;
 import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.git.ShareGestures;
-import org.testin.git.review.GitIdentityDialog;
-import org.testin.git.review.PendingCommitsDialog;
-import org.testin.git.review.RemoteUrlDialog;
-import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
@@ -47,6 +43,15 @@ import static org.testin.git.LocalGit.git;
 import static org.testin.git.LocalGit.mustGit;
 
 public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
+
+    private static @NotNull String addressOf(final @NotNull Path bare) {
+        final @NotNull String address = bare.toUri().toString();
+        return address.endsWith("/") ? address.substring(0, address.length() - 1) : address;
+    }
+
+    private static long count(final @NotNull List<Notification> said, final @NotNull String title) {
+        return said.stream().filter(notification -> notification.getTitle().equals(title)).count();
+    }
 
     @Override
     protected void tearDown() {
@@ -96,11 +101,6 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         }
     }
 
-    private static @NotNull String addressOf(final @NotNull Path bare) {
-        final @NotNull String address = bare.toUri().toString();
-        return address.endsWith("/") ? address.substring(0, address.length() - 1) : address;
-    }
-
     private void pressPushOnTheWaitingCommits(final @NotNull Path repository, final @NotNull List<Notification> said) {
         final int before = (int) said.stream().filter(notification -> notification.getTitle().equals(Bundle.message("git.not.pushed.title"))).count();
         new ViewPendingCommitsWork(getProject()).openFor(repository);
@@ -108,10 +108,6 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
 
         final @NotNull Notification waiting = said.stream().filter(notification -> notification.getTitle().equals(Bundle.message("git.not.pushed.title"))).toList().getLast();
         Notified.press(getProject(), waiting, waiting.getActions().getFirst());
-    }
-
-    private static long count(final @NotNull List<Notification> said, final @NotNull String title) {
-        return said.stream().filter(notification -> notification.getTitle().equals(title)).count();
     }
 
     // UC-SHARE-008, Rule-SHARE-040

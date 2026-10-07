@@ -50,12 +50,12 @@ public class HistoryTabIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull JBPanel<?> tab = new JBPanel<>(new BorderLayout());
 
-    private @NotNull TestCaseDto aTestCase() {
-        return EditorFixtures.testCase(getProject(), EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Login"), "Log in with a valid user", "a");
-    }
-
     private static @NotNull TestRunItems failed(final @NotNull TestCaseDto tc) {
         return TestRunItems.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The basket was emptied").bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
+    }
+
+    private @NotNull TestCaseDto aTestCase() {
+        return EditorFixtures.testCase(getProject(), EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Login"), "Log in with a valid user", "a");
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-100, Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-109

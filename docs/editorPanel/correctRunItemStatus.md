@@ -114,7 +114,8 @@ There is no undo for a run item status inside the test run editor. `Ctrl+Z`
 there belongs to the test cases, not to the test run. A run item status written
 over is gone. So is anything that clearing it removed.
 
-**There is no way to clear a run item status back to nothing.** **Pending**, **Untested** and **Removed** have no key and are on
+**There is no way to clear a run item status back to nothing.** **Pending**, **Untested** and **Removed** have no key
+and are on
 no menu.
 
 ## Where the plugin breaks its own rules

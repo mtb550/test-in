@@ -18,6 +18,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
+import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.DirectoryType;
 import org.testin.services.Services;
@@ -25,7 +26,6 @@ import org.testin.services.Services;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.jetbrains.annotations.NotNull;
 
 public class WatchedProjectsIdeTest extends AbstractTempRootIdeTest {
 

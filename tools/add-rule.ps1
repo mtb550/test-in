@@ -64,12 +64,16 @@ $root = Split-Path -Parent $PSScriptRoot
 $folder = Join-Path $root "docs/$Part"
 $main = Join-Path $folder 'main.md'
 
-if (-not (Test-Path $main)) { throw "No such part: $folder has no main.md" }
+if (-not (Test-Path $main))
+{
+    throw "No such part: $folder has no main.md"
+}
 
 # The prefix a part's rules carry, read from the part rather than from a table
 # here - a second list of these is a second thing to keep in step.
 $mainText = Get-Content $main -Raw
-if ($mainText -notmatch 'Rules are `Rule-([A-Z][A-Z-]*)-\d+` to `Rule-[A-Z][A-Z-]*-(\d+)`') {
+if ($mainText -notmatch 'Rules are `Rule-([A-Z][A-Z-]*)-\d+` to `Rule-[A-Z][A-Z-]*-(\d+)`')
+{
     throw "$main has no Numbering row saying the range its rules cover"
 }
 
@@ -80,28 +84,47 @@ $last = [int]$Matches[2]
 # A retired rule keeps its number forever and is named only in a Retired row once its
 # bullet is gone, so reading the Numbering row alone handed a retired number out again.
 $everGiven = Get-ChildItem (Join-Path $root 'docs') -Recurse -Filter '*.md' |
-    ForEach-Object { [regex]::Matches((Get-Content $_.FullName -Raw), "Rule-$prefix-(\d+)") } |
-    ForEach-Object { [int]$_.Groups[1].Value }
+        ForEach-Object { [regex]::Matches((Get-Content $_.FullName -Raw), "Rule-$prefix-(\d+)") } |
+        ForEach-Object { [int]$_.Groups[1].Value }
 $next = [int](([int[]]$everGiven + $last | Measure-Object -Maximum).Maximum) + 1
 $name = 'Rule-{0}-{1:D3}' -f $prefix, $next
 
 # One bullet, wrapped the way the documents are: 80 columns, two spaces under the
 # dash so the continuation lines up with the words rather than the marker.
-function Format-Rule([string] $ruleName, [string] $words) {
+function Format-Rule([string] $ruleName, [string] $words)
+{
     $line = "- **$ruleName** — $words"
     $out = @()
     $current = ''
 
-    foreach ($word in ($line -split '\s+')) {
-        $indent = if ($out.Count -eq 0) { '' } else { '  ' }
-        if ($current -eq '') { $current = $word; continue }
-        if (($indent + $current + ' ' + $word).Length -gt 80) {
+    foreach ($word in ($line -split '\s+'))
+    {
+        $indent = if ($out.Count -eq 0)
+        {
+            ''
+        }
+        else
+        {
+            '  '
+        }
+        if ($current -eq '')
+        {
+            $current = $word; continue
+        }
+        if (($indent + $current + ' ' + $word).Length -gt 80)
+        {
             $out += $current
             $current = $word
         }
-        else { $current = $current + ' ' + $word }
+        else
+        {
+            $current = $current + ' ' + $word
+        }
     }
-    if ($current -ne '') { $out += $current }
+    if ($current -ne '')
+    {
+        $out += $current
+    }
 
     return (($out | Select-Object -First 1) + "`n" + (($out | Select-Object -Skip 1 | ForEach-Object { "  $_" }) -join "`n")).TrimEnd()
 }
@@ -112,52 +135,78 @@ $bullet = Format-Rule $name $Text
 # block is where those pages agree, which is read off the pages themselves.
 $pages = Get-ChildItem $folder -Filter '*.md' | Where-Object { $_.Name -ne 'main.md' }
 
-if ($PSCmdlet.ParameterSetName -eq 'OnePage') {
+if ($PSCmdlet.ParameterSetName -eq 'OnePage')
+{
     $pages = $pages | Where-Object { $_.Name -eq $Page }
-    if (-not $pages) { throw "No such page: $Page under docs/$Part" }
+    if (-not $pages)
+    {
+        throw "No such page: $Page under docs/$Part"
+    }
 }
 
 # The numbers every page carries, which is the shared block by definition.
 $shared = $null
-foreach ($file in $pages) {
+foreach ($file in $pages)
+{
     $numbers = [regex]::Matches((Get-Content $file.FullName -Raw), '(?m)^- \*\*Rule-[A-Z][A-Z-]*-(\d+)\*\*') |
-        ForEach-Object { [int]$_.Groups[1].Value }
+            ForEach-Object { [int]$_.Groups[1].Value }
 
-    if ($null -eq $shared) { $shared = [System.Collections.Generic.HashSet[int]]::new([int[]]$numbers) }
-    else { $shared.IntersectWith([int[]]$numbers) }
+    if ($null -eq $shared)
+    {
+        $shared = [System.Collections.Generic.HashSet[int]]::new([int[]]$numbers)
+    }
+    else
+    {
+        $shared.IntersectWith([int[]]$numbers)
+    }
 }
 
-$lastShared = if ($Everywhere -and $shared.Count -gt 0) { ($shared | Measure-Object -Maximum).Maximum } else { -1 }
+$lastShared = if ($Everywhere -and $shared.Count -gt 0)
+{
+    ($shared | Measure-Object -Maximum).Maximum
+}
+else
+{
+    -1
+}
 
 $written = 0
-foreach ($file in $pages) {
+foreach ($file in $pages)
+{
     $text = Get-Content $file.FullName -Raw
     $rules = [regex]::Matches($text, '(?m)^- \*\*Rule-[A-Z][A-Z-]*-(\d+)\*\*[\s\S]*?(?=\r?\n- \*\*Rule-|\r?\n\r?\n)')
 
-    if ($rules.Count -eq 0) {
-        Write-Warning "$($file.Name) has no rules to add to, so it was left alone"
+    if ($rules.Count -eq 0)
+    {
+        Write-Warning "$( $file.Name ) has no rules to add to, so it was left alone"
         continue
     }
 
     # After the last shared rule for a part-wide one, and after the page's own
     # last rule otherwise.
-    $after = if ($lastShared -ge 0) {
+    $after = if ($lastShared -ge 0)
+    {
         ($rules | Where-Object { [int]$_.Groups[1].Value -le $lastShared } | Select-Object -Last 1)
     }
-    else { $rules[$rules.Count - 1] }
+    else
+    {
+        $rules[$rules.Count - 1]
+    }
 
     $at = $after.Index + $after.Length
     $updated = $text.Substring(0, $at) + "`n" + $bullet + $text.Substring($at)
 
-    if ($PSCmdlet.ShouldProcess($file.Name, "add $name")) {
+    if ( $PSCmdlet.ShouldProcess($file.Name, "add $name"))
+    {
         Set-Content -Path $file.FullName -Value $updated -NoNewline
     }
     $written++
 }
 
 # The Numbering row moves on, which is what the next writer reads.
-$movedOn = $mainText -replace "(Rules are ``Rule-$prefix-\d+`` to ``Rule-$prefix-)\d+(``)", "`${1}$('{0:D3}' -f $next)`$2"
-if ($PSCmdlet.ShouldProcess('main.md', "say the rules now end at $name")) {
+$movedOn = $mainText -replace "(Rules are ``Rule-$prefix-\d+`` to ``Rule-$prefix-)\d+(``)", "`${1}$( '{0:D3}' -f $next )`$2"
+if ( $PSCmdlet.ShouldProcess('main.md', "say the rules now end at $name"))
+{
     Set-Content -Path $main -Value $movedOn -NoNewline
 }
 

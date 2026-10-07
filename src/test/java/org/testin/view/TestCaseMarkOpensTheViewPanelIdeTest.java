@@ -43,6 +43,16 @@ public class TestCaseMarkOpensTheViewPanelIdeTest extends AbstractCodegenIdeTest
 
     private ViewOnScreen view;
 
+    private static void clicked(final @NotNull GutterMark mark) {
+        clicked(((LineMarkerInfo.LineMarkerGutterIconRenderer<?>) mark).getLineMarkerInfo());
+    }
+
+    private static <T extends PsiElement> void clicked(final @NotNull LineMarkerInfo<T> info) {
+        final @NotNull T element = Optional.ofNullable(info.getElement()).orElseThrow(() -> new AssertionError("the mark stands beside nothing"));
+        Optional.ofNullable(info.getNavigationHandler()).orElseThrow(() -> new AssertionError("the mark does nothing when clicked"))
+                .navigate(new MouseEvent(new JPanel(), MouseEvent.MOUSE_CLICKED, 0, 0, 1, 1, 1, false), element);
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -60,16 +70,6 @@ public class TestCaseMarkOpensTheViewPanelIdeTest extends AbstractCodegenIdeTest
                 .filter(mark -> Bundle.message("gutter.view.details").equals(mark.getTooltipText()))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the method has no mark beside its identity"));
-    }
-
-    private static void clicked(final @NotNull GutterMark mark) {
-        clicked(((LineMarkerInfo.LineMarkerGutterIconRenderer<?>) mark).getLineMarkerInfo());
-    }
-
-    private static <T extends PsiElement> void clicked(final @NotNull LineMarkerInfo<T> info) {
-        final @NotNull T element = Optional.ofNullable(info.getElement()).orElseThrow(() -> new AssertionError("the mark stands beside nothing"));
-        Optional.ofNullable(info.getNavigationHandler()).orElseThrow(() -> new AssertionError("the mark does nothing when clicked"))
-                .navigate(new MouseEvent(new JPanel(), MouseEvent.MOUSE_CLICKED, 0, 0, 1, 1, 1, false), element);
     }
 
     private boolean showing(final @NotNull TestCaseDto tc) {

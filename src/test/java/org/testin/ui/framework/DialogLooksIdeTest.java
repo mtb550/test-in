@@ -183,6 +183,22 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         return stack;
     }
 
+    private static @NotNull SimpleColoredComponent rowAt(final @NotNull JBList<?> rows, final int index) {
+        final @NotNull SimpleColoredComponent row = (SimpleColoredComponent) rendered(rows, index);
+        row.setSize(400, row.getPreferredSize().height);
+        return row;
+    }
+
+    private static <E> @NotNull Component rendered(final @NotNull JList<E> list, final int index) {
+        return list.getCellRenderer().getListCellRendererComponent(list, list.getModel().getElementAt(index), index, index == 0, false);
+    }
+
+    private static @NotNull List<Integer> gapsOf(final LayoutManager layout) {
+        if (layout instanceof final BorderLayout border) return List.of(border.getHgap(), border.getVgap());
+        if (layout instanceof final FlowLayout flow) return List.of(flow.getHgap(), flow.getVgap());
+        return List.of();
+    }
+
     // UC-INTERNAL-007, Rule-INTERNAL-077
     public void testEveryIconAFrameworkSurfaceDrawsIsGrayEvenWhenTheIconItIsHandedIsColored() {
         assertFalse("the icon this test hands the framework is not colored, so it proves nothing", isGray(GREEN));
@@ -297,8 +313,10 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
 
                 assertEquals("the corner of a card is square", 0, at(image, 0, 0).getAlpha());
                 assertFalse("the card has no edge of its own", fill.getRGB() == at(image, card.getWidth() / 2, 0).getRGB());
-                if (dark) assertTrue("in a dark theme the card is not the darker surface", ColorUtil.getLuminance(fill) <= ColorUtil.getLuminance(ground));
-                else assertTrue("in a light theme the card is not the lighter surface", ColorUtil.getLuminance(fill) >= ColorUtil.getLuminance(ground));
+                if (dark)
+                    assertTrue("in a dark theme the card is not the darker surface", ColorUtil.getLuminance(fill) <= ColorUtil.getLuminance(ground));
+                else
+                    assertTrue("in a light theme the card is not the lighter surface", ColorUtil.getLuminance(fill) >= ColorUtil.getLuminance(ground));
                 assertTrue("the card and the ground are not the theme's two surfaces", fill.getRGB() == UIUtil.getPanelBackground().getRGB() || ground.getRGB() == UIUtil.getPanelBackground().getRGB());
             }
         } finally {
@@ -356,16 +374,6 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         assertTrue("what a row says about itself is lined up into a column instead of sitting against its name", hintStarts.get(0) < hintStarts.get(1));
     }
 
-    private static @NotNull SimpleColoredComponent rowAt(final @NotNull JBList<?> rows, final int index) {
-        final @NotNull SimpleColoredComponent row = (SimpleColoredComponent) rendered(rows, index);
-        row.setSize(400, row.getPreferredSize().height);
-        return row;
-    }
-
-    private static <E> @NotNull Component rendered(final @NotNull JList<E> list, final int index) {
-        return list.getCellRenderer().getListCellRendererComponent(list, list.getModel().getElementAt(index), index, index == 0, false);
-    }
-
     // UC-INTERNAL-007, Rule-INTERNAL-109
     public void testWhereSomethingIsGoingIsOneRowWithOnlyTheSegmentItGainsInTheOrdinaryTextColor() {
         final @NotNull JComponent place = realized(DialogPlace.row(List.of("NAFATH", "Test Cases", "Login"), List.of("NAFATH", "Test Cases", "Accounts", "Login")).orElseThrow());
@@ -420,7 +428,8 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         for (final Component component : Drawn.components(everyField())) {
             if (!(component instanceof final JComponent drawn)) continue;
             final boolean ours = drawn.getClass().getName().startsWith("org.testin");
-            if (!ours && (drawn.getClass().getName().contains("$") || (!(drawn instanceof JPanel) && !(drawn instanceof JLabel)))) continue;
+            if (!ours && (drawn.getClass().getName().contains("$") || (!(drawn instanceof JPanel) && !(drawn instanceof JLabel))))
+                continue;
 
             if (drawn.getBorder() instanceof final EmptyBorder padding) {
                 final @NotNull Insets insets = padding.getBorderInsets();
@@ -431,11 +440,5 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         }
 
         assertEquals("a dialog writes a gap or a padding that is not one of the five steps", List.of(), offSteps);
-    }
-
-    private static @NotNull List<Integer> gapsOf(final LayoutManager layout) {
-        if (layout instanceof final BorderLayout border) return List.of(border.getHgap(), border.getVgap());
-        if (layout instanceof final FlowLayout flow) return List.of(flow.getHgap(), flow.getVgap());
-        return List.of();
     }
 }

@@ -16,6 +16,7 @@
 
 package org.testin.explorer.tree;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestCasesMainDirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -27,7 +28,6 @@ import org.testin.model.node.TestSetPackageDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

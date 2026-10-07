@@ -129,7 +129,7 @@ public final class JavaSourceRoot {
         final @NotNull String packageName = String.join(".", packageSegments);
         final @NotNull String declaration = packageName.isEmpty() ? "" : """
                 package %s;
-
+                
                 """.formatted(packageName);
 
         try {

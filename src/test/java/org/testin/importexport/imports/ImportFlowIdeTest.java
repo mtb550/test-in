@@ -78,65 +78,14 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
     private final @NotNull StandInEditorProvider standIn = new StandInEditorProvider();
     private TestProjectDirectoryDto testProject;
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        testProject = new NodesOnDisk(getProject()).testProject(root.resolve("Demo"));
-    }
-
-    @Override
-    protected void tearDown() {
-        FileEditorManagerEx.getInstanceEx(getProject()).closeAllFiles();
-        super.tearDown();
-    }
-
-    private @NotNull TestCases indexedTestCases() {
-        return Services.getInstance(getProject(), TestCases.class);
-    }
-
     private static @NotNull TestCaseDto aTestCase(final @NotNull String description) {
         return TestCaseDto.builder().description(description).createdBy("Sara").createdAt(CREATED).updatedBy("Sara").updatedAt(CREATED).build();
-    }
-
-    private @NotNull File aFile(final @NotNull String name, final @NotNull Map<String, List<TestCaseDto>> sheets) {
-        final @NotNull File file = root.resolve(name).toFile();
-        FileTypes.JSON.exportToFile(getProject(), file, sheets);
-        return file;
-    }
-
-    private @NotNull Map<String, List<TestCaseDto>> read(final @NotNull File file) {
-        return FileTypes.JSON.importToFile(getProject(), file);
     }
 
     private static @NotNull Map<String, List<TestCaseDto>> sheets(final @NotNull String name, final @NotNull TestCaseDto... testCases) {
         final @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
         sheets.put(name, new ArrayList<>(List.of(testCases)));
         return sheets;
-    }
-
-    private void imported(final @NotNull DirectoryDto into, final @NotNull Map<String, List<TestCaseDto>> sheets) {
-        imported(into, sheets, new EmptyProgressIndicator());
-    }
-
-    private void imported(final @NotNull DirectoryDto into, final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull ProgressIndicator indicator) {
-        if (into.holdsTestCases()) anEditorStandsOpenOn(into);
-        final int total = sheets.values().stream().mapToInt(List::size).sum();
-        final @NotNull Future<?> running = ApplicationManager.getApplication().executeOnPooledThread(() -> new ImportWork(getProject()).importInBackground(into, sheets, false, total, indicator));
-
-        Await.until("the import did not finish", running::isDone);
-        try {
-            running.get();
-        } catch (final InterruptedException | ExecutionException ex) {
-            throw new AssertionError("The import threw: " + ex.getMessage(), ex);
-        }
-    }
-
-    private void anEditorStandsOpenOn(final @NotNull DirectoryDto testSet) {
-        if (Arrays.stream(FileEditorManager.getInstance(getProject()).getOpenFiles()).anyMatch(open -> open.getPath().equals(testSet.getPath().toAbsolutePath().toString()))) return;
-
-        final @NotNull UnifiedVirtualFile file = new UnifiedVirtualFile(testSet);
-        file.putUserData(FileEditorProvider.KEY, standIn);
-        FileEditorManager.getInstance(getProject()).openFile(file, false);
     }
 
     private static @NotNull List<Path> filesOfTestCasesIn(final @NotNull Path folder) {
@@ -161,6 +110,73 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
         } catch (final IOException ex) {
             throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
         }
+    }
+
+    private static @NotNull ProgressIndicator failingAtTheFirstCheckOfTheSecondSheet(final @NotNull AtomicInteger asked) {
+        return (ProgressIndicator) Proxy.newProxyInstance(ProgressIndicator.class.getClassLoader(), new Class<?>[]{ProgressIndicator.class}, (_, method, _) -> {
+            if (method.getName().equals("isCanceled") && asked.incrementAndGet() == 4)
+                throw new IllegalStateException("the disk is full");
+            return nothingOf(method.getReturnType());
+        });
+    }
+
+    private static @NotNull Object nothingOf(final @NotNull Class<?> type) {
+        if (type == boolean.class) return false;
+        if (type == double.class) return 0.0;
+        if (type == int.class) return 0;
+        return "";
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        testProject = new NodesOnDisk(getProject()).testProject(root.resolve("Demo"));
+    }
+
+    @Override
+    protected void tearDown() {
+        FileEditorManagerEx.getInstanceEx(getProject()).closeAllFiles();
+        super.tearDown();
+    }
+
+    private @NotNull TestCases indexedTestCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private @NotNull File aFile(final @NotNull String name, final @NotNull Map<String, List<TestCaseDto>> sheets) {
+        final @NotNull File file = root.resolve(name).toFile();
+        FileTypes.JSON.exportToFile(getProject(), file, sheets);
+        return file;
+    }
+
+    private @NotNull Map<String, List<TestCaseDto>> read(final @NotNull File file) {
+        return FileTypes.JSON.importToFile(getProject(), file);
+    }
+
+    private void imported(final @NotNull DirectoryDto into, final @NotNull Map<String, List<TestCaseDto>> sheets) {
+        imported(into, sheets, new EmptyProgressIndicator());
+    }
+
+    private void imported(final @NotNull DirectoryDto into, final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull ProgressIndicator indicator) {
+        if (into.holdsTestCases()) anEditorStandsOpenOn(into);
+        final int total = sheets.values().stream().mapToInt(List::size).sum();
+        final @NotNull Future<?> running = ApplicationManager.getApplication().executeOnPooledThread(() -> new ImportWork(getProject()).importInBackground(into, sheets, false, total, indicator));
+
+        Await.until("the import did not finish", running::isDone);
+        try {
+            running.get();
+        } catch (final InterruptedException | ExecutionException ex) {
+            throw new AssertionError("The import threw: " + ex.getMessage(), ex);
+        }
+    }
+
+    private void anEditorStandsOpenOn(final @NotNull DirectoryDto testSet) {
+        if (Arrays.stream(FileEditorManager.getInstance(getProject()).getOpenFiles()).anyMatch(open -> open.getPath().equals(testSet.getPath().toAbsolutePath().toString())))
+            return;
+
+        final @NotNull UnifiedVirtualFile file = new UnifiedVirtualFile(testSet);
+        file.putUserData(FileEditorProvider.KEY, standIn);
+        FileEditorManager.getInstance(getProject()).openFile(file, false);
     }
 
     private @NotNull List<TestCaseDto> indexedTestCasesIn(final @NotNull Path testSet) {
@@ -269,6 +285,24 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
         Await.until("an import into a test set opens its editor again, so the package's would have been seen", () -> standIn.opened.get() == 2);
     }
 
+    // UC-SHARE-007, Rule-SHARE-037
+    public void testAnImportThatStopsSaysHowManyWereWrittenAndKeepsThem() {
+        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
+        final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("A Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused"));
+        twoSheets.put("B Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"), aTestCase("pay with a wallet"), aTestCase("pay on delivery"))));
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
+        final @NotNull AtomicInteger asked = new AtomicInteger();
+
+        imported(web, read(aFile("Plan.json", twoSheets)), failingAtTheFirstCheckOfTheSecondSheet(asked));
+
+        final @NotNull String failed = Bundle.message("import.failed.title");
+        Await.until("the import said nothing when it stopped", () -> said.stream().anyMatch(notification -> notification.getTitle().equals(failed)));
+        final @NotNull String content = said.stream().filter(notification -> notification.getTitle().equals(failed)).findFirst().orElseThrow().getContent();
+        assertTrue(content, content.contains(Bundle.message("import.failed.partial", "2", "5", "").strip()));
+        assertEquals("the two written before it stopped are gone", 2, filesOfTestCasesIn(web.getPath().resolve("A Login")).size());
+        assertEquals(List.of(), filesOfTestCasesIn(web.getPath().resolve("B Checkout")));
+    }
+
     private static final class StandInEditorProvider implements FileEditorProvider, DumbAware {
         private final @NotNull AtomicInteger opened = new AtomicInteger();
 
@@ -351,38 +385,6 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
         public void dispose() {
             component.removeAll();
         }
-    }
-
-    // UC-SHARE-007, Rule-SHARE-037
-    public void testAnImportThatStopsSaysHowManyWereWrittenAndKeepsThem() {
-        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
-        final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("A Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused"));
-        twoSheets.put("B Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"), aTestCase("pay with a wallet"), aTestCase("pay on delivery"))));
-        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
-        final @NotNull AtomicInteger asked = new AtomicInteger();
-
-        imported(web, read(aFile("Plan.json", twoSheets)), failingAtTheFirstCheckOfTheSecondSheet(asked));
-
-        final @NotNull String failed = Bundle.message("import.failed.title");
-        Await.until("the import said nothing when it stopped", () -> said.stream().anyMatch(notification -> notification.getTitle().equals(failed)));
-        final @NotNull String content = said.stream().filter(notification -> notification.getTitle().equals(failed)).findFirst().orElseThrow().getContent();
-        assertTrue(content, content.contains(Bundle.message("import.failed.partial", "2", "5", "").strip()));
-        assertEquals("the two written before it stopped are gone", 2, filesOfTestCasesIn(web.getPath().resolve("A Login")).size());
-        assertEquals(List.of(), filesOfTestCasesIn(web.getPath().resolve("B Checkout")));
-    }
-
-    private static @NotNull ProgressIndicator failingAtTheFirstCheckOfTheSecondSheet(final @NotNull AtomicInteger asked) {
-        return (ProgressIndicator) Proxy.newProxyInstance(ProgressIndicator.class.getClassLoader(), new Class<?>[]{ProgressIndicator.class}, (_, method, _) -> {
-            if (method.getName().equals("isCanceled") && asked.incrementAndGet() == 4) throw new IllegalStateException("the disk is full");
-            return nothingOf(method.getReturnType());
-        });
-    }
-
-    private static @NotNull Object nothingOf(final @NotNull Class<?> type) {
-        if (type == boolean.class) return false;
-        if (type == double.class) return 0.0;
-        if (type == int.class) return 0;
-        return "";
     }
 
     private static final class WatchingIndicator extends EmptyProgressIndicator {

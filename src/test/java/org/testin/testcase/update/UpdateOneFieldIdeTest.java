@@ -49,9 +49,16 @@ import java.util.stream.Stream;
 
 public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
 
+    private final @NotNull List<TestCaseDto> saved = new ArrayList<>();
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
-    private final @NotNull List<TestCaseDto> saved = new ArrayList<>();
+    private static @NotNull TestCaseDto with(final @NotNull TestCaseDto tc, final @NotNull String description, final @NotNull String expectedResult) {
+        return tc.edit().description(description).expectedResult(expectedResult).build();
+    }
+
+    private static boolean gray(final @NotNull CreateTestCaseSection section) {
+        return !section.getFocusComponent().isEnabled();
+    }
 
     @Override
     protected void tearDown() {
@@ -64,7 +71,8 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull TestCaseDto aTestCase(final @NotNull String description, final @NotNull String expectedResult) {
-        if (testSet.getPath().toString().isEmpty()) testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        if (testSet.getPath().toString().isEmpty())
+            testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
 
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).expectedResult(expectedResult).order("m" + description.length()).build();
         tc.setParent(testSet);
@@ -85,12 +93,9 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
     private @NotNull TestCaseEditor anEditorSelecting(final @NotNull TestCaseDto tc) {
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
         for (int i = 0; i < editor.getList().getModel().getSize(); i++)
-            if (editor.getList().getModel().getElementAt(i).getId().equals(tc.getId())) editor.getList().setSelectedIndex(i);
+            if (editor.getList().getModel().getElementAt(i).getId().equals(tc.getId()))
+                editor.getList().setSelectedIndex(i);
         return editor;
-    }
-
-    private static @NotNull TestCaseDto with(final @NotNull TestCaseDto tc, final @NotNull String description, final @NotNull String expectedResult) {
-        return tc.edit().description(description).expectedResult(expectedResult).build();
     }
 
     private @NotNull String fileOf(final @NotNull TestCaseDto tc) {
@@ -106,10 +111,6 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
         return Drawn.components(ShownDialog.content(getProject(), UpdateTestCaseDialog.class)).stream()
                 .filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).filter(EditorTextField::isEnabled)
                 .findFirst().orElseThrow(() -> new AssertionError("the update dialog has no field to type into"));
-    }
-
-    private static boolean gray(final @NotNull CreateTestCaseSection section) {
-        return !section.getFocusComponent().isEnabled();
     }
 
     // Rule-EDITOR-PANEL-035

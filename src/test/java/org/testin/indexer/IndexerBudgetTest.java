@@ -21,8 +21,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;
 import org.testin.logger.Logger;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
+import org.testin.model.result.TestRunItems;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 

@@ -75,7 +75,8 @@ public final class EditShownTestCase {
 
     // Rule-VIEW-PANEL-110
     private static @NotNull Optional<String> whyNotEditable(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        if (Services.getInstance(p, TestCases.class).findTestCase(dto.getId()).isEmpty()) return Optional.of(Bundle.message("details.deleted.no.edit"));
+        if (Services.getInstance(p, TestCases.class).findTestCase(dto.getId()).isEmpty())
+            return Optional.of(Bundle.message("details.deleted.no.edit"));
 
         final boolean committed = !currentPath.isEmpty() && Services.getInstance(p, TestRuns.class)
                 .findTestRunDir(Services.getInstance(p, TestinRoot.class).resolve(currentPath))

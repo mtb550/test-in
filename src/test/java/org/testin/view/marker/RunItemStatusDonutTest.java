@@ -16,6 +16,7 @@
 
 package org.testin.view.marker;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeCount;
 import org.testin.model.NodeFigures;
 import org.testin.model.NodeStatistics;
@@ -24,7 +25,6 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

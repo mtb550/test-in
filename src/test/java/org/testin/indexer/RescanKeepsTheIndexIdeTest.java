@@ -17,6 +17,7 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.ApplicationManager;
+import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.TempTree;
 import org.testin.services.Services;
@@ -25,7 +26,6 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.NotNull;
 
 public class RescanKeepsTheIndexIdeTest extends AbstractTempRootIdeTest {
 

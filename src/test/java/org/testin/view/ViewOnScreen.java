@@ -37,7 +37,6 @@ import org.testin.services.Services;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import java.util.Objects;
 import java.awt.BorderLayout;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -45,6 +44,7 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -291,7 +291,8 @@ public final class ViewOnScreen {
                 case "equals" -> StandIn.isItself(proxy, arguments.getFirst());
                 case "hashCode" -> System.identityHashCode(proxy);
                 case "toString" -> "a stand-in tool window";
-                default -> throw new UnsupportedOperationException("A stand-in tool window was asked " + method.getName());
+                default ->
+                        throw new UnsupportedOperationException("A stand-in tool window was asked " + method.getName());
             };
         }
 

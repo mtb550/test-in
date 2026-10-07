@@ -2,7 +2,8 @@
 
 # UC-EDITOR-PANEL-043: Run one test case's automation
 
-**As a** tester, **I want** to run a test case's generated method and have its run item status land in this test run, **so that** the machine judges what it can.
+**As a** tester, **I want** to run a test case's generated method and have its run item status land in this test run,
+**so that** the machine judges what it can.
 
 The machine runs the test and writes the run item status. The tester does not
 press `P` or `F`.
@@ -54,7 +55,8 @@ press `P` or `F`.
 - **Rule-EDITOR-PANEL-241** — A run item can be run again until its test run is
   Committed, and the new run item status is recorded.
 - **Rule-EDITOR-PANEL-242** — A status from the automation for the test case the
-  walk is on moves the walk to the next test case waiting for a run item status. The tester's own run item status does exactly the same, and execution goes on. Until
+  walk is on moves the walk to the next test case waiting for a run item status. The tester's own run item status does
+  exactly the same, and execution goes on. Until
   the status comes, the walk stays on that test case.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
@@ -104,9 +106,8 @@ differently.
 **During a walk** ([UC-EDITOR-PANEL-031](startExecution.md)), running the test
 case the walk is on keeps the walk there, its clock counting, until the status
 comes back. The status then moves the walk to the next test case waiting for a
-run item status, as the tester's own run item status does, and execution goes on
-(Rule-EDITOR-PANEL-242). The time recorded is still the framework's own
-(Rule-EDITOR-PANEL-183).
+run item status, as the tester's own run item status does, and execution goes on (Rule-EDITOR-PANEL-242). The time
+recorded is still the framework's own (Rule-EDITOR-PANEL-183).
 
 Everything about how the execution is built and named is on
 [UC-CODEGEN-008](../codegen/runAutomation.md).

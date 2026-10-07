@@ -37,7 +37,8 @@ public final class PackageDeclarations {
         VfsUtilCore.visitChildrenRecursively(moved, new VirtualFileVisitor<Void>() {
             @Override
             public boolean visitFile(final @NotNull VirtualFile file) {
-                if (!file.isDirectory() && "java".equals(file.getExtension())) retarget(p, sourceRoot, file, file.getParent());
+                if (!file.isDirectory() && "java".equals(file.getExtension()))
+                    retarget(p, sourceRoot, file, file.getParent());
 
                 return true;
             }

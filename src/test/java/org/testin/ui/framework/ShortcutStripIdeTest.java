@@ -72,6 +72,9 @@ public class ShortcutStripIdeTest extends BasePlatformTestCase {
         return SwingUtilities.convertPoint(component.getParent(), component.getLocation(), within).y + component.getHeight() / 2;
     }
 
+    private static void nothing() {
+    }
+
     // UC-INTERNAL-007, Rule-INTERNAL-078
     public void testTheStripIsOneRowAndANarrowDialogShortensItRatherThanFoldingIt() {
         final int oneRow = stripAt(2_000).getPreferredSize().height;
@@ -130,8 +133,5 @@ public class ShortcutStripIdeTest extends BasePlatformTestCase {
         @Override
         protected void submit() {
         }
-    }
-
-    private static void nothing() {
     }
 }

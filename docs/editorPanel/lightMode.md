@@ -223,10 +223,9 @@ view menu (Rule-EDITOR-PANEL-244). The line shows while the name or any button
 is on it. The buttons go while the failure form is open, as the run item status
 buttons do.
 
-Run claims the test case for this test run first, as the card's Run does
-(Rule-EDITOR-PANEL-180), so its run item status comes back here. When it does,
-the walk moves on exactly as after the tester's own run item status
-(Rule-EDITOR-PANEL-242).
+Run claims the test case for this test run first, as the card's Run does (Rule-EDITOR-PANEL-180), so its run item status
+comes back here. When it does,
+the walk moves on exactly as after the tester's own run item status (Rule-EDITOR-PANEL-242).
 
 ### 7. The two clocks
 
@@ -496,8 +495,8 @@ cursor. The error box still says so in its gray hint text, *"paste error or
 exception or screenshot…"*, because that is where a tester is already looking,
 and the status bar names it as *Ctrl+V Paste Screenshot*.
 The gesture is not tied to that box, so a screenshot arrives wherever they happen
-to be typing. A pasted screenshot shows as a small picture in a **Screenshots** row, never as letters, and its
-**x** takes it out. The row is
+to be typing. A pasted screenshot shows as a small picture in a **Screenshots** row, never as letters, and its **x**
+takes it out. The row is
 there only while it holds a picture.
 
 This removes a way to lose work. Passing a test case clears everything recorded

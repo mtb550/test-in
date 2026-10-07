@@ -16,6 +16,7 @@
 
 package org.testin.bug;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
@@ -24,7 +25,6 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

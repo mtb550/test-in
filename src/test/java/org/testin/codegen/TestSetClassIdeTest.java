@@ -39,7 +39,7 @@ public class TestSetClassIdeTest extends AbstractCodegenIdeTest {
 
         assertEquals("""
                 package nafath;
-
+                
                 public class LoginTest {
                 }
                 """, generatedClass("nafath.LoginTest").orElseThrow().getContainingFile().getText());

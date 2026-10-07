@@ -21,13 +21,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
@@ -50,6 +50,14 @@ public class TestProjectOnDiskIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(AppSettingsState.class);
     }
 
+    private static @NotNull List<Path> filesUnder(final @NotNull Path folder) {
+        try (Stream<Path> walk = Files.walk(folder)) {
+            return walk.filter(Files::isRegularFile).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + folder + ": " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -69,14 +77,6 @@ public class TestProjectOnDiskIdeTest extends AbstractTempRootIdeTest {
             XmlSerializerUtil.copyBean(wasStored, settings());
         } finally {
             super.tearDown();
-        }
-    }
-
-    private static @NotNull List<Path> filesUnder(final @NotNull Path folder) {
-        try (Stream<Path> walk = Files.walk(folder)) {
-            return walk.filter(Files::isRegularFile).toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + folder + ": " + ex.getMessage(), ex);
         }
     }
 

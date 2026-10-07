@@ -118,8 +118,8 @@ It is a read-only window. Nothing in it can be changed.
 1. **Name and Path** — **Path** is the node's full path on disk.
 2. **Who and when** — who created the node, who last changed it, and the dates.
 3. **Status** — left out on **Test Cases** and **Test Runs**, which have none.
-4. **The execution rows** — **Execution Started**, **Execution Ended** and
-   **Execution Time**, which is how long the test run took. Only a test run has
+4. **The execution rows** — **Execution Started**, **Execution Ended** and **Execution Time**, which is how long the
+   test run took. Only a test run has
    them, and a test run that never started shows none of them. A test run that
    started and has not ended shows the first alone: there is no length yet.
 5. **The settings** — every answer the tester gave when the test run was made.
@@ -150,7 +150,7 @@ else.
    asks, and never saved. Which counts appear depends on the kind of node:
 
    | Node             | Counts                                                     |
-   |------------------|------------------------------------------------------------|
+      |------------------|------------------------------------------------------------|
    | Test project     | **Test sets**, **Packages**, **Test cases**, **Test runs** |
    | **Test Cases**   | **Test sets**, **Packages**, **Test cases**                |
    | **Test Runs**    | **Packages**, **Test runs**                                |

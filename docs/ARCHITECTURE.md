@@ -167,8 +167,8 @@ is created, so a project that never opened the tool window has no listener. The
 open editors follow through a project listener in `plugin.xml`. `Rescan` still
 asks `Services.isNotCreated(p, TreePanel.class)` before it scans, because that
 question decides whether the project is scanned at all (#77). Startup reads only
-a bound test project; anything else waits for something to need the index
-(#364, Rule-INTERNAL-115). Nothing outside `explorer` and `editor`
+a bound test project; anything else waits for something to need the index (#364, Rule-INTERNAL-115). Nothing outside
+`explorer` and `editor`
 refreshes the tree or reloads the open editors itself, and `ArchitectureTest`
 fails if something does (#361, Rule-INTERNAL-114).
 
@@ -250,7 +250,8 @@ one cache and one `IndexChanged` announcement per change.
 Test runs in particular are saved and read only through the indexer —
 `TestRuns.putTestRun` to create one, `changeTestRun` and `saveTestRun` to change
 one, `changeTestRunMarker`, and `Nodes.addTestRunDir` for its folder. The
-sequential test run writer lives inside the package. It writes one file per result - `<test case id>.ri` - so recording a run item status writes that one file, and two testers judging different test cases of a test run never touch the
+sequential test run writer lives inside the package. It writes one file per result - `<test case id>.ri` - so recording
+a run item status writes that one file, and two testers judging different test cases of a test run never touch the
 same one. A test run's screenshots are its files too:
 `TestRuns.storeScreenshots` writes them, `screenshot` reads one, and the test
 run writer removes those no result names.
@@ -329,18 +330,18 @@ A tester edits a cell in the grid and presses Enter. Ten steps later the JSON on
 disk is either changed or byte-identical, and which one it is decides whether
 anything else happens at all.
 
-| #  | Where                                                  | What happens                                                                                                                                 |
-|----|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| 1  | `editor/grid/GridEditListener`                         | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
-| 2  | `editor/grid/GridEditListener.persistAndGenerate`      | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
-| 3  | `indexer/TestCases.putTestCase`                        | The public door. Returns a boolean: did this have anything to save.                                                                          |
-| 4  | `indexer/IndexerDataStore.putTestCase`                 | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                          |
-| 5  | `indexer/TestCaseSequenceStore.put`                    | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                                |
-| 6  | `indexer/TestDataFiles.alreadyHolds`                   | Serializes the test case and compares the bytes to the file. **Identical, and nothing below runs.**                                          |
-| 7  | `indexer/TestCaseSequenceStore.put`                    | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not.                                                |
-| 8  | `indexer/TestCaseSequenceStore.store`                  | Updates the two maps, then writes.                                                                                                           |
-| 9  | `indexer/TestDataFiles.write`                          | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed.                        |
-| 10 | back in `GridEditListener`                             | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry.                                   |
+| #  | Where                                             | What happens                                                                                                                                 |
+|----|---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | `editor/grid/GridEditListener`                    | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
+| 2  | `editor/grid/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
+| 3  | `indexer/TestCases.putTestCase`                   | The public door. Returns a boolean: did this have anything to save.                                                                          |
+| 4  | `indexer/IndexerDataStore.putTestCase`            | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                          |
+| 5  | `indexer/TestCaseSequenceStore.put`               | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                                |
+| 6  | `indexer/TestDataFiles.alreadyHolds`              | Serializes the test case and compares the bytes to the file. **Identical, and nothing below runs.**                                          |
+| 7  | `indexer/TestCaseSequenceStore.put`               | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not.                                                |
+| 8  | `indexer/TestCaseSequenceStore.store`             | Updates the two maps, then writes.                                                                                                           |
+| 9  | `indexer/TestDataFiles.write`                     | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed.                        |
+| 10 | back in `GridEditListener`                        | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry.                                   |
 
 **Why the bytes are identical.** Step 6 puts the rule's question in the rule's
 own terms: would this write leave the file the same. It has to be asked as

@@ -78,7 +78,8 @@ final class FieldChange {
                 .orElseThrow(() -> new AssertionError("the field's dialog does not hold \"" + "Log in with a valid user" + "\""));
         field.setText(now);
 
-        if (!KeyPress.press(p, field, Shortcuts.Enter.getKey())) throw new AssertionError("Enter did not save the field's dialog");
+        if (!KeyPress.press(p, field, Shortcuts.Enter.getKey()))
+            throw new AssertionError("Enter did not save the field's dialog");
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 }

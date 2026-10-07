@@ -19,9 +19,9 @@ package org.testin.editor.list;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.card.BaseCard;
 import org.testin.editor.EditorColors;
 import org.testin.editor.TestinEditor;
+import org.testin.editor.card.BaseCard;
 import org.testin.model.TestCaseDto;
 
 import javax.swing.JList;

@@ -33,13 +33,13 @@ import org.testin.filter.FilterPopupBtn;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Priority;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
@@ -52,6 +52,14 @@ import java.util.UUID;
 
 public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
+    private static void pressRefresh(final @NotNull AbstractTestinEditor<?, ?> editor) {
+        editor.getToolBar().getToolbarItem(RefreshBtn.class).doClick();
+    }
+
+    private static @NotNull List<String> shownDescriptions(final @NotNull AbstractTestinEditor<?, ?> editor) {
+        return editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList();
+    }
+
     private @NotNull TestSetDirectoryDto aTestSet() {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         return EditorFixtures.testSet(getProject(), tp, "Checkout");
@@ -62,14 +70,6 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
         tc.setParent(ts);
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
         return tc;
-    }
-
-    private static void pressRefresh(final @NotNull AbstractTestinEditor<?, ?> editor) {
-        editor.getToolBar().getToolbarItem(RefreshBtn.class).doClick();
-    }
-
-    private static @NotNull List<String> shownDescriptions(final @NotNull AbstractTestinEditor<?, ?> editor) {
-        return editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList();
     }
 
     // Rule-EDITOR-PANEL-117

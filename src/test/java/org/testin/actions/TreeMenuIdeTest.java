@@ -28,8 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.creator.CreateTreeNodeAction;
 import org.testin.explorer.tree.UpdateStatusAction;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.TestRunStatus;
-import org.testin.model.status.TestSetStatus;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestCasesMainDirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -38,6 +36,8 @@ import org.testin.model.node.TestRunPackageDirectoryDto;
 import org.testin.model.node.TestRunsMainDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.status.TestRunStatus;
+import org.testin.model.status.TestSetStatus;
 import org.testin.open.OpenAction;
 import org.testin.order.OrderNodeAction;
 import org.testin.remove.RemoveAction;
@@ -65,6 +65,10 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
         return node.getType().getDescription();
     }
 
+    private static @NotNull String said(final @NotNull Presentation shown) {
+        return Objects.requireNonNullElse(shown.getDescription(), "");
+    }
+
     private @NotNull Presentation updated(final @NotNull AnAction action, final @NotNull List<DirectoryDto> selected) {
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action, SimpleDataContext.builder()
                 .add(CommonDataKeys.PROJECT, getProject())
@@ -76,10 +80,6 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
 
     private @NotNull Presentation updated(final @NotNull AnAction action, final @NotNull DirectoryDto selected) {
         return updated(action, List.of(selected));
-    }
-
-    private static @NotNull String said(final @NotNull Presentation shown) {
-        return Objects.requireNonNullElse(shown.getDescription(), "");
     }
 
     private void assertGrayWithAReason(final @NotNull String entry, final @NotNull Presentation shown) {

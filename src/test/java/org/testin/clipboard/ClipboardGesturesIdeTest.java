@@ -48,9 +48,9 @@ import org.testin.view.Drawn;
 
 import javax.swing.JComponent;
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +66,31 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull String PASTE = "Testin.PasteTestCaseNode";
 
     private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+
+    private static @NotNull TestCaseDto at(final @NotNull TestCaseEditor editor, final int index) {
+        return editor.getList().getModel().getElementAt(index);
+    }
+
+    private static @NotNull List<String> descriptionsOf(final @NotNull List<TestCaseDto> testCases) {
+        return testCases.stream().map(TestCaseDto::getDescription).toList();
+    }
+
+    private static int opacityOfCard(final @NotNull TestCaseEditor editor, final int index) {
+        final @NotNull JBList<TestCaseDto> list = editor.getList();
+        list.setSize(900, 2000);
+        final @NotNull Component card = list.getCellRenderer().getListCellRendererComponent(list, at(editor, index), index, false, false);
+        card.setSize(900, Math.max(40, card.getPreferredSize().height));
+        card.doLayout();
+
+        final @NotNull BufferedImage image = new BufferedImage(card.getWidth(), card.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final @NotNull Graphics2D g = image.createGraphics();
+        try {
+            card.paint(g);
+        } finally {
+            g.dispose();
+        }
+        return image.getRGB(card.getWidth() - 3, card.getHeight() / 2) >>> 24;
+    }
 
     @Override
     protected void setUp() {
@@ -99,10 +124,6 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
         return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
     }
 
-    private static @NotNull TestCaseDto at(final @NotNull TestCaseEditor editor, final int index) {
-        return editor.getList().getModel().getElementAt(index);
-    }
-
     private @NotNull AnActionEvent eventOn(final @NotNull AnAction action, final @NotNull JComponent component) {
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action, Gestures.dataOf(getProject(), component));
         ActionUtil.updateAction(action, e);
@@ -123,27 +144,6 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull List<TestCaseDto> orderedIn(final @NotNull TestCaseEditor editor) {
         return TestCaseOrder.ordered(theTestCases().getTestCasesForTestSet(editor.getParent().getPath()));
-    }
-
-    private static @NotNull List<String> descriptionsOf(final @NotNull List<TestCaseDto> testCases) {
-        return testCases.stream().map(TestCaseDto::getDescription).toList();
-    }
-
-    private static int opacityOfCard(final @NotNull TestCaseEditor editor, final int index) {
-        final @NotNull JBList<TestCaseDto> list = editor.getList();
-        list.setSize(900, 2000);
-        final @NotNull Component card = list.getCellRenderer().getListCellRendererComponent(list, at(editor, index), index, false, false);
-        card.setSize(900, Math.max(40, card.getPreferredSize().height));
-        card.doLayout();
-
-        final @NotNull BufferedImage image = new BufferedImage(card.getWidth(), card.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        final @NotNull Graphics2D g = image.createGraphics();
-        try {
-            card.paint(g);
-        } finally {
-            g.dispose();
-        }
-        return image.getRGB(card.getWidth() - 3, card.getHeight() / 2) >>> 24;
     }
 
     private @NotNull List<String> everyFile() {

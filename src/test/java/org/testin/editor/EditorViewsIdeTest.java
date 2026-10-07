@@ -67,27 +67,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class EditorViewsIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull TestProjectDirectoryDto aTestProject() {
-        return EditorFixtures.testProject(getProject(), root);
-    }
-
-    private @NotNull TestSetDirectoryDto aTestSetHolding(final @NotNull TestProjectDirectoryDto tp, final int count) {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
-        EditorFixtures.testCases(getProject(), ts, count);
-        return ts;
-    }
-
-    private @NotNull TestCaseEditor openedTestSet(final int count) {
-        return EditorFixtures.openTestCaseEditor(getProject(), aTestSetHolding(aTestProject(), count), getTestRootDisposable());
-    }
-
-    private @NotNull TestRunEditor openedTestRun() {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, EditorFixtures.testCases(getProject(), ts, 3).stream().map(EditorFixtures::pending).toList());
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
-
     private static @NotNull Component at(final @NotNull AbstractTestinEditor<?, ?> editor, final @NotNull String place) {
         return Objects.requireNonNull(((BorderLayout) editor.getComponent().getLayout()).getLayoutComponent(place), "nothing is at " + place);
     }
@@ -122,7 +101,8 @@ public class EditorViewsIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull List<String> headers(final @NotNull JBTable table) {
         final @NotNull List<String> shown = new ArrayList<>();
-        for (int c = 0; c < table.getColumnCount(); c++) shown.add(String.valueOf(table.getColumnModel().getColumn(c).getHeaderValue()));
+        for (int c = 0; c < table.getColumnCount(); c++)
+            shown.add(String.valueOf(table.getColumnModel().getColumn(c).getHeaderValue()));
         return shown;
     }
 
@@ -146,6 +126,27 @@ public class EditorViewsIdeTest extends AbstractTempRootIdeTest {
             if (e.getPresentation().isEnabled()) enabled++;
         }
         return enabled;
+    }
+
+    private @NotNull TestProjectDirectoryDto aTestProject() {
+        return EditorFixtures.testProject(getProject(), root);
+    }
+
+    private @NotNull TestSetDirectoryDto aTestSetHolding(final @NotNull TestProjectDirectoryDto tp, final int count) {
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        EditorFixtures.testCases(getProject(), ts, count);
+        return ts;
+    }
+
+    private @NotNull TestCaseEditor openedTestSet(final int count) {
+        return EditorFixtures.openTestCaseEditor(getProject(), aTestSetHolding(aTestProject(), count), getTestRootDisposable());
+    }
+
+    private @NotNull TestRunEditor openedTestRun() {
+        final @NotNull TestProjectDirectoryDto tp = aTestProject();
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, EditorFixtures.testCases(getProject(), ts, 3).stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-001, Rule-EDITOR-PANEL-011

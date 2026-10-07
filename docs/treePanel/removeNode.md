@@ -66,7 +66,8 @@ The node goes to the recycle bin, so nothing is lost for good.
   even when they are selected together with nodes that are removed.
 - **Rule-TREE-PANEL-094** — A test run can be removed whatever its status. A
   signed-off test run still refuses a rename, a new number and a drag, because a
-  test run that is renamed or moved is still named in a report and now described wrongly. A removed test run is not misdescribed: it is gone, and a reader
+  test run that is renamed or moved is still named in a report and now described wrongly. A removed test run is not
+  misdescribed: it is gone, and a reader
   who cannot find it knows exactly that.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
@@ -126,7 +127,8 @@ and no place.
 2. The tester presses `Delete`, or chooses **Actions → Remove**.
 3. The **Confirm Removing** dialog opens. For one node it asks *Remove
    '\<name\>'?*. It then says how many test sets, test cases and test runs the
-   node holds, and shows the folder it sits in under *FROM*. For several nodes it asks *Remove these N items?*, where N is how
+   node holds, and shows the folder it sits in under *FROM*. For several nodes it asks *Remove these N items?*, where N
+   is how
    many.
 4. The tester presses `Enter`, or the **Remove** button.
 5. Testin keeps a copy of each node for undo, under a progress bar reading *Removing*, and then closes every editor open

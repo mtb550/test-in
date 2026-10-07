@@ -50,6 +50,46 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
     private TestSetDirectoryDto checkout;
     private TreePanel panel;
 
+    private static @NotNull AppSettingsState settings() {
+        return Services.getInstance(AppSettingsState.class);
+    }
+
+    private static boolean gitOnThePath() {
+        try {
+            return new ProcessBuilder("git", "--version").start().waitFor() == 0;
+        } catch (final IOException ex) {
+            return false;
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    private static @NotNull String git(final @NotNull Path in, final @NotNull String... arguments) {
+        final @NotNull List<String> command = new ArrayList<>();
+        command.add("git");
+        command.addAll(List.of(arguments));
+        try {
+            final @NotNull Process process = new ProcessBuilder(command).directory(in.toFile()).redirectErrorStream(true).start();
+            final @NotNull String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            if (process.waitFor() != 0) throw new AssertionError(String.join(" ", command) + " failed: " + output);
+            return output.trim();
+        } catch (final IOException ex) {
+            throw new AssertionError(String.join(" ", command) + " could not run: " + ex.getMessage(), ex);
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(String.join(" ", command) + " was interrupted", ex);
+        }
+    }
+
+    private static void writeUncommitted(final @NotNull Path file) {
+        try {
+            Files.writeString(file, "not committed");
+        } catch (final IOException ex) {
+            throw new AssertionError("could not write " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     public void setUp() {
         super.setUp();
@@ -86,40 +126,8 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
         super.tearDown();
     }
 
-    private static @NotNull AppSettingsState settings() {
-        return Services.getInstance(AppSettingsState.class);
-    }
-
     private @NotNull BoundTestProject bound() {
         return Services.getInstance(getProject(), BoundTestProject.class);
-    }
-
-    private static boolean gitOnThePath() {
-        try {
-            return new ProcessBuilder("git", "--version").start().waitFor() == 0;
-        } catch (final IOException ex) {
-            return false;
-        } catch (final InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            return false;
-        }
-    }
-
-    private static @NotNull String git(final @NotNull Path in, final @NotNull String... arguments) {
-        final @NotNull List<String> command = new ArrayList<>();
-        command.add("git");
-        command.addAll(List.of(arguments));
-        try {
-            final @NotNull Process process = new ProcessBuilder(command).directory(in.toFile()).redirectErrorStream(true).start();
-            final @NotNull String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            if (process.waitFor() != 0) throw new AssertionError(String.join(" ", command) + " failed: " + output);
-            return output.trim();
-        } catch (final IOException ex) {
-            throw new AssertionError(String.join(" ", command) + " could not run: " + ex.getMessage(), ex);
-        } catch (final InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new AssertionError(String.join(" ", command) + " was interrupted", ex);
-        }
     }
 
     private @NotNull String branchOnDisk() {
@@ -131,14 +139,6 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
         final @NotNull JComboBox<?> box = (JComboBox<?>) selector.getComponent();
         Await.until("the branch box never listed the branches", () -> box.isEnabled() && box.getItemCount() == 2);
         return box;
-    }
-
-    private static void writeUncommitted(final @NotNull Path file) {
-        try {
-            Files.writeString(file, "not committed");
-        } catch (final IOException ex) {
-            throw new AssertionError("could not write " + file + ": " + ex.getMessage(), ex);
-        }
     }
 
     // Rule-TREE-PANEL-108

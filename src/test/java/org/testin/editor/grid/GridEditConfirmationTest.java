@@ -16,6 +16,7 @@
 
 package org.testin.editor.grid;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -25,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -45,7 +45,8 @@ public class GridEditConfirmationTest {
                 if (file.getFileName().toString().startsWith(PARENT)) continue;
 
                 final String source = Files.readString(file);
-                if (source.contains("implements TableModelListener") || source.contains("extends " + PARENT)) found.add(file);
+                if (source.contains("implements TableModelListener") || source.contains("extends " + PARENT))
+                    found.add(file);
             }
 
             return found;

@@ -79,6 +79,13 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
 
     private TestProjectDirectoryDto testProject;
 
+    protected static @NotNull String attributeOf(final @NotNull PsiMethod pm, final @NotNull String attribute) {
+        return Optional.ofNullable(pm.getModifierList().findAnnotation(TESTNG_TEST))
+                .map(annotation -> annotation.findDeclaredAttributeValue(attribute))
+                .map(PsiElement::getText)
+                .orElse("");
+    }
+
     @Override
     protected @NotNull LightProjectDescriptor getProjectDescriptor() {
         return JAVA_TEST_SOURCE_ROOT;
@@ -170,13 +177,6 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
     protected @NotNull PsiMethod writtenMethodOf(final @NotNull String qualifiedName, final @NotNull TestCaseDto tc) {
         Await.until("'" + tc.getDescription() + "' has no method in " + qualifiedName, () -> methodOf(qualifiedName, tc).isPresent());
         return methodOf(qualifiedName, tc).orElseThrow();
-    }
-
-    protected static @NotNull String attributeOf(final @NotNull PsiMethod pm, final @NotNull String attribute) {
-        return Optional.ofNullable(pm.getModifierList().findAnnotation(TESTNG_TEST))
-                .map(annotation -> annotation.findDeclaredAttributeValue(attribute))
-                .map(PsiElement::getText)
-                .orElse("");
     }
 
     protected void settled() {

@@ -44,12 +44,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 final class LightModeFrame {
-    private static final @NotNull String PLACEMENT = "testin.lightMode.v1";
-
-    private static final int MIN_WIDTH = 280;
-
     static final int GRAB = 4;
-
+    private static final @NotNull String PLACEMENT = "testin.lightMode.v1";
+    private static final int MIN_WIDTH = 280;
     private final @NotNull JFrame frame = new JFrame();
     private final @NotNull Disposable motionScope;
     private @NotNull Optional<Animator> heightMotion = Optional.empty();

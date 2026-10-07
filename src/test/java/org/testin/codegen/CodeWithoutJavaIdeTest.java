@@ -63,6 +63,10 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
 
     private static final float DRAWN_AT = 1.3f;
 
+    private static @NotNull Icon iconOf(final @NotNull JBLabel label) {
+        return Optional.ofNullable(label.getIcon()).orElseThrow(() -> new AssertionError("the class button has no icon"));
+    }
+
     private @NotNull TestCaseDto aTestCase() {
         return indexedTestCase(indexedTestSet("Login", theTestCasesDirectory()), "Log in with a valid user", "b");
     }
@@ -86,10 +90,6 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
                 .filter(JBLabel.class::isInstance)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the view panel left the class button out"));
-    }
-
-    private static @NotNull Icon iconOf(final @NotNull JBLabel label) {
-        return Optional.ofNullable(label.getIcon()).orElseThrow(() -> new AssertionError("the class button has no icon"));
     }
 
     private @NotNull String grayed(final @NotNull TestCaseDto tc, final @NotNull JBLabel label) {

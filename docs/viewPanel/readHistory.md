@@ -139,7 +139,8 @@ There is no key for this. The tab is called **History**.
    run item's fields have no icon and are named in words (Rule-VIEW-PANEL-111). A
    commit that changed none of the fields reads *reordered or restamped*.
 5. **A bug card** — a card of its own, marked by a bar in the bug's severity
-   color, or in red when its run item did not fail and only has a filed issue. It opens with what happened, **Recorded**, then **Bug in** and the test
+   color, or in red when its run item did not fail and only has a filed issue. It opens with what happened,
+   **Recorded**, then **Bug in** and the test
    run, who and when, and the commit's hash, or **Not committed yet**. Then the
    bug's severity and priority when its run item failed, and its filed issue
    with its state on GitHub when there is one. Clicking the test run's name opens that test run
@@ -148,8 +149,7 @@ There is no key for this. The tab is called **History**.
 6. **Changed** — each of the bug's own attributes, from what it was to what it
    became. A run item change that touches no bug is not shown.
 7. **Cleared** — the bar is green, and the card says why: the run item is no
-   longer Failed and has no link. A run item removed from its test run reads
-   **Run item removed**.
+   longer Failed and has no link. A run item removed from its test run reads **Run item removed**.
 
 A commit that changed the test case and a bug gives two cards, the test case's
 first.

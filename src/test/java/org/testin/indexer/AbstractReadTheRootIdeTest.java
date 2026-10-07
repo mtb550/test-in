@@ -72,6 +72,10 @@ public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest
         SyntheticTree.write(testRun.resolve(fileName), "{ \"id\" : \"" + testCaseId + "\", \"status\" : \"PASSED\" }");
     }
 
+    protected static boolean names(final @NotNull List<String> messages, final @NotNull String words) {
+        return messages.stream().anyMatch(message -> message.contains(Html.ofText(words)));
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -118,9 +122,5 @@ public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest
                 .filter(notification -> notification.getTitle().equals(Html.ofText(title)))
                 .map(Notification::getContent)
                 .toList();
-    }
-
-    protected static boolean names(final @NotNull List<String> messages, final @NotNull String words) {
-        return messages.stream().anyMatch(message -> message.contains(Html.ofText(words)));
     }
 }

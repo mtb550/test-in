@@ -48,30 +48,6 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull String pageSizeBefore = "";
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        pageSizeBefore = Objects.toString(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY), "");
-        PropertiesComponent.getInstance().setValue(TestinEditor.PAGE_SIZE_KEY, String.valueOf(PAGE));
-    }
-
-    @Override
-    protected void tearDown() {
-        if (pageSizeBefore.isEmpty()) PropertiesComponent.getInstance().unsetValue(TestinEditor.PAGE_SIZE_KEY);
-        else PropertiesComponent.getInstance().setValue(TestinEditor.PAGE_SIZE_KEY, pageSizeBefore);
-        super.tearDown();
-    }
-
-    private @NotNull TestSetDirectoryDto aLongTestSet() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
-        EditorFixtures.testCases(getProject(), ts, LONG_TEST_SET);
-        return ts;
-    }
-
-    private @NotNull TestCaseEditor opened(final @NotNull TestSetDirectoryDto ts) {
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-    }
-
     private static void searchForNumber1(final @NotNull TestCaseEditor editor) {
         editor.getToolBar().getSearchTxt().setText(SEARCHED);
         Await.until("the search for '" + SEARCHED + "' never narrowed the list to " + NARROWED_TO, () -> editor.getCurrentTestCases().size() == NARROWED_TO);
@@ -97,6 +73,43 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
         } catch (final IOException ex) {
             throw new AssertionError(file + " could not be read", ex);
         }
+    }
+
+    private static void reloadsOntoTheSelectedPage(final @NotNull AbstractTestinEditor<?, ?> editor, final @NotNull BooleanSupplier loaded) {
+        onPage(editor, 3);
+        editor.getList().setSelectedIndex(5);
+        final @NotNull TestCaseDto selected = editor.getList().getSelectedValue();
+
+        editor.reloadData();
+        Await.until("the editor never reloaded", loaded);
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+        assertEquals("reloading did not land on the page that holds the selected test case", 3, editor.getCurrentPage());
+        assertEquals("the selected test case is not selected after reloading", Optional.of(selected.getId()), Optional.ofNullable(editor.getList().getSelectedValue()).map(TestCaseDto::getId));
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        pageSizeBefore = Objects.toString(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY), "");
+        PropertiesComponent.getInstance().setValue(TestinEditor.PAGE_SIZE_KEY, String.valueOf(PAGE));
+    }
+
+    @Override
+    protected void tearDown() {
+        if (pageSizeBefore.isEmpty()) PropertiesComponent.getInstance().unsetValue(TestinEditor.PAGE_SIZE_KEY);
+        else PropertiesComponent.getInstance().setValue(TestinEditor.PAGE_SIZE_KEY, pageSizeBefore);
+        super.tearDown();
+    }
+
+    private @NotNull TestSetDirectoryDto aLongTestSet() {
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        EditorFixtures.testCases(getProject(), ts, LONG_TEST_SET);
+        return ts;
+    }
+
+    private @NotNull TestCaseEditor opened(final @NotNull TestSetDirectoryDto ts) {
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-101
@@ -155,19 +168,6 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
         editor.getToolBar().getSearchTxt().setText("Test case");
         Await.until("the search never went back to the first page", () -> editor.getCurrentPage() == 1);
-    }
-
-    private static void reloadsOntoTheSelectedPage(final @NotNull AbstractTestinEditor<?, ?> editor, final @NotNull BooleanSupplier loaded) {
-        onPage(editor, 3);
-        editor.getList().setSelectedIndex(5);
-        final @NotNull TestCaseDto selected = editor.getList().getSelectedValue();
-
-        editor.reloadData();
-        Await.until("the editor never reloaded", loaded);
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-
-        assertEquals("reloading did not land on the page that holds the selected test case", 3, editor.getCurrentPage());
-        assertEquals("the selected test case is not selected after reloading", Optional.of(selected.getId()), Optional.ofNullable(editor.getList().getSelectedValue()).map(TestCaseDto::getId));
     }
 
     // Rule-EDITOR-PANEL-104

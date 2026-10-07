@@ -137,8 +137,7 @@ to drop one.
 a time*. There is no bulk editor for it.
 
 **If a description is edited to nothing** — that row is left as it was. A
-blank is not a value Testin could not read, so it is not counted as one
-(Rule-EDITOR-PANEL-206).
+blank is not a value Testin could not read, so it is not counted as one (Rule-EDITOR-PANEL-206).
 
 **If a description cannot name a Java method, or names the same method as
 another test case in the test set** — that row is left as it was, and a message

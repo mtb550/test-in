@@ -110,7 +110,8 @@ public final class TestCaseHistory {
     }
 
     private static @NotNull Optional<HistoryEntry> uncommitted(final @NotNull List<Optional<TestCaseDto>> read, final @NotNull Optional<TestCaseDto> present) {
-        if (present.isEmpty()) return read.isEmpty() || read.getFirst().isEmpty() ? Optional.empty() : Optional.of(new HistoryEntry(HistoryEntryKind.REMOVED, "", "", Config.NOT_EXECUTED, "", List.of()));
+        if (present.isEmpty())
+            return read.isEmpty() || read.getFirst().isEmpty() ? Optional.empty() : Optional.of(new HistoryEntry(HistoryEntryKind.REMOVED, "", "", Config.NOT_EXECUTED, "", List.of()));
 
         final @NotNull TestCaseDto now = present.orElseThrow();
         if (read.isEmpty()) {
@@ -124,7 +125,8 @@ public final class TestCaseHistory {
     }
 
     private static @NotNull HistoryEntry entry(final @NotNull HistoryCommit commit, final @NotNull Optional<TestCaseDto> version, final @NotNull Optional<TestCaseDto> before, final boolean oldest, final boolean removedHere) {
-        if (version.isEmpty()) return HistoryEntry.of(removedHere ? HistoryEntryKind.REMOVED : HistoryEntryKind.UNREADABLE, commit, List.of());
+        if (version.isEmpty())
+            return HistoryEntry.of(removedHere ? HistoryEntryKind.REMOVED : HistoryEntryKind.UNREADABLE, commit, List.of());
         if (oldest) return HistoryEntry.of(HistoryEntryKind.CREATED, commit, List.of());
 
         return before.map(older -> HistoryEntry.of(HistoryEntryKind.CHANGED, commit, TestCaseChangeComparator.compare(older, version.orElseThrow())))

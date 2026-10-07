@@ -44,18 +44,6 @@ public class SearchRowsIdeTest extends AbstractReadTheRootIdeTest {
 
     private @NotNull TestProjectDirectoryDto nafath = new TestProjectDirectoryDto();
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        nafath = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
-    }
-
-    private @NotNull Icon drawnInTheTree(final @NotNull DirectoryDto node) {
-        final @NotNull TreeCellRenderer tree = new TreeCellRenderer(Set.of());
-        tree.customizeCellRenderer(new JTree(), node, false, false, true, 0, false);
-        return tree.getIcon();
-    }
-
     private static @NotNull JBList<?> drawnAsTheSearchDrawsThem(final @NotNull List<SelectionList<Hit>> rows) {
         final @NotNull ComponentDialogBase.TextFieldBuilder<Hit> builder = ComponentDialogBase.<Hit>textFieldWithSelections().placeholder("search..");
         rows.forEach(row -> builder.selection(row.icon(), row.name(), row.hint(), row.value()));
@@ -81,6 +69,18 @@ public class SearchRowsIdeTest extends AbstractReadTheRootIdeTest {
         return IntStream.range(0, row.getWidth()).filter(x -> row.findFragmentAt(x) == 1).findFirst().orElseThrow(() -> new AssertionError("the row shows no path"));
     }
 
+    @Override
+    protected void setUp() {
+        super.setUp();
+        nafath = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
+    }
+
+    private @NotNull Icon drawnInTheTree(final @NotNull DirectoryDto node) {
+        final @NotNull TreeCellRenderer tree = new TreeCellRenderer(Set.of());
+        tree.customizeCellRenderer(new JTree(), node, false, false, true, 0, false);
+        return tree.getIcon();
+    }
+
     // UC-INTERNAL-001, Rule-INTERNAL-072
     public void testWhatKindOfThingARowIsItsIconSaysAndItIsTheIconTheTreeDraws() {
         final @NotNull DirectoryDto login = new NodesOnDisk(getProject()).testSet(nafath.getTestCasesDirectory(), "Login");
@@ -99,7 +99,8 @@ public class SearchRowsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-001, Rule-INTERNAL-073
     public void testTheSearchSaysHowManyMatchedNotHowManyItShows() {
-        for (int set = 1; set <= 60; set++) new NodesOnDisk(getProject()).testSet(nafath.getTestCasesDirectory(), "Login " + set);
+        for (int set = 1; set <= 60; set++)
+            new NodesOnDisk(getProject()).testSet(nafath.getTestCasesDirectory(), "Login " + set);
 
         final @NotNull Answer<Hit> answer = GlobalSearchDialog.rowsFor(getProject(), "Login");
 

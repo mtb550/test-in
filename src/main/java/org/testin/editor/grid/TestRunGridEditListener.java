@@ -20,11 +20,11 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.services.Services;
-import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.testrun.RunItemStatusService;
+import org.testin.testrun.TestRunEditorAttributes;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;

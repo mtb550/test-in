@@ -17,8 +17,11 @@
 package org.testin.clipboard;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.TestCaseStatus;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testng.annotations.Test;
 
 import javax.swing.KeyStroke;
@@ -27,16 +30,34 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.testin.model.Priority;
-import org.testin.model.status.TestCaseStatus;
-import org.testin.testcase.TestCaseEditorAttributes;
 import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class CopyChoiceTest {
+
+    private static @NotNull TestCaseDto writtenInFull() {
+        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        set.setPath2(new ArrayList<>(List.of("shop", "checkout", "Payment")));
+
+        final @NotNull TestCaseDto tc = TestCaseDto.builder()
+                .id(UUID.randomUUID())
+                .description("Refuse an expired card")
+                .expectedResult("The payment is declined")
+                .steps(List.of("Enter the card", "Press Pay"))
+                .priority(Priority.HIGH)
+                .reference("JIRA-77")
+                .testData("card=4111")
+                .preConditions("A basket holds one item")
+                .group(List.of("Regression"))
+                .module("payments")
+                .status(TestCaseStatus.REVIEWED)
+                .build();
+        tc.setParent(set);
+        return tc;
+    }
 
     @Test
     public void noTwoRowsAnswerToTheSameKey() {
@@ -86,27 +107,6 @@ public class CopyChoiceTest {
         assertEquals(CopyChoice.FQCN.from(tc), "shop.checkout.PaymentTest.cardIsDeclined");
     }
 
-    private static @NotNull TestCaseDto writtenInFull() {
-        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
-        set.setPath2(new ArrayList<>(List.of("shop", "checkout", "Payment")));
-
-        final @NotNull TestCaseDto tc = TestCaseDto.builder()
-                .id(UUID.randomUUID())
-                .description("Refuse an expired card")
-                .expectedResult("The payment is declined")
-                .steps(List.of("Enter the card", "Press Pay"))
-                .priority(Priority.HIGH)
-                .reference("JIRA-77")
-                .testData("card=4111")
-                .preConditions("A basket holds one item")
-                .group(List.of("Regression"))
-                .module("payments")
-                .status(TestCaseStatus.REVIEWED)
-                .build();
-        tc.setParent(set);
-        return tc;
-    }
-
     // Rule-EDITOR-PANEL-073, Rule-EDITOR-PANEL-207
     @Test
     public void allDetailsCopiesEveryFieldTheTesterWroteAsNameColonValue() {
@@ -146,7 +146,7 @@ public class CopyChoiceTest {
 
         assertEquals(CopyChoice.DESCRIPTION.from(List.of(first, second)), """
                 Log in
-
+                
                 Log out""");
     }
 

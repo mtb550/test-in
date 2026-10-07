@@ -66,8 +66,8 @@ about five seconds.
 ## What the tester should expect
 
 The count in the message is what really went back. It can be more than the
-tester aimed at. Stopping one test case in an execution of twelve reports
-*Stopped 12*, because the twelve share one process.
+tester aimed at. Stopping one test case in an execution of twelve reports *Stopped 12*, because the twelve share one
+process.
 
 A result arriving after the tester stopped a test case is ignored, so a stop is
 never read as a failure.

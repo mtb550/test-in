@@ -115,18 +115,18 @@ The always on top window, which has its own keys.
 
 ## The view panel
 
-| Key                                         | What it does                                                                                      |
-|---------------------------------------------|---------------------------------------------------------------------------------------------------|
-| `Enter`                                     | Opens the panel on the selected test cases                                                        |
-| `F2`                                        | Opens the menu that changes one field                                                             |
-| `Ctrl+Right`, `Ctrl+Alt+Cmd+Right` on a Mac | Forward: the next test case                                                                       |
-| `Ctrl+Left`, `Ctrl+Alt+Cmd+Left` on a Mac   | Back: the previous test case                                                                      |
-| `F5`                                        | Runs the test case on display                                                                     |
-| `Shift+F5`                                  | Opens its generated test method                                                                   |
-| `Escape`                                    | Closes the panel, pressed in the editor or inside the panel                                       |
-| `Tab`                                       | Brings the next tab to the front: **Details**, **History**, then **Details** again                |
-| `Shift+Tab`                                 | Brings the previous tab to the front                                                              |
-| `Ctrl` and the wheel                        | Changes the text size                                                                             |
+| Key                                         | What it does                                                                       |
+|---------------------------------------------|------------------------------------------------------------------------------------|
+| `Enter`                                     | Opens the panel on the selected test cases                                         |
+| `F2`                                        | Opens the menu that changes one field                                              |
+| `Ctrl+Right`, `Ctrl+Alt+Cmd+Right` on a Mac | Forward: the next test case                                                        |
+| `Ctrl+Left`, `Ctrl+Alt+Cmd+Left` on a Mac   | Back: the previous test case                                                       |
+| `F5`                                        | Runs the test case on display                                                      |
+| `Shift+F5`                                  | Opens its generated test method                                                    |
+| `Escape`                                    | Closes the panel, pressed in the editor or inside the panel                        |
+| `Tab`                                       | Brings the next tab to the front: **Details**, **History**, then **Details** again |
+| `Shift+Tab`                                 | Brings the previous tab to the front                                               |
+| `Ctrl` and the wheel                        | Changes the text size                                                              |
 
 ## Automation code
 

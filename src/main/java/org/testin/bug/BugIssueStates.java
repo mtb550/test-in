@@ -29,10 +29,10 @@ import org.testin.help.Hint;
 import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.indexer.TestRuns;
+import org.testin.model.TestRunDto;
 import org.testin.model.bug.BugIssue;
 import org.testin.model.bug.BugIssueUrl;
 import org.testin.model.result.TestRunItems;
-import org.testin.model.TestRunDto;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -58,6 +58,17 @@ public final class BugIssueStates {
     public BugIssueStates(final @NotNull Project p) {
         this.p = p;
         this.gh = ApplicationManager.getApplication().isUnitTestMode() ? Optional.empty() : Optional.of(GitHubCli::onPath);
+    }
+
+    static @NotNull Map<BugRepository, Set<Integer>> filedIn(final @NotNull Collection<TestRunDto> testRuns) {
+        return testRuns.stream()
+                .flatMap(testRun -> testRun.getResults().stream())
+                .map(TestRunItems::bugIssue)
+                .flatMap(Optional::stream)
+                .map(BugIssueUrl::issue)
+                .flatMap(Optional::stream)
+                .collect(Collectors.groupingBy(issue -> new BugRepository(issue.host(), issue.owner(), issue.name()),
+                        Collectors.mapping(BugIssue::number, Collectors.toCollection(TreeSet::new))));
     }
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-091
@@ -118,17 +129,6 @@ public final class BugIssueStates {
     private @NotNull IssueStates withoutBoards(final @NotNull GitHubCli cli, final @NotNull Mapper mapper, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
         Services.getInstance(p, Hints.class).fire(Hint.of(SetupStep.BOARD_COLUMNS, Bundle.message("bug.states.board.message", repository.host())));
         return cli.states(mapper, repository, numbers, false);
-    }
-
-    static @NotNull Map<BugRepository, Set<Integer>> filedIn(final @NotNull Collection<TestRunDto> testRuns) {
-        return testRuns.stream()
-                .flatMap(testRun -> testRun.getResults().stream())
-                .map(TestRunItems::bugIssue)
-                .flatMap(Optional::stream)
-                .map(BugIssueUrl::issue)
-                .flatMap(Optional::stream)
-                .collect(Collectors.groupingBy(issue -> new BugRepository(issue.host(), issue.owner(), issue.name()),
-                        Collectors.mapping(BugIssue::number, Collectors.toCollection(TreeSet::new))));
     }
 
     @TestOnly

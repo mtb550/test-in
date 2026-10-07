@@ -52,13 +52,13 @@ import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testproject.BoundTestProject;
@@ -86,13 +86,9 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull String TEST_PROJECT = "NAFATH";
 
     private final @NotNull AppSettingsState wasStored = new AppSettingsState();
-
-    private @NotNull List<Notification> said = List.of();
-
     private final @NotNull UUID opens = UUID.randomUUID();
-
     private final @NotNull UUID locks = UUID.randomUUID();
-
+    private @NotNull List<Notification> said = List.of();
     private String wasBound;
 
     private Path testin;
@@ -103,6 +99,68 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);
+    }
+
+    private static @NotNull AnAction theLink(final @NotNull Notification message, final @NotNull String named) {
+        return message.getActions().stream()
+                .filter(action -> named.equals(action.getTemplatePresentation().getText()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("the message has no " + named + " link: " + message.getActions().stream().map(a -> a.getTemplatePresentation().getText()).toList()));
+    }
+
+    private static @NotNull List<Path> everythingUnder(final @NotNull Path folder) {
+        try (Stream<Path> walk = Files.walk(folder)) {
+            return walk.sorted(Comparator.naturalOrder()).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + folder + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static @NotNull List<TextRenderInfo> chunksOf(final @NotNull PdfDocument document, final int page) {
+        final @NotNull List<TextRenderInfo> chunks = new ArrayList<>();
+        new PdfCanvasProcessor(new IEventListener() {
+            @Override
+            public void eventOccurred(final @NotNull IEventData data, final @NotNull EventType type) {
+                if (data instanceof final TextRenderInfo info) {
+                    info.preserveGraphicsState();
+                    chunks.add(info);
+                }
+            }
+
+            @Override
+            public @NotNull Set<EventType> getSupportedEvents() {
+                return Set.of(EventType.RENDER_TEXT);
+            }
+        }).processPageContent(document.getPage(page));
+        return chunks;
+    }
+
+    private static float startOf(final @NotNull TextRenderInfo chunk) {
+        return chunk.getBaseline().getStartPoint().get(Vector.I1);
+    }
+
+    private static float endOf(final @NotNull TextRenderInfo chunk) {
+        return chunk.getBaseline().getEndPoint().get(Vector.I1);
+    }
+
+    private static float heightOf(final @NotNull TextRenderInfo chunk) {
+        return chunk.getBaseline().getStartPoint().get(Vector.I2);
+    }
+
+    private static @NotNull List<Float> centersOfTheHeaderCells(final @NotNull List<TextRenderInfo> line) {
+        final @NotNull List<TextRenderInfo> sorted = line.stream().filter(chunk -> !chunk.getText().isBlank()).sorted(Comparator.comparingDouble(ReportDeliveryIdeTest::startOf)).toList();
+        final @NotNull List<Float> centers = new ArrayList<>();
+        float from = startOf(sorted.getFirst());
+        float to = endOf(sorted.getFirst());
+        for (final TextRenderInfo chunk : sorted.subList(1, sorted.size())) {
+            if (startOf(chunk) - to > 8) {
+                centers.add((from + to) / 2);
+                from = startOf(chunk);
+            }
+            to = endOf(chunk);
+        }
+        centers.add((from + to) / 2);
+        return centers;
     }
 
     private @NotNull BoundTestProject bound() {
@@ -190,23 +248,8 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         return said.stream().filter(n -> n.getContent().contains(Bundle.message("report.generated.message", "").strip())).findFirst().orElseThrow();
     }
 
-    private static @NotNull AnAction theLink(final @NotNull Notification message, final @NotNull String named) {
-        return message.getActions().stream()
-                .filter(action -> named.equals(action.getTemplatePresentation().getText()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("the message has no " + named + " link: " + message.getActions().stream().map(a -> a.getTemplatePresentation().getText()).toList()));
-    }
-
     private void clicked(final @NotNull Notification message, final @NotNull AnAction link) {
         Notified.press(getProject(), message, link);
-    }
-
-    private static @NotNull List<Path> everythingUnder(final @NotNull Path folder) {
-        try (Stream<Path> walk = Files.walk(folder)) {
-            return walk.sorted(Comparator.naturalOrder()).toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + folder + ": " + ex.getMessage(), ex);
-        }
     }
 
     // Rule-REPORT-001
@@ -356,53 +399,6 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         assertTrue("in the PDF the number is " + number + " wide and the description " + description + ": " + widths, number * 4 < description);
         assertTrue("in the PDF the bug priority is " + widths.get(2) + " wide and the description " + description, widths.get(2) < description);
         assertTrue("in the PDF the bug severity is " + widths.get(3) + " wide and the description " + description, widths.get(3) < description);
-    }
-
-    private static @NotNull List<TextRenderInfo> chunksOf(final @NotNull PdfDocument document, final int page) {
-        final @NotNull List<TextRenderInfo> chunks = new ArrayList<>();
-        new PdfCanvasProcessor(new IEventListener() {
-            @Override
-            public void eventOccurred(final @NotNull IEventData data, final @NotNull EventType type) {
-                if (data instanceof final TextRenderInfo info) {
-                    info.preserveGraphicsState();
-                    chunks.add(info);
-                }
-            }
-
-            @Override
-            public @NotNull Set<EventType> getSupportedEvents() {
-                return Set.of(EventType.RENDER_TEXT);
-            }
-        }).processPageContent(document.getPage(page));
-        return chunks;
-    }
-
-    private static float startOf(final @NotNull TextRenderInfo chunk) {
-        return chunk.getBaseline().getStartPoint().get(Vector.I1);
-    }
-
-    private static float endOf(final @NotNull TextRenderInfo chunk) {
-        return chunk.getBaseline().getEndPoint().get(Vector.I1);
-    }
-
-    private static float heightOf(final @NotNull TextRenderInfo chunk) {
-        return chunk.getBaseline().getStartPoint().get(Vector.I2);
-    }
-
-    private static @NotNull List<Float> centersOfTheHeaderCells(final @NotNull List<TextRenderInfo> line) {
-        final @NotNull List<TextRenderInfo> sorted = line.stream().filter(chunk -> !chunk.getText().isBlank()).sorted(Comparator.comparingDouble(ReportDeliveryIdeTest::startOf)).toList();
-        final @NotNull List<Float> centers = new ArrayList<>();
-        float from = startOf(sorted.getFirst());
-        float to = endOf(sorted.getFirst());
-        for (final TextRenderInfo chunk : sorted.subList(1, sorted.size())) {
-            if (startOf(chunk) - to > 8) {
-                centers.add((from + to) / 2);
-                from = startOf(chunk);
-            }
-            to = endOf(chunk);
-        }
-        centers.add((from + to) / 2);
-        return centers;
     }
 
     private @NotNull List<Float> pdfColumnWidths(final byte @NotNull [] pdf) {

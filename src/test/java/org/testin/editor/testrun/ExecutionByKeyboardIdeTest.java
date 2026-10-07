@@ -23,10 +23,10 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
-import org.testin.model.status.RunItemStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.RunItemStatus;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
 

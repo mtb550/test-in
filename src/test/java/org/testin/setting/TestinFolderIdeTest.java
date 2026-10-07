@@ -58,6 +58,15 @@ public class TestinFolderIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(AppSettingsState.class);
     }
 
+    private static @NotNull String folderShownBy(final @NotNull JComponent form) {
+        return Drawn.components(form).stream()
+                .filter(JTextComponent.class::isInstance)
+                .map(JTextComponent.class::cast)
+                .map(JTextComponent::getText)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("the dialog has no folder box"));
+    }
+
     private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
@@ -99,15 +108,6 @@ public class TestinFolderIdeTest extends AbstractTempRootIdeTest {
             Services.getInstance(getProject(), Nodes.class).addTestProject(tp);
             return tp;
         });
-    }
-
-    private static @NotNull String folderShownBy(final @NotNull JComponent form) {
-        return Drawn.components(form).stream()
-                .filter(JTextComponent.class::isInstance)
-                .map(JTextComponent.class::cast)
-                .map(JTextComponent::getText)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("the dialog has no folder box"));
     }
 
     // Rule-SETTING-010

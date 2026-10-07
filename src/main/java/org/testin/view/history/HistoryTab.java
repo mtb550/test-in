@@ -36,9 +36,9 @@ import org.testin.git.history.HistoryEntryKind;
 import org.testin.git.history.TestCaseHistory;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
+import org.testin.model.TestCaseDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
-import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -79,39 +79,6 @@ public class HistoryTab {
     private static final int BAR = 3;
     private static final @NotNull Color NOT_COMMITTED = JBColor.ORANGE;
     private static final @NotNull Color HASH = JBColor.LIGHT_GRAY;
-
-    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-099
-    public void load(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull Optional<TestCaseDto> shown) {
-        final @NotNull Object request = new Object();
-        historyTab.putClientProperty(REQUEST, request);
-        historyTab.removeAll();
-        historyTab.setLayout(new BorderLayout());
-        historyTab.revalidate();
-        historyTab.repaint();
-
-        if (shown.isEmpty()) return;
-        final @NotNull TestCaseDto tc = shown.orElseThrow();
-
-        final @NotNull Timer reading = new Timer(READING_AFTER_MILLIS, _ -> {
-            if (isCurrent(historyTab, request)) line(historyTab, Bundle.message("view.history.reading"));
-        });
-        reading.setRepeats(false);
-        reading.start();
-
-        final @NotNull Map<Path, String> runItemsNow = BugHistory.runItemsNow(p, tc.getId());
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
-            final @NotNull History history = testCases.testCaseFile(tc)
-                    .or(() -> TestCaseHistory.deletedFile(p, tc.getId()))
-                    .map(file -> BugHistory.addTo(TestCaseHistory.read(p, file, testCases.findTestCase(tc.getId())), p, file, tc.getId(), runItemsNow))
-                    .orElseGet(() -> History.failed(Bundle.message("view.history.no.file")));
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                reading.stop();
-                if (isCurrent(historyTab, request)) show(p, historyTab, history, tc, request);
-            }, p.getDisposed());
-        });
-    }
 
     private static boolean isCurrent(final @NotNull JBPanel<?> historyTab, final @NotNull Object request) {
         return request.equals(historyTab.getClientProperty(REQUEST));
@@ -184,10 +151,14 @@ public class HistoryTab {
 
     // Rule-VIEW-PANEL-096
     private static @NotNull List<JComponent> rows(final @NotNull HistoryEntry entry) {
-        if (entry.kind() == HistoryEntryKind.UNREADABLE) return List.of(muted(Bundle.message("view.history.unreadable")));
-        if (entry.kind() == HistoryEntryKind.UNCOMPARED) return List.of(muted(Bundle.message("view.history.uncompared")));
-        if (entry.kind() == HistoryEntryKind.CREATED) return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(Bundle.message("view.history.created"), RunItemStatus.PASSED.getRowColor()))));
-        if (entry.kind() == HistoryEntryKind.REMOVED) return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(RunItemStatus.REMOVED.getLabel(), RunItemStatus.REMOVED.getRowColor()))));
+        if (entry.kind() == HistoryEntryKind.UNREADABLE)
+            return List.of(muted(Bundle.message("view.history.unreadable")));
+        if (entry.kind() == HistoryEntryKind.UNCOMPARED)
+            return List.of(muted(Bundle.message("view.history.uncompared")));
+        if (entry.kind() == HistoryEntryKind.CREATED)
+            return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(Bundle.message("view.history.created"), RunItemStatus.PASSED.getRowColor()))));
+        if (entry.kind() == HistoryEntryKind.REMOVED)
+            return List.of(field(Bundle.message("caption.test.case"), pill(new Pill(RunItemStatus.REMOVED.getLabel(), RunItemStatus.REMOVED.getRowColor()))));
         if (entry.changes().isEmpty()) return List.of(muted(Bundle.message("git.change.reordered")));
 
         return entry.changes().stream().map(change -> field(change.fieldName(), change(change))).toList();
@@ -245,7 +216,8 @@ public class HistoryTab {
         return switch (event.kind()) {
             case RECORDED -> bugAttributes(p, event.item());
             case CHANGED -> event.changes().stream().map(change -> field(change.fieldName(), change(change))).toList();
-            case CLEARED -> List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.cleared.why", event.item().getStatus().getLabel()))));
+            case CLEARED ->
+                    List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.cleared.why", event.item().getStatus().getLabel()))));
             case REMOVED -> List.of();
         };
     }
@@ -338,5 +310,38 @@ public class HistoryTab {
     private static @NotNull JComponent left(final @NotNull JComponent component) {
         component.setAlignmentX(Component.LEFT_ALIGNMENT);
         return component;
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-099
+    public void load(final @NotNull Project p, final @NotNull JBPanel<?> historyTab, final @NotNull Optional<TestCaseDto> shown) {
+        final @NotNull Object request = new Object();
+        historyTab.putClientProperty(REQUEST, request);
+        historyTab.removeAll();
+        historyTab.setLayout(new BorderLayout());
+        historyTab.revalidate();
+        historyTab.repaint();
+
+        if (shown.isEmpty()) return;
+        final @NotNull TestCaseDto tc = shown.orElseThrow();
+
+        final @NotNull Timer reading = new Timer(READING_AFTER_MILLIS, _ -> {
+            if (isCurrent(historyTab, request)) line(historyTab, Bundle.message("view.history.reading"));
+        });
+        reading.setRepeats(false);
+        reading.start();
+
+        final @NotNull Map<Path, String> runItemsNow = BugHistory.runItemsNow(p, tc.getId());
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+            final @NotNull History history = testCases.testCaseFile(tc)
+                    .or(() -> TestCaseHistory.deletedFile(p, tc.getId()))
+                    .map(file -> BugHistory.addTo(TestCaseHistory.read(p, file, testCases.findTestCase(tc.getId())), p, file, tc.getId(), runItemsNow))
+                    .orElseGet(() -> History.failed(Bundle.message("view.history.no.file")));
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                reading.stop();
+                if (isCurrent(historyTab, request)) show(p, historyTab, history, tc, request);
+            }, p.getDisposed());
+        });
     }
 }

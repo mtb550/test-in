@@ -17,6 +17,7 @@
 package org.testin.bug;
 
 import com.intellij.execution.process.ProcessOutput;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

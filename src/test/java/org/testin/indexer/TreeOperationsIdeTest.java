@@ -17,17 +17,17 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
+import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.ProjectStatus;
-import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.markers.TestCasesMainDirectoryMarker;
 import org.testin.model.markers.TestProjectMarker;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.jetbrains.annotations.NotNull;
 
 public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
 

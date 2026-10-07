@@ -17,14 +17,15 @@
 package org.testin.model;
 
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

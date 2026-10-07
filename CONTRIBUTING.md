@@ -200,8 +200,7 @@ rule, give it the marker: that is how the count goes up.
 ### The coverage gate
 
 JaCoCo measures the lines and branches both test tasks run, `test` and
-`ideTest`, across the three modules, and reports them per package in one report
-(#325).
+`ideTest`, across the three modules, and reports them per package in one report (#325).
 
 ```bash
 ./gradlew check                            # both test tasks, every gate, and the report
@@ -282,7 +281,8 @@ the text. A word that cannot be corrected - an IntelliJ API, a command such as
 `.idea/dictionaries/project.xml`, the project dictionary every clone shares. It
 is never renamed into something wrong to quiet the check, and never suppressed.
 
-The script's own rules, because no IntelliJ inspection makes them. This table is the one list of them: `UnlistedRule` fails the gate when it leaves out a rule the script reports, or names one it no longer does.
+The script's own rules, because no IntelliJ inspection makes them. This table is the one list of them: `UnlistedRule`
+fails the gate when it leaves out a rule the script reports, or names one it no longer does.
 
 | Rule                            | What it forbids                                                                                                                                                                                 |
 |---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -300,6 +300,7 @@ The script's own rules, because no IntelliJ inspection makes them. This table is
 | `QualifiedClassName`            | A class written by its package path mid-line instead of imported                                                                                                                                |
 | `UnicodeEscape`                 | A `\u` escape in a `.java` file, for any character: write the character itself, or `Character.toString(0x1E)` for one that cannot be seen                                                       |
 | `ColorCode`                     | A color written as RGB or hex in a `.java` file. Use IntelliJ's own (`JBColor` constants, `JBUI.CurrentTheme`) or a house owner (`Icons`, `FixedColors`)                                        |
+| `UnusedImport`                  | An import nothing in the `.java` file names, or one of a class in the file's own package or in `java.lang`                                                                                      |
 | `DuplicatedDisplayString`       | A string a tester reads that another file also writes, so it has no owner                                                                                                                       |
 | `UsedFromContentModule`         | A declaration the inspector calls unused that a content module calls, until it is marked `@FromContentModule`                                                                                   |
 | `UnlistedRule`                  | A rule this script reports that this table does not name, or a row naming one it no longer reports                                                                                              |
@@ -365,7 +366,8 @@ patchChangelog` to put that version's heading over what Unreleased holds, and
 then publishes.
 
 **2.14.0-alpha's change notes have to say that 2.13.0-alpha is installed
-first.** The Unreleased section of `CHANGELOG.md` says so now. The converter that brought pre-2.13 test data forward was deleted
+first.** The Unreleased section of `CHANGELOG.md` says so now. The converter that brought pre-2.13 test data forward was
+deleted
 after 2.13.0-alpha was published (#333), so a tester who updates from
 2.12.0-alpha straight to 2.14.0-alpha meets a refusal naming that release
 rather than a conversion. JetBrains cannot make one plugin version require an

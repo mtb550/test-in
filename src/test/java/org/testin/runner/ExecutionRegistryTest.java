@@ -16,14 +16,14 @@
 
 package org.testin.runner;
 
-import org.testin.model.status.ExecutionStatus;
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
+import org.testin.model.status.ExecutionStatus;
 import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

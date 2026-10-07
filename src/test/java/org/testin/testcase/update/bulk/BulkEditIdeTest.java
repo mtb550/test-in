@@ -60,6 +60,29 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
+    private static int startOfValue(final @NotNull Document document, final int index) {
+        int at = -1;
+        for (int i = 0; i <= index; i++) at = document.getText().indexOf(MODULE, at + 1);
+        assertTrue("there is no value " + index, at >= 0);
+        return at + MODULE.length();
+    }
+
+    private static int endOfValue(final @NotNull Document document, final int index) {
+        return document.getText().indexOf('"', startOfValue(document, index));
+    }
+
+    private static @NotNull String read(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError(file + " could not be read", ex);
+        }
+    }
+
+    private static boolean green(final @NotNull Color color) {
+        return color.getGreen() > color.getRed() && color.getGreen() > color.getBlue();
+    }
+
     @Override
     protected void tearDown() {
         ShownDialog.close(getProject(), ModuleBulkSectionDialog.class);
@@ -107,17 +130,6 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
         return editors().stream().filter(editor -> !editor.isViewer()).findFirst().orElseThrow(() -> new AssertionError("there is nothing to type into"));
     }
 
-    private static int startOfValue(final @NotNull Document document, final int index) {
-        int at = -1;
-        for (int i = 0; i <= index; i++) at = document.getText().indexOf(MODULE, at + 1);
-        assertTrue("there is no value " + index, at >= 0);
-        return at + MODULE.length();
-    }
-
-    private static int endOfValue(final @NotNull Document document, final int index) {
-        return document.getText().indexOf('"', startOfValue(document, index));
-    }
-
     private void type(final int index, final @NotNull String value) {
         final @NotNull Document document = values().getDocument();
         WriteCommandAction.runWriteCommandAction(getProject(), () -> document.replaceString(startOfValue(document, index), endOfValue(document, index), value));
@@ -135,24 +147,12 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private static @NotNull String read(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError(file + " could not be read", ex);
-        }
-    }
-
     private @NotNull String moduleOf(final @NotNull TestCaseDto tc) {
         return theTestCases().findTestCase(tc.getId()).orElseThrow().getModule();
     }
 
     private @NotNull List<RangeHighlighter> greenIn(final @NotNull Editor editor) {
         return Stream.of(editor.getMarkupModel().getAllHighlighters()).filter(highlighter -> DiffColors.DIFF_INSERTED.equals(highlighter.getTextAttributesKey())).toList();
-    }
-
-    private static boolean green(final @NotNull Color color) {
-        return color.getGreen() > color.getRed() && color.getGreen() > color.getBlue();
     }
 
     // Rule-EDITOR-PANEL-040, Rule-EDITOR-PANEL-045

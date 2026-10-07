@@ -127,7 +127,7 @@ public final class BugTemplate {
         return """
                 <details>
                 <summary>%s</summary>
-
+                
                 %s
                 </details>""".formatted(html(text.lines().findFirst().orElse("").strip()), codeBlock(text));
     }

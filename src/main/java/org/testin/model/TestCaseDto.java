@@ -28,10 +28,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Config;
-import org.testin.model.Priority;
-import org.testin.model.status.TestCaseStatus;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.TestCaseStatus;
 import org.testin.util.Bundle;
 
 import java.time.ZoneId;

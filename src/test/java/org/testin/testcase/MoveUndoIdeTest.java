@@ -51,6 +51,14 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
     private @NotNull TestSetDirectoryDto from = new TestSetDirectoryDto();
     private @NotNull TestSetDirectoryDto to = new TestSetDirectoryDto();
 
+    private static boolean onDisk(final @NotNull Path testSet, final @NotNull UUID id) {
+        try (final Stream<Path> files = Files.list(testSet)) {
+            return files.anyMatch(file -> file.getFileName().toString().contains(id.toString()));
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + testSet, ex);
+        }
+    }
+
     @Override
     protected void tearDown() {
         Services.getInstance(getProject(), CutState.class).clear();
@@ -89,14 +97,6 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
         EditorFixtures.testCase(getProject(), from, "Log in with a valid user", "m0001");
         EditorFixtures.testCase(getProject(), from, "Log in with a wrong password", "m0002");
         EditorFixtures.testCase(getProject(), to, "Pay by card", "m0001");
-    }
-
-    private static boolean onDisk(final @NotNull Path testSet, final @NotNull UUID id) {
-        try (final Stream<Path> files = Files.list(testSet)) {
-            return files.anyMatch(file -> file.getFileName().toString().contains(id.toString()));
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + testSet, ex);
-        }
     }
 
     // Rule-EDITOR-PANEL-215

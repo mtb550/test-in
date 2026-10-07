@@ -17,16 +17,17 @@
 package org.testin.git.change;
 
 
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.Priority;
+import org.testin.model.TestCaseDto;
+import org.testin.model.status.TestCaseStatus;
+import org.testng.annotations.Test;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-import org.testin.model.Priority;
-import org.testin.model.status.TestCaseStatus;
-import org.testin.model.TestCaseDto;
-import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

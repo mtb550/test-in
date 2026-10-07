@@ -53,7 +53,7 @@ public class SettingsReadBySomethingTest {
         final @NotNull String store = read(RepositoryRoot.resolve("src").resolve("main/java/org/testin/setting/AppSettingsState.java"));
         final int load = store.indexOf("public void loadState(");
         return store.substring(0, load) + store.substring(store.indexOf("""
-
+                
                     }
                 """, load));
     }

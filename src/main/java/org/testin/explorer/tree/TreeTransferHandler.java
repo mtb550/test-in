@@ -120,6 +120,15 @@ public class TreeTransferHandler extends TransferHandler {
         return !occupied.test(targetPath.resolve(sourcePath.getFileName()));
     }
 
+    private static @NotNull Optional<TreeTransferPayload> payloadOf(final @NotNull Transferable contents) {
+        try {
+            return Optional.of((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR));
+        } catch (final UnsupportedFlavorException | IOException ex) {
+            Logger.debug("Clipboard no longer holds tree nodes: " + FailureText.of(ex));
+            return Optional.empty();
+        }
+    }
+
     @Override
     public int getSourceActions(final @NotNull JComponent c) {
         return COPY_OR_MOVE;
@@ -185,15 +194,6 @@ public class TreeTransferHandler extends TransferHandler {
 
     private @NotNull List<DirectoryDto> nodesOf(final @NotNull Transferable contents) {
         return payloadOf(contents).map(TreeTransferPayload::nodes).orElseGet(List::of);
-    }
-
-    private static @NotNull Optional<TreeTransferPayload> payloadOf(final @NotNull Transferable contents) {
-        try {
-            return Optional.of((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR));
-        } catch (final UnsupportedFlavorException | IOException ex) {
-            Logger.debug("Clipboard no longer holds tree nodes: " + FailureText.of(ex));
-            return Optional.empty();
-        }
     }
 
     private @NotNull List<DirectoryDto> transferableSelection() {

@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
-import org.testin.ui.dialogs.DialogStyle;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.logger.Logger;
@@ -28,6 +27,7 @@ import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.Tooltip;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 

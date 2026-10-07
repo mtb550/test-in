@@ -121,8 +121,8 @@ The same dialog the `F` key opens, with what was written already in it.
 
 ## What Testin refuses
 
-**If the test run is Committed** — the entry is gray, and its tooltip reads
-*This test run is Committed, so it records nothing further.* The grid's Actual
+**If the test run is Committed** — the entry is gray, and its tooltip reads *This test run is Committed, so it records
+nothing further.* The grid's Actual
 Result cell cannot be edited either.
 
 **If nothing is selected, or more than one thing is** — the entry is gray.

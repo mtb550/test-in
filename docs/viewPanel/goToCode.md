@@ -59,8 +59,8 @@ The three buttons sit on the line under the title, beside the badges.
 
 The same icon and the same words as the card in the editor, which is
 [UC-EDITOR-PANEL-047](../editorPanel/seeWhatIsAutomated.md). The tooltip always
-reads **Navigate to Test Method**, the name the gesture has everywhere
-(Rule-EDITOR-PANEL-237); where the button cannot work, it reads the reason
+reads **Navigate to Test Method**, the name the gesture has everywhere (Rule-EDITOR-PANEL-237); where the button cannot
+work, it reads the reason
 instead.
 
 | The button's shape              | What it means                                                                      |

@@ -23,12 +23,12 @@ import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.status.RunItemStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 
 import java.nio.file.Path;

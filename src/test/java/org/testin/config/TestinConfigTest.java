@@ -17,11 +17,12 @@
 package org.testin.config;
 
 
-import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.testin.bug.BugRepository;
 import org.testng.annotations.Test;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -131,9 +132,9 @@ public class TestinConfigTest {
     @Test
     public void aProjectIsLocalUntilTheFileSaysOtherwise() {
         final TestinProjectConfig quiet = TestinYml.parse("""
-                testinProject: cases
-                RepoUrl: https://github.com/acme/cases.git
-                """,
+                        testinProject: cases
+                        RepoUrl: https://github.com/acme/cases.git
+                        """,
                 "an address and no location");
 
         assertEquals(quiet.location(), TestinLocation.LOCAL, "left out, it is local");
@@ -203,7 +204,7 @@ public class TestinConfigTest {
     // Rule-TREE-PANEL-124
     @Test
     public void aRemoteProjectWithNoAddressIsReadAsItIsWritten() {
-        final @NotNull TestinProjectConfig remote =TestinYml.parse("""
+        final @NotNull TestinProjectConfig remote = TestinYml.parse("""
                 location: remote
                 testinProject: cases
                 """, "remote with no address");
@@ -346,9 +347,9 @@ public class TestinConfigTest {
     @Test
     public void aNestedKeyIsNotTheKey() {
         assertEquals(TestinYml.withLines("""
-                report:
-                  testinProject: inner
-                """, Map.of("testinProject", "NAFATH")),
+                        report:
+                          testinProject: inner
+                        """, Map.of("testinProject", "NAFATH")),
                 """
                         report:
                           testinProject: inner
@@ -382,10 +383,10 @@ public class TestinConfigTest {
     @Test
     public void thePreviewReadsWhatIsWritten() {
         final Map<String, String> values = TestinYml.valuesIn("""
-                # testinProject: old
-                testinProject: '#1 O''Brien'
-                location: local  # for now
-                """,
+                        # testinProject: old
+                        testinProject: '#1 O''Brien'
+                        location: local  # for now
+                        """,
                 Set.of("testinProject", "location", "RepoUrl"));
 
         assertEquals(values, Map.of("testinProject", "#1 O'Brien", "location", "local"));

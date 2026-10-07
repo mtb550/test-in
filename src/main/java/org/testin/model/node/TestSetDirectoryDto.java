@@ -25,8 +25,8 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.TestSetStatus;
 import org.testin.model.markers.TestSetMarker;
+import org.testin.model.status.TestSetStatus;
 
 @Setter
 @Getter

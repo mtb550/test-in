@@ -58,21 +58,6 @@ import java.util.Set;
 
 public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull TestCaseEditor aTestCaseEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
-        EditorFixtures.testCases(getProject(), ts, 3);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-    }
-
-    private @NotNull TestRunEditor aTestRunEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
-        final @NotNull List<TestCaseDto> covered = EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
-
     private static void laidOut(final @NotNull AbstractToolbarPanel toolbar, final int width) {
         toolbar.setSize(width, toolbar.getPreferredSize().height);
         toolbar.doLayout();
@@ -93,6 +78,32 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
         assertEquals("in the " + editor + " the search field does not take the width left over", wide + 200, search.getWidth());
     }
 
+    private static @NotNull String[] rowReading(final @NotNull String description) {
+        final String @NotNull [] row = new String[TestCaseEditorAttributes.values().length];
+        Arrays.fill(row, "");
+        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
+        return row;
+    }
+
+    private static @NotNull Color drawnBackground(final @NotNull JBTable table, final int row, final int column) {
+        return table.prepareRenderer(table.getCellRenderer(row, table.convertColumnIndexToView(column)), row, table.convertColumnIndexToView(column)).getBackground();
+    }
+
+    private @NotNull TestCaseEditor aTestCaseEditor() {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        EditorFixtures.testCases(getProject(), ts, 3);
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    }
+
+    private @NotNull TestRunEditor aTestRunEditor() {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
+        final @NotNull List<TestCaseDto> covered = EditorFixtures.testCases(getProject(), ts, 2);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
+    }
+
     // Rule-EDITOR-PANEL-212
     public void testTheSearchFieldIsTheLastThingOnTheToolbarInBothEditors() {
         final @NotNull TestCaseEditor testCaseEditor = aTestCaseEditor();
@@ -111,7 +122,8 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Icon rest = AllIcons.Actions.Refresh;
         final @NotNull AbstractIconButton button = AbstractIconButton.of("Refresh", rest, () -> {
         });
-        for (final MouseListener listener : button.getMouseListeners()) listener.mouseEntered(new MouseEvent(button, MouseEvent.MOUSE_ENTERED, System.currentTimeMillis(), 0, 2, 2, 0, false));
+        for (final MouseListener listener : button.getMouseListeners())
+            listener.mouseEntered(new MouseEvent(button, MouseEvent.MOUSE_ENTERED, System.currentTimeMillis(), 0, 2, 2, 0, false));
         assertNotSame("the pointer on the button did not give it its hover look", rest, button.getIcon());
 
         button.setEnabled(false);
@@ -160,17 +172,6 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         assertEquals("the pointer passing over a row changed how it is drawn", RowStripe.of(2), drawnBackground(table, 2, column));
         assertTrue(frame.isShowing());
-    }
-
-    private static @NotNull String[] rowReading(final @NotNull String description) {
-        final String @NotNull [] row = new String[TestCaseEditorAttributes.values().length];
-        Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
-        return row;
-    }
-
-    private static @NotNull Color drawnBackground(final @NotNull JBTable table, final int row, final int column) {
-        return table.prepareRenderer(table.getCellRenderer(row, table.convertColumnIndexToView(column)), row, table.convertColumnIndexToView(column)).getBackground();
     }
 
     // Rule-EDITOR-PANEL-257

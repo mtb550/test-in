@@ -43,6 +43,10 @@ public final class Mapper {
             .disable(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
 
+    private static @NotNull UncheckedIOException unreadable(final @NotNull String type, final @NotNull IOException ex) {
+        return new UncheckedIOException("Not a readable " + type + ": " + FailureText.of(ex), ex);
+    }
+
     public @NotNull <T> T readValue(final byte @NotNull [] src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
@@ -99,9 +103,5 @@ public final class Mapper {
             Logger.debug("Mapper.readTree() could not parse the content: " + FailureText.of(ex));
             return mapper.createObjectNode();
         }
-    }
-
-    private static @NotNull UncheckedIOException unreadable(final @NotNull String type, final @NotNull IOException ex) {
-        return new UncheckedIOException("Not a readable " + type + ": " + FailureText.of(ex), ex);
     }
 }

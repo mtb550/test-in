@@ -17,6 +17,7 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
+import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -25,7 +26,6 @@ import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
 

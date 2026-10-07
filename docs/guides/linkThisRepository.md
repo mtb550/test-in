@@ -19,8 +19,7 @@
    project. Testin keeps this choice on your machine only.
    ([Choose which test project this code project uses](../treePanel/chooseTestProject.md))
 2. Press **Save to testin.yml**, the eighth button at the top of the panel. A
-   preview shows the lines Testin will write.
-   ([Save the test project to testin.yml](../treePanel/saveTestinYml.md))
+   preview shows the lines Testin will write. ([Save the test project to testin.yml](../treePanel/saveTestinYml.md))
 3. Press `Enter`. Testin writes `testinProject`, and where the test project is
    cloned from when its folder is a Git repository with a remote. Every other
    line of the file stays as it was.

@@ -20,10 +20,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CheckedTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AutomationState;
-import org.testin.filter.FilterSelection;
-import org.testin.filter.TestCaseFilter;
 import org.testin.filter.FilterPopupBtn;
+import org.testin.filter.FilterSelection;
 import org.testin.filter.FilterSource;
+import org.testin.filter.TestCaseFilter;
 import org.testin.model.Modules;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.DirectoryDto;
@@ -62,6 +62,10 @@ public final class TestRunFormFilter implements FilterSource {
         automation.read(p, testCases(), () -> {
             if (!button.getSelectedAutomation().isEmpty()) onToolBarFilterSelectionChanged();
         });
+    }
+
+    private static @NotNull String nameOf(final @NotNull Path testCasesRoot, final @NotNull Path testSet) {
+        return testCasesRoot.relativize(testSet).toString().replace(testCasesRoot.getFileSystem().getSeparator(), " / ");
     }
 
     public @NotNull SelectionTree getSelection() {
@@ -105,10 +109,6 @@ public final class TestRunFormFilter implements FilterSource {
     @Override
     public void onToolBarFilterResetButtonClicked() {
         onToolBarFilterSelectionChanged();
-    }
-
-    private static @NotNull String nameOf(final @NotNull Path testCasesRoot, final @NotNull Path testSet) {
-        return testCasesRoot.relativize(testSet).toString().replace(testCasesRoot.getFileSystem().getSeparator(), " / ");
     }
 
     private @NotNull List<TestCaseDto> testCases() {

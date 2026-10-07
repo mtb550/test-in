@@ -69,16 +69,16 @@ public class DetailsRowsIdeTest extends BasePlatformTestCase {
                 .build();
     }
 
+    private static @NotNull GridBagConstraints placed(final @NotNull Component component) {
+        return ((GridBagLayout) component.getParent().getLayout()).getConstraints(component);
+    }
+
     private @NotNull JBPanel<?> drawn(final @NotNull TestCaseDto tc) {
         return Drawn.detailsTab(getProject(), tc, Optional.empty(), PATH);
     }
 
     private @NotNull List<String> words(final @NotNull TestCaseDto tc) {
         return Drawn.words(drawn(tc));
-    }
-
-    private static @NotNull GridBagConstraints placed(final @NotNull Component component) {
-        return ((GridBagLayout) component.getParent().getLayout()).getConstraints(component);
     }
 
     // Rule-VIEW-PANEL-023

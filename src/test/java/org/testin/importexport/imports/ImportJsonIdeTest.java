@@ -17,8 +17,8 @@ package org.testin.importexport.imports;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.status.TestCaseStatus;
 import org.testin.model.TestCaseDto;
+import org.testin.model.status.TestCaseStatus;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

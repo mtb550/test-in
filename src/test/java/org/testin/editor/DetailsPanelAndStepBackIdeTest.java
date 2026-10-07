@@ -47,6 +47,17 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull List<TestCaseDto> createdTestCases = List.of();
 
+    private static @NotNull Optional<String> shown(final @NotNull ViewOnScreen window) {
+        return window.getPanel().getCurrentTestCase().map(TestCaseDto::getDescription);
+    }
+
+    private static int editableColumnOf(final @NotNull JBTable table) {
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            if (table.isCellEditable(0, column) && table.getValueAt(0, column) instanceof String) return column;
+        }
+        throw new AssertionError("no cell of the grid can be edited");
+    }
+
     private @NotNull TestCaseEditor openedTestSet() {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
@@ -64,10 +75,6 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
 
     private void pressEscapeOn(final @NotNull TestCaseEditor editor) {
         Gestures.press(getProject(), editor.getList(), EscapeAction.class);
-    }
-
-    private static @NotNull Optional<String> shown(final @NotNull ViewOnScreen window) {
-        return window.getPanel().getCurrentTestCase().map(TestCaseDto::getDescription);
     }
 
     // Rule-EDITOR-PANEL-112
@@ -192,12 +199,5 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
             frame.dispose();
             Disposer.dispose(editor);
         }
-    }
-
-    private static int editableColumnOf(final @NotNull JBTable table) {
-        for (int column = 0; column < table.getColumnCount(); column++) {
-            if (table.isCellEditable(0, column) && table.getValueAt(0, column) instanceof String) return column;
-        }
-        throw new AssertionError("no cell of the grid can be edited");
     }
 }

@@ -34,16 +34,16 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.OnScreen;
 import org.testin.Said;
-import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.EditorFixtures;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunFixture;
@@ -80,10 +80,114 @@ import java.util.stream.IntStream;
 
 public class LightModeIdeTest extends AbstractTempRootIdeTest {
 
-    private static final @NonNls @NotNull String WITH_TYPOS = "The dashbord stayd blank";
+    private static final @NonNls
+    @NotNull String WITH_TYPOS = "The dashbord stayd blank";
 
     private static final @NotNull KeyStroke DETAILS = Shortcuts.ToggleDetails.getKey();
     private static final @NotNull KeyStroke DETAILS_RELEASED = KeyStroke.getKeyStroke(DETAILS.getKeyCode(), DETAILS.getModifiers(), true);
+    private static final int STEPS = 10;
+    private final @NotNull List<LightModeWindow> opened = new ArrayList<>();
+
+    private static void press(final @NotNull JFrame frame, final @NotNull KeyStroke key) {
+        assertTrue("light mode does not answer " + key, OnScreen.pressKey(frame.getRootPane(), key));
+    }
+
+    private static @NotNull List<Component> everythingIn(final @NotNull JFrame frame) {
+        return Drawn.components(frame.getRootPane());
+    }
+
+    private static <T> @NotNull T theOne(final @NotNull JFrame frame, final @NotNull Class<T> kind) {
+        return everythingIn(frame).stream().filter(kind::isInstance).map(kind::cast).findFirst().orElseThrow(() -> new AssertionError("light mode holds no " + kind.getSimpleName()));
+    }
+
+    private static @NotNull JFrame frameOf(final @NotNull LightModeWindow window) {
+        return (JFrame) Objects.requireNonNull(SwingUtilities.getWindowAncestor(window.frame().rootPane()));
+    }
+
+    private static @NotNull Animator theHeightMotion(final @NotNull LightModeWindow window) {
+        return window.frame().heightMotion().orElseThrow(() -> new AssertionError("the window changed height without moving"));
+    }
+
+    private static @NotNull List<Integer> heightsDriven(final @NotNull Animator motion, final @NotNull JFrame frame, final int to) {
+        final @NotNull List<Integer> seen = new ArrayList<>();
+        for (int step = 0; step < to; step++) {
+            motion.paintNow(step, STEPS, 0);
+            seen.add(frame.getHeight());
+        }
+        return seen;
+    }
+
+    private static int durationOf(final @NotNull Animator motion) {
+        try {
+            final @NotNull Field duration = Animator.class.getDeclaredField("cycleDuration");
+            duration.setAccessible(true);
+            return duration.getInt(motion);
+        } catch (final ReflectiveOperationException ex) {
+            throw new LinkageError("could not read how long the movement lasts", ex);
+        }
+    }
+
+    private static void pumpForATenthOfASecond() {
+        final long until = System.currentTimeMillis() + 100;
+        while (System.currentTimeMillis() < until) {
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            TimeoutUtil.sleep(5);
+        }
+    }
+
+    private static @NotNull String describedIn(final @NotNull JFrame frame) {
+        return everythingIn(frame).stream().filter(JTextArea.class::isInstance).map(JTextArea.class::cast)
+                .map(JTextArea::getText).filter(text -> text.startsWith("Test case number")).findFirst().orElse("");
+    }
+
+    private static @NotNull Color frameColorOf(final @NotNull JBLabel name) {
+        final @NotNull RoundedLineBorder rounded = (RoundedLineBorder) ((CompoundBorder) name.getBorder()).getOutsideBorder();
+        return rounded.getLineColor();
+    }
+
+    private static double contrast(final @NotNull Color first, final @NotNull Color second) {
+        final double one = luminance(first) + 0.05;
+        final double two = luminance(second) + 0.05;
+        return Math.max(one, two) / Math.min(one, two);
+    }
+
+    private static double luminance(final @NotNull Color color) {
+        return 0.2126 * channel(color.getRed()) + 0.7152 * channel(color.getGreen()) + 0.0722 * channel(color.getBlue());
+    }
+
+    private static double channel(final int value) {
+        final double scaled = value / 255.0;
+        return scaled <= 0.03928 ? scaled / 12.92 : Math.pow((scaled + 0.055) / 1.055, 2.4);
+    }
+
+    private static int indexIgnoringCase(final @NotNull List<String> words, final @NotNull String wanted) {
+        for (int i = 0; i < words.size(); i++) {
+            if (words.get(i).equalsIgnoreCase(wanted)) return i;
+        }
+        return -1;
+    }
+
+    private static boolean spellCheckingIsOn(final @NotNull PsiFile typedIn) {
+        final @NotNull Object customization = Objects.requireNonNull(InspectionProfileWrapper.getCustomInspectionProfileWrapper(typedIn), "the box was given no inspection customization");
+        try {
+            final @NotNull Field on = customization.getClass().getDeclaredField("myUseSpellCheck");
+            on.setAccessible(true);
+            return on.getBoolean(customization);
+        } catch (final ReflectiveOperationException ex) {
+            throw new LinkageError("the box was customized by something other than spell checking: " + customization.getClass().getName(), ex);
+        }
+    }
+
+    private static @NotNull List<JComponent> buttons(final @NotNull JFrame frame) {
+        final @NotNull List<String> names = List.of(Bundle.message("action.Testin.NavigateToTestMethod.text"), Bundle.message("action.Testin.RunTestMethod.text"), Bundle.message("card.stop.test.method"), Bundle.message("action.Testin.NavigateToTestCase.text"));
+        return everythingIn(frame).stream().filter(JBLabel.class::isInstance).map(JBLabel.class::cast).filter(label -> Objects.requireNonNullElse(label.getText(), "").isEmpty()).map(JComponent.class::cast)
+                .filter(label -> names.contains(Objects.requireNonNullElse(label.getAccessibleContext().getAccessibleName(), "")))
+                .toList();
+    }
+
+    private static @NotNull List<String> buttonNames(final @NotNull JFrame frame) {
+        return buttons(frame).stream().map(button -> button.getAccessibleContext().getAccessibleName()).toList();
+    }
 
     private @NotNull List<TestCaseDto> aTestSetWithSteps(final int count, final int steps) {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
@@ -139,22 +243,6 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
                 .orElseThrow(() -> new AssertionError("light mode opened no window"));
     }
 
-    private static void press(final @NotNull JFrame frame, final @NotNull KeyStroke key) {
-        assertTrue("light mode does not answer " + key, OnScreen.pressKey(frame.getRootPane(), key));
-    }
-
-    private static @NotNull List<Component> everythingIn(final @NotNull JFrame frame) {
-        return Drawn.components(frame.getRootPane());
-    }
-
-    private static <T> @NotNull T theOne(final @NotNull JFrame frame, final @NotNull Class<T> kind) {
-        return everythingIn(frame).stream().filter(kind::isInstance).map(kind::cast).findFirst().orElseThrow(() -> new AssertionError("light mode holds no " + kind.getSimpleName()));
-    }
-
-    private static final int STEPS = 10;
-
-    private final @NotNull List<LightModeWindow> opened = new ArrayList<>();
-
     @Override
     protected void tearDown() {
         opened.forEach(LightModeWindow::closeQuietly);
@@ -169,50 +257,10 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
         return window;
     }
 
-    private static @NotNull JFrame frameOf(final @NotNull LightModeWindow window) {
-        return (JFrame) Objects.requireNonNull(SwingUtilities.getWindowAncestor(window.frame().rootPane()));
-    }
-
-    private static @NotNull Animator theHeightMotion(final @NotNull LightModeWindow window) {
-        return window.frame().heightMotion().orElseThrow(() -> new AssertionError("the window changed height without moving"));
-    }
-
-    private static @NotNull List<Integer> heightsDriven(final @NotNull Animator motion, final @NotNull JFrame frame, final int to) {
-        final @NotNull List<Integer> seen = new ArrayList<>();
-        for (int step = 0; step < to; step++) {
-            motion.paintNow(step, STEPS, 0);
-            seen.add(frame.getHeight());
-        }
-        return seen;
-    }
-
-    private static int durationOf(final @NotNull Animator motion) {
-        try {
-            final @NotNull Field duration = Animator.class.getDeclaredField("cycleDuration");
-            duration.setAccessible(true);
-            return duration.getInt(motion);
-        } catch (final ReflectiveOperationException ex) {
-            throw new LinkageError("could not read how long the movement lasts", ex);
-        }
-    }
-
     private void passAndShowTheNext(final @NotNull LightModeWindow window) {
         press(frameOf(window), RunItemStatus.PASSED.getMenuEntry().shortcut());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         window.refresh();
-    }
-
-    private static void pumpForATenthOfASecond() {
-        final long until = System.currentTimeMillis() + 100;
-        while (System.currentTimeMillis() < until) {
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            TimeoutUtil.sleep(5);
-        }
-    }
-
-    private static @NotNull String describedIn(final @NotNull JFrame frame) {
-        return everythingIn(frame).stream().filter(JTextArea.class::isInstance).map(JTextArea.class::cast)
-                .map(JTextArea::getText).filter(text -> text.startsWith("Test case number")).findFirst().orElse("");
     }
 
     // Rule-EDITOR-PANEL-128
@@ -427,26 +475,6 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private static @NotNull Color frameColorOf(final @NotNull JBLabel name) {
-        final @NotNull RoundedLineBorder rounded = (RoundedLineBorder) ((CompoundBorder) name.getBorder()).getOutsideBorder();
-        return rounded.getLineColor();
-    }
-
-    private static double contrast(final @NotNull Color first, final @NotNull Color second) {
-        final double one = luminance(first) + 0.05;
-        final double two = luminance(second) + 0.05;
-        return Math.max(one, two) / Math.min(one, two);
-    }
-
-    private static double luminance(final @NotNull Color color) {
-        return 0.2126 * channel(color.getRed()) + 0.7152 * channel(color.getGreen()) + 0.0722 * channel(color.getBlue());
-    }
-
-    private static double channel(final int value) {
-        final double scaled = value / 255.0;
-        return scaled <= 0.03928 ? scaled / 12.92 : Math.pow((scaled + 0.055) / 1.055, 2.4);
-    }
-
     // Rule-EDITOR-PANEL-225
     public void testTheFailureFormStaysOpenWithWhatWasTypedWhenNothingCouldBeWritten() {
         final @NotNull TestRunFixture fixture = aTestRunOf(aTestSetWithSteps(2, 1));
@@ -503,13 +531,6 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private static int indexIgnoringCase(final @NotNull List<String> words, final @NotNull String wanted) {
-        for (int i = 0; i < words.size(); i++) {
-            if (words.get(i).equalsIgnoreCase(wanted)) return i;
-        }
-        return -1;
-    }
-
     // Rule-EDITOR-PANEL-221
     public void testWhatHappenedIsSpellCheckedInTheFormAndInTheDialog() {
         final @NotNull TestRunFixture fixture = aTestRunOf(aTestSetWithSteps(2, 1));
@@ -530,17 +551,6 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             assertSpellChecked("the failure dialog", inTheDialog);
         } finally {
             Disposer.dispose(editor);
-        }
-    }
-
-    private static boolean spellCheckingIsOn(final @NotNull PsiFile typedIn) {
-        final @NotNull Object customization = Objects.requireNonNull(InspectionProfileWrapper.getCustomInspectionProfileWrapper(typedIn), "the box was given no inspection customization");
-        try {
-            final @NotNull Field on = customization.getClass().getDeclaredField("myUseSpellCheck");
-            on.setAccessible(true);
-            return on.getBoolean(customization);
-        } catch (final ReflectiveOperationException ex) {
-            throw new LinkageError("the box was customized by something other than spell checking: " + customization.getClass().getName(), ex);
         }
     }
 
@@ -576,17 +586,6 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private static @NotNull List<JComponent> buttons(final @NotNull JFrame frame) {
-        final @NotNull List<String> names = List.of(Bundle.message("action.Testin.NavigateToTestMethod.text"), Bundle.message("action.Testin.RunTestMethod.text"), Bundle.message("card.stop.test.method"), Bundle.message("action.Testin.NavigateToTestCase.text"));
-        return everythingIn(frame).stream().filter(JBLabel.class::isInstance).map(JBLabel.class::cast).filter(label -> Objects.requireNonNullElse(label.getText(), "").isEmpty()).map(JComponent.class::cast)
-                .filter(label -> names.contains(Objects.requireNonNullElse(label.getAccessibleContext().getAccessibleName(), "")))
-                .toList();
-    }
-
-    private static @NotNull List<String> buttonNames(final @NotNull JFrame frame) {
-        return buttons(frame).stream().map(button -> button.getAccessibleContext().getAccessibleName()).toList();
-    }
-
     // Rule-EDITOR-PANEL-244
     public void testEachButtonIsAViewMenuEntryNamedAsItIsAndOnUntilTurnedOff() {
         final @NotNull TestRunFixture fixture = aTestRunOf(aTestSetWithSteps(2, 1));
@@ -595,7 +594,8 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
         try {
             final @NotNull ViewMenuBtn view = theOne(frame, ViewMenuBtn.class);
             final @NotNull List<String> entries = Arrays.stream(LightModePart.values()).map(LightModePart::getName).toList();
-            for (final String button : buttonNames(frame)) assertTrue("the View menu has no entry named " + button + ": " + entries, entries.contains(button));
+            for (final String button : buttonNames(frame))
+                assertTrue("the View menu has no entry named " + button + ": " + entries, entries.contains(button));
             assertTrue("the three buttons are not on to start with", view.getSelectedDetails().containsAll(List.of(LightModePart.TEST_METHOD_BUTTON, LightModePart.RUN_BUTTON, LightModePart.TEST_CASE_BUTTON)));
             assertTrue("Run and Stop are not one entry", LightModePart.RUN_BUTTON.governs(CardHoverAction.RUN_TEST_METHOD) && LightModePart.RUN_BUTTON.governs(CardHoverAction.STOP_TEST_METHOD));
 

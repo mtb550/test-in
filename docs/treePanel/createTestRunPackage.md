@@ -73,9 +73,8 @@ A test run package is a folder that holds test runs. This makes one.
 A dialog titled **Create Test Run Node** opens. It is the test run side of the dialog
 drawn under [UC-TREE-PANEL-007](createTestSet.md). It carries the same two rows,
 reading *test run* and *test run package*. Its gray hint text reads *set name,
-like Sprint 3 Cycle 1...*. The tester moves to the second row, which reads
-*Groups test runs*. After `Enter`, a new folder row appears in the tree.
-*Created* shows above the status bar at the bottom right of the IDE. Nothing
+like Sprint 3 Cycle 1...*. The tester moves to the second row, which reads *Groups test runs*. After `Enter`, a new
+folder row appears in the tree. *Created* shows above the status bar at the bottom right of the IDE. Nothing
 opens.
 
 ## Main flow

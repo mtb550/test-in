@@ -174,8 +174,7 @@ and which keys it answers, and the shell builds the rest.
   The band is the thing being chosen; the card is not. What a row says about
   itself - a hint in a picker list, a path in a search row - sits in gray right
   against the name it belongs to, whatever length the name is. Every list draws
-  its rows the same way, so there is no column to line it up in anywhere
-  (Rule-INTERNAL-074).
+  its rows the same way, so there is no column to line it up in anywhere (Rule-INTERNAL-074).
 - **Rule-INTERNAL-107** — A closed set of answers is shown as radios with the
   ordinary answer already picked, never a combo box a tester has to open to
   learn what the answers are. The set is closed when the code names it: a report
@@ -301,8 +300,8 @@ saved. No dialog asks first, even when something was typed, and what was typed
 is gone: Decision-015, after the failure form (Rule-EDITOR-PANEL-144) and Report
 Bug (Rule-VIEW-PANEL-070). Two dialogs give `Escape` an answer of its own, and
 the strip says which: the merge question skips the file (Rule-SHARE-084), and
-the question about bodies the tester wrote leaves them as they are
-(Rule-CODEGEN-091). The platform closes a popup on `Escape` before any key the
+the question about bodies the tester wrote leaves them as they are (Rule-CODEGEN-091). The platform closes a popup on
+`Escape` before any key the
 dialog binds is reached, so the shell answers `Escape` first, with what the
 dialog declared (Rule-INTERNAL-054).
 

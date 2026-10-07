@@ -30,7 +30,7 @@ public final class LoginTestSource {
     public static @NotNull String withImports(final @NotNull String imports, final @NotNull String testName) {
         return """
                 package nafath;
-
+                
                 %s
                 public class LoginTest {
                     @Test(description = "Log in", testName = "%s")

@@ -46,6 +46,10 @@ public class BugHistoryIdeTest extends AbstractGitRemoteIdeTest {
         return TestRunItems.builder().id(ID).status(status).bugSeverity(severity).actualResult("The basket was emptied").executedBy("Sara").build();
     }
 
+    private static @NotNull List<String> told(final @NotNull List<BugCard> bugs) {
+        return bugs.stream().map(bug -> (bug.isCommitted() ? "" : "not committed ") + bug.event().kind() + " in " + bug.event().testRunName()).toList();
+    }
+
     private void save(final @NotNull String testRun, final @NotNull TestRunItems item) {
         write(work, "Test Runs/" + testRun + "/" + RUN_ITEM, Services.getInstance(getProject(), Mapper.class).writeValueAsString(item));
     }
@@ -61,10 +65,6 @@ public class BugHistoryIdeTest extends AbstractGitRemoteIdeTest {
         } catch (final InterruptedException | ExecutionException ex) {
             throw new AssertionError("the bugs were never read", ex);
         }
-    }
-
-    private static @NotNull List<String> told(final @NotNull List<BugCard> bugs) {
-        return bugs.stream().map(bug -> (bug.isCommitted() ? "" : "not committed ") + bug.event().kind() + " in " + bug.event().testRunName()).toList();
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-106, Rule-VIEW-PANEL-107, Rule-VIEW-PANEL-108

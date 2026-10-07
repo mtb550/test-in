@@ -27,10 +27,10 @@ import org.testin.git.conflict.RebaseEnd;
 import org.testin.model.TestCaseDto;
 import org.testin.util.Bundle;
 
-import java.util.Objects;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

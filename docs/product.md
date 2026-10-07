@@ -316,9 +316,8 @@ because it means the same thing in both. See **Rule-PRODUCT-023**.
 
 ### 5.7 A test case's own status — four values
 
-This is separate from the run item status, and easy to confuse with it. A
-**run item status** says what happened to the test case in one test run.
-**This** says what the team thinks of the test case itself, across every test
+This is separate from the run item status, and easy to confuse with it. A **run item status** says what happened to the
+test case in one test run. **This** says what the team thinks of the test case itself, across every test
 run it is ever in.
 
 | Status            | What it means                                                    |

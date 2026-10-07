@@ -34,6 +34,14 @@ import static org.testng.Assert.assertTrue;
 
 public class JsonMarkerNamesTest {
 
+    private static @NotNull String read(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
     @Test
     public void everyMarkerIsReadAsJsonAndNothingElse() {
         final @NotNull Set<String> markers = Arrays.stream(DirectoryType.values()).map(DirectoryType::getMarker).collect(Collectors.toCollection(TreeSet::new));
@@ -43,13 +51,5 @@ public class JsonMarkerNamesTest {
 
         assertEquals(new TreeSet<>(Arrays.asList(declared.group(1).split(";"))), markers,
                 "testin-json.xml reads these names as JSON, and DirectoryType names its markers - a marker left out is read as another language, one extra claims a file Testin does not write");
-    }
-
-    private static @NotNull String read(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
-        }
     }
 }

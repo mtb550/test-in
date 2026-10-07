@@ -18,6 +18,7 @@ package org.testin.setting;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -30,7 +31,6 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

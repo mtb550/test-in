@@ -52,10 +52,10 @@ public class BugIssueUrlTest {
     @Test
     public void theAddressIsFoundInWhatGhPrinted() {
         assertEquals(BugIssueUrl.firstIn("""
-                Creating issue in mtb550/product
-
-                https://github.com/mtb550/product/issues/42
-                """),
+                        Creating issue in mtb550/product
+                        
+                        https://github.com/mtb550/product/issues/42
+                        """),
                 Optional.of("https://github.com/mtb550/product/issues/42"));
         assertEquals(BugIssueUrl.firstIn("could not create issue: HTTP 401"), Optional.empty());
     }

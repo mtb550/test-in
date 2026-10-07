@@ -25,8 +25,8 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.PackageStatus;
 import org.testin.model.markers.TestRunPackageMarker;
+import org.testin.model.status.PackageStatus;
 
 import java.util.List;
 

@@ -44,8 +44,8 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
-import org.testin.model.ToolBarAttribute;
 import org.testin.model.TestCaseDto;
+import org.testin.model.ToolBarAttribute;
 import org.testin.model.node.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -69,44 +69,35 @@ import java.util.UUID;
 public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute, N extends DirectoryDto> implements Disposable, Toolbar, TestinEditor {
     @Getter
     protected final @NotNull Project p;
-
-    @Getter
-    protected volatile @NotNull N parent;
-
     @Getter
     protected final @NotNull List<TestCaseDto> allTestCases;
-
     @Getter
     protected final @NotNull List<TestCaseDto> currentTestCases;
-
     protected final @NotNull ProjectIndexer indexer;
     protected final @NotNull Nodes nodes;
     protected final @NotNull TestCases testCases;
     protected final @NotNull TestCaseValues testCaseValues;
     protected final @NotNull AutomationState automationState;
     protected final @NotNull Notifier notifier;
-    private final @NotNull UndoHistories undoHistories;
-
     protected final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     protected final @NotNull Disposable projectDisposable;
     protected final @NotNull JBPanel<?> mainPanel;
     protected final @NotNull EditorCenter center;
-
     @Getter
     protected final @NotNull JBList<TestCaseDto> list;
-
     protected final @NotNull CollectionListModel<TestCaseDto> model;
     protected final @NotNull JBScrollPane scrollPane;
-
     protected final @NotNull ListView listView;
-
     protected final @NotNull AbstractEditorContextMenu contextMenu;
     @Getter
     protected final @NotNull StatusBar statusBar = new StatusBar();
-    private final @NotNull EditorGrid<A> grid = new EditorGrid<>(this);
     // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222
     protected final @NotNull EditorPaging paging = new EditorPaging(TestinEditor.pageSizeOf(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY, "")));
+    private final @NotNull UndoHistories undoHistories;
+    private final @NotNull EditorGrid<A> grid = new EditorGrid<>(this);
     private final @NotNull PendingSelection pending = new PendingSelection();
+    @Getter
+    protected volatile @NotNull N parent;
     @Getter
     @Setter
     protected @NotNull String hoveredIconAction = "";

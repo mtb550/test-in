@@ -136,17 +136,16 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 3. **The fields** — one to a row, with every answer on the row. A row shows all of
    its answers and one of them has to be picked: no row offers a blank answer, and
    nothing can be typed into one. Each row carries the icon of the field it asks
-   about. **Browser** is on the form only while *Platform* is **Web** and
-   *Component* is **Frontend**. **Device Type** takes its place only while
-   *Platform* is **Mobile** and *Component* is **Frontend**. A field that is not on
+   about. **Browser** is on the form only while *Platform* is **Web** and *Component* is **Frontend**. **Device Type**
+   takes its place only while *Platform* is **Mobile** and *Component* is **Frontend**. A field that is not on
    the form is not asked and is saved empty. So switching *Platform* from **Web**
-   to **Mobile** drops the browser that was picked. **Browser** arrives with
-   *Chrome* already picked, because a test run on the web is on Chrome until the
+   to **Mobile** drops the browser that was picked. **Browser** arrives with *Chrome* already picked, because a test run
+   on the web is on Chrome until the
    tester says otherwise; every other row arrives with nothing picked. The
    answers are:
 
    | Field       | Offers                                |
-   |-------------|---------------------------------------|
+      |-------------|---------------------------------------|
    | Test Type   | *Functional Test*, *Performance Test* |
    | Platform    | *Web*, *Mobile*                       |
    | Component   | *Frontend*, *Backend*                 |
@@ -170,10 +169,10 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    stay in the test run. (Rule-TREE-PANEL-130)
 6. **Filter** — the editor's own Filter button, opening the editor's own menu,
    drawn on [UC-EDITOR-PANEL-020](../editorPanel/filterTestCases.md). Priority,
-   Automation, Group and Module narrow the tree as they narrow an editor.
-   **Status** narrows it by the test case's own status. There is no **Run Item
-   Status**: every run item of a new test run starts Pending.
-   **Test Set** offers the test sets the tree holds, each named by its path
+   Automation, Group and Module narrow the tree as they narrow an editor. **Status** narrows it by the test case's own
+   status. There is no **Run Item
+   Status**: every run item of a new test run starts Pending. **Test Set** offers the test sets the tree holds, each
+   named by its path
    under **Test Cases**, such as *pkg / Checkout*. Every opening starts with no
    filter. (Rule-TREE-PANEL-129)
 

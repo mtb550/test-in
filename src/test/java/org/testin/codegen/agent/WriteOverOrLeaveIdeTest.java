@@ -18,7 +18,6 @@ package org.testin.codegen.agent;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.agent.WriteBodies;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;

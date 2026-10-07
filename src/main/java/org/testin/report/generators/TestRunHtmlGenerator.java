@@ -20,18 +20,18 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.ReportColor;
+import org.testin.model.TestRunDto;
 import org.testin.model.bug.BugIssueUrl;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.ReportColor;
+import org.testin.model.markers.DetailRow;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.result.ResultAnalysis;
 import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.result.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.markers.DetailRow;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -45,6 +45,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public final class TestRunHtmlGenerator {
+
+    // Rule-REPORT-025
+    private static @NotNull String runItemStatusTokens(final @NotNull Function<RunItemStatus, String> shade) {
+        final @NotNull StringBuilder tokens = new StringBuilder();
+
+        for (final RunItemStatus runItemStatus : List.of(RunItemStatus.PASSED, RunItemStatus.FAILED, RunItemStatus.BLOCKED, RunItemStatus.UNTESTED, RunItemStatus.REMOVED)) {
+            tokens.append("--run-item-status-").append(runItemStatus.name().toLowerCase(Locale.ROOT)).append(": #").append(shade.apply(runItemStatus)).append(";");
+        }
+
+        return tokens.toString();
+    }
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
@@ -280,17 +291,6 @@ public final class TestRunHtmlGenerator {
 
     private @NotNull String lightTokens() {
         return ReportColor.cssTokens(ReportColor::hex) + runItemStatusTokens(RunItemStatus::getReportHex);
-    }
-
-    // Rule-REPORT-025
-    private static @NotNull String runItemStatusTokens(final @NotNull Function<RunItemStatus, String> shade) {
-        final @NotNull StringBuilder tokens = new StringBuilder();
-
-        for (final RunItemStatus runItemStatus : List.of(RunItemStatus.PASSED, RunItemStatus.FAILED, RunItemStatus.BLOCKED, RunItemStatus.UNTESTED, RunItemStatus.REMOVED)) {
-            tokens.append("--run-item-status-").append(runItemStatus.name().toLowerCase(Locale.ROOT)).append(": #").append(shade.apply(runItemStatus)).append(";");
-        }
-
-        return tokens.toString();
     }
 
     private @NotNull String darkTokens() {

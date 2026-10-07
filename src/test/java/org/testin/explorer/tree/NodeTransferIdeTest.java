@@ -35,9 +35,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NodeTransferIdeTest extends AbstractTempRootIdeTest {
 
+    private final @NotNull List<Path> revealed = new CopyOnWriteArrayList<>();
     private @NotNull TestSetPackageDirectoryDto payments = new TestSetPackageDirectoryDto();
     private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
-    private final @NotNull List<Path> revealed = new CopyOnWriteArrayList<>();
 
     @Override
     protected void setUp() {

@@ -17,12 +17,13 @@
 package org.testin.model.result;
 
 
-import java.util.List;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.bug.BugSeverity;
 import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

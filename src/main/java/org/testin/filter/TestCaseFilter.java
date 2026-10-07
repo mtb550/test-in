@@ -20,9 +20,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Groups;
+import org.testin.model.TestCaseDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
-import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import java.util.Collection;

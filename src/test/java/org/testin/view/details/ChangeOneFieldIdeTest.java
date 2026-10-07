@@ -41,6 +41,14 @@ public class ChangeOneFieldIdeTest extends AbstractViewPanelIdeTest {
     private PopupsBuilt popups;
     private TestSetDirectoryDto ts;
 
+    private static @NotNull FileTime writtenAt(final @NotNull Path file) {
+        try {
+            return Files.getLastModifiedTime(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read when " + file + " was written: " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -65,14 +73,6 @@ public class ChangeOneFieldIdeTest extends AbstractViewPanelIdeTest {
                     .orElseThrow(() -> new AssertionError("the test case has no file in " + ts.getPath()));
         } catch (final IOException ex) {
             throw new AssertionError("Could not look for the test case's file: " + ex.getMessage(), ex);
-        }
-    }
-
-    private static @NotNull FileTime writtenAt(final @NotNull Path file) {
-        try {
-            return Files.getLastModifiedTime(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read when " + file + " was written: " + ex.getMessage(), ex);
         }
     }
 

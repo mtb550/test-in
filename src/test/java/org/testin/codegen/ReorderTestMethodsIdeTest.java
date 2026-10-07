@@ -31,9 +31,6 @@ public class ReorderTestMethodsIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String LOGIN_TEST = "nafath.LoginTest";
 
-    private record Reordered(@NotNull TestCaseDto openThePage, @NotNull TestCaseDto logIn, @NotNull TestCaseDto logOut, @NotNull TestCaseDto lockTheAccount) {
-    }
-
     private @NotNull Reordered openThePageMovedToTheEnd() {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
         final @NotNull TestCaseDto openThePage = createdTestCase(login, "Open the login page", "b");
@@ -84,5 +81,8 @@ public class ReorderTestMethodsIdeTest extends AbstractCodegenIdeTest {
         final @NotNull List<String> methods = Arrays.stream(generatedClass(LOGIN_TEST).orElseThrow().getMethods()).map(PsiMethod::getName).toList();
 
         assertEquals("the class read top to bottom is not the test set read top to bottom", List.of("logInWithAValidUser", "logOut", "openTheLoginPage"), methods);
+    }
+
+    private record Reordered(@NotNull TestCaseDto openThePage, @NotNull TestCaseDto logIn, @NotNull TestCaseDto logOut, @NotNull TestCaseDto lockTheAccount) {
     }
 }

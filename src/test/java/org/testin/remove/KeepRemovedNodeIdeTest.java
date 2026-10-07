@@ -51,6 +51,31 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
     private @NotNull TestProjectDirectoryDto nafath = new TestProjectDirectoryDto();
 
+    private static @NotNull Path theFileOf(final @NotNull TestSetDirectoryDto ts) {
+        try (Stream<Path> inside = Files.list(ts.getPath())) {
+            return inside.filter(file -> FileKind.of(file) == FileKind.TEST_CASE).findFirst().orElseThrow(() -> new AssertionError(ts.getName() + " holds no test case"));
+        } catch (final IOException ex) {
+            throw new AssertionError("could not list " + ts.getPath(), ex);
+        }
+    }
+
+    private static @NotNull String read(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + file, ex);
+        }
+    }
+
+    private static void putBack(final @NotNull Path staging, final @NotNull Path stagingAside) {
+        try {
+            Files.deleteIfExists(staging);
+            if (Files.exists(stagingAside)) Files.move(stagingAside, staging);
+        } catch (final IOException ex) {
+            throw new AssertionError("could not put the folder for kept copies back", ex);
+        }
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -72,22 +97,6 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
         final @NotNull TestSetDirectoryDto ts = new NodesOnDisk(getProject()).testSet(nafath.getTestCasesDirectory(), name);
         new NodesOnDisk(getProject()).testCase(ts);
         return ts;
-    }
-
-    private static @NotNull Path theFileOf(final @NotNull TestSetDirectoryDto ts) {
-        try (Stream<Path> inside = Files.list(ts.getPath())) {
-            return inside.filter(file -> FileKind.of(file) == FileKind.TEST_CASE).findFirst().orElseThrow(() -> new AssertionError(ts.getName() + " holds no test case"));
-        } catch (final IOException ex) {
-            throw new AssertionError("could not list " + ts.getPath(), ex);
-        }
-    }
-
-    private static @NotNull String read(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + file, ex);
-        }
     }
 
     private void removedByTheTester(final @NotNull List<? extends DirectoryDto> removed) {
@@ -163,15 +172,6 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
         settled();
 
         assertFalse("a removal whose copy could not be made was undone", Files.exists(login.getPath()));
-    }
-
-    private static void putBack(final @NotNull Path staging, final @NotNull Path stagingAside) {
-        try {
-            Files.deleteIfExists(staging);
-            if (Files.exists(stagingAside)) Files.move(stagingAside, staging);
-        } catch (final IOException ex) {
-            throw new AssertionError("could not put the folder for kept copies back", ex);
-        }
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-063

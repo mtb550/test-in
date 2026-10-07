@@ -28,10 +28,10 @@ import org.testin.Said;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
-import org.testin.model.status.RunItemStatus;
+import org.testin.model.TestCaseDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.result.TestRunSummary;
-import org.testin.model.TestCaseDto;
+import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -50,17 +50,6 @@ import static org.junit.Assert.assertNotEquals;
 
 public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() {
-        ShownDialog.close(getProject(), FailedResultDialog.class);
-        super.tearDown();
-    }
-
     private static void pumpForASecondAndAHalf() {
         final long until = System.currentTimeMillis() + 1500;
         while (System.currentTimeMillis() < until) {
@@ -71,6 +60,17 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
 
     private static void awaitWalkOn(final @NotNull TestRunEditor editor, final int index) {
         Await.until("the walk never reached test case " + (index + 1), () -> editor.getWalk().getCurrentlyExecutingIndex() == index);
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownDialog.close(getProject(), FailedResultDialog.class);
+        super.tearDown();
     }
 
     private @NotNull TestRunEditor walking(final @NotNull TestRunFixture fixture) {
@@ -132,7 +132,8 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
             fixture.press(editor, RunItemStatus.BLOCKED);
 
             assertEquals("five recorded at once were not one message with a count", List.of(Done.counted(RunItemStatus.BLOCKED.getLabel(), 5)), balloons);
-            for (final TestCaseDto tc : fixture.testCases().subList(0, 5)) assertEquals(RunItemStatus.BLOCKED, fixture.statusOf(tc));
+            for (final TestCaseDto tc : fixture.testCases().subList(0, 5))
+                assertEquals(RunItemStatus.BLOCKED, fixture.statusOf(tc));
         } finally {
             Disposer.dispose(editor);
         }

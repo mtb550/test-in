@@ -56,7 +56,8 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Imported");
         final @NotNull List<TestCaseDto> unplaced = new ArrayList<>();
-        for (final String description : List.of("Log in", "Log out", "Pay by card", "Check out")) unplaced.add(EditorFixtures.testCase(getProject(), ts, description, ""));
+        for (final String description : List.of("Log in", "Log out", "Pay by card", "Check out"))
+            unplaced.add(EditorFixtures.testCase(getProject(), ts, description, ""));
         final @NotNull TestCaseDto last = TestCaseOrder.ordered(unplaced).getLast();
 
         final @NotNull TestCaseDto moved = movedTo(1, last);

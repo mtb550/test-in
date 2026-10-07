@@ -26,13 +26,13 @@ import org.testin.model.TestCaseDto;
 import org.testin.ui.framework.TextValue;
 import org.testin.util.Bundle;
 
-import java.util.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -55,6 +55,14 @@ public class PreviewLoaderIdeTest extends AbstractTempRootIdeTest {
         }
     };
 
+    private static void waitLongerThanThePause() {
+        final long until = System.currentTimeMillis() + LONGER_THAN_THE_PAUSE;
+        while (System.currentTimeMillis() < until) {
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            TimeoutUtil.sleep(20);
+        }
+    }
+
     private @NotNull PreviewLoader loader(final boolean failing) {
         return new PreviewLoader(box, getProject(), statuses::add, (_, data) -> loaded.addAll(data.keySet()), (file, _) -> readFile(file, failing));
     }
@@ -76,14 +84,6 @@ public class PreviewLoaderIdeTest extends AbstractTempRootIdeTest {
             return file.toString();
         } catch (final IOException ex) {
             throw new AssertionError("Could not write " + name + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private static void waitLongerThanThePause() {
-        final long until = System.currentTimeMillis() + LONGER_THAN_THE_PAUSE;
-        while (System.currentTimeMillis() < until) {
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            TimeoutUtil.sleep(20);
         }
     }
 

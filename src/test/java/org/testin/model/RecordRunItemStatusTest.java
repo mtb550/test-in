@@ -17,9 +17,6 @@
 package org.testin.model;
 
 
-import java.time.ZoneId;
-import java.util.List;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
@@ -28,8 +25,12 @@ import org.testin.model.result.FailureDetail;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
+
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

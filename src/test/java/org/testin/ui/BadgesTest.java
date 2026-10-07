@@ -16,12 +16,12 @@
 
 package org.testin.ui;
 
+import org.testin.model.Priority;
+import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.Priority;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
-import org.testin.model.TestCaseDto;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
@@ -34,10 +34,19 @@ import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 public class BadgesTest {
+
+    private static List<Badge> bugBadges(final TestRunItems item) {
+        final List<Badge> badges = new ArrayList<>();
+
+        TestRunEditorAttributes.BUG_SEVERITY.applyToUI(item, badges, new HashMap<>());
+        TestRunEditorAttributes.BUG_PRIORITY.applyToUI(item, badges, new HashMap<>());
+
+        return badges;
+    }
 
     @Test
     public void aLightBackgroundEarnsDarkText() {
@@ -76,15 +85,6 @@ public class BadgesTest {
         assertEquals(badges.size(), 1);
         assertTrue(badges.getFirst() instanceof BugBadge bug && bug.text().equals("Enhancement / Low"),
                 "a severity and a priority nobody chose are Enhancement and Low");
-    }
-
-    private static List<Badge> bugBadges(final TestRunItems item) {
-        final List<Badge> badges = new ArrayList<>();
-
-        TestRunEditorAttributes.BUG_SEVERITY.applyToUI(item, badges, new HashMap<>());
-        TestRunEditorAttributes.BUG_PRIORITY.applyToUI(item, badges, new HashMap<>());
-
-        return badges;
     }
 
     // Rule-EDITOR-PANEL-253

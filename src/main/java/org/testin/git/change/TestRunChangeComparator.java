@@ -19,9 +19,9 @@ package org.testin.git.change;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunExecution;
-import org.testin.model.markers.TestRunMarker;
 
 import java.util.ArrayList;
 import java.util.List;

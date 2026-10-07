@@ -67,20 +67,6 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     private Path testSet;
     private UUID id;
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        testProject = aTestProjectAt(root.resolve("Shop"));
-        testSet = marked(theTestCasesOf(testProject).resolve("Login"), DirectoryType.TS);
-        id = aTestCaseIn(testSet);
-    }
-
-    @Override
-    protected void tearDown() {
-        ShownDialog.close(getProject(), PendingCommitsDialog.class);
-        super.tearDown();
-    }
-
     private static void write(final @NotNull Path file, final @NotNull String content) {
         try {
             Files.createDirectories(file.getParent());
@@ -107,6 +93,20 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
                   "modifiedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
                   "status" : "%s"
                 }""".formatted(status.name());
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        testProject = aTestProjectAt(root.resolve("Shop"));
+        testSet = marked(theTestCasesOf(testProject).resolve("Login"), DirectoryType.TS);
+        id = aTestCaseIn(testSet);
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownDialog.close(getProject(), PendingCommitsDialog.class);
+        super.tearDown();
     }
 
     private @NotNull Path aTestRun(final @NotNull String name, final @NotNull TestRunStatus status) {

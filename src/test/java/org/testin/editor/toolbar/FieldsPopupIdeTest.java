@@ -22,7 +22,6 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.CheckBoxList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.ShownFields;
-import org.testin.editor.toolbar.TestCaseDetailsPopupBtn;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import java.awt.event.KeyEvent;
@@ -34,6 +33,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FieldsPopupIdeTest extends BasePlatformTestCase {
 
     private @NotNull String chosenBefore = "";
+
+    private static int indexOf(final @NotNull CheckBoxList<TestCaseEditorAttributes> fields, final @NotNull TestCaseEditorAttributes field) {
+        for (int i = 0; i < fields.getModel().getSize(); i++)
+            if (fields.getItemAt(i) == field) return i;
+        throw new AssertionError(field.getName() + " is not on the list");
+    }
+
+    private static void drawn(final @NotNull CheckBoxList<TestCaseEditorAttributes> fields) {
+        fields.setSize(300, 800);
+        for (int i = 0; i < fields.getModel().getSize(); i++)
+            fields.getCellRenderer().getListCellRendererComponent(fields, fields.getModel().getElementAt(i), i, false, false);
+    }
+
+    private static void spaceOn(final @NotNull CheckBoxList<TestCaseEditorAttributes> fields, final @NotNull TestCaseEditorAttributes field) {
+        fields.setSelectedIndex(indexOf(fields, field));
+        final @NotNull KeyEvent space = new KeyEvent(fields, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, ' ');
+        for (final KeyListener listener : fields.getKeyListeners()) listener.keyTyped(space);
+    }
 
     @Override
     protected void setUp() {
@@ -55,24 +72,6 @@ public class FieldsPopupIdeTest extends BasePlatformTestCase {
         } catch (final Exception ex) {
             throw new AssertionError("Could not tear down " + getName(), ex);
         }
-    }
-
-    private static int indexOf(final @NotNull CheckBoxList<TestCaseEditorAttributes> fields, final @NotNull TestCaseEditorAttributes field) {
-        for (int i = 0; i < fields.getModel().getSize(); i++)
-            if (fields.getItemAt(i) == field) return i;
-        throw new AssertionError(field.getName() + " is not on the list");
-    }
-
-    private static void drawn(final @NotNull CheckBoxList<TestCaseEditorAttributes> fields) {
-        fields.setSize(300, 800);
-        for (int i = 0; i < fields.getModel().getSize(); i++)
-            fields.getCellRenderer().getListCellRendererComponent(fields, fields.getModel().getElementAt(i), i, false, false);
-    }
-
-    private static void spaceOn(final @NotNull CheckBoxList<TestCaseEditorAttributes> fields, final @NotNull TestCaseEditorAttributes field) {
-        fields.setSelectedIndex(indexOf(fields, field));
-        final @NotNull KeyEvent space = new KeyEvent(fields, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, ' ');
-        for (final KeyListener listener : fields.getKeyListeners()) listener.keyTyped(space);
     }
 
     // Rule-EDITOR-PANEL-023

@@ -35,6 +35,21 @@ public enum JavaCodeUpdate implements CodeUpdate {
 
     private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
 
+    // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082
+    private static boolean cannotGenerate(final @NotNull Project p, final @NotNull String description) {
+        if (!CodeOn.isOnOrHinted(p)) return true;
+        if (!DumbService.isDumb(p)) return false;
+
+        if (Once.claim(p, INDEXING_SAID)) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
+
+            DumbService.getInstance(p).runWhenSmart(() -> p.putUserData(INDEXING_SAID, null));
+        }
+
+        Logger.info("Skipped " + description + ": the IDE is indexing");
+        return true;
+    }
+
     // UC-CODEGEN-019, Rule-CODEGEN-005
     @Override
     public <T> void execute(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull T payload) {
@@ -50,20 +65,5 @@ public enum JavaCodeUpdate implements CodeUpdate {
 
         WriteCommandAction.runWriteCommandAction(p, type.description(), undoGroup,
                 () -> CodeGenerators.find(type).executeAll(p, items));
-    }
-
-    // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082
-    private static boolean cannotGenerate(final @NotNull Project p, final @NotNull String description) {
-        if (!CodeOn.isOnOrHinted(p)) return true;
-        if (!DumbService.isDumb(p)) return false;
-
-        if (Once.claim(p, INDEXING_SAID)) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
-
-            DumbService.getInstance(p).runWhenSmart(() -> p.putUserData(INDEXING_SAID, null));
-        }
-
-        Logger.info("Skipped " + description + ": the IDE is indexing");
-        return true;
     }
 }

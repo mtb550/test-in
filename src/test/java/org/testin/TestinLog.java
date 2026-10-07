@@ -61,6 +61,19 @@ public final class TestinLog {
         }
     }
 
+    private static @NotNull String everything() {
+        try {
+            return Files.exists(LOG) ? Files.readString(LOG, StandardCharsets.UTF_8) : "";
+        } catch (final IOException beingWritten) {
+            return "";
+        }
+    }
+
+    private static @NotNull Level levelNow() {
+        final @NotNull LogWriter writer = ApplicationManager.getApplication().getService(LogWriter.class);
+        return Arrays.stream(Level.values()).filter(level -> level != Level.DISABLED && writer.writes(level)).findFirst().orElse(Level.DISABLED);
+    }
+
     public @NotNull List<String> lines() {
         return written().lines().toList();
     }
@@ -74,18 +87,5 @@ public final class TestinLog {
         final @NotNull String everything = everything();
         final int from = everything.indexOf(start);
         return everything.substring(from < 0 ? 0 : from + start.length(), everything.indexOf(upTo));
-    }
-
-    private static @NotNull String everything() {
-        try {
-            return Files.exists(LOG) ? Files.readString(LOG, StandardCharsets.UTF_8) : "";
-        } catch (final IOException beingWritten) {
-            return "";
-        }
-    }
-
-    private static @NotNull Level levelNow() {
-        final @NotNull LogWriter writer = ApplicationManager.getApplication().getService(LogWriter.class);
-        return Arrays.stream(Level.values()).filter(level -> level != Level.DISABLED && writer.writes(level)).findFirst().orElse(Level.DISABLED);
     }
 }

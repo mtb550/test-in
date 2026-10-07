@@ -57,10 +57,6 @@ record IssueStates(@NotNull Map<Integer, BugIssueState> states, boolean boardRef
         return new IssueStates(states, false, "");
     }
 
-    @NotNull BugIssueState stateOf(final int number) {
-        return states.getOrDefault(number, BugIssueState.NOT_READ);
-    }
-
     private static @NotNull BugIssueState stateOf(final @NotNull JsonNode issue) {
         for (final JsonNode item : issue.path("projectItems").path("nodes")) {
             final @NotNull JsonNode column = item.path("fieldValueByName");
@@ -78,5 +74,9 @@ record IssueStates(@NotNull Map<Integer, BugIssueState> states, boolean boardRef
 
         final @NotNull String said = answer.getStderr().strip();
         return said.isEmpty() ? Bundle.message("bug.send.failed", answer.getExitCode()) : said;
+    }
+
+    @NotNull BugIssueState stateOf(final int number) {
+        return states.getOrDefault(number, BugIssueState.NOT_READ);
     }
 }

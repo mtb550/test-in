@@ -25,9 +25,9 @@ import org.testin.OnScreen;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.ResultAnalysisBtn;
+import org.testin.model.TestCaseDto;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
-import org.testin.model.TestCaseDto;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
@@ -45,24 +45,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class ResultAnalysisIdeTest extends AbstractTempRootIdeTest {
-
-    @Override
-    protected void setUp() {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() {
-        ShownDialog.close(getProject(), ResultAnalysisDialog.class);
-        super.tearDown();
-    }
-
-    private @NotNull TestRunFixture aJudgedTestRunIn(final @NotNull TestRunStatus status) {
-        final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 2);
-        final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, testCases.stream().map(tc -> EditorFixtures.pending(tc).setStatus(RunItemStatus.PASSED)).toList(), testCases);
-        fixture.testRun().getMarker().changeStatus(status);
-        return fixture;
-    }
 
     private static @NotNull Transferable aScreenshot() {
         final @NotNull BufferedImage image = new BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB);
@@ -83,6 +65,24 @@ public class ResultAnalysisIdeTest extends AbstractTempRootIdeTest {
                 return DataFlavor.imageFlavor.equals(flavor) ? image : "";
             }
         };
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownDialog.close(getProject(), ResultAnalysisDialog.class);
+        super.tearDown();
+    }
+
+    private @NotNull TestRunFixture aJudgedTestRunIn(final @NotNull TestRunStatus status) {
+        final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 2);
+        final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, testCases.stream().map(tc -> EditorFixtures.pending(tc).setStatus(RunItemStatus.PASSED)).toList(), testCases);
+        fixture.testRun().getMarker().changeStatus(status);
+        return fixture;
     }
 
     // Rule-EDITOR-PANEL-189

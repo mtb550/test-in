@@ -50,7 +50,8 @@ public final class Gestures {
     public static @NotNull DataContext dataOf(final @NotNull Project p, final @NotNull JComponent on) {
         final @NotNull DataContext project = SimpleDataContext.getProjectContext(p);
         for (Component at = on; at != null; at = at.getParent()) {
-            if (at instanceof final UiDataProvider provider) return CustomizedDataContext.withSnapshot(project, sink -> sink.uiDataSnapshot(provider));
+            if (at instanceof final UiDataProvider provider)
+                return CustomizedDataContext.withSnapshot(project, sink -> sink.uiDataSnapshot(provider));
         }
         return project;
     }

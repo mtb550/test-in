@@ -83,8 +83,8 @@ to Sync** names the folder, then reads *is not under Git yet. Open Pending
 Commits to create the repository.* Testin Help holds **Initialize Git (git
 init)** until the repository exists.
 
-**If no remote address is set** — a short message titled **Sync Aborted** reads
-*No remote URL is configured for this project. Push a commit first to configure
+**If no remote address is set** — a short message titled **Sync Aborted** reads *No remote URL is configured for this
+project. Push a commit first to configure
 the remote.* Testin Help holds the same until the first push sets a remote.
 
 **If Git cannot name a branch** — the sync fails, and the message says so.
@@ -93,8 +93,8 @@ the remote.* Testin Help holds the same until the first push sets a remote.
 anything else. That is [UC-SHARE-017](resolveConflicts.md).
 
 **If the remote cannot be asked for its branches** — nothing is pulled or
-pushed. A message titled **Sync Failed** reads *Could not ask* the remote
-*whether it has the branch*, the branch, *so nothing was pulled or pushed:*,
+pushed. A message titled **Sync Failed** reads *Could not ask* the remote *whether it has the branch*, the branch, *so
+nothing was pulled or pushed:*,
 and Git's reason on the next line.
 
 **If anything else fails** — a message titled **Sync Failed** gives the reason.

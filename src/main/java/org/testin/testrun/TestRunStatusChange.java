@@ -27,10 +27,10 @@ import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.indexer.TestRuns;
 import org.testin.indexer.WatchedPath;
 import org.testin.logger.Logger;
+import org.testin.model.markers.TestRunMarker;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.TestRunStatus;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -78,8 +78,8 @@ public final class TestRunStatusChange {
         WatchedPath.testProjectOf(testRun.getPath(), Services.getInstance(p, TestinRoot.class).absolutePath())
                 .filter(testProject -> !new GitRepositoryService(p).isNotRepository(testProject))
                 .ifPresent(testProject ->
-                notifier.infoWithActions(p, TestRunStatus.COMPLETED.getLabel(), Bundle.message("test.run.completed.commit", testRun.getName()),
-                        notifier.action(Bundle.message("action.Testin.ViewPendingCommits.text"), () -> new ViewPendingCommitsWork(p).openFor(testProject))));
+                        notifier.infoWithActions(p, TestRunStatus.COMPLETED.getLabel(), Bundle.message("test.run.completed.commit", testRun.getName()),
+                                notifier.action(Bundle.message("action.Testin.ViewPendingCommits.text"), () -> new ViewPendingCommitsWork(p).openFor(testProject))));
     }
 
     private void persist(final @NotNull TestRunDirectoryDto testRun, final @NotNull Optional<TestRunEditor> open) {

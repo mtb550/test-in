@@ -20,8 +20,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.testrun.TestRunEditorAttributes;
 
 import java.awt.GridBagConstraints;

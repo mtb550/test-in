@@ -68,32 +68,13 @@ public final class PopupsBuilt {
 
         @Getter
         private final @NotNull JComponent content;
+        private final @NotNull Map<String, List<Object>> asked = new ConcurrentHashMap<>();
         @Getter
         private @NotNull String title = "";
         private @NotNull Optional<JBPopup> popup = Optional.empty();
-        private final @NotNull Map<String, List<Object>> asked = new ConcurrentHashMap<>();
 
         private Built(final @NotNull JComponent content) {
             this.content = content;
-        }
-
-        private @NotNull ComponentPopupBuilder watching(final @NotNull ComponentPopupBuilder real) {
-            return (ComponentPopupBuilder) Proxy.newProxyInstance(ComponentPopupBuilder.class.getClassLoader(), new Class<?>[]{ComponentPopupBuilder.class}, (proxy, method, args) -> {
-                if (method.getName().equals("setTitle")) title = String.valueOf(args[0]);
-                if (args != null && args.length == 1) asked.computeIfAbsent(method.getName(), _ -> new CopyOnWriteArrayList<>()).add(args[0]);
-                final Object answer;
-                try {
-                    answer = method.invoke(real, args);
-                } catch (final InvocationTargetException ex) {
-                    throw ex.getCause();
-                }
-                if (answer instanceof final JBPopup created) {
-                    final @NotNull JBPopup sized = sizedOffScreen(created);
-                    popup = Optional.of(sized);
-                    return sized;
-                }
-                return real.equals(answer) ? proxy : answer;
-            });
         }
 
         private static @NotNull JBPopup sizedOffScreen(final @NotNull JBPopup real) {
@@ -108,6 +89,26 @@ public final class PopupsBuilt {
                     throw ex.getCause();
                 }
                 return method.getName().equals("getSize") ? Optional.ofNullable(answer).orElseGet(() -> new Dimension(OFF_SCREEN_WIDTH, OFF_SCREEN_HEIGHT)) : answer;
+            });
+        }
+
+        private @NotNull ComponentPopupBuilder watching(final @NotNull ComponentPopupBuilder real) {
+            return (ComponentPopupBuilder) Proxy.newProxyInstance(ComponentPopupBuilder.class.getClassLoader(), new Class<?>[]{ComponentPopupBuilder.class}, (proxy, method, args) -> {
+                if (method.getName().equals("setTitle")) title = String.valueOf(args[0]);
+                if (args != null && args.length == 1)
+                    asked.computeIfAbsent(method.getName(), _ -> new CopyOnWriteArrayList<>()).add(args[0]);
+                final Object answer;
+                try {
+                    answer = method.invoke(real, args);
+                } catch (final InvocationTargetException ex) {
+                    throw ex.getCause();
+                }
+                if (answer instanceof final JBPopup created) {
+                    final @NotNull JBPopup sized = sizedOffScreen(created);
+                    popup = Optional.of(sized);
+                    return sized;
+                }
+                return real.equals(answer) ? proxy : answer;
             });
         }
 

@@ -53,6 +53,33 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
+    private static @NotNull JBTable gridOf(final @NotNull TestCaseEditor editor) {
+        return Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst().orElseThrow(() -> new AssertionError("the grid was never built"));
+    }
+
+    private static int column(final @NotNull JBTable table, final @NotNull TestCaseEditorAttributes attribute) {
+        return table.convertColumnIndexToView(attribute.column());
+    }
+
+    private static void typeInto(final @NotNull JBTable table, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String typed) {
+        assertTrue(attribute.getName() + " did not open", table.editCellAt(row, column(table, attribute)));
+        ((JTextComponent) table.getEditorComponent()).setText(typed);
+        assertTrue("the cell did not close", table.getCellEditor().stopCellEditing());
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    private static @NotNull String read(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError(file + " could not be read", ex);
+        }
+    }
+
+    private static @NotNull String adjusted(final @NotNull String stored, final @NotNull String typed) {
+        return Bundle.message("grid.adjusted.title") + "\n" + Bundle.message("grid.adjusted.message", stored, typed);
+    }
+
     private @NotNull TestCases theTestCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
@@ -76,21 +103,6 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
         return editor;
     }
 
-    private static @NotNull JBTable gridOf(final @NotNull TestCaseEditor editor) {
-        return Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst().orElseThrow(() -> new AssertionError("the grid was never built"));
-    }
-
-    private static int column(final @NotNull JBTable table, final @NotNull TestCaseEditorAttributes attribute) {
-        return table.convertColumnIndexToView(attribute.column());
-    }
-
-    private static void typeInto(final @NotNull JBTable table, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String typed) {
-        assertTrue(attribute.getName() + " did not open", table.editCellAt(row, column(table, attribute)));
-        ((JTextComponent) table.getEditorComponent()).setText(typed);
-        assertTrue("the cell did not close", table.getCellEditor().stopCellEditing());
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-    }
-
     private @NotNull TestCaseDto stored(final @NotNull TestCaseDto tc) {
         return theTestCases().findTestCase(tc.getId()).orElseThrow();
     }
@@ -101,18 +113,6 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
         } catch (final IOException ex) {
             throw new AssertionError("the test set could not be read", ex);
         }
-    }
-
-    private static @NotNull String read(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError(file + " could not be read", ex);
-        }
-    }
-
-    private static @NotNull String adjusted(final @NotNull String stored, final @NotNull String typed) {
-        return Bundle.message("grid.adjusted.title") + "\n" + Bundle.message("grid.adjusted.message", stored, typed);
     }
 
     // Rule-EDITOR-PANEL-050, Rule-EDITOR-PANEL-051

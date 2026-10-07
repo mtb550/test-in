@@ -67,7 +67,8 @@ public enum ResultAnalysis {
 
         for (final ResultAnalysis section : values()) {
             final long testCases = section.count.applyAsLong(summary);
-            if (testCases > 0) segments.add(new Segment(section.labelIn(testRun) + " " + testCases, section.getOnceFinished().getRowColor()));
+            if (testCases > 0)
+                segments.add(new Segment(section.labelIn(testRun) + " " + testCases, section.getOnceFinished().getRowColor()));
         }
 
         if (summary.hasRemoved()) {

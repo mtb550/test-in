@@ -16,6 +16,7 @@
 
 package org.testin.git.change;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
@@ -33,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

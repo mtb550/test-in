@@ -26,10 +26,10 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.git.GitFailure;
 import org.testin.git.conflict.GitConflictOffer;
 import org.testin.model.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.status.RunItemStatus;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testrun.RunItemStatusService;
 

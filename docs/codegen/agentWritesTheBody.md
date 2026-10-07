@@ -172,8 +172,8 @@ keep their `// TODO`, and the count reports what landed.
 ## Why it works this way
 
 The tester's own agent runs the request, under the tester's own account, so
-Testin holds no API key and no credential of any kind — the same bargain
-**Report Bug** makes with `gh`. What an agent needs to sign in lives in the
+Testin holds no API key and no credential of any kind — the same bargain **Report Bug** makes with `gh`. What an agent
+needs to sign in lives in the
 system environment, where Testin neither reads it nor writes it.
 
 The agent is never asked while the method is being written. Writing a method is

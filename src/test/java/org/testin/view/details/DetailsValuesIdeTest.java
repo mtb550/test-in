@@ -23,13 +23,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.editor.ShownFields;
 import org.testin.indexer.TestRuns;
+import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -83,6 +83,14 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
     private static @NotNull Container lineOf(final @NotNull Component part) {
         return part.getParent();
+    }
+
+    private static int heightOf(final Icon icon) {
+        return Optional.ofNullable(icon).map(Icon::getIconHeight).orElse(0);
+    }
+
+    private static int widthOf(final Icon icon) {
+        return Optional.ofNullable(icon).map(Icon::getIconWidth).orElse(0);
     }
 
     private @NotNull JBPanel<?> drawnWithEveryBandOpen(final @NotNull TestCaseDto tc, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> path) {
@@ -208,14 +216,6 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
         } finally {
             ShownFields.write(ShownFields.IN_TEST_RUNS, was);
         }
-    }
-
-    private static int heightOf(final Icon icon) {
-        return Optional.ofNullable(icon).map(Icon::getIconHeight).orElse(0);
-    }
-
-    private static int widthOf(final Icon icon) {
-        return Optional.ofNullable(icon).map(Icon::getIconWidth).orElse(0);
     }
 
     private static final class KeyboardStop extends LayoutFocusTraversalPolicy {

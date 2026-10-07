@@ -18,7 +18,6 @@ package org.testin.editor.statusbar;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.statusbar.PageStep;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;

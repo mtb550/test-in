@@ -65,31 +65,6 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
 
     private final @NotNull List<AbstractFrameworkDialog> opened = new ArrayList<>();
 
-    @Override
-    protected void setUp() {
-        try {
-            super.setUp();
-        } catch (final Exception ex) {
-            throw new AssertionError("could not set up " + getName(), ex);
-        }
-        PopupsShowAtContentSize.during(getTestRootDisposable());
-    }
-
-    @Override
-    protected void tearDown() {
-        try {
-            opened.stream().map(AbstractFrameworkDialog::getPopup).filter(popup -> !popup.isDisposed()).forEach(JBPopup::cancel);
-            super.tearDown();
-        } catch (final Exception ex) {
-            throw new AssertionError("could not tear down " + getName(), ex);
-        }
-    }
-
-    private <D extends AbstractFrameworkDialog> @NotNull D shown(final @NotNull D dialog) {
-        if (dialog.show()) opened.add(dialog);
-        return dialog;
-    }
-
     private static @NotNull AbstractPopup popupOf(final @NotNull AbstractFrameworkDialog dialog) {
         return (AbstractPopup) dialog.getPopup();
     }
@@ -140,6 +115,31 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
 
     private static @NotNull ComponentDialogBase<TextInput> aField(final @NotNull String caption) {
         return ComponentDialogBase.textField().caption(caption).placeholder("set " + caption.toLowerCase(Locale.ROOT) + "..").build();
+    }
+
+    @Override
+    protected void setUp() {
+        try {
+            super.setUp();
+        } catch (final Exception ex) {
+            throw new AssertionError("could not set up " + getName(), ex);
+        }
+        PopupsShowAtContentSize.during(getTestRootDisposable());
+    }
+
+    @Override
+    protected void tearDown() {
+        try {
+            opened.stream().map(AbstractFrameworkDialog::getPopup).filter(popup -> !popup.isDisposed()).forEach(JBPopup::cancel);
+            super.tearDown();
+        } catch (final Exception ex) {
+            throw new AssertionError("could not tear down " + getName(), ex);
+        }
+    }
+
+    private <D extends AbstractFrameworkDialog> @NotNull D shown(final @NotNull D dialog) {
+        if (dialog.show()) opened.add(dialog);
+        return dialog;
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-053

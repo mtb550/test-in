@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.TestCaseDto;
 
-import java.util.Objects;
 import java.io.File;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ExportThenImportIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull ZonedDateTime CREATED = ZonedDateTime.of(2026, 8, 20, 3, 33, 24, 0, ZoneId.of("Asia/Riyadh"));
@@ -43,15 +43,15 @@ public class ExportThenImportIdeTest extends AbstractTempRootIdeTest {
                 .build();
     }
 
+    private static @NotNull List<String> descriptions(final @NotNull List<TestCaseDto> testCases) {
+        return testCases.stream().map(TestCaseDto::getDescription).toList();
+    }
+
     private @NotNull Map<String, List<TestCaseDto>> roundTrip(final @NotNull Map<String, List<TestCaseDto>> sheets) {
         final @NotNull File file = root.resolve("export.xlsx").toFile();
         FileTypes.XLSX.exportToFile(getProject(), file, sheets);
 
         return FileTypes.XLSX.importToFile(getProject(), file);
-    }
-
-    private static @NotNull List<String> descriptions(final @NotNull List<TestCaseDto> testCases) {
-        return testCases.stream().map(TestCaseDto::getDescription).toList();
     }
 
     // UC-SHARE-002, Rule-SHARE-007, Rule-SHARE-012

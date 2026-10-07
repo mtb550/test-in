@@ -124,11 +124,6 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     // Rule-EDITOR-PANEL-251
-    private int sentenceFloor() {
-        return statusLabel.getFontMetrics(statusLabel.getFont()).charWidth('m') * SENTENCE_CHARACTERS;
-    }
-
-    // Rule-EDITOR-PANEL-251
     static @NotNull Widths budget(final int inner, final int sentenceFloor, final int arrowsWanted, final int figuresWanted) {
         final int arrows = Math.clamp(arrowsWanted, 0, inner);
         final int floor = Math.clamp(sentenceFloor, 0, inner - arrows);
@@ -175,6 +170,19 @@ public class StatusBar extends JBPanel<StatusBar> {
                 EditorColors.FILTER_ACTIVE.getRed(), EditorColors.FILTER_ACTIVE.getGreen(),
                 EditorColors.FILTER_ACTIVE.getBlue(),
                 Bundle.message("statusbar.filtered.from", String.valueOf(totalCount)));
+    }
+
+    // Rule-EDITOR-PANEL-265
+    static @NotNull String besideTheIcon(final @NotNull TestRunMarker marker) {
+        if (marker.getStatus() == TestRunStatus.ASSIGNED)
+            return Services.getInstance(AppSettingsState.class).testerName;
+        if (marker.getStatus().isRecord()) return HistoryCard.shortOf(marker.getCommit());
+        return "";
+    }
+
+    // Rule-EDITOR-PANEL-251
+    private int sentenceFloor() {
+        return statusLabel.getFontMetrics(statusLabel.getFont()).charWidth('m') * SENTENCE_CHARACTERS;
     }
 
     @Override
@@ -239,7 +247,8 @@ public class StatusBar extends JBPanel<StatusBar> {
         runItemStatusesRow.removeAll();
 
         for (final Segment runItemStatus : runItemStatuses) {
-            if (runItemStatusesRow.getComponentCount() > 0) runItemStatusesRow.add(painted(" · ", UIUtil.getInactiveTextColor()));
+            if (runItemStatusesRow.getComponentCount() > 0)
+                runItemStatusesRow.add(painted(" · ", UIUtil.getInactiveTextColor()));
 
             runItemStatusesRow.add(painted(runItemStatus.text(), runItemStatus.color()));
         }
@@ -258,13 +267,6 @@ public class StatusBar extends JBPanel<StatusBar> {
         Tooltip.set(testRunStatusLabel, Bundle.message("statusbar.test.run.status.tip", status.getLabel()));
         testRunStatusLabel.getAccessibleContext().setAccessibleName(status.getLabel());
         testRunStatusLabel.setVisible(true);
-    }
-
-    // Rule-EDITOR-PANEL-265
-    static @NotNull String besideTheIcon(final @NotNull TestRunMarker marker) {
-        if (marker.getStatus() == TestRunStatus.ASSIGNED) return Services.getInstance(AppSettingsState.class).testerName;
-        if (marker.getStatus().isRecord()) return HistoryCard.shortOf(marker.getCommit());
-        return "";
     }
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102

@@ -17,20 +17,6 @@
 package org.testin.git;
 
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;
 import org.testin.git.change.ChangeSubject;
@@ -50,6 +36,21 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import static org.testin.git.LocalGit.git;
 import static org.testin.git.LocalGit.mustGit;
 import static org.testng.Assert.assertEquals;
@@ -62,6 +63,21 @@ public class GitWorkflowTest {
     private Path remote;
 
     private Path work;
+
+    private static @NotNull Map<String, String> contents(final Path directory, final String revision, final List<String> relativePaths) {
+        try {
+            final Process process = new ProcessBuilder("git", "cat-file", "--batch").directory(directory.toFile()).start();
+            try (OutputStream stdin = process.getOutputStream()) {
+                stdin.write(GitCommandRunner.batchRequest(revision, relativePaths));
+            }
+
+            final byte[] batch = process.getInputStream().readAllBytes();
+            assertEquals(process.waitFor(), 0, "git cat-file --batch failed in " + directory);
+            return GitCommandRunner.objectsIn(relativePaths, batch);
+        } catch (final IOException | InterruptedException ex) {
+            throw new AssertionError(ex);
+        }
+    }
 
     @BeforeMethod
     public void createRepositories() {
@@ -183,21 +199,6 @@ public class GitWorkflowTest {
         final List<String> status = GitRefs.records(mustGit(work, "status", "--porcelain", "-z", "-uall"));
 
         return GitDiffProcessor.toDiffs(status, work, RealMapper.build(), paths -> contents(work, "HEAD", paths), _ -> Optional.empty());
-    }
-
-    private static @NotNull Map<String, String> contents(final Path directory, final String revision, final List<String> relativePaths) {
-        try {
-            final Process process = new ProcessBuilder("git", "cat-file", "--batch").directory(directory.toFile()).start();
-            try (OutputStream stdin = process.getOutputStream()) {
-                stdin.write(GitCommandRunner.batchRequest(revision, relativePaths));
-            }
-
-            final byte[] batch = process.getInputStream().readAllBytes();
-            assertEquals(process.waitFor(), 0, "git cat-file --batch failed in " + directory);
-            return GitCommandRunner.objectsIn(relativePaths, batch);
-        } catch (final IOException | InterruptedException ex) {
-            throw new AssertionError(ex);
-        }
     }
 
     private @NotNull Set<String> stagedFor(final List<PendingChange> review) {

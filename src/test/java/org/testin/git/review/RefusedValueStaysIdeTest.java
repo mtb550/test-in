@@ -23,7 +23,6 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.TestinLog;
-import org.testin.git.review.RemoteUrlDialog;
 import org.testin.notifications.Refused;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Html;
@@ -35,12 +34,6 @@ import java.util.List;
 
 public class RefusedValueStaysIdeTest extends BasePlatformTestCase {
 
-    private @NotNull ExtendableTextField theUrlField() {
-        return Drawn.components(ShownDialog.popup(getProject(), RemoteUrlDialog.class).getContent()).stream()
-                .filter(ExtendableTextField.class::isInstance).map(ExtendableTextField.class::cast).findFirst()
-                .orElseThrow(() -> new AssertionError("the dialog has no field"));
-    }
-
     private static @NotNull List<SimpleTextAttributes> hintAttributesOf(final @NotNull ExtendableTextField field) {
         final @NotNull List<SimpleTextAttributes> attributes = new ArrayList<>();
         final SimpleColoredComponent.@NotNull ColoredIterator fragments = field.getEmptyText().getComponent().iterator();
@@ -49,6 +42,12 @@ public class RefusedValueStaysIdeTest extends BasePlatformTestCase {
             attributes.add(fragments.getTextAttributes());
         }
         return attributes;
+    }
+
+    private @NotNull ExtendableTextField theUrlField() {
+        return Drawn.components(ShownDialog.popup(getProject(), RemoteUrlDialog.class).getContent()).stream()
+                .filter(ExtendableTextField.class::isInstance).map(ExtendableTextField.class::cast).findFirst()
+                .orElseThrow(() -> new AssertionError("the dialog has no field"));
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-067

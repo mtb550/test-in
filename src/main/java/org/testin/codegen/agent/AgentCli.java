@@ -100,21 +100,6 @@ public final class AgentCli {
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-084
-    public @NotNull Optional<String> ask(final @NotNull AgentConnection connection, final @NotNull String prompt) {
-        if (!connection.isConnected()) return Optional.empty();
-
-        final @NotNull List<String> arguments = arguments(connection.arguments(), prompt);
-        if (wantsThePromptAsAnArgument(connection.arguments())) return said(connection.command(), arguments, Optional.empty(), connection.timeout());
-
-        final @NotNull Optional<Path> written = promptFile(prompt);
-        try {
-            return said(connection.command(), arguments, written, connection.timeout());
-        } finally {
-            written.ifPresent(AgentCli::forget);
-        }
-    }
-
-    // UC-CODEGEN-021, Rule-CODEGEN-084
     private static @NotNull Optional<Path> promptFile(final @NotNull String prompt) {
         try {
             final @NotNull Path written = Files.createTempFile("testin-prompt", ".txt");
@@ -136,6 +121,22 @@ public final class AgentCli {
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-084
+    public @NotNull Optional<String> ask(final @NotNull AgentConnection connection, final @NotNull String prompt) {
+        if (!connection.isConnected()) return Optional.empty();
+
+        final @NotNull List<String> arguments = arguments(connection.arguments(), prompt);
+        if (wantsThePromptAsAnArgument(connection.arguments()))
+            return said(connection.command(), arguments, Optional.empty(), connection.timeout());
+
+        final @NotNull Optional<Path> written = promptFile(prompt);
+        try {
+            return said(connection.command(), arguments, written, connection.timeout());
+        } finally {
+            written.ifPresent(AgentCli::forget);
+        }
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084
     public @NotNull Optional<String> check(final @NotNull AgentConnection connection) {
         if (!connection.isConnected()) return Optional.empty();
 
@@ -144,7 +145,8 @@ public final class AgentCli {
 
     private @NotNull Optional<String> said(final @NotNull String command, final @NotNull List<String> arguments, final @NotNull Optional<Path> input, final @NotNull Duration timeout) {
         return launcher.run(command, arguments, input, timeout).map(output -> {
-            if (output.getExitCode() != 0) Logger.warn("The agent '" + command + "' ended with " + output.getExitCode() + ": " + output.getStderr().strip());
+            if (output.getExitCode() != 0)
+                Logger.warn("The agent '" + command + "' ended with " + output.getExitCode() + ": " + output.getStderr().strip());
 
             return output.getStdout().strip();
         });

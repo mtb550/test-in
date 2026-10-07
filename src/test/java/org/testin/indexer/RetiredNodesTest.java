@@ -16,8 +16,8 @@
 
 package org.testin.indexer;
 
-import org.testin.model.status.PackageStatus;
-import org.testin.model.status.TestSetStatus;
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.Marker;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestCasesMainDirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -26,7 +26,8 @@ import org.testin.model.node.TestRunPackageDirectoryDto;
 import org.testin.model.node.TestRunsMainDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
-import org.testin.model.markers.Marker;
+import org.testin.model.status.PackageStatus;
+import org.testin.model.status.TestSetStatus;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -34,7 +35,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

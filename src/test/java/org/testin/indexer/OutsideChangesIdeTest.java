@@ -107,12 +107,22 @@ public class OutsideChangesIdeTest extends AbstractReadTheRootIdeTest {
         }
     }
 
-    private @NotNull Path theCodeProjectsTestinYml() {
-        return TestinYml.savePath(getProject()).orElseThrow(() -> new AssertionError("the code project has no folder for " + TestinYml.fileName()));
-    }
-
     private static @NotNull String namingNafath() {
         return TestinYml.lines("NAFATH").entrySet().stream().map(line -> line.getKey() + ": " + line.getValue()).collect(Collectors.joining("\n", "", "\n"));
+    }
+
+    private static void awaitQuietly(final @NotNull CountDownLatch latch) {
+        try {
+            if (!latch.await(15, TimeUnit.SECONDS))
+                throw new AssertionError("waited fifteen seconds for another thread");
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while waiting for another thread", ex);
+        }
+    }
+
+    private @NotNull Path theCodeProjectsTestinYml() {
+        return TestinYml.savePath(getProject()).orElseThrow(() -> new AssertionError("the code project has no folder for " + TestinYml.fileName()));
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-020
@@ -164,15 +174,6 @@ public class OutsideChangesIdeTest extends AbstractReadTheRootIdeTest {
         Await.until("the read never finished", read::get);
         assertTrue("a change that arrived while the read was running was dropped when that read finished", rescan().isBooked(checkout));
         Await.until("the change booked during the read was never read", () -> !rescan().isBooked(checkout));
-    }
-
-    private static void awaitQuietly(final @NotNull CountDownLatch latch) {
-        try {
-            if (!latch.await(15, TimeUnit.SECONDS)) throw new AssertionError("waited fifteen seconds for another thread");
-        } catch (final InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new AssertionError("interrupted while waiting for another thread", ex);
-        }
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-023

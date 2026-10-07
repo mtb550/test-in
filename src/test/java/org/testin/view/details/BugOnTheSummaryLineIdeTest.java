@@ -18,12 +18,12 @@ package org.testin.view.details;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.BrowserOpened;
@@ -41,13 +41,6 @@ public class BugOnTheSummaryLineIdeTest extends AbstractViewPanelIdeTest {
     private TestCaseDto tc;
     private TestRunDirectoryDto tr;
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        tc = aTestCase(aTestSet("Login"), "Log in with a valid user", "a");
-        tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
-    }
-
     private static @NotNull TestRunItems recorded(final @NotNull TestCaseDto tc, final @NotNull RunItemStatus status, final @NotNull String bugIssueUrl) {
         return TestRunItems.builder().id(tc.getId()).status(status).bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl(bugIssueUrl).build();
     }
@@ -56,6 +49,13 @@ public class BugOnTheSummaryLineIdeTest extends AbstractViewPanelIdeTest {
         Component row = drawn;
         while (!(row.getParent().getLayout() instanceof GridBagLayout)) row = row.getParent();
         return row;
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        tc = aTestCase(aTestSet("Login"), "Log in with a valid user", "a");
+        tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
     }
 
     private @NotNull JBPanel<?> drawn(final @NotNull TestRunItems runItem) {

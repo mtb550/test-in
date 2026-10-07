@@ -64,7 +64,8 @@ public final class BugHistory {
         final @NotNull Map<String, String> now = inProject(testProject, FileKind.RUN_ITEM.fileName(testCaseId), runItemsNow);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
-        if (git.isNotRepository(testProject)) return history.with(notCommitted(testProject, List.of(), now, Map.of(), mapper), List.of());
+        if (git.isNotRepository(testProject))
+            return history.with(notCommitted(testProject, List.of(), now, Map.of(), mapper), List.of());
 
         try {
             final @NotNull List<BugCommit> commits = commits(git.log(testProject, FORMAT, "--name-status", "--", pathspec(DirectoryType.TRD, FileKind.RUN_ITEM, testCaseId), pathspec(DirectoryType.TCD, FileKind.TEST_CASE, testCaseId)));
@@ -119,7 +120,8 @@ public final class BugHistory {
     private static @NotNull Optional<BugCard> card(final @NotNull Path testProject, final @NotNull BugCommit commit, final @NotNull ChangedFile changed, final @NotNull Map<String, String> versions, final @NotNull Mapper mapper) {
         final @NotNull Optional<TestRunItems> before = version(mapper, versions, commit.hash() + "^", changed.before());
         final @NotNull Optional<TestRunItems> after = version(mapper, versions, commit.hash(), changed.after());
-        if (before.isEmpty() != changed.before().isEmpty() || after.isEmpty() != changed.after().isEmpty()) return Optional.empty();
+        if (before.isEmpty() != changed.before().isEmpty() || after.isEmpty() != changed.after().isEmpty())
+            return Optional.empty();
 
         return BugEvents.between(testRun(testProject, changed.after().isEmpty() ? changed.before() : changed.after()), before, after)
                 .map(event -> new BugCard(commit.hash(), commit.who(), commit.when(), event));

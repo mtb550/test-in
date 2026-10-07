@@ -16,6 +16,7 @@
 
 package org.testin.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Done;
 import org.testin.notifications.Refused;
 import org.testng.annotations.Test;
@@ -31,7 +32,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

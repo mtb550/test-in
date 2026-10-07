@@ -57,8 +57,7 @@ The status says how far the test run has got.
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
 - **Rule-TREE-PANEL-067** — **Completed** and **Closed** are final. The test run
-  accepts no more run item statuses. Every test case still **Pending** becomes
-  **Untested**. (Rule-TREE-PANEL-009)
+  accepts no more run item statuses. Every test case still **Pending** becomes **Untested**. (Rule-TREE-PANEL-009)
 - **Rule-TREE-PANEL-068** — A tester sets **Assigned**, **Completed** and **Closed**. **Created** and **In Progress**
   are the test run's own record of
   itself.
@@ -100,13 +99,13 @@ The status says how far the test run has got.
 
 1. **One row for each status the test run can move to** — each with its icon,
    the same icon the tree draws for a test run in that status. Drawn here for a
-   test run that is *Created*, which can move to any of the three. From
-   *Assigned* or *In Progress* there are two rows, Completed and Closed.
+   test run that is *Created*, which can move to any of the three. From *Assigned* or *In Progress* there are two rows,
+   Completed and Closed.
 2. **Only forward, and only what a tester sets.** *Created* and *In Progress*
    are the test run's own record of itself and are never rows; nor is the status
    the test run already has, because moving to it would say nothing. The keys
-   belong to the statuses rather than to the positions: **Assigned** is `1`,
-   **Completed** is `2`, **Closed** is `3`, whichever of them the popup is
+   belong to the statuses rather than to the positions: **Assigned** is `1`, **Completed** is `2`, **Closed** is `3`,
+   whichever of them the popup is
    showing.
 3. **The status bar says how to choose.** The popup opens in the middle of the
    IDE window, not at the pointer, with the first row selected. The tester
@@ -125,12 +124,12 @@ The status says how far the test run has got.
 6. Setting **Completed** or **Closed** signs the test run off. Every test case
    still **Pending** becomes **Untested**, except one removed from its test set,
    which stays as the test run recorded it. Testin records the time the test run
-   finished, but only if it had been started. From then on **Set Status**,
-   **Edit Test Run** and **Run Tests** are gray on it.
+   finished, but only if it had been started. From then on **Set Status**, **Edit Test Run** and **Run Tests** are gray
+   on it.
 7. Setting **Completed** shows a notification instead of the status word: *Commit
    <name> in View Pending Commits to keep it as the record.* Its **View Pending
-   Commits** button opens the review, and the commit makes the test run
-   **Committed** (Rule-TREE-PANEL-136, Rule-SHARE-130).
+   Commits** button opens the review, and the commit makes the test run **Committed** (Rule-TREE-PANEL-136,
+   Rule-SHARE-130).
 
 **Signing off a test run cannot be undone.** A status change is not on the
 tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.

@@ -155,8 +155,8 @@ print their own key.
 The last group of three is gray in an IDE without the Java plugin or the
 TestNG plugin, and each entry says which plugin it is waiting for.
 
-In a test run editor, the menu holds the three run item statuses first: **Passed**, **Failed** and **Blocked**. Then come
-**Failed Test Case Details**, then **View Test Case Details** and **Navigate to Test Case**, then **Actions**, then
+In a test run editor, the menu holds the three run item statuses first: **Passed**, **Failed** and **Blocked**. Then
+come **Failed Test Case Details**, then **View Test Case Details** and **Navigate to Test Case**, then **Actions**, then
 **Run Test Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case** and **Automate Test
 Case** are not on it. A test run records run item statuses
 rather than the test case, and it covers test cases that already exist.

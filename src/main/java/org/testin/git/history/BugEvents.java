@@ -46,9 +46,12 @@ final class BugEvents {
         final @NotNull Optional<TestRunItems> bugBefore = before.filter(FailureDetail::recordsABug);
         final @NotNull Optional<TestRunItems> bugAfter = after.filter(FailureDetail::recordsABug);
 
-        if (bugBefore.isEmpty()) return bugAfter.map(item -> new BugEvent(BugEventKind.RECORDED, testRun, item, List.of()));
-        if (after.isEmpty()) return Optional.of(new BugEvent(BugEventKind.REMOVED, testRun, bugBefore.orElseThrow(), List.of()));
-        if (bugAfter.isEmpty()) return Optional.of(new BugEvent(BugEventKind.CLEARED, testRun, after.orElseThrow(), List.of()));
+        if (bugBefore.isEmpty())
+            return bugAfter.map(item -> new BugEvent(BugEventKind.RECORDED, testRun, item, List.of()));
+        if (after.isEmpty())
+            return Optional.of(new BugEvent(BugEventKind.REMOVED, testRun, bugBefore.orElseThrow(), List.of()));
+        if (bugAfter.isEmpty())
+            return Optional.of(new BugEvent(BugEventKind.CLEARED, testRun, after.orElseThrow(), List.of()));
 
         final @NotNull List<FieldChange> changes = RunItemChangeComparator.differences(bugBefore.orElseThrow(), bugAfter.orElseThrow()).stream()
                 .filter(change -> BUG_FIELDS.contains(change.fieldName()))

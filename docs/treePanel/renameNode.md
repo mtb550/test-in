@@ -104,10 +104,8 @@ This changes the name of one node. Nothing inside it moves.
    side: the node's own kind of icon with its name, and its place in the test
    project. The tester can still read the name being replaced after typing has
    started (Rule-TREE-PANEL-123). The place leaves the drive, the download folder
-   and the Testin folder off, with a chevron between the segments
-   (Rule-INTERNAL-108).
-2. **The caption over the field**, carrying the one hairline a dialog draws
-   (Rule-INTERNAL-087).
+   and the Testin folder off, with a chevron between the segments (Rule-INTERNAL-108).
+2. **The caption over the field**, carrying the one hairline a dialog draws (Rule-INTERNAL-087).
 3. **One field**, filled in with the current name. Its gray hint text reads *set new name...*. The cursor sits after the
    name. So typing **adds to the
    name** instead of replacing it. `Ctrl+A` selects the whole name. Spaces at

@@ -26,11 +26,11 @@ import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import javax.swing.text.JTextComponent;
-import java.util.Objects;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class LeavingACellIdeTest extends BasePlatformTestCase {
 

@@ -16,24 +16,24 @@
 
 package org.testin.filter;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
-import org.testin.model.status.TestCaseStatus;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
-import org.testin.model.TestCaseDto;
+import org.testin.model.status.TestCaseStatus;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testng.annotations.Test;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.testcase.TestCaseEditorAttributes;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 
 import static org.testng.Assert.assertEquals;
 
@@ -145,7 +145,8 @@ public class TestCaseFilterTest {
             final @NotNull String value = field.gridValue(tc);
             if (value.isBlank()) continue;
 
-            if (TestCaseFilter.filter(List.of(tc), new FilterSelection(value, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())).isEmpty()) notFound.add(field.getName() + " = " + value);
+            if (TestCaseFilter.filter(List.of(tc), new FilterSelection(value, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())).isEmpty())
+                notFound.add(field.getName() + " = " + value);
         }
 
         assertEquals(notFound, List.of(), "the search does not read these fields");

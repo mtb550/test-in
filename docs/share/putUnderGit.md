@@ -41,8 +41,8 @@ repository.
 ## What the tester sees
 
 No window opens. A short message titled **Git repository not found** answers,
-and the Testin Help mark at the end of the status bar turns red. Its hint carries
-**Initialize Git (git init)** and the guide *How to share test projects over
+and the Testin Help mark at the end of the status bar turns red. Its hint carries **Initialize Git (git init)** and the
+guide *How to share test projects over
 Git*; clicking it makes the repository, and a small message reads *Git
 initialized*.
 

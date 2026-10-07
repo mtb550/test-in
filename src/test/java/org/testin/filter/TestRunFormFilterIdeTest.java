@@ -51,6 +51,16 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
     private TestCaseDto paid;
     private TestRunFormFilter filter;
 
+    private static @NotNull CheckedTreeNode holding(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto... testCases) {
+        final @NotNull CheckedTreeNode node = new CheckedTreeNode(testSet);
+        for (final TestCaseDto tc : testCases) node.add(new CheckedTreeNode(tc));
+        return node;
+    }
+
+    private static @NotNull String nameOf(final @NotNull AnAction entry) {
+        return Objects.requireNonNullElse(entry.getTemplatePresentation().getText(), "");
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -75,22 +85,12 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
         return tc;
     }
 
-    private static @NotNull CheckedTreeNode holding(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto... testCases) {
-        final @NotNull CheckedTreeNode node = new CheckedTreeNode(testSet);
-        for (final TestCaseDto tc : testCases) node.add(new CheckedTreeNode(tc));
-        return node;
-    }
-
     private @NotNull FilterPopupBtn button() {
         return Drawn.first(filter.getSelection().getPanel(), FilterPopupBtn.class);
     }
 
     private @NotNull List<AnAction> menu() {
         return Arrays.asList(button().menu().getChildren(TestActionEvent.createTestEvent()));
-    }
-
-    private static @NotNull String nameOf(final @NotNull AnAction entry) {
-        return Objects.requireNonNullElse(entry.getTemplatePresentation().getText(), "");
     }
 
     private @NotNull List<AnAction> entriesOf(final @NotNull String submenu) {

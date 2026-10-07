@@ -17,11 +17,9 @@
    status bar offers **Initialize Git (git init)**; click it.
    ([Put the test project under Git](../share/putUnderGit.md))
 2. Choose **View Pending Commits** again. Every change is listed, one row for
-   each changed field. Untick what is not ready to send.
-   ([See what I have not committed](../share/reviewChanges.md))
+   each changed field. Untick what is not ready to send. ([See what I have not committed](../share/reviewChanges.md))
 3. Type a message and press **Commit & Push**. The first time, Git asks who you
-   are: type your name and email.
-   ([Tell Git who I am](../share/setGitIdentity.md))
+   are: type your name and email. ([Tell Git who I am](../share/setGitIdentity.md))
 4. The first push asks for the remote address. Paste the team's repository
    address. ([Commit and push](../share/commitAndPush.md))
 5. From then on, choose **Sync with Remote** to send your commits and take the

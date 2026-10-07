@@ -18,7 +18,6 @@ package org.testin.editor.toolbar;
 
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.toolbar.Toolbar;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 import org.testin.view.marker.MarkerDetailsViewDialog;

@@ -96,7 +96,8 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
         if (!typed.isConnected()) return Bundle.message("agent.check.no.command");
 
         final @NotNull Optional<String> answered = BackgroundWork.synchronously(Bundle.message("agent.check.button"), true, () -> AgentCli.onPath(ProgressManager.getInstance().getProgressIndicator()).check(typed), Optional.empty());
-        if (answered.isEmpty()) return Bundle.message("agent.check.not.found", typed.command(), AgentCli.triedNames(typed.command()));
+        if (answered.isEmpty())
+            return Bundle.message("agent.check.not.found", typed.command(), AgentCli.triedNames(typed.command()));
 
         return answered.orElseThrow().isBlank()
                 ? Bundle.message("agent.check.said.nothing", typed.command())

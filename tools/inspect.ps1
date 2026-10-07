@@ -45,36 +45,36 @@
 #>
 
 param(
-    # The one folder this script writes: the XML, the two reports, and the
-    # inspector's throwaway IDE directories. Deliberately not under build/:
-    # ./gradlew clean deletes that, and the findings list is what you work from
-    # for the next hour. Ignored by Git instead.
+# The one folder this script writes: the XML, the two reports, and the
+# inspector's throwaway IDE directories. Deliberately not under build/:
+# ./gradlew clean deletes that, and the findings list is what you work from
+# for the next hour. Ignored by Git instead.
     [string] $OutputDir = '.inspection',
 
-    # Narrows a run to one place, and passing '' inspects the project root.
-    #
-    # No default, deliberately. It used to default to 'src/main', which is
-    # always truthy - so the branch that reads every production source root was
-    # unreachable, the content modules were never checked, and three comments
-    # said otherwise (#170). What "no override" means is now asked of
-    # PSBoundParameters, which can tell it from a value.
+# Narrows a run to one place, and passing '' inspects the project root.
+#
+# No default, deliberately. It used to default to 'src/main', which is
+# always truthy - so the branch that reads every production source root was
+# unreachable, the content modules were never checked, and three comments
+# said otherwise (#170). What "no override" means is now asked of
+# PSBoundParameters, which can tell it from a value.
     [string] $Subdirectory,
 
-    # Reuse the XML already in $OutputDir and only rebuild the reports. The
-    # line numbers in it are the ones the inspector saw, so a source edited
-    # since then reports against lines that have moved - fine for re-reading a
-    # run, wrong for judging the tree as it is now.
+# Reuse the XML already in $OutputDir and only rebuild the reports. The
+# line numbers in it are the ones the inspector saw, so a source edited
+# since then reports against lines that have moved - fine for re-reading a
+# run, wrong for judging the tree as it is now.
     [switch] $ReportOnly,
 
-    # Only this script's own rules, and no IDE at all. Seconds rather than
-    # twenty minutes, because nothing is indexed: the rules below read the
-    # source as text.
-    #
-    # This is what to run before handing a change over. The full run belongs to
-    # CI on every push, and the findings it alone can see - dead code, a
-    # deprecated call, a redundant cast - are read from that run. What it cannot
-    # see is exactly what this mode catches, and what kept arriving in Muteb's
-    # IDE one warning at a time.
+# Only this script's own rules, and no IDE at all. Seconds rather than
+# twenty minutes, because nothing is indexed: the rules below read the
+# source as text.
+#
+# This is what to run before handing a change over. The full run belongs to
+# CI on every push, and the findings it alone can see - dead code, a
+# deprecated call, a redundant cast - are read from that run. What it cannot
+# see is exactly what this mode catches, and what kept arriving in Muteb's
+# IDE one warning at a time.
     [switch] $Quick
 )
 
@@ -103,9 +103,17 @@ $narrowed = $PSBoundParameters.ContainsKey('Subdirectory')
 # the whole repository. So Select-Inspected drops what lies outside - .sandbox,
 # which holds an entire IDE and produced 74,803 spelling findings, this script's
 # own scratch folder, and the sample data.
-$analysisScope = if ($narrowed) { $Subdirectory } else { '' }
+$analysisScope = if ($narrowed)
+{
+    $Subdirectory
+}
+else
+{
+    ''
+}
 
-function Resolve-Inspector {
+function Resolve-Inspector
+{
     $props = Get-Content (Join-Path $repo 'gradle.properties')
     $version = ($props | Select-String -Pattern '^intellij\.version=(.+)$').Matches[0].Groups[1].Value
 
@@ -113,24 +121,53 @@ function Resolve-Inspector {
     # at the runner's workspace rather than at the profile, so looking only in
     # the profile found nothing there and the scheduled run could not start.
     # $HOME is PowerShell's own and is the profile on every platform.
-    $gradleHome = if ($env:GRADLE_USER_HOME) { $env:GRADLE_USER_HOME } else { Join-Path $HOME '.gradle' }
+    $gradleHome = if ($env:GRADLE_USER_HOME)
+    {
+        $env:GRADLE_USER_HOME
+    }
+    else
+    {
+        Join-Path $HOME '.gradle'
+    }
 
     # The platform is downloaded per operating system and the folder is named
     # after it, so the suffix is matched rather than assumed (#106).
-    $osSuffix = if ($IsWindows) { 'win' } elseif ($IsMacOS) { 'mac' } else { 'linux' }
+    $osSuffix = if ($IsWindows)
+    {
+        'win'
+    }
+    elseif ($IsMacOS)
+    {
+        'mac'
+    }
+    else
+    {
+        'linux'
+    }
 
     # The Gradle transform path carries a content hash, so it is matched by shape rather than stored.
     $ide = Get-ChildItem -Path (Join-Path $gradleHome "caches/*/transforms/*/transformed" "idea-$version-$osSuffix") `
         -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
 
-    if (-not $ide) {
+    if (-not $ide)
+    {
         throw "No downloaded IDE $version found under $gradleHome. Run './gradlew compileJava' first - it fetches the platform this script inspects with."
     }
 
     # inspect.bat on Windows, inspect.sh everywhere else. Same arguments, different name.
-    $launcher = if ($IsWindows) { 'inspect.bat' } else { 'inspect.sh' }
+    $launcher = if ($IsWindows)
+    {
+        'inspect.bat'
+    }
+    else
+    {
+        'inspect.sh'
+    }
     $inspect = Join-Path $ide.FullName 'bin' $launcher
-    if (-not (Test-Path $inspect)) { throw "No $launcher in $($ide.FullName)" }
+    if (-not (Test-Path $inspect))
+    {
+        throw "No $launcher in $( $ide.FullName )"
+    }
 
     # Plugin DevKit, which the IDE no longer bundles. It is what reads plugin.xml:
     # without it an icon path that resolves nowhere passes, and a field only
@@ -138,9 +175,10 @@ function Resolve-Inspector {
     # Marketplace serves the build made for this IDE's exact build number. Kept
     # under Gradle's caches folder, which CI restores between runs.
     $product = Get-Content (Join-Path $ide.FullName 'product-info.json') -Raw | ConvertFrom-Json
-    $build = "$($product.productCode)-$($product.buildNumber)"
+    $build = "$( $product.productCode )-$( $product.buildNumber )"
     $devKit = Join-Path $gradleHome 'caches' 'testin-devkit' "devkit-$build.zip"
-    if (-not (Test-Path $devKit)) {
+    if (-not (Test-Path $devKit))
+    {
         New-Item -ItemType Directory -Force -Path (Split-Path $devKit) | Out-Null
         Invoke-WebRequest -Uri "https://plugins.jetbrains.com/pluginManager?action=download&id=DevKit&build=$build" -OutFile "$devKit.part"
         Move-Item -Path "$devKit.part" -Destination $devKit
@@ -150,7 +188,8 @@ function Resolve-Inspector {
     return [pscustomobject]@{ Launcher = $inspect; DevKit = $devKit }
 }
 
-function Invoke-Inspector([object] $inspector, [string] $outPath) {
+function Invoke-Inspector([object] $inspector, [string] $outPath)
+{
     # Outside the repository, and emptied before every run. Both halves matter.
     #
     # Empty, because reusing these caches is tempting - they hold the indexes
@@ -163,7 +202,10 @@ function Invoke-Inspector([object] $inspector, [string] $outPath) {
     # wrote them. The inspector reads the project from disk, so the scratch has
     # no reason to sit in it.
     $scratch = Join-Path ([System.IO.Path]::GetTempPath()) 'testin-inspect'
-    if (Test-Path $scratch) { Remove-Item -Path $scratch -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Test-Path $scratch)
+    {
+        Remove-Item -Path $scratch -Recurse -Force -ErrorAction SilentlyContinue
+    }
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
 
     # Forward slashes: idea.properties is read as a Java properties file, where a
@@ -180,18 +222,25 @@ idea.plugins.path=$s/plugins
 
     $profilePath = Join-Path $repo '.idea' 'inspectionProfiles' 'Testin.xml'
     $arguments = @($repo, $profilePath, $outPath, '-v1')
-    if ($analysisScope) { $arguments += @('-d', (Join-Path $repo $analysisScope)) }
+    if ($analysisScope)
+    {
+        $arguments += @('-d', (Join-Path $repo $analysisScope))
+    }
 
     Write-Host "Inspecting $repo - one indexing pass, expect 10-20 minutes..."
     $env:IDEA_PROPERTIES = $propsFile
-    try {
+    try
+    {
         & $inspector.Launcher @arguments
-    } finally {
+    }
+    finally
+    {
         Remove-Item Env:\IDEA_PROPERTIES -ErrorAction SilentlyContinue
     }
 }
 
-function Select-Inspected([object[]] $problems) {
+function Select-Inspected([object[]] $problems)
+{
     <#
         The findings in files this repository writes, which is what the scope
         .idea/scopes/Inspected.xml names - the same scope Code | Inspect Code
@@ -201,45 +250,66 @@ function Select-Inspected([object[]] $problems) {
     $pattern = ([xml](Get-Content (Join-Path $repo '.idea/scopes/Inspected.xml') -Raw)).component.scope.pattern
     $folders = @()
     $files = @()
-    foreach ($part in ($pattern.Trim('(', ')') -split '\|\|')) {
+    foreach ($part in ($pattern.Trim('(', ')') -split '\|\|'))
+    {
         $target = $part -replace '^file:', ''
-        if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
+        if ( $target.EndsWith('//*'))
+        {
+            $folders += $target.Substring(0, $target.Length - 3) + '/'
+        }
+        else
+        {
+            $files += $target
+        }
     }
 
     # The spell check reads every file Git tracks, not only the scope: a typo in
     # CHANGELOG.md or a gradle.properties comment is as public as one in src.
     # What it must not read is the same as for every rule - .sandbox and the
     # other folders nobody here writes - and those are not tracked.
-    $tracked = [System.Collections.Generic.HashSet[string]]::new([string[]] @(git -C $repo ls-files))
+    $tracked = [System.Collections.Generic.HashSet[string]]::new([string[]]@(git -C $repo ls-files))
 
     $problems | Where-Object {
         $path = $_.Path.TrimEnd('/')
-        if ($_.Inspection -eq $spelling) { return $tracked.Contains($path) }
+        if ($_.Inspection -eq $spelling)
+        {
+            return $tracked.Contains($path)
+        }
         ($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0
     }
 }
 
-function Read-Problems([string] $outPath) {
+function Read-Problems([string] $outPath)
+{
     $files = Get-ChildItem -Path (Join-Path $outPath '*.xml') -ErrorAction SilentlyContinue
-    if (-not $files) { throw "No XML in $outPath - the inspector produced nothing. Check its output above." }
+    if (-not $files)
+    {
+        throw "No XML in $outPath - the inspector produced nothing. Check its output above."
+    }
 
-    foreach ($file in $files) {
+    foreach ($file in $files)
+    {
         $doc = [xml](Get-Content -Path $file.FullName -Raw)
-        foreach ($problem in $doc.problems.problem) {
-            if (-not $problem) { continue }
+        foreach ($problem in $doc.problems.problem)
+        {
+            if (-not $problem)
+            {
+                continue
+            }
             [pscustomobject]@{
-                # file:// $PROJECT_DIR$ / path - only the repo-relative tail is useful.
-                Path       = ($problem.file -replace '^file://\$PROJECT_DIR\$/', '')
-                Line       = [int] $problem.line
+            # file:// $PROJECT_DIR$ / path - only the repo-relative tail is useful.
+                Path = ($problem.file -replace '^file://\$PROJECT_DIR\$/', '')
+                Line = [int]$problem.line
                 Inspection = $problem.problem_class.id
-                Severity   = $problem.problem_class.severity
-                Message    = ($problem.description -replace '<[^>]+>', '' -replace '\s+', ' ').Trim()
+                Severity = $problem.problem_class.severity
+                Message = ($problem.description -replace '<[^>]+>', '' -replace '\s+', ' ').Trim()
             }
         }
     }
 }
 
-function Get-SourceRoots {
+function Get-SourceRoots
+{
     <#
         Every production source tree, not just the core one.
 
@@ -252,11 +322,12 @@ function Get-SourceRoots {
         should not fail the run.
     #>
     return @('src/main', 'testin-java/src/main', 'testin-testng/src/main') |
-        ForEach-Object { Join-Path $repo $_ } |
-        Where-Object { Test-Path $_ }
+            ForEach-Object { Join-Path $repo $_ } |
+            Where-Object { Test-Path $_ }
 }
 
-function Get-JavaSourceRoots {
+function Get-JavaSourceRoots
+{
     <#
         Every source tree, tests included.
 
@@ -269,11 +340,12 @@ function Get-JavaSourceRoots {
         Only the ones that exist, for the same reason as above.
     #>
     return @('src/main', 'src/test', 'testin-java/src', 'testin-testng/src') |
-        ForEach-Object { Join-Path $repo $_ } |
-        Where-Object { Test-Path $_ }
+            ForEach-Object { Join-Path $repo $_ } |
+            Where-Object { Test-Path $_ }
 }
 
-function Resolve-CrossModuleUsages([object[]] $problems) {
+function Resolve-CrossModuleUsages([object[]] $problems)
+{
     <#
         A method the inspector calls dead because the only calls to it are in a
         content module.
@@ -295,16 +367,23 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
         in, and the finding is still in the list to read.
     #>
     $moduleRoots = @('testin-java/src/main', 'testin-testng/src/main') |
-        ForEach-Object { Join-Path $repo $_ } |
-        Where-Object { Test-Path $_ }
+            ForEach-Object { Join-Path $repo $_ } |
+            Where-Object { Test-Path $_ }
 
-    if (-not $moduleRoots) { return $problems }
+    if (-not $moduleRoots)
+    {
+        return $problems
+    }
 
     $moduleText = (Get-ChildItem -Path $moduleRoots -Filter *.java -Recurse -File |
-        ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) }) -join "`n"
+            ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) }) -join "`n"
 
-    foreach ($problem in $problems) {
-        if ($problem.Inspection -ne 'unused') { continue }
+    foreach ($problem in $problems)
+    {
+        if ($problem.Inspection -ne 'unused')
+        {
+            continue
+        }
 
         # A parameter an implementation elsewhere uses. Its own name is no use
         # for the search below - a parameter called p appears in every file in
@@ -313,32 +392,48 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
         # two p parameters were reported unused on every run: the only
         # implementation in scope is NoCodeNavigation, which does nothing by
         # design, and the real one is CodeNavigator in testin-java (#170).
-        if ($problem.Message -match '^Parameter .* is not used in any implementation') {
+        if ($problem.Message -match '^Parameter .* is not used in any implementation')
+        {
             $type = [System.IO.Path]::GetFileNameWithoutExtension($problem.Path)
-            if ($moduleText -match ('\b' + [regex]::Escape($type) + '\b')) { Set-UsedFromContentModule $problem }
+            if ($moduleText -match ('\b' + [regex]::Escape($type) + '\b'))
+            {
+                Set-UsedFromContentModule $problem
+            }
             continue
         }
 
         # A method, a whole class, or an enum constant. It caught only the first
         # to begin with, which left ExecutionPosition reported as a dead class
         # while two files in testin-java were calling it.
-        if ($problem.Message -notmatch '^(Method|Class|Enum constant|Constructor) .* never used') { continue }
+        if ($problem.Message -notmatch '^(Method|Class|Enum constant|Constructor) .* never used')
+        {
+            continue
+        }
 
         $name = Get-DeclaredName $problem
-        if (-not $name) { continue }
+        if (-not $name)
+        {
+            continue
+        }
 
         # How a module would name it. A type is named outright, so a word match
         # is enough and anything tighter would miss an import or a static call.
         # A method or a constant is reached through something, so the dot or the
         # method reference has to be there - a bare word match on a name like
         # "run" would spare every finding in the report.
-        $pattern = if ($problem.Message -match '^Class ') {
+        $pattern = if ($problem.Message -match '^Class ')
+        {
             '\b' + [regex]::Escape($name) + '\b'
-        } else {
+        }
+        else
+        {
             '(\.|::)\s*' + [regex]::Escape($name) + '\s*[(:,)]'
         }
 
-        if ($moduleText -notmatch $pattern) { continue }
+        if ($moduleText -notmatch $pattern)
+        {
+            continue
+        }
 
         Set-UsedFromContentModule $problem
     }
@@ -353,12 +448,14 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
     scope calls, and a parameter no implementation in scope uses - and the
     sentence a reader gets should not depend on which of them found it.
 #>
-function Set-UsedFromContentModule([object] $problem) {
+function Set-UsedFromContentModule([object] $problem)
+{
     $problem.Inspection = 'UsedFromContentModule'
-    $problem.Message = "$($problem.Message) It is called from a content module, which the inspector cannot see: mark it @FromContentModule, the entry point .idea/misc.xml names."
+    $problem.Message = "$( $problem.Message ) It is called from a content module, which the inspector cannot see: mark it @FromContentModule, the entry point .idea/misc.xml names."
 }
 
-function Get-DeclaredName([object] $problem) {
+function Get-DeclaredName([object] $problem)
+{
     <#
         The method name a finding points at. Read from the source rather than
         parsed out of the message, which names the method only in some of its
@@ -377,32 +474,51 @@ function Get-DeclaredName([object] $problem) {
         is not there would be a report that says too little.
     #>
     $file = Join-Path $repo $problem.Path
-    if (-not (Test-Path $file)) { return '' }
+    if (-not (Test-Path $file))
+    {
+        return ''
+    }
 
     $lines = [System.IO.File]::ReadAllLines($file)
-    if ($problem.Line -lt 1 -or $problem.Line -gt $lines.Count) { return '' }
+    if ($problem.Line -lt 1 -or $problem.Line -gt $lines.Count)
+    {
+        return ''
+    }
 
     $last = [Math]::Min($problem.Line + 4, $lines.Count)
     for ($n = $problem.Line; $n -le $last; $n++) {
         $text = $lines[$n - 1]
         $trimmed = $text.Trim()
-        if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
-        if ($trimmed.EndsWith('*/')) { continue }
+        if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*'))
+        {
+            continue
+        }
+        if ( $trimmed.EndsWith('*/'))
+        {
+            continue
+        }
 
         # A type first: "public final class ExecutionPosition {" has no
         # parenthesis to find, and "record Moved(..)" has one that would give
         # back the record name anyway - but only by accident, and not for a
         # class or an interface.
-        if ($text -match '\b(?:class|interface|enum|record)\s+(\w+)') { return $matches[1] }
+        if ($text -match '\b(?:class|interface|enum|record)\s+(\w+)')
+        {
+            return $matches[1]
+        }
 
-        if ($text -match '\b(\w+)\s*\(') { return $matches[1] }
+        if ($text -match '\b(\w+)\s*\(')
+        {
+            return $matches[1]
+        }
     }
 
     return ''
 }
 
 
-function Test-MachineString([string] $value) {
+function Test-MachineString([string] $value)
+{
     <#
         Whether a literal is machinery rather than something a tester reads.
 
@@ -410,26 +526,51 @@ function Test-MachineString([string] $value) {
         gets switched off, and the ones it lets through - a caption, a status, a
         button - are the ones worth arguing about.
     #>
-    if ($value.Length -lt 2 -or $value.Length -gt 60) { return $true }
-    if ($value -notmatch '[A-Za-z]') { return $true }
+    if ($value.Length -lt 2 -or $value.Length -gt 60)
+    {
+        return $true
+    }
+    if ($value -notmatch '[A-Za-z]')
+    {
+        return $true
+    }
     # paths, ids, format strings, css, packages
-    if ($value -match '[/\\{}<>%$#=;|\[\]()*+^~`]') { return $true }
-    if ($value -match '\.' -and $value -notmatch ' ') { return $true }
-    if ($value -ne $value.Trim()) { return $true }
-    if ($value -cmatch '^[a-z0-9_-]+$') { return $true }
-    if ($value -cmatch '^[A-Z0-9_]+$') { return $true }
+    if ($value -match '[/\\{}<>%$#=;|\[\]()*+^~`]')
+    {
+        return $true
+    }
+    if ($value -match '\.' -and $value -notmatch ' ')
+    {
+        return $true
+    }
+    if ($value -ne $value.Trim())
+    {
+        return $true
+    }
+    if ($value -cmatch '^[a-z0-9_-]+$')
+    {
+        return $true
+    }
+    if ($value -cmatch '^[A-Z0-9_]+$')
+    {
+        return $true
+    }
     # An identifier, not a sentence. A hump inside a single word is how a JSON
     # field, a config key or an inspection name is spelled - testinProject,
     # RepoUrl, UnstableApiUsage - and none of them is read by a tester. A word
     # they do read is a word, or words: Copy and Details have no hump, Git Error
     # has a space.
-    if ($value -notmatch ' ' -and $value -cmatch '[a-z][A-Z]') { return $true }
+    if ($value -notmatch ' ' -and $value -cmatch '[a-z][A-Z]')
+    {
+        return $true
+    }
     return $false
 }
 
 
 
-function Write-DisplayStringInventory([string[]] $scopes, [string] $outPath) {
+function Write-DisplayStringInventory([string[]] $scopes, [string] $outPath)
+{
     <#
         Every string a tester might read, and where it is written.
 
@@ -446,28 +587,48 @@ function Write-DisplayStringInventory([string[]] $scopes, [string] $outPath) {
     #>
     $rows = @()
 
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $short = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
             $number = 0
 
-            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+            {
                 $number++
 
                 $trimmed = $text.Trim()
-                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
-                if ($text -match 'Logger\.(trace|debug|info|warn|error|fatal)') { continue }
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*'))
+                {
+                    continue
+                }
+                if ($text -match 'Logger\.(trace|debug|info|warn|error|fatal)')
+                {
+                    continue
+                }
 
-                foreach ($match in [regex]::Matches($text, '"((?:[^"\\]|\\.)*)"')) {
+                foreach ($match in [regex]::Matches($text, '"((?:[^"\\]|\\.)*)"'))
+                {
                     $value = $match.Groups[1].Value
-                    if (Test-MachineString $value) { continue }
+                    if (Test-MachineString $value)
+                    {
+                        continue
+                    }
 
                     # The nearest identifier followed by '(' before the string.
                     # Single-line calls only, which is nearly all of them; the
                     # rest land under (unknown) and are still listed.
                     $before = $text.Substring(0, $match.Index)
                     $calls = [regex]::Matches($before, '([\w.]+)\s*\(')
-                    $call = if ($calls.Count -gt 0) { $calls[$calls.Count - 1].Groups[1].Value } else { '(unknown)' }
+                    $call = if ($calls.Count -gt 0)
+                    {
+                        $calls[$calls.Count - 1].Groups[1].Value
+                    }
+                    else
+                    {
+                        '(unknown)'
+                    }
 
                     $rows += [pscustomobject]@{ Value = $value; Call = $call; Where = "$short`:$number" }
                 }
@@ -482,23 +643,28 @@ function Write-DisplayStringInventory([string[]] $scopes, [string] $outPath) {
         'Grouped by the call it is handed to - the call says what kind of word it',
         'is, and a group with no owning enum is a vocabulary waiting for one.',
         '',
-        "$($rows.Count) uses of $(@($rows | Select-Object -ExpandProperty Value -Unique).Count) distinct strings.",
+        "$( $rows.Count ) uses of $( @($rows | Select-Object -ExpandProperty Value -Unique).Count ) distinct strings.",
         '',
         'The ones written in more than one file are also in findings.txt, as',
         'DuplicatedDisplayString, which is what the ratchet counts.',
         '')
 
-    foreach ($group in ($rows | Group-Object Call | Sort-Object Count -Descending)) {
+    foreach ($group in ($rows | Group-Object Call | Sort-Object Count -Descending))
+    {
         $distinct = @($group.Group | Select-Object -ExpandProperty Value -Unique)
         $lines += ''
         $lines += ('=' * 78)
         $lines += ('{0}   -   {1} use(s), {2} distinct' -f $group.Name, $group.Count, $distinct.Count)
         $lines += ('=' * 78)
 
-        foreach ($value in ($distinct | Sort-Object)) {
+        foreach ($value in ($distinct | Sort-Object))
+        {
             $places = @($group.Group | Where-Object { $_.Value -eq $value } | Select-Object -ExpandProperty Where)
             $lines += ('  "{0}"' -f $value)
-            foreach ($place in ($places | Sort-Object)) { $lines += ('        ' + $place) }
+            foreach ($place in ($places | Sort-Object))
+            {
+                $lines += ('        ' + $place)
+            }
         }
     }
 
@@ -506,7 +672,8 @@ function Write-DisplayStringInventory([string[]] $scopes, [string] $outPath) {
     Write-Host "Strings:   $inventory"
 }
 
-function Read-DriftedCaptions([string[]] $enums) {
+function Read-DriftedCaptions([string[]] $enums)
+{
     <#
         One concept, two words, in front of the same tester.
 
@@ -525,14 +692,16 @@ function Read-DriftedCaptions([string[]] $enums) {
         A constant whose caption comes from another enum is skipped: asking an
         owner is the fix, not the finding.
     #>
-    $captions = @{}
+    $captions = @{ }
 
-    foreach ($file in $enums) {
+    foreach ($file in $enums)
+    {
         # Loud, not skipped. A path that is not there used to be passed over in
         # silence, so this check shrank from four enums to two on the day #111
         # moved the other two - and printed "Gate clear" either way for
         # everything it had stopped looking at (#66, finding 98).
-        if (-not (Test-Path $file)) {
+        if (-not (Test-Path $file))
+        {
             throw "Read-DriftedCaptions was given a file that is not there: $file"
         }
 
@@ -540,7 +709,10 @@ function Read-DriftedCaptions([string[]] $enums) {
         $short = (Split-Path $file -Leaf) -replace '\.java$', ''
 
         for ($i = 0; $i -lt $lines.Count - 1; $i++) {
-            if ($lines[$i] -notmatch '^    ([A-Z][A-Z0-9_]+)\($') { continue }
+            if ($lines[$i] -notmatch '^    ([A-Z][A-Z0-9_]+)\($')
+            {
+                continue
+            }
             $constant = $matches[1]
 
             # The caption is the first argument, on the line below: a literal, or
@@ -549,39 +721,51 @@ function Read-DriftedCaptions([string[]] $enums) {
             # constant have to agree on, and reading only the literal meant this
             # saw nothing at all once every caption became a key.
             $argument = $lines[$i + 1].Trim()
-            if ($argument -notmatch '^(?:Bundle\.message\()?"((?:[^"\\]|\\.)*)"') { continue }
+            if ($argument -notmatch '^(?:Bundle\.message\()?"((?:[^"\\]|\\.)*)"')
+            {
+                continue
+            }
 
             $value = $matches[1]
-            if (-not $captions.ContainsKey($constant)) { $captions[$constant] = @() }
+            if (-not $captions.ContainsKey($constant))
+            {
+                $captions[$constant] = @()
+            }
             $captions[$constant] += [pscustomobject]@{
                 Value = $value
                 Where = $short
-                Path  = $file.Substring($repo.Length + 1) -replace '\\', '/'
-                Line  = $i + 2
+                Path = $file.Substring($repo.Length + 1) -replace '\\', '/'
+                Line = $i + 2
             }
         }
     }
 
-    foreach ($constant in $captions.Keys) {
+    foreach ($constant in $captions.Keys)
+    {
         $places = $captions[$constant]
         $distinct = @($places | Select-Object -ExpandProperty Value -Unique)
-        if ($distinct.Count -lt 2) { continue }
+        if ($distinct.Count -lt 2)
+        {
+            continue
+        }
 
         $names = ($distinct | ForEach-Object { '"' + $_ + '"' }) -join ' and '
 
-        foreach ($place in $places) {
+        foreach ($place in $places)
+        {
             [pscustomobject]@{
-                Path       = $place.Path
-                Line       = $place.Line
+                Path = $place.Path
+                Line = $place.Line
                 Inspection = 'DriftedCaption'
-                Severity   = 'ERROR'
-                Message    = "$constant is called $names in different places. One concept, one word - ask the enum that owns it."
+                Severity = 'ERROR'
+                Message = "$constant is called $names in different places. One concept, one word - ask the enum that owns it."
             }
         }
     }
 }
 
-function Read-DuplicatedDisplayStrings([string[]] $scopes) {
+function Read-DuplicatedDisplayStrings([string[]] $scopes)
+{
     <#
         A user-facing string written in more than one file has no owner.
 
@@ -599,23 +783,39 @@ function Read-DuplicatedDisplayStrings([string[]] $scopes) {
         Log lines are skipped. What a log says is not read by a tester and is
         not worth centralizing.
     #>
-    $found = @{}
+    $found = @{ }
 
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $number = 0
-            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+            {
                 $number++
 
                 $trimmed = $text.Trim()
-                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
-                if ($text -match 'Logger\.(trace|debug|info|warn|error|fatal)') { continue }
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*'))
+                {
+                    continue
+                }
+                if ($text -match 'Logger\.(trace|debug|info|warn|error|fatal)')
+                {
+                    continue
+                }
 
-                foreach ($match in [regex]::Matches($text, '"((?:[^"\\]|\\.)*)"')) {
+                foreach ($match in [regex]::Matches($text, '"((?:[^"\\]|\\.)*)"'))
+                {
                     $value = $match.Groups[1].Value
-                    if (Test-MachineString $value) { continue }
+                    if (Test-MachineString $value)
+                    {
+                        continue
+                    }
 
-                    if (-not $found.ContainsKey($value)) { $found[$value] = @() }
+                    if (-not $found.ContainsKey($value))
+                    {
+                        $found[$value] = @()
+                    }
                     $found[$value] += [pscustomobject]@{
                         Path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
                         Line = $number
@@ -625,26 +825,32 @@ function Read-DuplicatedDisplayStrings([string[]] $scopes) {
         }
     }
 
-    foreach ($value in $found.Keys) {
+    foreach ($value in $found.Keys)
+    {
         $places = $found[$value]
         $files = @($places | Select-Object -ExpandProperty Path -Unique)
-        if ($files.Count -lt 2) { continue }
+        if ($files.Count -lt 2)
+        {
+            continue
+        }
 
         # Every place after the first: the first one is allowed to be where it
         # lives, and the rest are the ones that should be asking it.
-        foreach ($place in ($places | Select-Object -Skip 1)) {
+        foreach ($place in ($places | Select-Object -Skip 1))
+        {
             [pscustomobject]@{
-                Path       = $place.Path
-                Line       = $place.Line
+                Path = $place.Path
+                Line = $place.Line
                 Inspection = 'DuplicatedDisplayString'
-                Severity   = 'WARNING'
-                Message    = "`"$value`" is written in $($files.Count) files. A string a tester reads belongs to the type that owns the concept - ask it instead."
+                Severity = 'WARNING'
+                Message = "`"$value`" is written in $( $files.Count ) files. A string a tester reads belongs to the type that owns the concept - ask it instead."
             }
         }
     }
 }
 
-function Read-ModelStatics([string[]] $scopes) {
+function Read-ModelStatics([string[]] $scopes)
+{
     <#
         Static mutable state, in the packages that model the data.
 
@@ -660,42 +866,67 @@ function Read-ModelStatics([string[]] $scopes) {
         Only non-final statics. A static final is a constant or an empty value
         of its own type, which is the pattern this codebase is built on.
     #>
-    foreach ($scope in $scopes) {
-        if (-not (Test-Path $scope)) { continue }
+    foreach ($scope in $scopes)
+    {
+        if (-not (Test-Path $scope))
+        {
+            continue
+        }
 
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $number = 0
-            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+            {
                 $number++
 
                 $trimmed = $text.Trim()
-                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*'))
+                {
+                    continue
+                }
 
                 # An import declares nothing, so it holds nothing. An
                 # 'import static a.b.C.took;' has no parentheses and no
                 # 'final', which is every test below - so it read as a mutable
                 # static and failed the gate over a line that is not a member.
-                if ($trimmed.StartsWith('import ')) { continue }
+                if ( $trimmed.StartsWith('import '))
+                {
+                    continue
+                }
 
-                if ($text -notmatch '\bstatic\b') { continue }
-                if ($text -match '\bfinal\b') { continue }
-                if ($text -match '\bstatic\s+(final\s+)?(class|interface|enum|record)\b') { continue }
+                if ($text -notmatch '\bstatic\b')
+                {
+                    continue
+                }
+                if ($text -match '\bfinal\b')
+                {
+                    continue
+                }
+                if ($text -match '\bstatic\s+(final\s+)?(class|interface|enum|record)\b')
+                {
+                    continue
+                }
                 # a method, not a field
-                if ($text -match '\(') { continue }
+                if ($text -match '\(')
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
-                    Line       = $number
+                    Path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line = $number
                     Inspection = 'StaticMutableState'
-                    Severity   = 'ERROR'
-                    Message    = "One slot for the whole IDE: $trimmed - a value that belongs to a project goes on a project service the caller gets and sets."
+                    Severity = 'ERROR'
+                    Message = "One slot for the whole IDE: $trimmed - a value that belongs to a project goes on a project service the caller gets and sets."
                 }
             }
         }
     }
 }
 
-function Read-HandWrittenPrivateConstructors([string[]] $scopes) {
+function Read-HandWrittenPrivateConstructors([string[]] $scopes)
+{
     <#
         An empty private constructor, where the Lombok annotation says it better.
 
@@ -707,33 +938,45 @@ function Read-HandWrittenPrivateConstructors([string[]] $scopes) {
         Swing setup - is a different thing entirely, and Lombok cannot express
         it.
     #>
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $lines = [System.IO.File]::ReadAllLines($file.FullName)
 
             for ($i = 0; $i -lt $lines.Count; $i++) {
                 $text = $lines[$i]
-                if ($text -notmatch '^\s*private\s+[A-Z]\w*\s*\(\s*\)\s*\{') { continue }
+                if ($text -notmatch '^\s*private\s+[A-Z]\w*\s*\(\s*\)\s*\{')
+                {
+                    continue
+                }
 
                 # Empty when the brace closes on this line, or the next line is
                 # only the closing brace.
                 $empty = $text -match '\{\s*\}\s*$'
-                if (-not $empty -and $i + 1 -lt $lines.Count) { $empty = $lines[$i + 1].Trim() -eq '}' }
-                if (-not $empty) { continue }
+                if (-not $empty -and $i + 1 -lt $lines.Count)
+                {
+                    $empty = $lines[$i + 1].Trim() -eq '}'
+                }
+                if (-not $empty)
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
-                    Line       = $i + 1
+                    Path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line = $i + 1
                     Inspection = 'HandWrittenPrivateConstructor'
-                    Severity   = 'ERROR'
-                    Message    = 'An empty private constructor: use @NoArgsConstructor(access = AccessLevel.PRIVATE) instead.'
+                    Severity = 'ERROR'
+                    Message = 'An empty private constructor: use @NoArgsConstructor(access = AccessLevel.PRIVATE) instead.'
                 }
             }
         }
     }
 }
 
-function Hide-StringsAndComments([string] $source) {
+function Hide-StringsAndComments([string] $source)
+{
     <#
         The same file with every string literal, char literal, text block and
         comment blanked to spaces, offsets unchanged.
@@ -747,41 +990,84 @@ function Hide-StringsAndComments([string] $source) {
     $i = 0
     $n = $source.Length
 
-    while ($i -lt $n) {
+    while ($i -lt $n)
+    {
         $c = $source[$i]
 
-        if ($c -eq '"' -and $i + 3 -le $n -and $source.Substring($i, 3) -eq '"""') {
+        if ($c -eq '"' -and $i + 3 -le $n -and $source.Substring($i, 3) -eq '"""')
+        {
             $j = $source.IndexOf('"""', $i + 3)
-            $j = if ($j -lt 0) { $n } else { $j + 3 }
-            for ($k = $i; $k -lt $j; $k++) { if ($source[$k] -ne "`n") { $out[$k] = ' ' } }
+            $j = if ($j -lt 0)
+            {
+                $n
+            }
+            else
+            {
+                $j + 3
+            }
+            for ($k = $i; $k -lt $j; $k++) {
+                if ($source[$k] -ne "`n")
+                {
+                    $out[$k] = ' '
+                }
+            }
             $i = $j
             continue
         }
 
-        if ($c -eq '"' -or $c -eq "'") {
+        if ($c -eq '"' -or $c -eq "'")
+        {
             $j = $i + 1
-            while ($j -lt $n) {
-                if ($source[$j] -eq '\') { $j += 2; continue }
-                if ($source[$j] -eq $c) { $j++; break }
+            while ($j -lt $n)
+            {
+                if ($source[$j] -eq '\')
+                {
+                    $j += 2; continue
+                }
+                if ($source[$j] -eq $c)
+                {
+                    $j++; break
+                }
                 $j++
             }
-            for ($k = $i; $k -lt [Math]::Min($j, $n); $k++) { $out[$k] = ' ' }
+            for ($k = $i; $k -lt [Math]::Min($j, $n); $k++) {
+                $out[$k] = ' '
+            }
             $i = $j
             continue
         }
 
-        if ($c -eq '/' -and $i + 1 -lt $n -and $source[$i + 1] -eq '/') {
+        if ($c -eq '/' -and $i + 1 -lt $n -and $source[$i + 1] -eq '/')
+        {
             $j = $source.IndexOf("`n", $i)
-            if ($j -lt 0) { $j = $n }
-            for ($k = $i; $k -lt $j; $k++) { $out[$k] = ' ' }
+            if ($j -lt 0)
+            {
+                $j = $n
+            }
+            for ($k = $i; $k -lt $j; $k++) {
+                $out[$k] = ' '
+            }
             $i = $j
             continue
         }
 
-        if ($c -eq '/' -and $i + 1 -lt $n -and $source[$i + 1] -eq '*') {
+        if ($c -eq '/' -and $i + 1 -lt $n -and $source[$i + 1] -eq '*')
+        {
             $j = $source.IndexOf('*/', $i + 2)
-            $j = if ($j -lt 0) { $n } else { $j + 2 }
-            for ($k = $i; $k -lt $j; $k++) { if ($source[$k] -ne "`n") { $out[$k] = ' ' } }
+            $j = if ($j -lt 0)
+            {
+                $n
+            }
+            else
+            {
+                $j + 2
+            }
+            for ($k = $i; $k -lt $j; $k++) {
+                if ($source[$k] -ne "`n")
+                {
+                    $out[$k] = ' '
+                }
+            }
             $i = $j
             continue
         }
@@ -792,32 +1078,62 @@ function Hide-StringsAndComments([string] $source) {
     return $out.ToString()
 }
 
-function Get-LambdaBody([string] $masked, [int] $after) {
+function Get-LambdaBody([string] $masked, [int] $after)
+{
     $k = $after
-    while ($k -lt $masked.Length -and [char]::IsWhiteSpace($masked[$k])) { $k++ }
-    if ($k -ge $masked.Length) { return '' }
+    while ($k -lt $masked.Length -and [char]::IsWhiteSpace($masked[$k]))
+    {
+        $k++
+    }
+    if ($k -ge $masked.Length)
+    {
+        return ''
+    }
 
     $depth = 0
 
-    if ($masked[$k] -eq '{') {
+    if ($masked[$k] -eq '{')
+    {
         for ($j = $k; $j -lt $masked.Length; $j++) {
-            if ($masked[$j] -eq '{') { $depth++ }
-            elseif ($masked[$j] -eq '}') { $depth--; if ($depth -eq 0) { break } }
+            if ($masked[$j] -eq '{')
+            {
+                $depth++
+            }
+            elseif ($masked[$j] -eq '}')
+            {
+                $depth--; if ($depth -eq 0)
+                {
+                    break
+                }
+            }
         }
-        return $masked.Substring($k + 1, [Math]::Max(0, [Math]::Min($j, $masked.Length) - $k - 1))
+        return $masked.Substring($k + 1,[Math]::Max(0, [Math]::Min($j, $masked.Length) - $k - 1))
     }
 
     for ($j = $k; $j -lt $masked.Length; $j++) {
         $ch = $masked[$j]
-        if ('([{'.Contains($ch)) { $depth++ }
-        elseif (')]}'.Contains($ch)) { if ($depth -eq 0) { break }; $depth-- }
-        elseif (($ch -eq ';' -or $ch -eq ',') -and $depth -eq 0) { break }
+        if ( '([{'.Contains($ch))
+        {
+            $depth++
+        }
+        elseif (')]}'.Contains($ch))
+        {
+            if ($depth -eq 0)
+            {
+                break
+            }; $depth--
+        }
+        elseif (($ch -eq ';' -or $ch -eq ',') -and $depth -eq 0)
+        {
+            break
+        }
     }
 
     return $masked.Substring($k, [Math]::Min($j, $masked.Length) - $k)
 }
 
-function Read-UnusedLambdaParameters([string[]] $scopes) {
+function Read-UnusedLambdaParameters([string[]] $scopes)
+{
     <#
         A lambda parameter nothing in the body reads. Java has a name for one
         since 21 - the unnamed variable, _ - so there is a fix that needs no
@@ -834,52 +1150,77 @@ function Read-UnusedLambdaParameters([string[]] $scopes) {
         nobody. Switch arms - case 'n' -> ... - are skipped: the literal is
         masked away and what is left looks exactly like a lambda.
     #>
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $source = [System.IO.File]::ReadAllText($file.FullName)
             $masked = Hide-StringsAndComments $source
             $path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
 
             $unused = [System.Collections.Generic.List[object]]::new()
 
-            foreach ($match in [regex]::Matches($masked, '\(([^()]*)\)\s*->')) {
+            foreach ($match in [regex]::Matches($masked, '\(([^()]*)\)\s*->'))
+            {
                 $inner = $match.Groups[1].Value
-                if ($inner -notmatch '^\s*\w+(\s*,\s*\w+)*\s*$') { continue }
+                if ($inner -notmatch '^\s*\w+(\s*,\s*\w+)*\s*$')
+                {
+                    continue
+                }
 
                 $body = Get-LambdaBody $masked ($match.Index + $match.Length)
-                foreach ($name in [regex]::Matches($inner, '\w+')) {
-                    if ($name.Value -eq '_') { continue }
-                    if ($body -match ('\b' + [regex]::Escape($name.Value) + '\b')) { continue }
+                foreach ($name in [regex]::Matches($inner, '\w+'))
+                {
+                    if ($name.Value -eq '_')
+                    {
+                        continue
+                    }
+                    if ($body -match ('\b' + [regex]::Escape($name.Value) + '\b'))
+                    {
+                        continue
+                    }
                     $unused.Add(@{ At = $match.Groups[1].Index + $name.Index; Name = $name.Value })
                 }
             }
 
-            foreach ($match in [regex]::Matches($masked, '(?<![\w.)])(\w+)\s*->')) {
+            foreach ($match in [regex]::Matches($masked, '(?<![\w.)])(\w+)\s*->'))
+            {
                 $name = $match.Groups[1].Value
-                if ($name -in @('_', 'default', 'case')) { continue }
+                if ($name -in @('_', 'default', 'case'))
+                {
+                    continue
+                }
 
-                $lineStart = $masked.LastIndexOf("`n", [Math]::Max(0, $match.Index - 1)) + 1
-                if ($masked.Substring($lineStart, $match.Index - $lineStart) -match '\b(case)\b') { continue }
+                $lineStart = $masked.LastIndexOf("`n",[Math]::Max(0, $match.Index - 1)) + 1
+                if ($masked.Substring($lineStart, $match.Index - $lineStart) -match '\b(case)\b')
+                {
+                    continue
+                }
 
                 $body = Get-LambdaBody $masked ($match.Index + $match.Length)
-                if ($body -match ('\b' + [regex]::Escape($name) + '\b')) { continue }
+                if ($body -match ('\b' + [regex]::Escape($name) + '\b'))
+                {
+                    continue
+                }
                 $unused.Add(@{ At = $match.Groups[1].Index; Name = $name })
             }
 
-            foreach ($found in $unused) {
+            foreach ($found in $unused)
+            {
                 [pscustomobject]@{
-                    Path       = $path
-                    Line       = ($masked.Substring(0, $found.At) -split "`n").Count
+                    Path = $path
+                    Line = ($masked.Substring(0, $found.At) -split "`n").Count
                     Inspection = 'UnusedLambdaParameter'
-                    Severity   = 'ERROR'
-                    Message    = "Parameter '$($found.Name)' is never used. Java 21 named it: write _ instead"
+                    Severity = 'ERROR'
+                    Message = "Parameter '$( $found.Name )' is never used. Java 21 named it: write _ instead"
                 }
             }
         }
     }
 }
 
-function Read-WrappedDeclarations([string] $scope) {
+function Read-WrappedDeclarations([string] $scope)
+{
     <#
         A method declaration is one line. A signature is one thing to read, and
         split over four lines it is four things to put back together before the
@@ -899,32 +1240,44 @@ function Read-WrappedDeclarations([string] $scope) {
     $declaration = '^\s*(?:(?:public|protected|private|static|final|abstract|synchronized|native|default|strictfp)\s+)+[^;=()]*?\b\w+\s*\('
     $record = '^\s*(?:\w+\s+)*record\s+\w+(?:<[^>]*>)?\s*\('
 
-    foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+    {
         $number = 0
-        foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+        foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+        {
             $number++
 
             $trimmed = $text.Trim()
-            if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
-            if ($text -notmatch $declaration -and $text -notmatch $record) { continue }
+            if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*'))
+            {
+                continue
+            }
+            if ($text -notmatch $declaration -and $text -notmatch $record)
+            {
+                continue
+            }
 
             # Still open at the end of the line, so the signature carries on to
             # the next one. A declaration that closes on its own line is fine,
             # however long it is.
-            if ([regex]::Matches($text, '\(').Count -le [regex]::Matches($text, '\)').Count) { continue }
+            if ([regex]::Matches($text, '\(').Count -le [regex]::Matches($text, '\)').Count)
+            {
+                continue
+            }
 
             [pscustomobject]@{
-                Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
-                Line       = $number
+                Path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                Line = $number
                 Inspection = 'WrappedMethodDeclaration'
-                Severity   = 'ERROR'
-                Message    = "A method declaration belongs on one line: $trimmed"
+                Severity = 'ERROR'
+                Message = "A method declaration belongs on one line: $trimmed"
             }
         }
     }
 }
 
-function Read-HelpersNamedLikeTests([string[]] $scopes) {
+function Read-HelpersNamedLikeTests([string[]] $scopes)
+{
     <#
         A helper in a JUnit 3 test whose name starts with "test". JUnit 3 runs
         every public void test*() by name, so the IDE's JUnitMalformedDeclaration
@@ -939,29 +1292,41 @@ function Read-HelpersNamedLikeTests([string[]] $scopes) {
     $helper = '^\s*(?:(?:public|protected|private|static|final|abstract|synchronized)\s+)+[^;=()]*?\b(test\w*)\s*\('
     $test = '^\s*public\s+void\s+test\w*\s*\(\s*\)'
 
-    foreach ($scope in $scopes) {
-        if (-not (Test-Path $scope)) { continue }
+    foreach ($scope in $scopes)
+    {
+        if (-not (Test-Path $scope))
+        {
+            continue
+        }
 
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $lines = [System.IO.File]::ReadAllLines($file.FullName)
-            if (-not ($lines -match $junit3)) { continue }
+            if (-not ($lines -match $junit3))
+            {
+                continue
+            }
 
             for ($i = 0; $i -lt $lines.Count; $i++) {
-                if ($lines[$i] -notmatch $helper -or $lines[$i] -match $test) { continue }
+                if ($lines[$i] -notmatch $helper -or $lines[$i] -match $test)
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
-                    Line       = $i + 1
+                    Path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line = $i + 1
                     Inspection = 'HelperNamedLikeTest'
-                    Severity   = 'ERROR'
-                    Message    = "JUnit 3 reads $($Matches[1]) as a test because of its name. A helper's name does not start with 'test': aTestCase, theTestRuns."
+                    Severity = 'ERROR'
+                    Message = "JUnit 3 reads $( $Matches[1] ) as a test because of its name. A helper's name does not start with 'test': aTestCase, theTestRuns."
                 }
             }
         }
     }
 }
 
-function Test-DocComment([string[]] $lines, [int] $close) {
+function Test-DocComment([string[]] $lines, [int] $close)
+{
     <#
         Whether the block comment that ends at $close is a doc comment.
 
@@ -976,14 +1341,18 @@ function Test-DocComment([string[]] $lines, [int] $close) {
         for a one-line /** .. */.
     #>
     for ($i = $close; $i -ge 0; $i--) {
-        if (-not $lines[$i].Trim().StartsWith('/*')) { continue }
+        if (-not $lines[$i].Trim().StartsWith('/*'))
+        {
+            continue
+        }
         return $lines[$i].Trim().StartsWith('/**')
     }
 
     return $false
 }
 
-function Read-OrphanedJavadoc([string[]] $scopes) {
+function Read-OrphanedJavadoc([string[]] $scopes)
+{
     <#
         A javadoc block the compiler throws away.
 
@@ -1012,37 +1381,58 @@ function Read-OrphanedJavadoc([string[]] $scopes) {
     #>
     $frozen = @('src/main/java/org/testin/model/TestRunDto.java')
 
-    foreach ($scope in $scopes) {
-        if (-not (Test-Path $scope)) { continue }
+    foreach ($scope in $scopes)
+    {
+        if (-not (Test-Path $scope))
+        {
+            continue
+        }
 
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
-            if ($frozen -contains $path) { continue }
+            if ($frozen -contains $path)
+            {
+                continue
+            }
 
             $lines = [System.IO.File]::ReadAllLines($file.FullName)
 
             for ($i = 0; $i -lt $lines.Count; $i++) {
-                if ($lines[$i].Trim() -notmatch '\*/$') { continue }
-                if (-not (Test-DocComment $lines $i)) { continue }
+                if ($lines[$i].Trim() -notmatch '\*/$')
+                {
+                    continue
+                }
+                if (-not (Test-DocComment $lines $i))
+                {
+                    continue
+                }
 
                 $j = $i + 1
-                while ($j -lt $lines.Count -and ($lines[$j].Trim() -eq '' -or $lines[$j].Trim() -match '^@[A-Za-z_][\w.]*(\(.*\))?$')) { $j++ }
+                while ($j -lt $lines.Count -and ($lines[$j].Trim() -eq '' -or $lines[$j].Trim() -match '^@[A-Za-z_][\w.]*(\(.*\))?$'))
+                {
+                    $j++
+                }
 
-                if ($j -ge $lines.Count -or $lines[$j].Trim() -notmatch '^/\*\*') { continue }
+                if ($j -ge $lines.Count -or $lines[$j].Trim() -notmatch '^/\*\*')
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $path
-                    Line       = $i + 1
+                    Path = $path
+                    Line = $i + 1
                     Inspection = 'OrphanedJavadoc'
-                    Severity   = 'ERROR'
-                    Message    = "A second block opens at line $($j + 1), so javac keeps that one and this documents nothing."
+                    Severity = 'ERROR'
+                    Message = "A second block opens at line $( $j + 1 ), so javac keeps that one and this documents nothing."
                 }
             }
         }
     }
 }
 
-function Read-HtmlParagraphInMarkdown {
+function Read-HtmlParagraphInMarkdown
+{
     <#
         A paragraph break written as HTML in a Markdown file.
 
@@ -1056,29 +1446,37 @@ function Read-HtmlParagraphInMarkdown {
         Every tracked Markdown file is read, the repository's root included,
         which is where CLAUDE.md sits and where the inspector does not look.
     #>
-    foreach ($relative in @(git -C $repo ls-files '*.md')) {
+    foreach ($relative in @(git -C $repo ls-files '*.md'))
+    {
         # A page deleted in the working tree is still tracked until the delete is staged,
         # and a gate that throws on it reports nothing at all.
         $path = Join-Path $repo $relative
-        if (-not (Test-Path $path)) { continue }
+        if (-not (Test-Path $path))
+        {
+            continue
+        }
 
         $lines = [System.IO.File]::ReadAllLines($path)
 
         for ($i = 0; $i -lt $lines.Count; $i++) {
-            if ($lines[$i].Trim() -ne '<p>') { continue }
+            if ($lines[$i].Trim() -ne '<p>')
+            {
+                continue
+            }
 
             [pscustomobject]@{
-                Path       = $relative
-                Line       = $i + 1
+                Path = $relative
+                Line = $i + 1
                 Inspection = 'HtmlParagraphInMarkdown'
-                Severity   = 'ERROR'
-                Message    = 'A bare <p> opens a raw HTML block, where backticks stop being code. Separate the paragraphs with a blank line.'
+                Severity = 'ERROR'
+                Message = 'A bare <p> opens a raw HTML block, where backticks stop being code. Separate the paragraphs with a blank line.'
             }
         }
     }
 }
 
-function Read-UnlistedRules {
+function Read-UnlistedRules
+{
     <#
         A rule this script reports that CONTRIBUTING.md's table of its rules
         does not name, or a row in that table naming a rule it no longer
@@ -1092,50 +1490,69 @@ function Read-UnlistedRules {
     #>
     $contributing = Join-Path $repo 'CONTRIBUTING.md'
     $lines = [System.IO.File]::ReadAllLines($contributing)
-    $intro = [array]::FindIndex($lines, [Predicate[string]] { param($line) $line.StartsWith("The script's own rules") })
+    $intro = [array]::FindIndex($lines, [Predicate[string]]{ param($line) $line.StartsWith("The script's own rules") })
 
     $listed = @()
     for ($i = $intro + 1; $i -lt $lines.Count; $i++) {
-        if ($lines[$i] -match '^\|\s*`(\w+)`') { $listed += $Matches[1] }
-        elseif ($listed -and -not $lines[$i].StartsWith('|')) { break }
+        if ($lines[$i] -match '^\|\s*`(\w+)`')
+        {
+            $listed += $Matches[1]
+        }
+        elseif ($listed -and -not $lines[$i].StartsWith('|'))
+        {
+            break
+        }
     }
 
     $reported = @([regex]::Matches([System.IO.File]::ReadAllText($PSCommandPath), "Inspection\s*=\s*'(\w+)'") |
             ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
 
-    foreach ($rule in $reported | Where-Object { $_ -notin $listed }) {
+    foreach ($rule in $reported | Where-Object { $_ -notin $listed })
+    {
         [pscustomobject]@{
-            Path       = 'CONTRIBUTING.md'
-            Line       = $intro + 1
+            Path = 'CONTRIBUTING.md'
+            Line = $intro + 1
             Inspection = 'UnlistedRule'
-            Severity   = 'ERROR'
-            Message    = "tools/inspect.ps1 reports $rule, and the table of the script's own rules does not name it."
+            Severity = 'ERROR'
+            Message = "tools/inspect.ps1 reports $rule, and the table of the script's own rules does not name it."
         }
     }
-    foreach ($rule in $listed | Where-Object { $_ -notin $reported }) {
+    foreach ($rule in $listed | Where-Object { $_ -notin $reported })
+    {
         [pscustomobject]@{
-            Path       = 'CONTRIBUTING.md'
-            Line       = $intro + 1
+            Path = 'CONTRIBUTING.md'
+            Line = $intro + 1
             Inspection = 'UnlistedRule'
-            Severity   = 'ERROR'
-            Message    = "The table of the script's own rules names $rule, and tools/inspect.ps1 no longer reports it."
+            Severity = 'ERROR'
+            Message = "The table of the script's own rules names $rule, and tools/inspect.ps1 no longer reports it."
         }
     }
 }
 
-function Get-CellBorders([string] $line) {
+function Get-CellBorders([string] $line)
+{
     $borders = [System.Collections.Generic.List[int]]::new()
     $inCode = $false
     for ($i = 0; $i -lt $line.Length; $i++) {
         $c = $line[$i]
-        if ($c -eq '\') { $i++; continue }
-        if ($c -eq '`') { $inCode = -not $inCode }
-        elseif ($c -eq '|' -and -not $inCode) { $borders.Add($i) }
+        if ($c -eq '\')
+        {
+            $i++; continue
+        }
+        if ($c -eq '`')
+        {
+            $inCode = -not $inCode
+        }
+        elseif ($c -eq '|' -and -not $inCode)
+        {
+            $borders.Add($i)
+        }
     }
     $borders -join ','
 }
 
-function Read-MisalignedMarkdownTable {
+function Read-MisalignedMarkdownTable
+{
     <#
         A Markdown table whose column borders do not line up, row under row.
 
@@ -1150,9 +1567,13 @@ function Read-MisalignedMarkdownTable {
         A border is a | outside a code span and not escaped, so a pipe inside
         backticks is cell text. Code fences are skipped.
     #>
-    foreach ($relative in @(git -C $repo ls-files '*.md')) {
+    foreach ($relative in @(git -C $repo ls-files '*.md'))
+    {
         $path = Join-Path $repo $relative
-        if (-not (Test-Path $path)) { continue }
+        if (-not (Test-Path $path))
+        {
+            continue
+        }
 
         $lines = [System.IO.File]::ReadAllLines($path)
         $fenced = $false
@@ -1160,25 +1581,38 @@ function Read-MisalignedMarkdownTable {
 
         for ($i = 0; $i -lt $lines.Count; $i++) {
             $line = $lines[$i]
-            if ($line.TrimStart().StartsWith('```')) { $fenced = -not $fenced }
-            if ($fenced -or -not $line.StartsWith('|')) { $header = $null; continue }
+            if ( $line.TrimStart().StartsWith('```'))
+            {
+                $fenced = -not $fenced
+            }
+            if ($fenced -or -not $line.StartsWith('|'))
+            {
+                $header = $null; continue
+            }
 
             $borders = Get-CellBorders $line
-            if ($null -eq $header) { $header = $borders; continue }
-            if ($borders -eq $header) { continue }
+            if ($null -eq $header)
+            {
+                $header = $borders; continue
+            }
+            if ($borders -eq $header)
+            {
+                continue
+            }
 
             [pscustomobject]@{
-                Path       = $relative
-                Line       = $i + 1
+                Path = $relative
+                Line = $i + 1
                 Inspection = 'MisalignedMarkdownTable'
-                Severity   = 'ERROR'
-                Message    = "This row's column borders are not under the header's. Pad every cell to its column's width, as the IDE's Reformat Code does."
+                Severity = 'ERROR'
+                Message = "This row's column borders are not under the header's. Pad every cell to its column's width, as the IDE's Reformat Code does."
             }
         }
     }
 }
 
-function Find-CommentStart([string] $line) {
+function Find-CommentStart([string] $line)
+{
     <#
         Where a comment starts on a line of code, or -1. A // inside a string -
         an address, a regular expression - is not a comment, so the quotes are
@@ -1189,20 +1623,34 @@ function Find-CommentStart([string] $line) {
     for ($j = 0; $j -lt $line.Length; $j++) {
         $c = $line[$j]
 
-        if ($quote) {
-            if ($c -eq '\') { $j++; continue }
-            if ($c -eq $quote) { $quote = '' }
+        if ($quote)
+        {
+            if ($c -eq '\')
+            {
+                $j++; continue
+            }
+            if ($c -eq $quote)
+            {
+                $quote = ''
+            }
             continue
         }
 
-        if ($c -eq '"' -or $c -eq "'") { $quote = $c; continue }
-        if ($c -eq '/' -and $j + 1 -lt $line.Length -and ($line[$j + 1] -eq '/' -or $line[$j + 1] -eq '*')) { return $j }
+        if ($c -eq '"' -or $c -eq "'")
+        {
+            $quote = $c; continue
+        }
+        if ($c -eq '/' -and $j + 1 -lt $line.Length -and ($line[$j + 1] -eq '/' -or $line[$j + 1] -eq '*'))
+        {
+            return $j
+        }
     }
 
     return -1
 }
 
-function Read-QualifiedClassNames([string[]] $scopes) {
+function Read-QualifiedClassNames([string[]] $scopes)
+{
     <#
         A class is named by its import, never by its package path.
 
@@ -1223,49 +1671,76 @@ function Read-QualifiedClassNames([string[]] $scopes) {
     #>
     $qualified = '(?<![\w."])(?:[a-z][a-z0-9_]*\.){2,}[A-Z]\w*'
 
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $number = 0
             $inTextBlock = $false
             $excused = $false
 
-            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+            {
                 $number++
                 $trimmed = $text.Trim()
 
                 $fences = [regex]::Matches($text, '"""').Count
-                if ($inTextBlock) {
-                    if ($fences % 2 -eq 1) { $inTextBlock = $false }
+                if ($inTextBlock)
+                {
+                    if ($fences % 2 -eq 1)
+                    {
+                        $inTextBlock = $false
+                    }
                     continue
                 }
-                if ($fences % 2 -eq 1) { $inTextBlock = $true; continue }
+                if ($fences % 2 -eq 1)
+                {
+                    $inTextBlock = $true; continue
+                }
 
-                if ($trimmed.StartsWith('//noinspection')) { $excused = $true; continue }
-                if ($excused) {
-                    if ($trimmed.EndsWith(';')) { $excused = $false }
+                if ( $trimmed.StartsWith('//noinspection'))
+                {
+                    $excused = $true; continue
+                }
+                if ($excused)
+                {
+                    if ( $trimmed.EndsWith(';'))
+                    {
+                        $excused = $false
+                    }
                     continue
                 }
 
-                if ($trimmed.StartsWith('import ') -or $trimmed.StartsWith('package ')) { continue }
-                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+                if ($trimmed.StartsWith('import ') -or $trimmed.StartsWith('package '))
+                {
+                    continue
+                }
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*'))
+                {
+                    continue
+                }
 
                 $bare = [regex]::Replace($text, '"[^"]*"', '""')
                 $match = [regex]::Match($bare, $qualified)
-                if (-not $match.Success) { continue }
+                if (-not $match.Success)
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
-                    Line       = $number
+                    Path = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line = $number
                     Inspection = 'QualifiedClassName'
-                    Severity   = 'ERROR'
-                    Message    = "A class is named by its import, never by its package path: $($match.Value)"
+                    Severity = 'ERROR'
+                    Message = "A class is named by its import, never by its package path: $( $match.Value )"
                 }
             }
         }
     }
 }
 
-function Read-ColorCodes([string[]] $scopes) {
+function Read-ColorCodes([string[]] $scopes)
+{
     <#
         A color is IntelliJ's own, never a number.
 
@@ -1279,27 +1754,34 @@ function Read-ColorCodes([string[]] $scopes) {
     #>
     $code = 'new\s+(JB)?Color\s*\(\s*(0x|\d)|new\s+JBColor\s*\([^;]*,\s*(0x|\d)|Color\.decode\s*\(|ColorUtil\.fromHex\s*\('
 
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $number = 0
-            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+            {
                 $number++
                 $match = [regex]::Match($text, $code)
-                if (-not $match.Success) { continue }
+                if (-not $match.Success)
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
-                    Line       = $number
+                    Path = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line = $number
                     Inspection = 'ColorCode'
-                    Severity   = 'ERROR'
-                    Message    = "A color is IntelliJ's own or a house owner's (Icons, FixedColors), never RGB or hex: $($match.Value)"
+                    Severity = 'ERROR'
+                    Message = "A color is IntelliJ's own or a house owner's (Icons, FixedColors), never RGB or hex: $( $match.Value )"
                 }
             }
         }
     }
 }
 
-function Read-UnicodeEscapes([string[]] $scopes) {
+function Read-UnicodeEscapes([string[]] $scopes)
+{
     <#
         A character is written as itself, never as a unicode escape.
 
@@ -1313,27 +1795,90 @@ function Read-UnicodeEscapes([string[]] $scopes) {
     #>
     $escape = '(?<!\\)\\u+[0-9a-fA-F]{4}'
 
-    foreach ($scope in $scopes) {
-        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
             $number = 0
-            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName))
+            {
                 $number++
                 $match = [regex]::Match($text, $escape)
-                if (-not $match.Success) { continue }
+                if (-not $match.Success)
+                {
+                    continue
+                }
 
                 [pscustomobject]@{
-                    Path       = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
-                    Line       = $number
+                    Path = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line = $number
                     Inspection = 'UnicodeEscape'
-                    Severity   = 'ERROR'
-                    Message    = "Write the character itself, or Character.toString(0x..) for one that cannot be seen: $($match.Value)"
+                    Severity = 'ERROR'
+                    Message = "Write the character itself, or Character.toString(0x..) for one that cannot be seen: $( $match.Value )"
                 }
             }
         }
     }
 }
 
-function Read-NonMarkerComments([string[]] $scopes) {
+function Read-UnusedImports([string[]] $scopes)
+{
+    <#
+        An import the file does not need: nothing in its code names the class,
+        or the class is in the file's own package or in java.lang, where the
+        compiler finds it without one.
+
+        The profile turned UNUSED_IMPORT on in db8617b0 and dropped it in
+        920a865b without a word, and javac says nothing, so three were left
+        behind on 7 October 2026 when ArrayList became List, beside 25 that
+        the #394 package moves stranded in their new package. An IDE reformat
+        found them, one paste from Muteb's screen. A use inside a string or a
+        comment is not a use, so both are blanked before the names are read.
+    #>
+    $declared = '(?m)^import\s+(static\s+)?([\w.]+)\s*;'
+
+    foreach ($scope in $scopes)
+    {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File)
+        {
+            $source = [System.IO.File]::ReadAllText($file.FullName)
+            $package = [regex]::Match($source, '(?m)^package\s+([\w.]+)\s*;').Groups[1].Value
+            $code = [regex]::Replace((Hide-StringsAndComments $source), '(?m)^(import|package)\s[^;]*;', '')
+
+            foreach ($import in [regex]::Matches($source, $declared))
+            {
+                $name = $import.Groups[2].Value
+                $owner = $name.Substring(0, $name.LastIndexOf('.'))
+                $simple = $name.Substring($name.LastIndexOf('.') + 1)
+                $isStatic = $import.Groups[1].Success
+
+                $why = if (-not $isStatic -and ($owner -eq $package -or $owner -eq 'java.lang'))
+                {
+                    "$simple is in $owner, which needs no import"
+                }
+                elseif (-not [regex]::IsMatch($code, "\b$( [regex]::Escape($simple) )\b"))
+                {
+                    "nothing in the file names $simple"
+                }
+                else
+                {
+                    continue
+                }
+
+                [pscustomobject]@{
+                    Path = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line = ($source.Substring(0, $import.Index) -split "`n").Count
+                    Inspection = 'UnusedImport'
+                    Severity = 'ERROR'
+                    Message = "Remove the import of ${name}: $why"
+                }
+            }
+        }
+    }
+}
+
+function Read-NonMarkerComments([string[]] $scopes)
+{
     <#
         A comment that is not a marker.
 
@@ -1546,6 +2091,7 @@ $problems += @(Read-NonMarkerComments $everyTree)
 $problems += @(Read-UnusedLambdaParameters $everyTree)
 $problems += @(Read-QualifiedClassNames $everyTree)
 $problems += @(Read-UnicodeEscapes $everyTree)
+$problems += @(Read-UnusedImports $everyTree)
 $problems += @(Read-ColorCodes $everyTree)
 $problems += @(Read-HelpersNamedLikeTests $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)

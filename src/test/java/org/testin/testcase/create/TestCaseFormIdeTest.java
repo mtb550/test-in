@@ -24,10 +24,10 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
 import org.testin.model.Priority;
 import org.testin.model.StatusBarItem;
-import org.testin.model.status.TestCaseStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.TestCaseStatus;
 import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
@@ -52,6 +52,24 @@ import java.util.stream.Collectors;
 
 public class TestCaseFormIdeTest extends AbstractTempRootIdeTest {
 
+    private static @NotNull List<String> theStrip(final @NotNull CreateTestCaseDialog dialog, final @NotNull List<String> known) {
+        final @NotNull JComponent root = dialog.root();
+        final @NotNull Component strip = ((BorderLayout) root.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+        return Drawn.words((JComponent) strip).stream().filter(known::contains).toList();
+    }
+
+    private static @NotNull List<String> namesOf(final StatusBarItem @NotNull [] items) {
+        return Arrays.stream(items).map(StatusBarItem::getName).toList();
+    }
+
+    private static @NotNull List<JRadioButton> radiosIn(final @NotNull JComponent section) {
+        return Drawn.components(section).stream().filter(JRadioButton.class::isInstance).map(JRadioButton.class::cast).toList();
+    }
+
+    private static @NotNull Optional<String> chosen(final @NotNull List<JRadioButton> radios) {
+        return radios.stream().filter(JRadioButton::isSelected).map(JRadioButton::getText).findFirst();
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -73,24 +91,6 @@ public class TestCaseFormIdeTest extends AbstractTempRootIdeTest {
         });
         assertTrue("the dialog did not open", dialog.show());
         return dialog;
-    }
-
-    private static @NotNull List<String> theStrip(final @NotNull CreateTestCaseDialog dialog, final @NotNull List<String> known) {
-        final @NotNull JComponent root = dialog.root();
-        final @NotNull Component strip = ((BorderLayout) root.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
-        return Drawn.words((JComponent) strip).stream().filter(known::contains).toList();
-    }
-
-    private static @NotNull List<String> namesOf(final StatusBarItem @NotNull [] items) {
-        return Arrays.stream(items).map(StatusBarItem::getName).toList();
-    }
-
-    private static @NotNull List<JRadioButton> radiosIn(final @NotNull JComponent section) {
-        return Drawn.components(section).stream().filter(JRadioButton.class::isInstance).map(JRadioButton.class::cast).toList();
-    }
-
-    private static @NotNull Optional<String> chosen(final @NotNull List<JRadioButton> radios) {
-        return radios.stream().filter(JRadioButton::isSelected).map(JRadioButton::getText).findFirst();
     }
 
     // Rule-EDITOR-PANEL-199

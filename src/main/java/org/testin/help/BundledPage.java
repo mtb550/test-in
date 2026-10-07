@@ -33,6 +33,10 @@ import java.util.Optional;
 public record BundledPage(@NotNull String path) {
     private static final @NotNull String ROOT = "/docs/";
 
+    public static boolean isPage(final @NotNull String href) {
+        return !href.contains(":") && URI.create(href).getPath().endsWith(".md");
+    }
+
     // UC-INTERNAL-009, Rule-INTERNAL-130
     public @NotNull String html() {
         return markdown()
@@ -43,10 +47,6 @@ public record BundledPage(@NotNull String path) {
     // UC-INTERNAL-009, Rule-INTERNAL-130
     public @NotNull BundledPage follow(final @NotNull String href) {
         return new BundledPage(URI.create(path).resolve(URI.create(href).getPath()).getPath());
-    }
-
-    public static boolean isPage(final @NotNull String href) {
-        return !href.contains(":") && URI.create(href).getPath().endsWith(".md");
     }
 
     @NotNull Optional<String> markdown() {

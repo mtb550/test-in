@@ -31,9 +31,8 @@ import org.testin.util.Shortcuts;
 import java.util.List;
 
 public final class GuideDialog extends AbstractFrameworkDialog {
-    private @NotNull BundledPage shown;
-
     private final @NotNull HtmlPage page;
+    private @NotNull BundledPage shown;
 
     // UC-INTERNAL-009, Rule-INTERNAL-130
     GuideDialog(final @NotNull Project p, final @NotNull Guide guide) {

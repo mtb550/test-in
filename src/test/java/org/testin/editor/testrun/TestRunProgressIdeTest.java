@@ -30,11 +30,11 @@ import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.testrun.TestRunFixture;
@@ -62,13 +62,13 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
-    private void awaitWrites() {
-        Services.getInstance(getProject(), TestRuns.class).awaitWrites();
-    }
-
     private static @NotNull List<JComponent> theThreeTestRunLabels(final @NotNull StatusBar bar) {
         final @NotNull Container figures = (Container) bar.getComponent(2);
         return List.of((JComponent) figures.getComponent(0), (JComponent) figures.getComponent(1), (JComponent) figures.getComponent(2));
+    }
+
+    private void awaitWrites() {
+        Services.getInstance(getProject(), TestRuns.class).awaitWrites();
     }
 
     // Rule-EDITOR-PANEL-172
@@ -157,7 +157,8 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-179
     public void testTheThreeTestRunLabelsAreHiddenWithNothingToSayAndNeverInATestCaseEditor() {
-        for (final JComponent label : theThreeTestRunLabels(new StatusBar())) assertFalse("a test run label shows on a fresh status bar", label.isVisible());
+        for (final JComponent label : theThreeTestRunLabels(new StatusBar()))
+            assertFalse("a test run label shows on a fresh status bar", label.isVisible());
 
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
@@ -167,7 +168,8 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestRunEditor testRunEditor = fixture.opened(getTestRootDisposable());
         try {
             testCaseEditor.refreshView();
-            for (final JComponent label : theThreeTestRunLabels(testCaseEditor.getStatusBar())) assertFalse("a test case editor shows a test run label", label.isVisible());
+            for (final JComponent label : theThreeTestRunLabels(testCaseEditor.getStatusBar()))
+                assertFalse("a test case editor shows a test run label", label.isVisible());
 
             final @NotNull List<JComponent> inTheTestRun = theThreeTestRunLabels(testRunEditor.getStatusBar());
             assertTrue("the test run's status is not shown", inTheTestRun.get(0).isVisible());

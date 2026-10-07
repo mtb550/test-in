@@ -76,12 +76,12 @@ nothing at all.
 
 ## The order of the steps
 
-| Press                      | What it does                            |
-|----------------------------|-----------------------------------------|
-| A cell is open for editing | Cancels the edit                        |
-| A cut or a copy is waiting | Drops it and empties the clipboard      |
-| The details panel is open  | Closes it                               |
-| Anything else              | Clears the selection                    |
+| Press                      | What it does                       |
+|----------------------------|------------------------------------|
+| A cell is open for editing | Cancels the edit                   |
+| A cut or a copy is waiting | Drops it and empties the clipboard |
+| The details panel is open  | Closes it                          |
+| Anything else              | Clears the selection               |
 
 ## Main flow
 

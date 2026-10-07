@@ -52,6 +52,23 @@ import java.util.stream.Stream;
 
 public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
+    private static @NotNull AnAction undoOn(final @NotNull TestCaseEditor editor) {
+        final @NotNull KeyStroke controlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Shortcuts.menuMask());
+        return ActionUtil.getActions(editor.getList()).stream()
+                .filter(UndoAction.class::isInstance)
+                .filter(action -> Stream.of(action.getShortcutSet().getShortcuts()).anyMatch(shortcut -> shortcut instanceof final KeyboardShortcut key && controlZ.equals(key.getFirstKeyStroke())))
+                .findFirst().orElseThrow(() -> new AssertionError("nothing on the cards takes a change back on Ctrl+Z"));
+    }
+
+    private static @NotNull String stamp(final @NotNull Path testSet, final @NotNull TestCaseDto tc) {
+        try (final Stream<Path> files = Files.list(testSet)) {
+            final @NotNull Path file = files.filter(candidate -> candidate.getFileName().toString().startsWith(tc.getId().toString())).findFirst().orElseThrow();
+            return Files.readString(file) + "@" + file.toFile().lastModified();
+        } catch (final IOException ex) {
+            throw new AssertionError("the test set could not be read", ex);
+        }
+    }
+
     @Override
     protected void tearDown() {
         ShownDialog.close(getProject(), ConfirmDialog.class);
@@ -65,7 +82,8 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestCaseEditor aTestSetOf(final @NotNull String... descriptions) {
         final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
-        for (int i = 0; i < descriptions.length; i++) EditorFixtures.testCase(getProject(), ts, descriptions[i], String.format("m%04d", i));
+        for (int i = 0; i < descriptions.length; i++)
+            EditorFixtures.testCase(getProject(), ts, descriptions[i], String.format("m%04d", i));
         return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
     }
 
@@ -91,23 +109,6 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
     private void awaitGone(final @NotNull TestCaseDto tc) {
         Await.until("'" + tc.getDescription() + "' was never removed", () -> theTestCases().findTestCase(tc.getId()).isEmpty());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-    }
-
-    private static @NotNull AnAction undoOn(final @NotNull TestCaseEditor editor) {
-        final @NotNull KeyStroke controlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Shortcuts.menuMask());
-        return ActionUtil.getActions(editor.getList()).stream()
-                .filter(UndoAction.class::isInstance)
-                .filter(action -> Stream.of(action.getShortcutSet().getShortcuts()).anyMatch(shortcut -> shortcut instanceof final KeyboardShortcut key && controlZ.equals(key.getFirstKeyStroke())))
-                .findFirst().orElseThrow(() -> new AssertionError("nothing on the cards takes a change back on Ctrl+Z"));
-    }
-
-    private static @NotNull String stamp(final @NotNull Path testSet, final @NotNull TestCaseDto tc) {
-        try (final Stream<Path> files = Files.list(testSet)) {
-            final @NotNull Path file = files.filter(candidate -> candidate.getFileName().toString().startsWith(tc.getId().toString())).findFirst().orElseThrow();
-            return Files.readString(file) + "@" + file.toFile().lastModified();
-        } catch (final IOException ex) {
-            throw new AssertionError("the test set could not be read", ex);
-        }
     }
 
     // Rule-EDITOR-PANEL-062

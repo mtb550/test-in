@@ -22,10 +22,10 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 

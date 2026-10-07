@@ -31,12 +31,12 @@ import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
@@ -72,7 +72,8 @@ public final class EditorFixtures {
 
     public static @NotNull List<TestCaseDto> testCases(final @NotNull Project p, final @NotNull TestSetDirectoryDto ts, final int count) {
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
-        for (int i = 0; i < count; i++) made.add(testCase(p, ts, "Test case number " + (i + 1), String.format("m%04d", i)));
+        for (int i = 0; i < count; i++)
+            made.add(testCase(p, ts, "Test case number " + (i + 1), String.format("m%04d", i)));
         return made;
     }
 

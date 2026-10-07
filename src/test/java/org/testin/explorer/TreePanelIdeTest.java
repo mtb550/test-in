@@ -38,9 +38,9 @@ import org.testin.explorer.toolbar.SaveTestinYmlAction;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.ProjectStatus;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.SelectTestProjectAction;
@@ -55,6 +55,20 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class TreePanelIdeTest extends AbstractReadTheRootIdeTest {
+
+    private static @NotNull List<Object> rowsOf(final @NotNull SimpleTree tree) {
+        PlatformTestUtil.waitWhileBusy(tree);
+        PlatformTestUtil.expandAll(tree);
+        return IntStream.range(0, tree.getRowCount())
+                .mapToObj(row -> TreeValues.valueOf(tree.getPathForRow(row).getLastPathComponent(), Object.class).orElse(""))
+                .toList();
+    }
+
+    private static @NotNull List<Object> settledRowsOf(final @NotNull TreePanel panel) {
+        final @NotNull SimpleTree tree = panel.getProjectTree().getMainTree();
+        Await.until("the tree never showed Checkout", () -> !rowsOf(tree).isEmpty() && rowsOf(tree).getFirst() instanceof final DirectoryDto top && top.getName().equals("Checkout"));
+        return rowsOf(tree);
+    }
 
     private @NotNull BoundTestProject bound() {
         return Services.getInstance(getProject(), BoundTestProject.class);
@@ -76,20 +90,6 @@ public class TreePanelIdeTest extends AbstractReadTheRootIdeTest {
         final @NotNull TreePanel panel = aPanel();
         Await.until("the panel never showed the welcome screen", () -> !panel.showsTree());
         return panel;
-    }
-
-    private static @NotNull List<Object> rowsOf(final @NotNull SimpleTree tree) {
-        PlatformTestUtil.waitWhileBusy(tree);
-        PlatformTestUtil.expandAll(tree);
-        return IntStream.range(0, tree.getRowCount())
-                .mapToObj(row -> TreeValues.valueOf(tree.getPathForRow(row).getLastPathComponent(), Object.class).orElse(""))
-                .toList();
-    }
-
-    private static @NotNull List<Object> settledRowsOf(final @NotNull TreePanel panel) {
-        final @NotNull SimpleTree tree = panel.getProjectTree().getMainTree();
-        Await.until("the tree never showed Checkout", () -> !rowsOf(tree).isEmpty() && rowsOf(tree).getFirst() instanceof final DirectoryDto top && top.getName().equals("Checkout"));
-        return rowsOf(tree);
     }
 
     private @NotNull List<AnAction> titleBarOf(final @NotNull TreePanel panel) {

@@ -71,7 +71,8 @@ public final class SelectionTable implements DialogComponent {
             @Override
             public @NotNull Component prepareRenderer(final @NotNull TableCellRenderer renderer, final int row, final int column) {
                 final @NotNull Component cell = super.prepareRenderer(renderer, row, column);
-                if (fixed.containsKey(convertRowIndexToModel(row))) cell.setForeground(NamedColorUtil.getInactiveTextColor());
+                if (fixed.containsKey(convertRowIndexToModel(row)))
+                    cell.setForeground(NamedColorUtil.getInactiveTextColor());
                 return cell;
             }
 

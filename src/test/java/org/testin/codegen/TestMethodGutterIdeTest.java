@@ -31,6 +31,10 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String TEST_CASE_ID = UUID.randomUUID().toString();
 
+    private static @NotNull String aTestMethod(final @NotNull String imports, final @NotNull String testName) {
+        return LoginTestSource.withImports(imports, testName);
+    }
+
     private @NotNull List<GutterMark> gutterMarksAt(final @NotNull String text, final @NotNull String caretAt) {
         final @NotNull PsiFile file = myFixture.addFileToProject("nafath/LoginTest.java", text);
         myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
@@ -39,10 +43,6 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
         return myFixture.findGuttersAtCaret().stream()
                 .filter(mark -> Bundle.message("gutter.view.details").equals(mark.getTooltipText()))
                 .toList();
-    }
-
-    private static @NotNull String aTestMethod(final @NotNull String imports, final @NotNull String testName) {
-        return LoginTestSource.withImports(imports, testName);
     }
 
     // Rule-CODEGEN-028
@@ -66,7 +66,7 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
     public void testAnIdentityOutsideATestNgTestHasNoMark() {
         myFixture.addFileToProject("nafath/Test.java", """
                 package nafath;
-
+                
                 public @interface Test {
                     String description();
                     String testName();

@@ -23,8 +23,8 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.testrun.ChangedSinceCommit;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
@@ -51,6 +51,13 @@ public final class RunItemSummary extends AbstractDetails {
         return line;
     }
 
+    // Rule-EDITOR-PANEL-263
+    private static @NotNull JBLabel changedSince() {
+        final @NotNull JBLabel label = new JBLabel(Bundle.message("test.run.changed.since.commit"));
+        label.setForeground(UIUtil.getContextHelpForeground());
+        return label;
+    }
+
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
@@ -64,13 +71,6 @@ public final class RunItemSummary extends AbstractDetails {
 
         final int next = addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
         return ChangedSinceCommit.of(runItem) ? addFullWidthRow(panel, gbc, changedSince(), JBUI.insets(GAP, INSETS_SIDE, 0, INSETS_SIDE), next) : next;
-    }
-
-    // Rule-EDITOR-PANEL-263
-    private static @NotNull JBLabel changedSince() {
-        final @NotNull JBLabel label = new JBLabel(Bundle.message("test.run.changed.since.commit"));
-        label.setForeground(UIUtil.getContextHelpForeground());
-        return label;
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086

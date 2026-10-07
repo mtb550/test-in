@@ -45,23 +45,6 @@ public class UndoMenuIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull String testerBefore = "";
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        testerBefore = Services.getInstance(AppSettingsState.class).testerName;
-        Services.getInstance(AppSettingsState.class).testerName = "Sara";
-    }
-
-    @Override
-    protected void tearDown() {
-        Services.getInstance(AppSettingsState.class).testerName = testerBefore;
-        super.tearDown();
-    }
-
-    private @NotNull TestCases theTestCases() {
-        return Services.getInstance(getProject(), TestCases.class);
-    }
-
     private static @NotNull AnAction entry(final @NotNull TestCaseEditor editor, final @NotNull UndoDirection direction) {
         return ActionUtil.getActions(editor.getList()).stream()
                 .filter(UndoAction.class::isInstance)
@@ -88,6 +71,23 @@ public class UndoMenuIdeTest extends AbstractTempRootIdeTest {
         ((JTextComponent) grid.getEditorComponent()).setText("Sign in");
         assertTrue(grid.getCellEditor().stopCellEditing());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        testerBefore = Services.getInstance(AppSettingsState.class).testerName;
+        Services.getInstance(AppSettingsState.class).testerName = "Sara";
+    }
+
+    @Override
+    protected void tearDown() {
+        Services.getInstance(AppSettingsState.class).testerName = testerBefore;
+        super.tearDown();
+    }
+
+    private @NotNull TestCases theTestCases() {
+        return Services.getInstance(getProject(), TestCases.class);
     }
 
     // Rule-EDITOR-PANEL-067, Rule-EDITOR-PANEL-071, Rule-EDITOR-PANEL-068

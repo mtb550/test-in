@@ -22,8 +22,6 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.git.ShareGestures;
 import org.testin.git.conflict.Question;
 import org.testin.git.conflict.ResolveConflictDialog;
-import org.testin.git.review.GitIdentityDialog;
-import org.testin.git.review.Identity;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 
@@ -36,19 +34,19 @@ import java.util.Set;
 public class GitDialogsIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull String LONG_STEPS = "open the app\nsign in with the account that has two factor authentication switched on and wait";
 
-    @Override
-    protected void tearDown() {
-        ShownDialog.close(getProject(), GitIdentityDialog.class);
-        ShownDialog.close(getProject(), ResolveConflictDialog.class);
-        super.tearDown();
-    }
-
     private static @NotNull List<JRadioButton> radios(final @NotNull JComponent dialog) {
         return UIUtil.uiTraverser(dialog).filter(JRadioButton.class).toList();
     }
 
     private static @NotNull JRadioButton radio(final @NotNull JComponent dialog, final @NotNull String text) {
         return radios(dialog).stream().filter(button -> button.getText().equals(text)).findFirst().orElseThrow(() -> new AssertionError("no choice reads " + text + " among " + radios(dialog).stream().map(JRadioButton::getText).toList()));
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownDialog.close(getProject(), GitIdentityDialog.class);
+        ShownDialog.close(getProject(), ResolveConflictDialog.class);
+        super.tearDown();
     }
 
     private @NotNull Identity answeredIdentity(final boolean everyRepository) {

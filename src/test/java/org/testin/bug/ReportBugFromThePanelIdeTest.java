@@ -28,13 +28,13 @@ import org.testin.Notified;
 import org.testin.Said;
 import org.testin.config.TestinYml;
 import org.testin.editor.EditorFixtures;
+import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
@@ -87,6 +87,50 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
     private Optional<String> ymlBefore = Optional.empty();
     private Function<ProgressIndicator, GitHubCli> ghBefore;
 
+    private static @NotNull String read(final @NotNull Path file) {
+        try {
+            return Files.readString(file, StandardCharsets.UTF_8);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static <T> @NotNull T theOne(final @NotNull JComponent dialog, final @NotNull Class<T> kind) {
+        final @NotNull List<T> found = Drawn.components(dialog).stream().filter(kind::isInstance).map(kind::cast).toList();
+        assertEquals("the dialog does not hold exactly one " + kind.getSimpleName(), 1, found.size());
+        return found.getFirst();
+    }
+
+    private static @NotNull JTextField title(final @NotNull JComponent dialog) {
+        return theOne(dialog, JTextField.class);
+    }
+
+    private static @NotNull JTextArea body(final @NotNull JComponent dialog) {
+        return theOne(dialog, JTextArea.class);
+    }
+
+    private static @NotNull JButton send(final @NotNull JComponent dialog) {
+        return Drawn.components(dialog).stream().filter(JButton.class::isInstance).map(JButton.class::cast)
+                .filter(button -> Bundle.message("bug.dialog.send").equals(button.getText()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("the dialog has no Send"));
+    }
+
+    private static @NotNull String besideSend(final @NotNull JComponent dialog) {
+        final @NotNull JButton send = send(dialog);
+        return Arrays.stream(send.getParent().getComponents()).filter(part -> !part.equals(send)).map(Drawn::text).filter(text -> !text.isEmpty()).findFirst().orElse("");
+    }
+
+    private static void enterBindingsFrom(final @NotNull Component holder) {
+        if (holder instanceof final JComponent component) {
+            for (final InputMap keys : List.of(component.getInputMap(JComponent.WHEN_FOCUSED), component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT))) {
+                Optional.ofNullable(keys.get(ENTER)).map(name -> component.getActionMap().get(name))
+                        .ifPresent((final Action action) -> action.actionPerformed(new ActionEvent(component, ActionEvent.ACTION_PERFORMED, "Enter")));
+            }
+        }
+        Optional.ofNullable(holder.getParent()).ifPresent(ReportBugFromThePanelIdeTest::enterBindingsFrom);
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -109,14 +153,6 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
             restoreTheYml();
         } finally {
             super.tearDown();
-        }
-    }
-
-    private static @NotNull String read(final @NotNull Path file) {
-        try {
-            return Files.readString(file, StandardCharsets.UTF_8);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -156,32 +192,6 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         return ShownDialog.content(getProject(), ReportBugDialog.class);
     }
 
-    private static <T> @NotNull T theOne(final @NotNull JComponent dialog, final @NotNull Class<T> kind) {
-        final @NotNull List<T> found = Drawn.components(dialog).stream().filter(kind::isInstance).map(kind::cast).toList();
-        assertEquals("the dialog does not hold exactly one " + kind.getSimpleName(), 1, found.size());
-        return found.getFirst();
-    }
-
-    private static @NotNull JTextField title(final @NotNull JComponent dialog) {
-        return theOne(dialog, JTextField.class);
-    }
-
-    private static @NotNull JTextArea body(final @NotNull JComponent dialog) {
-        return theOne(dialog, JTextArea.class);
-    }
-
-    private static @NotNull JButton send(final @NotNull JComponent dialog) {
-        return Drawn.components(dialog).stream().filter(JButton.class::isInstance).map(JButton.class::cast)
-                .filter(button -> Bundle.message("bug.dialog.send").equals(button.getText()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("the dialog has no Send"));
-    }
-
-    private static @NotNull String besideSend(final @NotNull JComponent dialog) {
-        final @NotNull JButton send = send(dialog);
-        return Arrays.stream(send.getParent().getComponents()).filter(part -> !part.equals(send)).map(Drawn::text).filter(text -> !text.isEmpty()).findFirst().orElse("");
-    }
-
     private void sentAndSettled() {
         Await.until("the send never finished", () -> Services.getInstance(getProject(), BugReports.class).whyReportBugIsOff(item, failed).filter(Bundle.message("bug.sending")::equals).isEmpty() && !issuesCreated().isEmpty());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -190,18 +200,9 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
     private void pressEnterIn(final @NotNull JComponent field) {
         field.dispatchEvent(new KeyEvent(field, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, '\n'));
         enterBindingsFrom(field);
-        for (final AnAction action : KeyPress.answering(field, ENTER)) ActionUtil.performAction(action, KeyPress.eventIn(getProject(), action, field));
+        for (final AnAction action : KeyPress.answering(field, ENTER))
+            ActionUtil.performAction(action, KeyPress.eventIn(getProject(), action, field));
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-    }
-
-    private static void enterBindingsFrom(final @NotNull Component holder) {
-        if (holder instanceof final JComponent component) {
-            for (final InputMap keys : List.of(component.getInputMap(JComponent.WHEN_FOCUSED), component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT))) {
-                Optional.ofNullable(keys.get(ENTER)).map(name -> component.getActionMap().get(name))
-                        .ifPresent((final Action action) -> action.actionPerformed(new ActionEvent(component, ActionEvent.ACTION_PERFORMED, "Enter")));
-            }
-        }
-        Optional.ofNullable(holder.getParent()).ifPresent(ReportBugFromThePanelIdeTest::enterBindingsFrom);
     }
 
     // Rule-VIEW-PANEL-067, Rule-VIEW-PANEL-078
@@ -341,7 +342,8 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<String> secrets = new ArrayList<>();
         for (final Field field : AppSettingsState.class.getDeclaredFields()) {
             final @NotNull String name = field.getName().toLowerCase(Locale.ROOT);
-            if (name.contains("token") || name.contains("password") || name.contains("secret")) secrets.add(field.getName());
+            if (name.contains("token") || name.contains("password") || name.contains("secret"))
+                secrets.add(field.getName());
         }
         assertEquals("Testin's settings keep a password or a token", List.of(), secrets);
 

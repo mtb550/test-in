@@ -19,6 +19,7 @@ package org.testin.view.details;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.model.TestCaseDto;
@@ -26,10 +27,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
 import java.awt.GridBagConstraints;
-
 import java.util.List;
-
-import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public final class BadgesAndActions extends AbstractDetails {

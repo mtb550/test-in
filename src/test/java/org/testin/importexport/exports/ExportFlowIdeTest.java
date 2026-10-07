@@ -67,32 +67,6 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
     private Path downloads;
     private TestProjectDirectoryDto testProject;
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        downloads = folder(root.resolve("downloads"));
-        testProject = new NodesOnDisk(getProject()).testProject(root.resolve("testin").resolve("Demo"));
-
-        downloadFolderBefore = settings().defaultDownloadFolder;
-        settings().defaultDownloadFolder = downloads.toString();
-    }
-
-    @Override
-    protected void tearDown() {
-        settings().defaultDownloadFolder = downloadFolderBefore;
-        ShownDialog.close(getProject(), ExportDialog.class);
-        ShownDialog.close(getProject(), ConfirmDialog.class);
-        super.tearDown();
-    }
-
-    private @NotNull AppSettingsState settings() {
-        return Services.getInstance(getProject(), AppSettingsState.class);
-    }
-
-    private @NotNull TestCases indexedTestCases() {
-        return Services.getInstance(getProject(), TestCases.class);
-    }
-
     private static @NotNull Path folder(final @NotNull Path path) {
         try {
             return Files.createDirectories(path);
@@ -123,17 +97,6 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         } catch (final IOException ex) {
             throw new AssertionError("Could not list " + folder + ": " + ex.getMessage(), ex);
         }
-    }
-
-    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description) {
-        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order("m" + description.length()).build();
-        assertTrue("the test case was not written", indexedTestCases().putTestCaseVerbatim(ts.getPath(), tc));
-        return tc;
-    }
-
-    private @NotNull JComponent theExportDialogFor(final @NotNull DirectoryDto node) {
-        new ExportWork(getProject()).exportFrom(node);
-        return ShownDialog.waitedFor(getProject(), ExportDialog.class);
     }
 
     private static @NotNull JBTabbedPane tabsIn(final @NotNull JComponent content) {
@@ -173,6 +136,43 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         return TestCaseEditorAttributes.all(Can.EXPORT).indexOf(TestCaseEditorAttributes.DESCRIPTION) + 2;
     }
 
+    @Override
+    protected void setUp() {
+        super.setUp();
+        downloads = folder(root.resolve("downloads"));
+        testProject = new NodesOnDisk(getProject()).testProject(root.resolve("testin").resolve("Demo"));
+
+        downloadFolderBefore = settings().defaultDownloadFolder;
+        settings().defaultDownloadFolder = downloads.toString();
+    }
+
+    @Override
+    protected void tearDown() {
+        settings().defaultDownloadFolder = downloadFolderBefore;
+        ShownDialog.close(getProject(), ExportDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
+        super.tearDown();
+    }
+
+    private @NotNull AppSettingsState settings() {
+        return Services.getInstance(getProject(), AppSettingsState.class);
+    }
+
+    private @NotNull TestCases indexedTestCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description) {
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order("m" + description.length()).build();
+        assertTrue("the test case was not written", indexedTestCases().putTestCaseVerbatim(ts.getPath(), tc));
+        return tc;
+    }
+
+    private @NotNull JComponent theExportDialogFor(final @NotNull DirectoryDto node) {
+        new ExportWork(getProject()).exportFrom(node);
+        return ShownDialog.waitedFor(getProject(), ExportDialog.class);
+    }
+
     // UC-SHARE-001, Rule-SHARE-001, Rule-SHARE-011
     public void testExportingWithACorrectionChangesNoTestCase() {
         final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
@@ -185,7 +185,8 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
 
         final @NotNull JComponent dialog = theExportDialogFor(login);
         final @NotNull JBTable table = firstTable(dialog);
-        for (int row = 0; row < table.getRowCount(); row++) table.getModel().setValueAt("corrected for the reviewer", row, descriptionColumn());
+        for (int row = 0; row < table.getRowCount(); row++)
+            table.getModel().setValueAt("corrected for the reviewer", row, descriptionColumn());
         button(dialog, ExportAction.NAME).doClick();
         exported(said, 2);
 

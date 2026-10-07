@@ -24,15 +24,15 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.DialogComponent;
 import org.testin.ui.framework.Spacing;
 
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.function.Supplier;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.ScrollPaneConstants;
 
 // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006
 public final class TestCaseForm implements DialogComponent {

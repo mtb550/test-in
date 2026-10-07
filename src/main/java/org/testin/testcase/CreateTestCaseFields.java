@@ -135,6 +135,11 @@ public enum CreateTestCaseFields implements StatusBarItem {
         this.ownKeys = ImmutableList.copyOf(ownKeys);
     }
 
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-111
+    public static @NotNull Optional<Icon> iconOf(final @NotNull String field) {
+        return Arrays.stream(values()).filter(each -> each.name.equals(field)).findFirst().map(CreateTestCaseFields::getIcon);
+    }
+
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-199
     public StatusBarItem @NotNull [] getStatusBarItems() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>(ownKeys);
@@ -147,10 +152,5 @@ public enum CreateTestCaseFields implements StatusBarItem {
     @Override
     public @NotNull String getShortcutText() {
         return shortcut.getShortcutText();
-    }
-
-    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-111
-    public static @NotNull Optional<Icon> iconOf(final @NotNull String field) {
-        return Arrays.stream(values()).filter(each -> each.name.equals(field)).findFirst().map(CreateTestCaseFields::getIcon);
     }
 }

@@ -22,7 +22,6 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.grid.GridContextMenuListener;
 import org.testin.editor.list.CardMouseListener;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.toolbar.GridViewBtn;
@@ -41,12 +40,6 @@ import java.util.function.BooleanSupplier;
 
 public class RightClickIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull TestCaseEditor fourTestCases() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
-        EditorFixtures.testCases(getProject(), ts, 4);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-    }
-
     private static boolean refusedForWantOfAScreen(final @NotNull Runnable press) {
         try {
             press.run();
@@ -57,8 +50,15 @@ public class RightClickIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static void rightClick(final @NotNull Runnable press, final @NotNull BooleanSupplier movedFirst) {
-        if (refusedForWantOfAScreen(press)) assertTrue("the menu opened before the selection moved to what was clicked", movedFirst.getAsBoolean());
+        if (refusedForWantOfAScreen(press))
+            assertTrue("the menu opened before the selection moved to what was clicked", movedFirst.getAsBoolean());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    private @NotNull TestCaseEditor fourTestCases() {
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        EditorFixtures.testCases(getProject(), ts, 4);
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-110

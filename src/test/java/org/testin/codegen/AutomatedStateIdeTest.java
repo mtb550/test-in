@@ -44,6 +44,10 @@ public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
 
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
+    private static @NotNull JComponent automatedCount(final @NotNull StatusBar bar) {
+        return (JComponent) ((Container) bar.getComponent(2)).getComponent(3);
+    }
+
     private @NotNull AutomationState state() {
         return Services.getInstance(getProject(), AutomationState.class);
     }
@@ -63,10 +67,6 @@ public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
         state().read(getProject(), testCases, () -> {
         });
         Await.until("the automation state never arrived", () -> testCases.stream().noneMatch(tc -> state().of(tc.getId()) == Automated.UNKNOWN));
-    }
-
-    private static @NotNull JComponent automatedCount(final @NotNull StatusBar bar) {
-        return (JComponent) ((Container) bar.getComponent(2)).getComponent(3);
     }
 
     // Rule-EDITOR-PANEL-195

@@ -107,7 +107,8 @@ public final class ShareGestures {
         final @NotNull List<Boolean> onTheMainThread = new CopyOnWriteArrayList<>();
         final @NotNull Git real = Git.getInstance();
         final @NotNull Git watched = (Git) Proxy.newProxyInstance(Git.class.getClassLoader(), new Class<?>[]{Git.class}, (_, method, arguments) -> {
-            if (method.getName().startsWith("runCommand")) onTheMainThread.add(ApplicationManager.getApplication().isDispatchThread());
+            if (method.getName().startsWith("runCommand"))
+                onTheMainThread.add(ApplicationManager.getApplication().isDispatchThread());
             try {
                 return method.invoke(real, arguments);
             } catch (final InvocationTargetException ex) {

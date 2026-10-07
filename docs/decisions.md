@@ -425,8 +425,8 @@ old name. The writer lives beside the reader in `config/TestinYml`, so the file
 still has one class (Rule-INTERNAL-089). Decision-011 is superseded.
 
 **Amended 5 October 2026.** A second explicit gesture writes it: **Apply** in
-the bugRepoUrl hint of Testin Help writes that one line and opens the file
-(Rule-VIEW-PANEL-104, #307). Both writers are a tester's own click, and
+the bugRepoUrl hint of Testin Help writes that one line and opens the file (Rule-VIEW-PANEL-104, #307). Both writers are
+a tester's own click, and
 `ArchitectureTest` names them; a silent write is still refused.
 
 **If you are about to reverse it.** Writing the file anywhere but the button -
@@ -582,8 +582,8 @@ October 2026 (#120).
 two tabs: the light file system's own URL is `mock:///` plus the name, and
 would give both the same one. Asking the platform for a file at a `testin://`
 URL still finds nothing, now because no file system answers that protocol. The
-title color is unchanged, since the light file system is non-physical too
-(Decision-017). Tabs are restored by Testin's own `LastOpenEditors`, and
+title color is unchanged, since the light file system is non-physical too (Decision-017). Tabs are restored by Testin's
+own `LastOpenEditors`, and
 `SaveOnProjectClose` closes them before the IDE saves, so the IDE never stores
 a `testin://` URL it cannot resolve.
 

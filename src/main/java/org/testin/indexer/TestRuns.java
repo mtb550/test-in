@@ -22,10 +22,10 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -129,9 +129,9 @@ public final class TestRuns {
     // Rule-INTERNAL-011
     public void changeResult(final @NotNull Path testRunPath, final @NotNull UUID testCaseId, final @NotNull Consumer<TestRunItems> change) {
         findTestRun(testRunPath).ifPresentOrElse(testRun -> testRun.resultOf(testCaseId).ifPresentOrElse(result -> {
-            change.accept(result);
-            testRunWriter().persistResult(testRunPath, testRun, result);
-        }, () -> Logger.warn("'" + testRunPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
+                    change.accept(result);
+                    testRunWriter().persistResult(testRunPath, testRun, result);
+                }, () -> Logger.warn("'" + testRunPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
                 () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + testRunPath.getFileName()));
     }
 

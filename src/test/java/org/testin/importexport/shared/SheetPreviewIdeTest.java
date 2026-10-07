@@ -27,13 +27,13 @@ import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import javax.swing.table.TableModel;
-import java.util.Objects;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
@@ -45,12 +45,6 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
         final @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
         sheets.put(name, new ArrayList<>(List.of(testCases)));
         return sheets;
-    }
-
-    private @NotNull SheetPreview shown(final @NotNull Can capability, final @NotNull Map<String, List<TestCaseDto>> sheets) {
-        final @NotNull SheetPreview preview = new SheetPreview(getProject(), TestCaseEditorAttributes.all(capability));
-        preview.show(sheets);
-        return preview;
     }
 
     private static @NotNull JBTabbedPane tabs(final @NotNull SheetPreview preview) {
@@ -76,6 +70,12 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
         final @NotNull List<Object> ticks = new ArrayList<>();
         for (int row = 0; row < model.getRowCount(); row++) ticks.add(model.getValueAt(row, 0));
         return ticks;
+    }
+
+    private @NotNull SheetPreview shown(final @NotNull Can capability, final @NotNull Map<String, List<TestCaseDto>> sheets) {
+        final @NotNull SheetPreview preview = new SheetPreview(getProject(), TestCaseEditorAttributes.all(capability));
+        preview.show(sheets);
+        return preview;
     }
 
     // UC-SHARE-001, Rule-SHARE-008

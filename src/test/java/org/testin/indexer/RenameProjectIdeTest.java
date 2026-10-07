@@ -17,12 +17,13 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
+import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.model.status.ProjectStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -31,7 +32,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.jetbrains.annotations.NotNull;
 
 public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
 

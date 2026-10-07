@@ -133,8 +133,7 @@ keep them (Rule-REPORT-018).
 **If the test run is still In Progress** — every way of asking is gray: the
 toolbar button, the tree entry and `Ctrl+P`. The button's tooltip reads *A
 report is written once the test run has stopped — it is In Progress*. A report
-is about what a test run recorded, and a test run still going is still recording
-(Rule-REPORT-016).
+is about what a test run recorded, and a test run still going is still recording (Rule-REPORT-016).
 
 **If the selection is not a test run** — **Generate Report** is gray in the tree
 menu, and its tooltip reads *Select a test run to report on.* A report is about

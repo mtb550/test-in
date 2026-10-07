@@ -28,12 +28,12 @@ import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testrun.failure.FailedResultDialog;
 import org.testin.ui.framework.ShownDialog;
@@ -71,6 +71,17 @@ public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> test
         return of(p, root, testCases.stream().map(EditorFixtures::pending).toList(), testCases);
     }
 
+    public static @NotNull AnAction keyFor(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
+        return ActionUtil.getActions(editor.getList()).stream()
+                .filter(action -> action instanceof final SetTestCaseStatusAction key && key.getStatus() == status)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no key records " + status));
+    }
+
+    public static @NotNull List<EditorTextField> boxesOf(final @NotNull JComponent dialog) {
+        return Drawn.components(dialog).stream().filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).toList();
+    }
+
     public @NotNull TestRunEditor opened(final @NotNull Disposable owner) {
         return EditorFixtures.openTestRunEditor(p, testRun, owner);
     }
@@ -81,13 +92,6 @@ public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> test
 
     public @NotNull RunItemStatus statusOf(final @NotNull TestCaseDto tc) {
         return resultOf(tc).getStatus();
-    }
-
-    public static @NotNull AnAction keyFor(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
-        return ActionUtil.getActions(editor.getList()).stream()
-                .filter(action -> action instanceof final SetTestCaseStatusAction key && key.getStatus() == status)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("no key records " + status));
     }
 
     public void press(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
@@ -101,9 +105,5 @@ public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> test
     public @NotNull JComponent openFailureDialog() {
         Await.until("the failure dialog never opened", () -> failureDialog().isPresent());
         return failureDialog().orElseThrow();
-    }
-
-    public static @NotNull List<EditorTextField> boxesOf(final @NotNull JComponent dialog) {
-        return Drawn.components(dialog).stream().filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).toList();
     }
 }

@@ -36,12 +36,12 @@ import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
+import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testrun.failure.FailedResultDialog;
@@ -73,18 +73,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
-
-    @Override
-    protected void setUp() {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() {
-        ShownDialog.close(getProject(), FailedResultDialog.class);
-        CopyPasteManager.getInstance().setContents(new StringSelection(""));
-        super.tearDown();
-    }
 
     private static @NotNull Transferable aPicture(final @NotNull Color color) {
         final @NotNull BufferedImage image = new BufferedImage(40, 30, BufferedImage.TYPE_INT_RGB);
@@ -134,6 +122,37 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
                 .toList();
     }
 
+    private static @NotNull EditorTextField actualResultBox(final @NotNull JComponent dialog) {
+        return TestRunFixture.boxesOf(dialog).getFirst();
+    }
+
+    private static int firstPixelOf(final byte @NotNull [] png) {
+        try {
+            return Objects.requireNonNull(ImageIO.read(new ByteArrayInputStream(png))).getRGB(0, 0);
+        } catch (final IOException ex) {
+            throw new AssertionError("a kept screenshot is not a picture", ex);
+        }
+    }
+
+    private static @NotNull AnAction actionFor(final @NotNull JComponent on, final @NotNull KeyStroke key) {
+        return ActionUtil.getActions(on).stream()
+                .filter(action -> Arrays.stream(action.getShortcutSet().getShortcuts()).anyMatch(shortcut -> shortcut instanceof final KeyboardShortcut keyboard && key.equals(keyboard.getFirstKeyStroke())))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError(key + " is not bound to the " + on.getClass().getSimpleName()));
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownDialog.close(getProject(), FailedResultDialog.class);
+        CopyPasteManager.getInstance().setContents(new StringSelection(""));
+        super.tearDown();
+    }
+
     private @NotNull TestRunEditor walking(final @NotNull TestRunFixture fixture) {
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         editor.onStartExecutionClicked();
@@ -147,10 +166,6 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
 
     private void editTheFailureOf(final @NotNull TestRunEditor editor) {
         Gestures.press(getProject(), ActionManager.getInstance().getAction("Testin.UpdateRunItem"), editor.getList());
-    }
-
-    private static @NotNull EditorTextField actualResultBox(final @NotNull JComponent dialog) {
-        return TestRunFixture.boxesOf(dialog).getFirst();
     }
 
     // Rule-EDITOR-PANEL-219
@@ -201,14 +216,6 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             assertEquals("taking a picture out did not take it out of the test run", List.of(pastedNames.get(1)), edited.getScreenshots());
         } finally {
             Disposer.dispose(editor);
-        }
-    }
-
-    private static int firstPixelOf(final byte @NotNull [] png) {
-        try {
-            return Objects.requireNonNull(ImageIO.read(new ByteArrayInputStream(png))).getRGB(0, 0);
-        } catch (final IOException ex) {
-            throw new AssertionError("a kept screenshot is not a picture", ex);
         }
     }
 
@@ -287,18 +294,18 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             assertTrue("the box did not grow as lines were added", box.getPreferredSize().height > oneLine);
 
             box.setText("""
-                1
-                2
-                3
-                4
-                5
-                6
-                7
-                8
-                9
-                10
-                11
-                12""");
+                    1
+                    2
+                    3
+                    4
+                    5
+                    6
+                    7
+                    8
+                    9
+                    10
+                    11
+                    12""");
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final int sixLines = box.getFontMetrics(box.getFont()).getHeight() * 6;
             assertTrue("the box grew past six lines: " + box.getPreferredSize().height + " > " + sixLines, box.getPreferredSize().height <= sixLines + oneLine);
@@ -318,13 +325,6 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
         } finally {
             Disposer.dispose(editor);
         }
-    }
-
-    private static @NotNull AnAction actionFor(final @NotNull JComponent on, final @NotNull KeyStroke key) {
-        return ActionUtil.getActions(on).stream()
-                .filter(action -> Arrays.stream(action.getShortcutSet().getShortcuts()).anyMatch(shortcut -> shortcut instanceof final KeyboardShortcut keyboard && key.equals(keyboard.getFirstKeyStroke())))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError(key + " is not bound to the " + on.getClass().getSimpleName()));
     }
 
     // Rule-EDITOR-PANEL-167
@@ -390,7 +390,8 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         final @NotNull List<String> heldWhenSaid = new ArrayList<>();
         Services.getInstance(getProject(), Notifier.class).watchBalloons(getTestRootDisposable(), html -> {
-            if (html.contains(Bundle.message("run.item.updated"))) heldWhenSaid.add(fixture.resultOf(testCases.getFirst()).getActualResult());
+            if (html.contains(Bundle.message("run.item.updated")))
+                heldWhenSaid.add(fixture.resultOf(testCases.getFirst()).getActualResult());
         });
         try {
             editor.getList().setSelectedIndex(0);

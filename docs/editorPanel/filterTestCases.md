@@ -98,11 +98,11 @@ There is no key for this. The button's tooltip reads **Filter**.
    [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
    is written on the refresh page.
 5. **Module** — the modules the test cases in this test set actually carry.
-6. **Status** — the test case's own status: **Reviewed**, **Pending**,
-   **Disabled** and **To Be Updated**. It works in both editors and in the
+6. **Status** — the test case's own status: **Reviewed**, **Pending**, **Disabled** and **To Be Updated**. It works in
+   both editors and in the
    Create Test Run dialog.
-7. **Run Item Status** — what the test run recorded for each run item, such as
-   **Passed** or **Failed**. Only a test run editor has this row.
+7. **Run Item Status** — what the test run recorded for each run item, such as **Passed** or **Failed**. Only a test run
+   editor has this row.
 8. **Test Set** — gray in both editors, reading *Test Set (only Create Test Run
    picks across test sets)*. The same menu opens in the
    [Create Test Run](../treePanel/createTestRun.md) dialog, where it offers the

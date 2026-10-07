@@ -106,8 +106,7 @@ The node keeps everything inside it. Only where it sits changes.
 ```
 
 1. **The question** — says the verb and the names. The verb is *Move* after a
-   cut. It is *Copy* after a copy. It sits on a card
-   (Rule-INTERNAL-099).
+   cut. It is *Copy* after a copy. It sits on a card (Rule-INTERNAL-099).
 2. **Where it is going** — one row, not two labeled blocks: where the nodes are
    now, an arrow, then where they land (Rule-INTERNAL-109). Both are said as
    places in the test project rather than as paths on disk (Rule-INTERNAL-108).

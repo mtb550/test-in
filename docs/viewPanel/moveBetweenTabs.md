@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-017: Move between the panel's tabs
 
-**As a** tester, **I want** to reach the **History** tab from the keyboard,
-**so that** I can read it without taking my hands off it.
+**As a** tester, **I want** to reach the **History** tab from the keyboard, **so that** I can read it without taking my
+hands off it.
 
 The panel has two tabs: **Details** and **History**. `Tab` brings the next one
 to the front, and `Shift+Tab` the one before.

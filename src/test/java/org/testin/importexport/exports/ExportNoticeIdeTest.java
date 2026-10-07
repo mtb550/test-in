@@ -43,6 +43,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ExportNoticeIdeTest extends AbstractTempRootIdeTest {
     private final @NotNull List<String> browsed = new CopyOnWriteArrayList<>();
 
+    private static @NotNull AnAction link(final @NotNull Notification notification, final @NotNull String name) {
+        return notification.getActions().stream().filter(action -> name.equals(action.getTemplateText())).findFirst()
+                .orElseThrow(() -> new AssertionError("the message has no " + name));
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -67,11 +72,6 @@ public class ExportNoticeIdeTest extends AbstractTempRootIdeTest {
         final @NotNull String title = Done.counted(Done.EXPORTED.getOutcome(), 3);
         Await.until("the export said nothing", () -> said.stream().anyMatch(notification -> notification.getTitle().equals(title)));
         return said.stream().filter(notification -> notification.getTitle().equals(title)).findFirst().orElseThrow();
-    }
-
-    private static @NotNull AnAction link(final @NotNull Notification notification, final @NotNull String name) {
-        return notification.getActions().stream().filter(action -> name.equals(action.getTemplateText())).findFirst()
-                .orElseThrow(() -> new AssertionError("the message has no " + name));
     }
 
     // UC-SHARE-004, Rule-SHARE-022

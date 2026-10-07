@@ -14,11 +14,9 @@
 ## Steps
 
 1. Open the settings. Press the gear button on the Testin panel's toolbar, or
-   open **Settings | Tools | Testin**.
-   ([Open the settings page](../setting/openSettings.md))
+   open **Settings | Tools | Testin**. ([Open the settings page](../setting/openSettings.md))
 2. Set **Testin folder** to the folder that holds your test projects. Type the
-   full path, or press **...** to choose the folder.
-   ([Set the Testin folder](../setting/setTestinFolder.md))
+   full path, or press **...** to choose the folder. ([Set the Testin folder](../setting/setTestinFolder.md))
 3. Set **Tester name** to your name. Testin writes it onto everything you save.
    ([Give my name](../setting/setTesterName.md))
 4. Set **Default download folder** to where reports and exports should be saved

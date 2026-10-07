@@ -88,8 +88,8 @@ already made.
 not read the Git remote:* and then the reason.
 
 **If the remote cannot be asked for its branches** — nothing is pulled or
-pushed. A message titled **Push Failed** reads *Could not ask* the remote
-*whether it has the branch*, the branch, *so nothing was pulled or pushed:*,
+pushed. A message titled **Push Failed** reads *Could not ask* the remote *whether it has the branch*, the branch, *so
+nothing was pulled or pushed:*,
 and Git's reason on the next line.
 
 **If the push fails** — a message titled **Push Failed** carries the reason.

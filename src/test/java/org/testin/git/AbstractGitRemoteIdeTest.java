@@ -36,44 +36,6 @@ public abstract class AbstractGitRemoteIdeTest extends AbstractTempRootIdeTest {
     protected Path remote;
     protected Path work;
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        assertTrue("Git is not on the PATH, so a repository cannot be exercised", LocalGit.onThePath());
-
-        remote = directory("remote.git");
-        work = directory("work");
-
-        mustGit(remote, "init", "--bare", "--initial-branch=" + MAIN);
-        mustGit(work, "init", "--initial-branch=" + MAIN);
-        identify(work, "Testin Test", "testin@example.invalid");
-        mustGit(work, "remote", "add", "origin", remoteUrl());
-
-        write(work, "first.tc", "{}");
-        commitAll(work, "first");
-        mustGit(work, "push", "-u", "origin", MAIN);
-    }
-
-    protected @NotNull String remoteUrl() {
-        return remote.toUri().toString();
-    }
-
-    protected @NotNull Path directory(final @NotNull String name) {
-        try {
-            return Files.createDirectories(root.resolve(name));
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not make " + name + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    protected @NotNull Path colleague() {
-        final @NotNull Path colleague = root.resolve("colleague");
-        mustGit(root, "clone", remoteUrl(), colleague.toString());
-        identify(colleague, "Colleague", "colleague@example.invalid");
-
-        return colleague;
-    }
-
     protected static void identify(final @NotNull Path repository, final @NotNull String name, final @NotNull String email) {
         mustGit(repository, "config", "user.name", name);
         mustGit(repository, "config", "user.email", email);
@@ -114,5 +76,43 @@ public abstract class AbstractGitRemoteIdeTest extends AbstractTempRootIdeTest {
 
     protected static @NotNull List<String> answers(final @NotNull Notification notification) {
         return notification.getActions().stream().map(AnAction::getTemplateText).toList();
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        assertTrue("Git is not on the PATH, so a repository cannot be exercised", LocalGit.onThePath());
+
+        remote = directory("remote.git");
+        work = directory("work");
+
+        mustGit(remote, "init", "--bare", "--initial-branch=" + MAIN);
+        mustGit(work, "init", "--initial-branch=" + MAIN);
+        identify(work, "Testin Test", "testin@example.invalid");
+        mustGit(work, "remote", "add", "origin", remoteUrl());
+
+        write(work, "first.tc", "{}");
+        commitAll(work, "first");
+        mustGit(work, "push", "-u", "origin", MAIN);
+    }
+
+    protected @NotNull String remoteUrl() {
+        return remote.toUri().toString();
+    }
+
+    protected @NotNull Path directory(final @NotNull String name) {
+        try {
+            return Files.createDirectories(root.resolve(name));
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not make " + name + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    protected @NotNull Path colleague() {
+        final @NotNull Path colleague = root.resolve("colleague");
+        mustGit(root, "clone", remoteUrl(), colleague.toString());
+        identify(colleague, "Colleague", "colleague@example.invalid");
+
+        return colleague;
     }
 }

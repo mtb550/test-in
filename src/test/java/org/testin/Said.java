@@ -67,6 +67,14 @@ public final class Said {
         }
     }
 
+    private static @NotNull String plain(final @NotNull String html) {
+        return StringUtil.unescapeXmlEntities(html.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "").replace("<br>", "\n"));
+    }
+
+    private static @NotNull String oneLine(final @NotNull String html) {
+        return html.replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").strip();
+    }
+
     public @NotNull List<String> shown() {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         return balloons;
@@ -75,13 +83,5 @@ public final class Said {
     public @NotNull List<Notification> notifications() {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         return notifications;
-    }
-
-    private static @NotNull String plain(final @NotNull String html) {
-        return StringUtil.unescapeXmlEntities(html.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "").replace("<br>", "\n"));
-    }
-
-    private static @NotNull String oneLine(final @NotNull String html) {
-        return html.replaceAll("<[^>]+>", " ").replaceAll("\\s+", " ").strip();
     }
 }

@@ -16,6 +16,7 @@
 
 package org.testin.bug;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
 import org.testng.annotations.Test;
@@ -23,7 +24,6 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -173,12 +173,12 @@ public class BugTemplateTest {
     @Test
     public void sectionTextCannotBecomeMarkup() {
         assertEquals(BugTemplate.section("""
-                # not a heading
-                text
-                ---
-                  ===
-                * * *
-                @someone fixed #12 in <script> for me@example.com"""),
+                        # not a heading
+                        text
+                        ---
+                          ===
+                        * * *
+                        @someone fixed #12 in <script> for me@example.com"""),
                 """
                         \\# not a heading
                         text
@@ -198,7 +198,7 @@ public class BugTemplateTest {
         assertEquals(BugTemplate.codeBlock("""
                 a ``` b
                 `````
-
+                
                 """), """
                 ``````
                 a ``` b
@@ -213,15 +213,15 @@ public class BugTemplateTest {
     @Test
     public void theSummaryIsTheFirstLineThatSaysAnythingEscaped() {
         final String exception = BugTemplate.exception("""
-
-
+                
+                
                 Error <init> & "x" @bob #12
                   at y""");
 
         assertTrue(exception.startsWith("""
                 <details>
                 <summary>Error &lt;init&gt; &amp; &quot;x&quot; @&#8203;bob #&#8203;12</summary>
-
+                
                 ```
                 """), exception);
     }

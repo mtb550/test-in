@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
-import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.DirectoryDto;
+import org.testin.model.result.TestRunConfiguration;
 import org.testin.services.Services;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.util.Bundle;
@@ -72,6 +72,13 @@ public final class TestRunForm {
         return ids;
     }
 
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-134
+    private static @NotNull CheckedTreeNode deletedFolder(final @NotNull List<TestCaseDto> deleted) {
+        final @NotNull CheckedTreeNode folder = new CheckedTreeNode(Bundle.message("test.run.deleted.test.cases"));
+        deleted.forEach(tc -> folder.add(new CheckedTreeNode(tc)));
+        return folder;
+    }
+
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022
     public void open(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull List<TestCaseDto> deleted, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull TestRunFormAction action) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -87,13 +94,6 @@ public final class TestRunForm {
                 new TestRunConfigurationDialog(p, form, new TestRunFormFilter(p, testCasesRoot.getPath(), root), action).show();
             });
         });
-    }
-
-    // UC-TREE-PANEL-022, Rule-TREE-PANEL-134
-    private static @NotNull CheckedTreeNode deletedFolder(final @NotNull List<TestCaseDto> deleted) {
-        final @NotNull CheckedTreeNode folder = new CheckedTreeNode(Bundle.message("test.run.deleted.test.cases"));
-        deleted.forEach(tc -> folder.add(new CheckedTreeNode(tc)));
-        return folder;
     }
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-093, Rule-TREE-PANEL-076

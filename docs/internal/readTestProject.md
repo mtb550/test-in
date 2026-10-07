@@ -72,8 +72,8 @@ There is no key for this. It starts on its own.
   parse is never written over, so it is still there to repair.
 - **Rule-INTERNAL-089** — `testin.yml` is read and written by one class, and
   written only by a tester's own gesture: **Save to testin.yml**
-  (Rule-TREE-PANEL-112), or **Apply** in the bugRepoUrl hint
-  (Rule-VIEW-PANEL-104). Testin never needs it: when a code project has none, or
+  (Rule-TREE-PANEL-112), or **Apply** in the bugRepoUrl hint (Rule-VIEW-PANEL-104). Testin never needs it: when a code
+  project has none, or
   it leaves a value out, nothing refuses, stalls or asks the tester to create it;
   only the automation code stays off (Rule-CODEGEN-082). When it is there, what
   it says is read in one place, so a missing value means the same thing
@@ -225,8 +225,8 @@ project, and it is skipped without a word. This is the ordinary case. The
 Testin folder usually holds other things.
 
 **If Testin itself fails while reading a test project** — the test project is
-not counted as read. The tester is told it could not be read, and why
-(Rule-INTERNAL-124). This is a fault in Testin, not in the files. A damaged file
+not counted as read. The tester is told it could not be read, and why (Rule-INTERNAL-124). This is a fault in Testin,
+not in the files. A damaged file
 is never reported this way. A damaged `.tp` or other marker is read as defaults.
 An unreadable test case or result is left out, as described below.
 
@@ -259,8 +259,7 @@ says which row is missing.
 result, and once the read has finished one message names all of them. It is
 titled **Results not read in \<project\>** and it says the file names, up to
 five of them, then how many more there are. Nothing writes over a result Testin
-cannot read and nothing removes it, so the repair is to fix the file and press
-**Refresh**.
+cannot read and nothing removes it, so the repair is to fix the file and press **Refresh**.
 
 **If two test case files claim the same identity** — the second one read goes
 over the first, and a notification titled **Test cases sharing an identity in

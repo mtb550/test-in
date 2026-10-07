@@ -121,7 +121,8 @@ public final class ProjectIndexer {
             final @NotNull CountDownLatch passLatch = indexingLatch;
             Logger.info("Indexing " + validProjects.size() + " projects..");
 
-            for (final Path projectPath : validProjects) indexInBackground(projectPath, projectsLeft, allRead, passLatch);
+            for (final Path projectPath : validProjects)
+                indexInBackground(projectPath, projectsLeft, allRead, passLatch);
         } catch (final Exception ex) {
             Logger.error("indexWithProgress: " + FailureText.of(ex));
             indexing.set(false);
@@ -141,44 +142,44 @@ public final class ProjectIndexer {
         final @NotNull String projectName = projectPath.getFileName().toString();
 
         BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("indexer.task.title", projectName), true) {
-                    @Override
-                    public void run(final @NotNull ProgressIndicator indicator) {
-                        indicator.setIndeterminate(false);
-                        indicator.setFraction(0.0);
-                        indicator.setText(Bundle.message("indexer.progress.indexing", projectName));
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(false);
+                indicator.setFraction(0.0);
+                indicator.setText(Bundle.message("indexer.progress.indexing", projectName));
 
-                        final long started = System.nanoTime();
-                        final @NotNull Optional<String> failure = scanCoordinator.scan(projectPath, indicator);
-                        Logger.info("Reading '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
-                        failure.ifPresent(why -> {
-                            allRead.set(false);
-                            problems.projectNotRead(projectName, why);
-                        });
-
-                        indicator.setFraction(1.0);
-                        indicator.setText(Bundle.message("indexer.progress.done", projectName));
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        Logger.info("Reading '" + projectName + "' was canceled, so it is read again on the next request.");
-                        allRead.set(false);
-                    }
-
-                    @Override
-                    public void onThrowable(final @NotNull Throwable error) {
-                        Logger.error("Error indexing '" + projectName + "': " + FailureText.of(error));
-                        allRead.set(false);
-                    }
-
-                    @Override
-                    public void onFinished() {
-                        if (!oneProjectFinished(projectsLeft, passLatch)) return;
-
-                        if (allRead.get()) finishSuccessfully();
-                        else finishWithFailure();
-                    }
+                final long started = System.nanoTime();
+                final @NotNull Optional<String> failure = scanCoordinator.scan(projectPath, indicator);
+                Logger.info("Reading '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
+                failure.ifPresent(why -> {
+                    allRead.set(false);
+                    problems.projectNotRead(projectName, why);
                 });
+
+                indicator.setFraction(1.0);
+                indicator.setText(Bundle.message("indexer.progress.done", projectName));
+            }
+
+            @Override
+            public void onCancel() {
+                Logger.info("Reading '" + projectName + "' was canceled, so it is read again on the next request.");
+                allRead.set(false);
+            }
+
+            @Override
+            public void onThrowable(final @NotNull Throwable error) {
+                Logger.error("Error indexing '" + projectName + "': " + FailureText.of(error));
+                allRead.set(false);
+            }
+
+            @Override
+            public void onFinished() {
+                if (!oneProjectFinished(projectsLeft, passLatch)) return;
+
+                if (allRead.get()) finishSuccessfully();
+                else finishWithFailure();
+            }
+        });
     }
 
     private boolean oneProjectFinished(final @NotNull AtomicInteger projectsLeft, final @NotNull CountDownLatch passLatch) {
@@ -335,7 +336,8 @@ public final class ProjectIndexer {
 
     private boolean isListedTestProject(final @NotNull Path folder) {
         final boolean marked = isTestProjectFolder(folder);
-        if (!marked) Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker() + " marker (not a test project): " + folder);
+        if (!marked)
+            Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker() + " marker (not a test project): " + folder);
         return marked;
     }
 

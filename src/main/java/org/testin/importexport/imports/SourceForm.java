@@ -18,14 +18,14 @@ package org.testin.importexport.imports;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.PreviewLoader;
 import org.testin.model.TestCaseDto;
-import org.testin.util.Bundle;
 import org.testin.testcase.TestCaseEditorAttributes;
-import org.testin.importexport.FileTypes;
 import org.testin.ui.dialogs.CollapsiblePanel;
 import org.testin.ui.dialogs.FormRows;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
 import java.io.File;

@@ -41,6 +41,14 @@ public class RenamingNeverWritesTestinYmlIdeTest extends AbstractTempRootIdeTest
 
     private @NotNull Optional<String> ymlWas = Optional.empty();
 
+    private static @NotNull String bytesOf(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -70,14 +78,6 @@ public class RenamingNeverWritesTestinYmlIdeTest extends AbstractTempRootIdeTest
 
     private @NotNull Path yml() {
         return TestinYml.savePath(getProject()).orElseThrow(() -> new AssertionError("the project has no " + TestinYml.fileName()));
-    }
-
-    private static @NotNull String bytesOf(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + file + ": " + ex.getMessage(), ex);
-        }
     }
 
     private @NotNull BoundTestProject bound() {

@@ -73,7 +73,8 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
         if (nodesToRemove.isEmpty()) return;
 
         // Rule-CODEGEN-096
-        if (nodesToRemove.stream().anyMatch(node -> JavaCode.of(node.getType()).getRemoved().generates()) && WaitForIndexing.refuses(p, Bundle.message("remove.confirm.button"))) return;
+        if (nodesToRemove.stream().anyMatch(node -> JavaCode.of(node.getType()).getRemoved().generates()) && WaitForIndexing.refuses(p, Bundle.message("remove.confirm.button")))
+            return;
 
         final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 

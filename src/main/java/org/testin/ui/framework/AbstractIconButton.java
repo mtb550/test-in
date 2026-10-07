@@ -41,20 +41,9 @@ import java.util.Optional;
 public abstract class AbstractIconButton extends JButton {
     private final @NotNull Icon restIcon;
     private final @NotNull Icon zoomedIcon;
-
-    private boolean hovered;
-
-    private boolean on;
-
     private final @NotNull Optional<String> shortcutText;
-
-    // Rule-INTERNAL-119
-    public static @NotNull AbstractIconButton of(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Runnable onClick) {
-        final @NotNull AbstractIconButton button = new AbstractIconButton(tooltip, icon) {
-        };
-        button.addActionListener(_ -> onClick.run());
-        return button;
-    }
+    private boolean hovered;
+    private boolean on;
 
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         this(tooltip, icon, Optional.empty());
@@ -103,6 +92,14 @@ public abstract class AbstractIconButton extends JButton {
                 setHovered(false);
             }
         });
+    }
+
+    // Rule-INTERNAL-119
+    public static @NotNull AbstractIconButton of(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Runnable onClick) {
+        final @NotNull AbstractIconButton button = new AbstractIconButton(tooltip, icon) {
+        };
+        button.addActionListener(_ -> onClick.run());
+        return button;
     }
 
     // Rule-INTERNAL-122

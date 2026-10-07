@@ -17,6 +17,7 @@
 package org.testin.ui.framework;
 
 import com.intellij.ui.components.fields.ExtendableTextField;
+import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
@@ -30,7 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import org.jetbrains.annotations.NotNull;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;

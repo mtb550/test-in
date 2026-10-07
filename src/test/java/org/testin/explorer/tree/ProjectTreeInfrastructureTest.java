@@ -22,11 +22,10 @@ import org.testng.annotations.Test;
 
 import javax.swing.TransferHandler;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-
-import java.util.List;
 
 public class ProjectTreeInfrastructureTest {
 

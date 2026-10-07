@@ -22,8 +22,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
-import org.testin.model.result.TestRunSummary;
 import org.testin.model.node.DirectoryDto;
+import org.testin.model.result.TestRunSummary;
 import org.testin.services.Services;
 
 import java.util.ArrayList;

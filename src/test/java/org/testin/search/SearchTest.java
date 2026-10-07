@@ -16,6 +16,7 @@
 
 package org.testin.search;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestCasesMainDirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

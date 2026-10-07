@@ -16,9 +16,9 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.view.Drawn;
 

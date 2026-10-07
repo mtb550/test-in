@@ -43,6 +43,30 @@ import java.util.List;
 
 public class RenameNodeIdeTest extends AbstractCodegenIdeTest {
 
+    private static @NotNull String loginClass() {
+        return "nafath." + NameSanitizer.className("Login");
+    }
+
+    private static @NotNull String signInClass() {
+        return "nafath." + NameSanitizer.className("Sign in");
+    }
+
+    private static void laidOut(final @NotNull Container container) {
+        container.setSize(container.getPreferredSize());
+        for (final Container each : UIUtil.uiTraverser(container).filter(Container.class)) each.doLayout();
+    }
+
+    private static int topOf(final @NotNull Component component, final @NotNull Container within) {
+        return SwingUtilities.convertPoint(component.getParent(), component.getLocation(), within).y;
+    }
+
+    private static @NotNull Component readingAnyCase(final @NotNull Container container, final @NotNull String text) {
+        return Drawn.components(container).stream()
+                .filter(component -> Drawn.text(component).equalsIgnoreCase(text))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("nothing on the dialog reads \"" + text + "\": " + Drawn.words(container)));
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -69,30 +93,6 @@ public class RenameNodeIdeTest extends AbstractCodegenIdeTest {
         ShownDialog.typed(getProject(), RenameDialog.class, "Sign in");
         ShownDialog.press(getProject(), RenameDialog.class, Shortcuts.Enter);
         Await.until(node.getName() + " was not renamed to Sign in", () -> nodes().nodeExists(node.getPath().resolveSibling("Sign in")));
-    }
-
-    private static @NotNull String loginClass() {
-        return "nafath." + NameSanitizer.className("Login");
-    }
-
-    private static @NotNull String signInClass() {
-        return "nafath." + NameSanitizer.className("Sign in");
-    }
-
-    private static void laidOut(final @NotNull Container container) {
-        container.setSize(container.getPreferredSize());
-        for (final Container each : UIUtil.uiTraverser(container).filter(Container.class)) each.doLayout();
-    }
-
-    private static int topOf(final @NotNull Component component, final @NotNull Container within) {
-        return SwingUtilities.convertPoint(component.getParent(), component.getLocation(), within).y;
-    }
-
-    private static @NotNull Component readingAnyCase(final @NotNull Container container, final @NotNull String text) {
-        return Drawn.components(container).stream()
-                .filter(component -> Drawn.text(component).equalsIgnoreCase(text))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("nothing on the dialog reads \"" + text + "\": " + Drawn.words(container)));
     }
 
     // Rule-TREE-PANEL-036

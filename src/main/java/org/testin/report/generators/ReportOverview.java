@@ -19,12 +19,12 @@ package org.testin.report.generators;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.DetailRow;
+import org.testin.model.markers.TestRunMarker;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunExecution;
 import org.testin.model.result.TestRunSummary;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.markers.DetailRow;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 

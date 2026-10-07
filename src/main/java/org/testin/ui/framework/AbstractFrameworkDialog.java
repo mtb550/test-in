@@ -34,8 +34,8 @@ import org.testin.model.StatusBarItem;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.util.Shortcuts;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Shortcuts;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -43,8 +43,8 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.LayoutFocusTraversalPolicy;
-import javax.swing.Scrollable;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.Scrollable;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -62,19 +62,14 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     protected final @NotNull Notifier notifier;
 
     private final @NotNull OpenDialogs openDialogs;
-
+    private final @NotNull Maximized maximized = new Maximized();
     protected @NotNull String title = "";
     protected @NotNull List<? extends ComponentDialogBase<?>> components = List.of();
     protected @NotNull List<StatusBarShortcut> shortcuts = List.of();
-
     protected @NotNull DialogSize size = DialogSize.CONTENT;
-
     // UC-INTERNAL-007, Rule-INTERNAL-076
     protected boolean dismissOnClickOutside;
-
     protected boolean resizable;
-
-    private final @NotNull Maximized maximized = new Maximized();
     private @NotNull Optional<DialogDto> dto = Optional.empty();
     private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
     private @NotNull Optional<JBPopup> popup = Optional.empty();
@@ -192,7 +187,8 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         size.applyTo(p, contentPanel);
 
         // Rule-INTERNAL-101
-        if (sizeIsTheTesters()) builder.setResizable(true).setMovable(true).setCommandButton(Maximized.button(() -> maximized.toggle(getPopup(), DialogSize.frameOn(p))));
+        if (sizeIsTheTesters())
+            builder.setResizable(true).setMovable(true).setCommandButton(Maximized.button(() -> maximized.toggle(getPopup(), DialogSize.frameOn(p))));
 
         // Rule-INTERNAL-059
         builder.setCancelKeyEnabled(dto().shortcuts().stream().noneMatch(one -> one.shortcut() == Shortcuts.Escape));

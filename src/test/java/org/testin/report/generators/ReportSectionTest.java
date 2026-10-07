@@ -16,6 +16,7 @@
 
 package org.testin.report.generators;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
 import org.testin.model.result.ResultAnalysis;
 import org.testin.model.result.TestRunItems;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

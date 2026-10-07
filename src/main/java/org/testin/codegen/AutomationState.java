@@ -48,11 +48,9 @@ public final class AutomationState implements Disposable {
     private static final long NEVER_READ = -1;
 
     private final @NotNull Map<UUID, Automated> known = new ConcurrentHashMap<>();
-
-    private volatile long readAtCodeVersion = NEVER_READ;
-
     // UC-CODEGEN-005, Rule-CODEGEN-025
     private final @NotNull Set<UUID> withAMethod = ConcurrentHashMap.newKeySet();
+    private volatile long readAtCodeVersion = NEVER_READ;
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195, Rule-CODEGEN-002
     private static @NotNull Automated stateOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, Boolean> methods) {
@@ -61,6 +59,27 @@ public final class AutomationState implements Disposable {
         if (method.isPresent()) return method.orElseThrow() ? Automated.WRITTEN : Automated.NONE;
 
         return Fqcn.methodNameOf(tc).isEmpty() ? Automated.NONE : Automated.MISSING;
+    }
+
+    private static @NotNull Answer answer(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final long codeVersion = PsiModificationTracker.getInstance(p).getModificationCount();
+        final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();
+        final @NotNull Set<UUID> found = new LinkedHashSet<>();
+
+        try {
+            final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, testCases);
+
+            for (final TestCaseDto tc : testCases) {
+                answers.put(tc.getId(), stateOf(tc, methods));
+                if (methods.containsKey(tc.getId())) found.add(tc.getId());
+            }
+        } catch (final ProcessCanceledException cancelled) {
+            throw cancelled;
+        } catch (final Exception ex) {
+            Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + FailureText.of(ex));
+        }
+
+        return new Answer(answers, found, codeVersion);
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197
@@ -106,27 +125,6 @@ public final class AutomationState implements Disposable {
     private boolean alreadyAnswered(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         return readAtCodeVersion == PsiModificationTracker.getInstance(p).getModificationCount()
                 && testCases.stream().allMatch(tc -> known.containsKey(tc.getId()));
-    }
-
-    private static @NotNull Answer answer(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
-        final long codeVersion = PsiModificationTracker.getInstance(p).getModificationCount();
-        final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();
-        final @NotNull Set<UUID> found = new LinkedHashSet<>();
-
-        try {
-            final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, testCases);
-
-            for (final TestCaseDto tc : testCases) {
-                answers.put(tc.getId(), stateOf(tc, methods));
-                if (methods.containsKey(tc.getId())) found.add(tc.getId());
-            }
-        } catch (final ProcessCanceledException cancelled) {
-            throw cancelled;
-        } catch (final Exception ex) {
-            Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + FailureText.of(ex));
-        }
-
-        return new Answer(answers, found, codeVersion);
     }
 
     // Rule-CODEGEN-082, Rule-EDITOR-PANEL-211

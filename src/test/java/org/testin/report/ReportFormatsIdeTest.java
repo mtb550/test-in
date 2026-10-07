@@ -37,14 +37,14 @@ import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.result.TestRunSummary;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -78,6 +78,22 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
     private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
 
     private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
+
+    private static @NotNull String withoutTags(final @NotNull String html) {
+        return html.replaceAll("<[^>]+>", "");
+    }
+
+    private static @NotNull String squeezed(final @NotNull String text) {
+        return text.replaceAll("\\s", "");
+    }
+
+    private static void assertPrints(final @NotNull String format, final @NotNull String report, final @NotNull String expected) {
+        assertTrue(format + " does not print: " + expected, squeezed(report).contains(squeezed(expected)));
+    }
+
+    private static void assertLeavesOut(final @NotNull String format, final @NotNull String report, final @NotNull String unexpected) {
+        assertFalse(format + " prints what it should leave out: " + unexpected, report.contains(unexpected));
+    }
 
     private @NotNull BoundTestProject bound() {
         return Services.getInstance(getProject(), BoundTestProject.class);
@@ -157,7 +173,8 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
     private @NotNull String pdf(final @NotNull TestRunDirectoryDto testRun) {
         try (PdfDocument document = new PdfDocument(new PdfReader(new ByteArrayInputStream(report(FileTypes.PDF, testRun))))) {
             final @NotNull StringBuilder text = new StringBuilder();
-            for (int page = 1; page <= document.getNumberOfPages(); page++) text.append(PdfTextExtractor.getTextFromPage(document.getPage(page))).append('\n');
+            for (int page = 1; page <= document.getNumberOfPages(); page++)
+                text.append(PdfTextExtractor.getTextFromPage(document.getPage(page))).append('\n');
             return text.toString();
         } catch (final IOException ex) {
             throw new AssertionError("Could not read the PDF back: " + ex.getMessage(), ex);
@@ -206,22 +223,6 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         final @NotNull StringBuilder text = new StringBuilder();
         sheets(testRun).forEach(sheet -> sheet.forEach(row -> text.append(String.join("\t", row)).append('\n')));
         return text.toString();
-    }
-
-    private static @NotNull String withoutTags(final @NotNull String html) {
-        return html.replaceAll("<[^>]+>", "");
-    }
-
-    private static @NotNull String squeezed(final @NotNull String text) {
-        return text.replaceAll("\\s", "");
-    }
-
-    private static void assertPrints(final @NotNull String format, final @NotNull String report, final @NotNull String expected) {
-        assertTrue(format + " does not print: " + expected, squeezed(report).contains(squeezed(expected)));
-    }
-
-    private static void assertLeavesOut(final @NotNull String format, final @NotNull String report, final @NotNull String unexpected) {
-        assertFalse(format + " prints what it should leave out: " + unexpected, report.contains(unexpected));
     }
 
     // Rule-REPORT-002
@@ -286,7 +287,8 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         }
 
         final @NotNull List<String> header = sheets(testRun).get(1).getFirst();
-        for (final String column : words) assertTrue("The spreadsheet names a column differently: " + column + " is not in " + header, header.contains(column));
+        for (final String column : words)
+            assertTrue("The spreadsheet names a column differently: " + column + " is not in " + header, header.contains(column));
     }
 
     // Rule-REPORT-020

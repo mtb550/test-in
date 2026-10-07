@@ -93,8 +93,8 @@ The **Edit Test Run** dialog opens. It is the dialog drawn under
 [UC-TREE-PANEL-009](createTestRun.md), with two differences. Its title reads **Edit Test Run**, and its button reads
 **Save**. It arrives filled in with the
 test run's own name, its test cases and its configuration. Its **Filter** works
-the same way, and a test case the filter hides is not taken out of the test run
-(Rule-TREE-PANEL-130). After **Save**, the
+the same way, and a test case the filter hides is not taken out of the test run (Rule-TREE-PANEL-130). After **Save**,
+the
 tree refreshes and *Updated* shows above the status bar at the bottom right of
 the IDE.
 

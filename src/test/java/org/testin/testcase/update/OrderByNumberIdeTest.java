@@ -43,6 +43,14 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
+    private static @NotNull String read(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError(file + " could not be read", ex);
+        }
+    }
+
     @Override
     protected void tearDown() {
         ShownDialog.close(getProject(), UpdateTestCaseDialog.class);
@@ -57,7 +65,8 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     private void select(final @NotNull TestCaseEditor editor, final @NotNull String description) {
         for (int i = 0; i < editor.getList().getModel().getSize(); i++)
-            if (editor.getList().getModel().getElementAt(i).getDescription().equals(description)) editor.getList().setSelectedIndex(i);
+            if (editor.getList().getModel().getElementAt(i).getDescription().equals(description))
+                editor.getList().setSelectedIndex(i);
     }
 
     private @NotNull IntegerField theOrderBox(final @NotNull TestCaseEditor editor) {
@@ -82,14 +91,6 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
             return files.filter(file -> file.toString().endsWith(".tc")).sorted().map(file -> file + "@" + file.toFile().lastModified() + "=" + read(file)).filter(file -> !file.contains("\"Test case number 6\"")).toList();
         } catch (final IOException ex) {
             throw new AssertionError("the test set could not be read", ex);
-        }
-    }
-
-    private static @NotNull String read(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError(file + " could not be read", ex);
         }
     }
 

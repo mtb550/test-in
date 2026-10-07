@@ -71,6 +71,9 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         showPanel(p, testCases, path, ViewToolWindowFactory::nothingAfter);
     }
 
+    private static void nothingAfter(final @NotNull ViewPanel shown) {
+    }
+
     // Rule-VIEW-PANEL-008
     @Override
     public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow toolWindow) {
@@ -94,8 +97,5 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!p.isDisposed()) StartupActivity.execute(p);
         });
-    }
-
-    private static void nothingAfter(final @NotNull ViewPanel shown) {
     }
 }

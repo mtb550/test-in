@@ -25,15 +25,15 @@ import org.testin.NodesOnDisk;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
-import org.testin.model.status.NodeStatus;
-import org.testin.model.status.PackageStatus;
-import org.testin.model.status.TestSetStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunPackageDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.status.NodeStatus;
+import org.testin.model.status.PackageStatus;
+import org.testin.model.status.TestSetStatus;
 import org.testin.services.Services;
 
 import javax.swing.JTree;
@@ -44,10 +44,6 @@ import java.util.List;
 import java.util.Set;
 
 public class RetiredNodesIdeTest extends AbstractTempRootIdeTest {
-
-    private @NotNull Nodes nodes() {
-        return Services.getInstance(getProject(), Nodes.class);
-    }
 
     private static @NotNull List<String> drawn(final @NotNull DirectoryDto node) {
         final @NotNull TreeCellRenderer renderer = new TreeCellRenderer(Set.of());
@@ -60,6 +56,10 @@ public class RetiredNodesIdeTest extends AbstractTempRootIdeTest {
             fragments.add(text + (each.getTextAttributes().equals(SimpleTextAttributes.GRAYED_ATTRIBUTES) ? " [grayed]" : ""));
         }
         return fragments;
+    }
+
+    private @NotNull Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
     }
 
     private void marked(final @NotNull DirectoryDto node, final @NotNull NodeStatus status) {

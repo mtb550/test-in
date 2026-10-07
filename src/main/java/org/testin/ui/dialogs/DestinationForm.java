@@ -38,16 +38,6 @@ public final class DestinationForm implements DialogComponent {
     private final @NotNull FormatSection format;
     private final @NotNull JComponent panel;
 
-    // UC-REPORT-001, Rule-INTERNAL-099
-    public static @NotNull DestinationForm stacked(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
-        return new DestinationForm(p, formats, defaultFormat, suggestedName, chooserTitle, chooserDescription, "");
-    }
-
-    // UC-SHARE-001, Rule-INTERNAL-099
-    public static @NotNull DestinationForm inSection(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription, final @NotNull String section) {
-        return new DestinationForm(p, formats, defaultFormat, suggestedName, chooserTitle, chooserDescription, section);
-    }
-
     private DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription, final @NotNull String section) {
         folder = ComponentDialogBase.textField()
                 .caption(Bundle.message("destination.caption.folder"))
@@ -70,6 +60,16 @@ public final class DestinationForm implements DialogComponent {
                 : new FormRows().wideRow(folder.getPanel()).wideRow(fileName.getPanel()).wideRow(format.panel());
 
         panel = roomy ? CollapsiblePanel.build(section, rows, EXPANDED) : DialogStyle.asSection(rows);
+    }
+
+    // UC-REPORT-001, Rule-INTERNAL-099
+    public static @NotNull DestinationForm stacked(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
+        return new DestinationForm(p, formats, defaultFormat, suggestedName, chooserTitle, chooserDescription, "");
+    }
+
+    // UC-SHARE-001, Rule-INTERNAL-099
+    public static @NotNull DestinationForm inSection(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription, final @NotNull String section) {
+        return new DestinationForm(p, formats, defaultFormat, suggestedName, chooserTitle, chooserDescription, section);
     }
 
     static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {

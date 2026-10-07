@@ -46,20 +46,6 @@ public class ContextMenuKeyIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull List<TestCaseDto> testCases = List.of();
 
-    private @NotNull TestSetDirectoryDto aTestSet() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
-        testCases = EditorFixtures.testCases(getProject(), ts, 3);
-        return ts;
-    }
-
-    private @NotNull TestRunEditor aTestRunEditor() {
-        aTestSet();
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
-
     private static @NotNull Optional<Point> whereTheKeyOpensTheMenu(final @NotNull JComponent on) {
         return ((OpenContextMenuAction) Gestures.boundTo(on, OpenContextMenuAction.class)).whereItOpens();
     }
@@ -95,6 +81,20 @@ public class ContextMenuKeyIdeTest extends AbstractTempRootIdeTest {
         final @NotNull SimpleTree tree = new SimpleTree(new DefaultTreeModel(top));
         tree.setSize(300, 300);
         return tree;
+    }
+
+    private @NotNull TestSetDirectoryDto aTestSet() {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        testCases = EditorFixtures.testCases(getProject(), ts, 3);
+        return ts;
+    }
+
+    private @NotNull TestRunEditor aTestRunEditor() {
+        aTestSet();
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-123

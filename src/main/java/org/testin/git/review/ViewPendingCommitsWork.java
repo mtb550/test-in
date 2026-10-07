@@ -56,12 +56,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier, @NotNull Nodes nodes) {
-    private static @NotNull String commitLabel(final @NotNull String commitId) {
-        return commitId.isBlank() ? Bundle.message("git.commit.label.none") : Bundle.message("git.commit.label", commitId);
-    }
-
     public ViewPendingCommitsWork(final @NotNull Project p) {
         this(p, new GitRepositoryService(p), new GitCommits(p), Services.getInstance(p, Notifier.class), Services.getInstance(p, Nodes.class));
+    }
+
+    private static @NotNull String commitLabel(final @NotNull String commitId) {
+        return commitId.isBlank() ? Bundle.message("git.commit.label.none") : Bundle.message("git.commit.label", commitId);
     }
 
     // UC-SHARE-009, Rule-SHARE-042

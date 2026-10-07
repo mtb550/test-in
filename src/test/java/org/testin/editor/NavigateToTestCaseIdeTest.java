@@ -33,11 +33,11 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.Automated;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.details.ActionIcons;
@@ -58,19 +58,6 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
 
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
-    private @NotNull List<TestCaseDto> automatedTestCases() {
-        testSet = createdTestSet("Checkout");
-        final @NotNull List<TestCaseDto> made = List.of(createdTestCase(testSet, "Log in with a valid user", "m0001"), createdTestCase(testSet, "Log in with a wrong password", "m0002"));
-        settled();
-        return made;
-    }
-
-    private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestRunItems> results) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, results);
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
-
     private static @NotNull AnAction navigateToTestCase() {
         return ActionManager.getInstance().getAction("Testin.NavigateToTestCase");
     }
@@ -83,6 +70,19 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
             names.add(Objects.requireNonNullElse(ActionManager.getInstance().getId(own), Objects.requireNonNullElse(own.getTemplatePresentation().getText(), "")));
         }
         return names;
+    }
+
+    private @NotNull List<TestCaseDto> automatedTestCases() {
+        testSet = createdTestSet("Checkout");
+        final @NotNull List<TestCaseDto> made = List.of(createdTestCase(testSet, "Log in with a valid user", "m0001"), createdTestCase(testSet, "Log in with a wrong password", "m0002"));
+        settled();
+        return made;
+    }
+
+    private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestRunItems> results) {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, results);
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-233

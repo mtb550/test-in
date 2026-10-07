@@ -24,22 +24,22 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.Gestures;
-import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.EditorFixtures;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.toolbar.RefreshBtn;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
-import org.testin.model.status.ExecutionStatus;
 import org.testin.model.FileKind;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.ExecutionStatus;
+import org.testin.model.status.RunItemStatus;
 import org.testin.runner.CapturedRunner;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
@@ -66,7 +66,8 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     private @NotNull List<TestCaseDto> automatedTestCases(final int count) {
         final @NotNull TestSetDirectoryDto ts = createdTestSet("Checkout");
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
-        for (int i = 0; i < count; i++) made.add(createdTestCase(ts, "Test case number " + (i + 1), String.format("m%04d", i)));
+        for (int i = 0; i < count; i++)
+            made.add(createdTestCase(ts, "Test case number " + (i + 1), String.format("m%04d", i)));
         settled();
         return made;
     }

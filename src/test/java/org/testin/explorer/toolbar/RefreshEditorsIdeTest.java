@@ -53,6 +53,28 @@ public class RefreshEditorsIdeTest extends AbstractOpenEditorsIdeTest {
     private TestCaseDto inCard;
     private TreePanel panel;
 
+    private static @NotNull AppSettingsState settings() {
+        return Services.getInstance(AppSettingsState.class);
+    }
+
+    private static void aSecondTestCaseWrittenBesides(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto first) {
+        final @NotNull Path written = testSet.getPath().resolve(FileKind.TEST_CASE.fileName(first.getId()));
+        final @NotNull UUID second = UUID.randomUUID();
+        try {
+            Files.writeString(testSet.getPath().resolve(FileKind.TEST_CASE.fileName(second)), Files.readString(written).replace(first.getId().toString(), second.toString()).replace("\"m\"", "\"n\""));
+        } catch (final IOException ex) {
+            throw new AssertionError("could not write a second test case into " + testSet.getName() + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static void aCellIsBeingEditedIn(final @NotNull TestinEditor editor) {
+        ((AbstractTestinEditor<?, ?>) editor).onToolBarSwitchedToGridView();
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+        final @NotNull JTable grid = Optional.ofNullable(UIUtil.uiTraverser(editor.getComponent()).filter(JTable.class).first()).orElseThrow(() -> new AssertionError("the editor shows no grid"));
+        for (int column = 0; column < grid.getColumnCount() && !grid.isEditing(); column++) grid.editCellAt(0, column);
+        assertTrue("no cell could be opened for editing", editor.isBusy());
+    }
+
     @Override
     public void setUp() {
         super.setUp();
@@ -79,32 +101,10 @@ public class RefreshEditorsIdeTest extends AbstractOpenEditorsIdeTest {
         super.tearDown();
     }
 
-    private static @NotNull AppSettingsState settings() {
-        return Services.getInstance(AppSettingsState.class);
-    }
-
     private @NotNull TestinEditor editorOn(final @NotNull TestSetDirectoryDto testSet) {
         final @NotNull TestinEditor editor = Services.getInstance(getProject(), TestinEditors.class).editorFor(testSet).orElseThrow(() -> new AssertionError(testSet.getName() + " has no editor open"));
         Await.until("the editor on " + testSet.getName() + " never loaded", () -> !editor.isLoading());
         return editor;
-    }
-
-    private static void aSecondTestCaseWrittenBesides(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto first) {
-        final @NotNull Path written = testSet.getPath().resolve(FileKind.TEST_CASE.fileName(first.getId()));
-        final @NotNull UUID second = UUID.randomUUID();
-        try {
-            Files.writeString(testSet.getPath().resolve(FileKind.TEST_CASE.fileName(second)), Files.readString(written).replace(first.getId().toString(), second.toString()).replace("\"m\"", "\"n\""));
-        } catch (final IOException ex) {
-            throw new AssertionError("could not write a second test case into " + testSet.getName() + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private static void aCellIsBeingEditedIn(final @NotNull TestinEditor editor) {
-        ((AbstractTestinEditor<?, ?>) editor).onToolBarSwitchedToGridView();
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-        final @NotNull JTable grid = Optional.ofNullable(UIUtil.uiTraverser(editor.getComponent()).filter(JTable.class).first()).orElseThrow(() -> new AssertionError("the editor shows no grid"));
-        for (int column = 0; column < grid.getColumnCount() && !grid.isEditing(); column++) grid.editCellAt(0, column);
-        assertTrue("no cell could be opened for editing", editor.isBusy());
     }
 
     // Rule-TREE-PANEL-082

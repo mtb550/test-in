@@ -16,9 +16,6 @@
 
 package org.testin.git.conflict;
 
-import org.testin.git.conflict.Merge;
-import org.testin.git.conflict.RunItemMerge;
-import org.testin.git.conflict.TestRunMarkerMerge;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 

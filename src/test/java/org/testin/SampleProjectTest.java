@@ -22,11 +22,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
-import org.testin.model.result.TestRunItems;
 import org.testin.model.TestCaseDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.TestSetMarker;
+import org.testin.model.result.TestRunItems;
 import org.testng.annotations.Test;
 
 import java.io.IOException;

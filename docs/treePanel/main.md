@@ -119,10 +119,10 @@ tree. It is always one click away.
 - **Bound** means this code project is set to use one test project. The
   choice is kept on this machine; a `testin.yml` in the code project can name
   one for everyone, and **Save to testin.yml** writes it there (Rule-TREE-PANEL-106, Rule-TREE-PANEL-112).
-- **Signed off** means a test run is **Completed**, **Closed** or
-  **Committed**. Its test cases and settings can no longer change, though the
-  tree can still remove it. Its run item statuses can, until it is
-  **Committed**: the last status, which only Testin sets when the test run is
+- **Signed off** means a test run is **Completed**, **Closed** or **Committed**. Its test cases and settings can no
+  longer change, though the
+  tree can still remove it. Its run item statuses can, until it is **Committed**: the last status, which only Testin
+  sets when the test run is
   committed (Rule-TREE-PANEL-135).
 - A **container** is **Test Cases** or **Test Runs**. There are always exactly
   two, and they come with the test project.
@@ -362,8 +362,8 @@ two of them are quiet:
 - **Open**, **Remove**, **Copy** and **Cut** act on all of them.
 - **Order**, **Paste**, **Create** and **Details** stay black and act on the
   first row alone, saying nothing about the rest.
-- **Rename**, **Re-create**, **Edit Test Run**, **Set Status**, **Export**,
-  **Import** and every status entry go gray instead.
+- **Rename**, **Re-create**, **Edit Test Run**, **Set Status**, **Export**, **Import** and every status entry go gray
+  instead.
 
 **The menu key**, the one beside the right `Ctrl`, opens the node menu over the
 selected row.

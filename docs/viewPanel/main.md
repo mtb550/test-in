@@ -121,16 +121,15 @@ in front of them while they write down what actually happened.
    the test case's own editor. All three are always drawn; one that cannot work
    here is gray, does not grow under the pointer, and says what it is waiting for (Rule-VIEW-PANEL-085).
 6. **Execution result** — what one test run recorded. The whole band, its name
-   included, is drawn only when the panel was opened from a test run
-   (Rule-VIEW-PANEL-085). Its run item status, its duration and its bug are one
+   included, is drawn only when the panel was opened from a test run (Rule-VIEW-PANEL-085). Its run item status, its
+   duration and its bug are one
    line under the band's name, the duration is framed rather than filled, and
    who ran it and when close the band as a row (Rule-VIEW-PANEL-086). That is
    [UC-VIEW-PANEL-005](readRunItemResult.md).
 7. **Test case** — folded until a tester clicks its name, and then every field
    the test case has, with every empty one left out. The state is remembered for
    the IDE rather than for one test case. In the test case editor there is no
-   test run above it, so the fields are drawn with no heading and no fold
-   (Rule-VIEW-PANEL-087).
+   test run above it, so the fields are drawn with no heading and no fold (Rule-VIEW-PANEL-087).
 8. **The captions** — each on a line of its own above its value, in the
    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
    The value has the whole width of the panel (Rule-VIEW-PANEL-082).

@@ -26,8 +26,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
-import org.testin.model.status.ExecutionStatusBadge;
 import org.testin.model.TestCaseDto;
+import org.testin.model.status.ExecutionStatusBadge;
 import org.testin.util.FixedColors;
 import org.testin.util.Fonts;
 
@@ -45,19 +45,14 @@ public final class Badges {
     static final int BADGE_RADIUS = 20;
 
     static final int TAG_NOTCH = 7;
-
-    private static final int BADGE_ICON_GAP = 4;
-
     static final @NotNull String PAIR_JOIN = " / ";
-
+    static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), FixedColors.BLACK);
+    private static final int BADGE_ICON_GAP = 4;
     private static final int BADGE_PAD_V = 2;
     private static final int BADGE_PAD_H = 10;
-
     private static final @NotNull Color TEXT_ON_LIGHT = FixedColors.DARK_GRAY;
     private static final @NotNull Color TEXT_ON_DARK = FixedColors.WHITE;
-
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
-    static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), FixedColors.BLACK);
     private static final @NotNull Icon CLOCK = IconUtil.resizeSquared(AllIcons.Vcs.History, 14);
 
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {

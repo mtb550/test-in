@@ -27,15 +27,15 @@ import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.editor.toolbar.StopExecutionBtn;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
-import org.testin.model.result.Failure;
 import org.testin.model.FileKind;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.status.TestRunStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.Failure;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
 import org.testin.testrun.RunItemStatusService;
 import org.testin.util.Mapper;
@@ -51,6 +51,15 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
+
+    private static @NotNull UUID walkingOn(final @NotNull TestRunEditor editor) {
+        final int index = editor.getWalk().getCurrentlyExecutingIndex();
+        return index < 0 ? new UUID(0L, 0L) : editor.getCurrentTestCases().get(index).getId();
+    }
+
+    private static void awaitWalkOn(final @NotNull TestRunEditor editor, final @NotNull TestCaseDto tc) {
+        Await.until("the walk never reached '" + tc.getDescription() + "'", () -> walkingOn(editor).equals(tc.getId()));
+    }
 
     private @NotNull TestRuns theTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
@@ -85,15 +94,6 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestRunItems resultOf(final @NotNull TestRunDirectoryDto tr, final @NotNull TestCaseDto tc) {
         return theTestRuns().getTestRunByPath(tr.getPath()).resultOf(tc.getId()).orElseThrow();
-    }
-
-    private static @NotNull UUID walkingOn(final @NotNull TestRunEditor editor) {
-        final int index = editor.getWalk().getCurrentlyExecutingIndex();
-        return index < 0 ? new UUID(0L, 0L) : editor.getCurrentTestCases().get(index).getId();
-    }
-
-    private static void awaitWalkOn(final @NotNull TestRunEditor editor, final @NotNull TestCaseDto tc) {
-        Await.until("the walk never reached '" + tc.getDescription() + "'", () -> walkingOn(editor).equals(tc.getId()));
     }
 
     private void record(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {

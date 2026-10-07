@@ -18,8 +18,8 @@ package org.testin.testcase.create;
 
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.status.TestCaseStatus;
 import org.testin.model.TestCaseDto;
+import org.testin.model.status.TestCaseStatus;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;

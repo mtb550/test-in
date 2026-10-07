@@ -47,6 +47,19 @@ final class TestDataFiles {
 
     private final @NotNull OwnWrites ownWrites = Services.getInstance(OwnWrites.class);
 
+    // Rule-INTERNAL-125
+    static @NotNull Path besideItself(final @NotNull Path path) {
+        return path.resolveSibling(path.getFileName() + ".writing");
+    }
+
+    private static void forget(final @NotNull Path beside) {
+        try {
+            Files.deleteIfExists(beside);
+        } catch (final IOException ex) {
+            Logger.warn("Could not remove " + beside + " after a write that failed: " + FailureText.of(ex));
+        }
+    }
+
     // UC-INTERNAL-004, Rule-INTERNAL-033
     <T> boolean alreadyHolds(final @NotNull Path path, final @NotNull T content) {
         try {
@@ -127,19 +140,6 @@ final class TestDataFiles {
             reportWriteFailure(path, ex);
             forget(beside);
             return false;
-        }
-    }
-
-    // Rule-INTERNAL-125
-    static @NotNull Path besideItself(final @NotNull Path path) {
-        return path.resolveSibling(path.getFileName() + ".writing");
-    }
-
-    private static void forget(final @NotNull Path beside) {
-        try {
-            Files.deleteIfExists(beside);
-        } catch (final IOException ex) {
-            Logger.warn("Could not remove " + beside + " after a write that failed: " + FailureText.of(ex));
         }
     }
 

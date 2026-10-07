@@ -24,12 +24,12 @@ import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
-import org.testin.model.status.TestSetStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.status.TestSetStatus;
 import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
@@ -47,11 +47,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TreeTransferIdeTest extends AbstractTempRootIdeTest {
 
+    private final @NotNull List<Path> revealed = new CopyOnWriteArrayList<>();
     private TestSetPackageDirectoryDto payments;
     private TestSetDirectoryDto login;
     private TestCaseDto loginTestCase;
     private TreeTransferHandler handler;
-    private final @NotNull List<Path> revealed = new CopyOnWriteArrayList<>();
 
     @Override
     protected void setUp() {

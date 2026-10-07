@@ -64,22 +64,6 @@ public class SettingsPageRulesIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(AppSettingsState.class);
     }
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        XmlSerializerUtil.copyBean(settings(), wasStored);
-    }
-
-    @Override
-    protected void tearDown() {
-        try {
-            XmlSerializerUtil.copyBean(wasStored, settings());
-            Logger.setLogLevel(Level.valueOf(wasStored.logLevel));
-        } finally {
-            super.tearDown();
-        }
-    }
-
     private static @NotNull List<JComponent> everyPage() {
         return List.of(new SettingsConfigurable().createComponent(), new AgentSettingsConfigurable().createComponent(), new AgentPromptConfigurable().createComponent());
     }
@@ -95,6 +79,22 @@ public class SettingsPageRulesIdeTest extends AbstractTempRootIdeTest {
             page.apply();
         } catch (final ConfigurationException ex) {
             throw new AssertionError("the page refused what was typed: " + ex.getMessageHtml(), ex);
+        }
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        XmlSerializerUtil.copyBean(settings(), wasStored);
+    }
+
+    @Override
+    protected void tearDown() {
+        try {
+            XmlSerializerUtil.copyBean(wasStored, settings());
+            Logger.setLogLevel(Level.valueOf(wasStored.logLevel));
+        } finally {
+            super.tearDown();
         }
     }
 
@@ -129,8 +129,10 @@ public class SettingsPageRulesIdeTest extends AbstractTempRootIdeTest {
                         .toList();
                 assertTrue("something on a settings page answers a key of Testin's: " + bound, bound.isEmpty());
                 assertEquals("something on a settings page answers a key from anywhere in the window", 0, component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).size());
-                if (component instanceof final AbstractButton button) assertEquals("the button " + button.getText() + " has a key of its own", 0, button.getMnemonic());
-                if (component instanceof final JLabel label) assertEquals("the label " + label.getText() + " has a key of its own", 0, label.getDisplayedMnemonic());
+                if (component instanceof final AbstractButton button)
+                    assertEquals("the button " + button.getText() + " has a key of its own", 0, button.getMnemonic());
+                if (component instanceof final JLabel label)
+                    assertEquals("the label " + label.getText() + " has a key of its own", 0, label.getDisplayedMnemonic());
             }
         }
     }

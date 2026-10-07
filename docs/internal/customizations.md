@@ -42,10 +42,10 @@ part (#348, sandbox-checked 1 October 2026):
 
 These are recorded decisions. They are listed so nobody "cleans" them.
 
-| What                                                          | Where                                                | The decision                                                                            | Rule in docs/                      |
-|---------------------------------------------------------------|------------------------------------------------------|-----------------------------------------------------------------------------------------|------------------------------------|
-| `GRAY`, `RED`, `GREEN` are a `JBColor` whose halves are equal | `util/Icons.java` `GRAY`, `RED`, `GREEN`             | Testin's icons are one color in both themes, on purpose - the pair says so              | Rule-INTERNAL-077                  |
-| The dialog surfaces                                           | `ui/dialogs/DialogStyle.java` `CONTENT`              | Two named theme colors, chosen per theme by luminance. Rule-INTERNAL-099                | Rule-INTERNAL-099                  |
+| What                                                          | Where                                    | The decision                                                               | Rule in docs/     |
+|---------------------------------------------------------------|------------------------------------------|----------------------------------------------------------------------------|-------------------|
+| `GRAY`, `RED`, `GREEN` are a `JBColor` whose halves are equal | `util/Icons.java` `GRAY`, `RED`, `GREEN` | Testin's icons are one color in both themes, on purpose - the pair says so | Rule-INTERNAL-077 |
+| The dialog surfaces                                           | `ui/dialogs/DialogStyle.java` `CONTENT`  | Two named theme colors, chosen per theme by luminance. Rule-INTERNAL-099   | Rule-INTERNAL-099 |
 
 ## Not customizations at all
 

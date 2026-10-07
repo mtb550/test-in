@@ -36,14 +36,14 @@ import java.util.Map;
 
 public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull List<String> wordsOfTheDialogOpenedBy(final @NotNull TestCaseEditor editor) {
-        return ShownDialog.wordsOf(new MarkerDetailsViewDialog(getProject(), editor.getEditedNode()));
-    }
-
     private static @NotNull String countedTestCases(final @NotNull List<String> words) {
         final int caption = words.stream().map(word -> word.toLowerCase(Locale.ROOT)).toList().indexOf(NodeCount.TEST_CASES.getCaption().toLowerCase(Locale.ROOT));
         assertTrue("the dialog does not count the test cases: " + words, caption > 0);
         return words.get(caption - 1);
+    }
+
+    private @NotNull List<String> wordsOfTheDialogOpenedBy(final @NotNull TestCaseEditor editor) {
+        return ShownDialog.wordsOf(new MarkerDetailsViewDialog(getProject(), editor.getEditedNode()));
     }
 
     // Rule-EDITOR-PANEL-121

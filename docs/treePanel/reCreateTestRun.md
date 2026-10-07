@@ -4,8 +4,8 @@
 
 > **No key.** On the menu: **Actions → Re-Create Test Run**.
 
-**As a** tester, **I want** to make the next cycle from a finished test run,
-**so that** starting the next round of testing takes one step. The new one has
+**As a** tester, **I want** to make the next cycle from a finished test run, **so that** starting the next round of
+testing takes one step. The new one has
 the same test cases and settings and no run item statuses, so nobody builds the
 whole test run again by hand.
 
@@ -75,10 +75,10 @@ This copies a test run's test cases and settings into a new, empty one.
 ## What the tester sees
 
 The **Create Test Run** dialog opens. It is the dialog drawn under
-[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same
-**Create** button. It arrives filled in. The next name is in *Test Run name*,
-the same test cases are ticked, and the same configuration is set. After
-**Create**, the new test run's editor opens and *Created* shows above the status
+[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same **Create** button. It arrives filled in. The
+next name is in *Test Run name*,
+the same test cases are ticked, and the same configuration is set. After **Create**, the new test run's editor opens and
+*Created* shows above the status
 bar at the bottom right of the IDE.
 
 ## Main flow

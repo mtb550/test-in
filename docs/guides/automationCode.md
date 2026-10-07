@@ -18,10 +18,9 @@
    ([Get a class when I create a test set](../codegen/getClassForTestSet.md))
 2. Create a test case. Its method appears in that class.
    ([Get a method when I create a test case](../codegen/getMethodForTestCase.md))
-3. For test cases that arrived without a method, select them and press `F12`,
-   **Automate Test Case**. ([Ask for the method a test case never got](../codegen/automateTestCase.md))
-4. Press `Shift+F5` to open a test case's method.
-   ([Go to the code from a test case](../codegen/goToCode.md))
+3. For test cases that arrived without a method, select them and press `F12`, **Automate Test Case**.
+   ([Ask for the method a test case never got](../codegen/automateTestCase.md))
+4. Press `Shift+F5` to open a test case's method. ([Go to the code from a test case](../codegen/goToCode.md))
 5. Press `F5` to run the selected test cases. Each result is recorded on its
    run item. ([Run a test case's automation](../codegen/runAutomation.md))
 

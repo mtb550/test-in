@@ -69,7 +69,8 @@ public final class TestRunConfigurationDialog extends AbstractFrameworkDialog {
     // Rule-TREE-PANEL-130
     private @NotNull String tally() {
         final int hidden = selection.hiddenChecked();
-        if (hidden == 0) return Bundle.message("test.run.form.tally", selection.checkedLeaves(), selection.branchesHoldingChecked());
+        if (hidden == 0)
+            return Bundle.message("test.run.form.tally", selection.checkedLeaves(), selection.branchesHoldingChecked());
 
         return Bundle.message("test.run.form.tally.hidden", selection.checkedLeaves(), selection.branchesHoldingChecked(), hidden);
     }

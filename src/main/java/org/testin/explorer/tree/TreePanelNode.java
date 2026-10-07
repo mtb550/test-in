@@ -26,9 +26,9 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.status.ProjectStatus;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 
@@ -48,6 +48,21 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
         this.p = p;
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
         this.nodes = Services.getInstance(p, Nodes.class);
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    static @NotNull TreePanelNode standingFor(final @NotNull Project p, final @NotNull Path root, final @NotNull Path folder) {
+        @NotNull TreePanelNode node = new TreePanelNode(p, root);
+        @NotNull Path at = root;
+
+        for (final Path part : root.relativize(folder)) {
+            at = at.resolve(part);
+            final @NotNull TreePanelNode child = new TreePanelNode(p, at);
+            child.setParent(node);
+            node = child;
+        }
+
+        return node;
     }
 
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-063
@@ -108,21 +123,6 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
 
     private @NotNull Object identity() {
         return getValue() instanceof DirectoryDto directory ? directory.getPath() : getValue();
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-114
-    static @NotNull TreePanelNode standingFor(final @NotNull Project p, final @NotNull Path root, final @NotNull Path folder) {
-        @NotNull TreePanelNode node = new TreePanelNode(p, root);
-        @NotNull Path at = root;
-
-        for (final Path part : root.relativize(folder)) {
-            at = at.resolve(part);
-            final @NotNull TreePanelNode child = new TreePanelNode(p, at);
-            child.setParent(node);
-            node = child;
-        }
-
-        return node;
     }
 
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-008

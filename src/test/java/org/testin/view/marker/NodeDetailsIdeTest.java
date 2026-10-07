@@ -34,6 +34,14 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
     private TestSetDirectoryDto login;
 
+    private static @NotNull String bytesOf(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("could not read " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -52,14 +60,6 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull Path marker() {
         return login.getPath().resolve(login.getMarkerFileName());
-    }
-
-    private static @NotNull String bytesOf(final @NotNull Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("could not read " + file + ": " + ex.getMessage(), ex);
-        }
     }
 
     private @NotNull String theTestCasesCountedForDetails() {

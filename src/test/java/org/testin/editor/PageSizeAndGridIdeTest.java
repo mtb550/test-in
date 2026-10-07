@@ -55,6 +55,12 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
+    private static void typedPageSize(final @NotNull TestinEditor editor) {
+        editor.getStatusBar().getPageSizeField().setText(TYPED_PAGE_SIZE);
+        editor.getStatusBar().getPageSizeField().postActionEvent();
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
     private @NotNull List<TestCaseDto> aTestSetOfThree() {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         testSet = EditorFixtures.testSet(getProject(), tp, "Checkout");
@@ -65,12 +71,6 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
-
-    private static void typedPageSize(final @NotNull TestinEditor editor) {
-        editor.getStatusBar().getPageSizeField().setText(TYPED_PAGE_SIZE);
-        editor.getStatusBar().getPageSizeField().postActionEvent();
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
     private @NotNull TestCaseDto stored(final @NotNull TestCaseDto tc) {

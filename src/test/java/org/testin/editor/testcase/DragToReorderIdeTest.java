@@ -24,8 +24,6 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.editor.testcase.TransferListener;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
@@ -63,7 +61,8 @@ public class DragToReorderIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestCaseEditor aTestSetOf(final @NotNull String... descriptions) {
         testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
-        for (int i = 0; i < descriptions.length; i++) EditorFixtures.testCase(getProject(), testSet, descriptions[i], String.format("m%04d", i));
+        for (int i = 0; i < descriptions.length; i++)
+            EditorFixtures.testCase(getProject(), testSet, descriptions[i], String.format("m%04d", i));
         return EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
     }
 

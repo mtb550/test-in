@@ -61,21 +61,6 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
 
     private static final @NotNull List<String> THE_SEVEN = List.of("Copy Test Case Value", "Copy Test Case", "Cut Test Case", "Paste Test Case", "Delete Test Case", "Undo", "Redo");
 
-    private @NotNull TestCaseEditor aTestCaseEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
-        EditorFixtures.testCases(getProject(), ts, 2);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-    }
-
-    private @NotNull TestRunEditor aTestRunEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
-        final @NotNull List<TestCaseDto> inTheTestRun = EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, inTheTestRun.stream().map(EditorFixtures::pending).toList());
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
-
     private static @NotNull List<AnAction> childrenOf(final @NotNull DefaultActionGroup group) {
         return Arrays.stream(group.getChildren(ActionManager.getInstance())).filter(action -> !(action instanceof Separator)).toList();
     }
@@ -136,12 +121,27 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull Presentation updated(final @NotNull AbstractTestinEditor<?, ?> editor, final @NotNull AnAction entry) {
-        return Gestures.updated(getProject(), entry, editor.getList());
-    }
-
     private static @NotNull String said(final @NotNull Presentation shown) {
         return Objects.requireNonNullElse(shown.getDescription(), "");
+    }
+
+    private @NotNull TestCaseEditor aTestCaseEditor() {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        EditorFixtures.testCases(getProject(), ts, 2);
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    }
+
+    private @NotNull TestRunEditor aTestRunEditor() {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
+        final @NotNull List<TestCaseDto> inTheTestRun = EditorFixtures.testCases(getProject(), ts, 2);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, inTheTestRun.stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
+    }
+
+    private @NotNull Presentation updated(final @NotNull AbstractTestinEditor<?, ?> editor, final @NotNull AnAction entry) {
+        return Gestures.updated(getProject(), entry, editor.getList());
     }
 
     // Rule-EDITOR-PANEL-213
@@ -214,7 +214,8 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
                     if (shown.isEnabled()) continue;
 
                     final @NotNull String template = Objects.requireNonNullElse(entry.getTemplatePresentation().getDescription(), "");
-                    if (said(shown).isBlank() || said(shown).equals(template)) silent.add(nameOf(entry) + " in the " + editor.getClass().getSimpleName());
+                    if (said(shown).isBlank() || said(shown).equals(template))
+                        silent.add(nameOf(entry) + " in the " + editor.getClass().getSimpleName());
                 }
             }
             assertEquals("these entries are gray with nothing selected and do not say why", List.of(), silent);

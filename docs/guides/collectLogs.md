@@ -11,8 +11,7 @@
 
 ## Steps
 
-1. Open **Settings | Tools | Testin**, set **Log level** to **TRACE** and press
-   **Apply**. No restart is needed.
+1. Open **Settings | Tools | Testin**, set **Log level** to **TRACE** and press **Apply**. No restart is needed.
    ([Choose how much Testin writes to its log](../setting/setLogLevel.md))
 2. Do again what went wrong.
 3. Choose **Help | Collect Logs and Diagnostic Data**. The file it makes holds

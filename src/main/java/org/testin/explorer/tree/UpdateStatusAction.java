@@ -26,8 +26,8 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.status.NodeStatus;
 import org.testin.model.node.DirectoryDto;
+import org.testin.model.status.NodeStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -55,7 +55,8 @@ public class UpdateStatusAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
     private void mark(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         try {
-            if (!Services.getInstance(p, Nodes.class).mark(dir, status, Services.getInstance(p, AppSettingsState.class).testerName)) return;
+            if (!Services.getInstance(p, Nodes.class).mark(dir, status, Services.getInstance(p, AppSettingsState.class).testerName))
+                return;
 
             Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 

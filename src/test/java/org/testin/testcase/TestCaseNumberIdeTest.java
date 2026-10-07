@@ -46,23 +46,6 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
 
     private @NotNull Set<TestCaseEditorAttributes> shownBefore = Set.of();
 
-    @Override
-    protected void setUp() {
-        super.setUp();
-        shownBefore = ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class);
-        ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.allOf(TestCaseEditorAttributes.class));
-    }
-
-    @Override
-    protected void tearDown() {
-        ShownFields.write(ShownFields.IN_TEST_SETS, shownBefore);
-        super.tearDown();
-    }
-
-    private @NotNull TestCaseEditor opened(final @NotNull TestSetDirectoryDto ts) {
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-    }
-
     private static int numberOnTheCard(final @NotNull TestCaseEditor editor, final @NotNull TestCaseDto tc) {
         final @NotNull String title = editor.cardTitle(tc);
         return Integer.parseInt(title.substring(0, title.indexOf('.')));
@@ -99,6 +82,23 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
         } catch (final IOException ex) {
             throw new AssertionError("could not read " + file, ex);
         }
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        shownBefore = ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class);
+        ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.allOf(TestCaseEditorAttributes.class));
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownFields.write(ShownFields.IN_TEST_SETS, shownBefore);
+        super.tearDown();
+    }
+
+    private @NotNull TestCaseEditor opened(final @NotNull TestSetDirectoryDto ts) {
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-025

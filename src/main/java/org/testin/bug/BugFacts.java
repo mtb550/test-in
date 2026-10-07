@@ -18,12 +18,12 @@ package org.testin.bug;
 
 import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunItems;
-import org.testin.model.TestCaseDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.report.generators.ReportText;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Display;

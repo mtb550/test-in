@@ -42,6 +42,12 @@ public class TestNGHandOverIdeTest extends AbstractCodegenIdeTest {
 
     private final @NotNull List<RunProfile> executed = new CopyOnWriteArrayList<>();
 
+    private static @NotNull Collection<String> patternsOf(final @NotNull RunProfile configuration) {
+        if (!(configuration instanceof final TestNGConfiguration testNG))
+            throw new AssertionError("the execution is not a TestNG configuration: " + configuration.getClass().getName());
+        return testNG.getPersistantData().getPatterns();
+    }
+
     @Override
     protected void setUp() {
         super.setUp();
@@ -61,11 +67,6 @@ public class TestNGHandOverIdeTest extends AbstractCodegenIdeTest {
                 executed.add(environment.getRunProfile());
             }
         }), getTestRootDisposable());
-    }
-
-    private static @NotNull Collection<String> patternsOf(final @NotNull RunProfile configuration) {
-        if (!(configuration instanceof final TestNGConfiguration testNG)) throw new AssertionError("the execution is not a TestNG configuration: " + configuration.getClass().getName());
-        return testNG.getPersistantData().getPatterns();
     }
 
     private @NotNull TestRunEditor runningTheWholeTestRunOf(final @NotNull List<TestCaseDto> covered) {

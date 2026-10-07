@@ -52,8 +52,8 @@ them opens.
 | A test set         | Test cases                                 |
 | A test run         | Total, and a ring of its run item statuses |
 
-The run item statuses on the ring are **Passed**, **Failed**, **Blocked**,
-**Untested** and **Removed**. The pass rate sits in the middle of it.
+The run item statuses on the ring are **Passed**, **Failed**, **Blocked**, **Untested** and **Removed**. The pass rate
+sits in the middle of it.
 
 ## The screen
 
@@ -122,8 +122,8 @@ drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
 **If the node holds nothing** — the removal confirmation shows no *Holds* line
 at all, rather than a line of zeros.
 
-**If a test run has no run item statuses yet** — the middle of the ring reads
-*Not run*. A *0%* there would read as every test case having failed.
+**If a test run has no run item statuses yet** — the middle of the ring reads *Not run*. A *0%* there would read as
+every test case having failed.
 
 **If a test run cannot be read** — every count is zero and nothing fails. The
 node is still in the tree, so Details still opens on it.

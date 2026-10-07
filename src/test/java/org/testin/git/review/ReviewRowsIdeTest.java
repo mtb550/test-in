@@ -25,7 +25,6 @@ import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.git.ShareGestures;
-import org.testin.git.review.PendingCommitsDialog;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
@@ -53,6 +52,20 @@ public class ReviewRowsIdeTest extends AbstractGitRemoteIdeTest {
     private TestSetDirectoryDto login;
     private TestCaseDto first;
     private TestCaseDto second;
+
+    private static int rowNamed(final @NotNull JBTable table, final @NotNull String name) {
+        for (int row = 0; row < table.getRowCount(); row++) {
+            if (name.equals(table.getValueAt(row, 2))) return row;
+        }
+        throw new AssertionError("no row is named " + name);
+    }
+
+    private static void revert(final @NotNull JPopupMenu menu) {
+        Arrays.stream(menu.getComponents()).filter(JMenuItem.class::isInstance).map(JMenuItem.class::cast)
+                .filter(item -> item.getText().equals(Bundle.message("dialog.pending.revert.row"))).findFirst()
+                .orElseThrow(() -> new AssertionError("the menu has no revert")).doClick();
+        menu.setVisible(false);
+    }
 
     @Override
     protected void setUp() {
@@ -90,13 +103,6 @@ public class ReviewRowsIdeTest extends AbstractGitRemoteIdeTest {
         return ShareGestures.table(ShareGestures.theReviewOf(getProject(), work));
     }
 
-    private static int rowNamed(final @NotNull JBTable table, final @NotNull String name) {
-        for (int row = 0; row < table.getRowCount(); row++) {
-            if (name.equals(table.getValueAt(row, 2))) return row;
-        }
-        throw new AssertionError("no row is named " + name);
-    }
-
     private @NotNull JPopupMenu rightClick(final @NotNull JBTable table, final int row) {
         final @NotNull JWindow onScreen = new JWindow();
         onScreen.setBounds(-4000, -4000, 10, 10);
@@ -110,13 +116,6 @@ public class ReviewRowsIdeTest extends AbstractGitRemoteIdeTest {
                 .flatMap(window -> UIUtil.uiTraverser(window).filter(JPopupMenu.class).toList().stream())
                 .filter(Component::isShowing).findFirst()
                 .orElseThrow(() -> new AssertionError("right-clicking the row showed no menu"));
-    }
-
-    private static void revert(final @NotNull JPopupMenu menu) {
-        Arrays.stream(menu.getComponents()).filter(JMenuItem.class::isInstance).map(JMenuItem.class::cast)
-                .filter(item -> item.getText().equals(Bundle.message("dialog.pending.revert.row"))).findFirst()
-                .orElseThrow(() -> new AssertionError("the menu has no revert")).doClick();
-        menu.setVisible(false);
     }
 
     private void revertFromTheMenuOn(final @NotNull JBTable table, final int row) {

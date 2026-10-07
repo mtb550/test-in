@@ -38,8 +38,7 @@ There is no key for this. Press **Start Manual Execution** again.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-153** — Starting again finds the first test case with no
   run item status, so the walk resumes rather than restarting. A test case
-  judged in the first sitting is passed over wherever it sits
-  (Rule-EDITOR-PANEL-130).
+  judged in the first sitting is passed over wherever it sits (Rule-EDITOR-PANEL-130).
 - **Rule-EDITOR-PANEL-154** — The clock adds to the time a test case already
   carried, rather than starting it again.
 - **Rule-EDITOR-PANEL-155** — The stamp saying when execution began is kept.

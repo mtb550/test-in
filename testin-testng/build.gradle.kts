@@ -35,7 +35,12 @@ dependencies {
     // Ships beside this module, not inside it.
     compileOnly(project(":"))
 
-    listOf("compileOnly", "annotationProcessor", "testCompileOnly", "testAnnotationProcessor").forEach { configuration ->
+    listOf(
+        "compileOnly",
+        "annotationProcessor",
+        "testCompileOnly",
+        "testAnnotationProcessor"
+    ).forEach { configuration ->
         add(configuration, libs.lombok)
     }
 

@@ -36,11 +36,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ImportJson {
-    // UC-SHARE-006
-    public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
-        return parseFile(p, file);
-    }
-
     // UC-SHARE-005, Rule-SHARE-029
     private static @NotNull TestCaseDto asNewTestCase(final @NotNull TestCaseDto read) {
         final @NotNull TestCaseDto fresh = TestCaseDto.builder().build();
@@ -59,6 +54,11 @@ public class ImportJson {
             Logger.error("JSON import could not read " + file + ": " + FailureText.of(ex));
             throw new UncheckedIOException(ex);
         }
+    }
+
+    // UC-SHARE-006
+    public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
+        return parseFile(p, file);
     }
 
     // UC-SHARE-005, Rule-SHARE-024

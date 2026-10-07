@@ -26,7 +26,6 @@ import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor

@@ -18,16 +18,16 @@ package org.testin.explorer.tree;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.tree.LeafState;
-import org.testin.model.status.ProjectStatus;
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.status.ProjectStatus;
 
-import java.util.Objects;
 import java.nio.file.Path;
-import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
 
 import static org.testng.Assert.assertNotEquals;
 

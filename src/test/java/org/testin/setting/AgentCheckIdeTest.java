@@ -67,7 +67,8 @@ public class AgentCheckIdeTest extends AbstractTempRootIdeTest {
                     echo "fake-agent $1"
                     echo a second line
                     """, StandardCharsets.US_ASCII);
-            if (!agent.toFile().setExecutable(true)) throw new AssertionError("could not make the stand-in agent runnable");
+            if (!agent.toFile().setExecutable(true))
+                throw new AssertionError("could not make the stand-in agent runnable");
             return agent;
         } catch (final IOException ex) {
             throw new AssertionError("could not write the stand-in agent: " + ex.getMessage(), ex);
@@ -89,7 +90,8 @@ public class AgentCheckIdeTest extends AbstractTempRootIdeTest {
 
         assertEquals("the refusal does not name the command and the spellings looked for", Bundle.message("agent.check.not.found", command, AgentCli.triedNames(command)), said);
         if (SystemInfo.isWindows) {
-            for (final String spelling : List.of(".exe", ".cmd", ".bat")) assertTrue("the refusal does not say " + command + spelling + " was looked for: " + said, said.toLowerCase(Locale.ROOT).contains(command + spelling));
+            for (final String spelling : List.of(".exe", ".cmd", ".bat"))
+                assertTrue("the refusal does not say " + command + spelling + " was looked for: " + said, said.toLowerCase(Locale.ROOT).contains(command + spelling));
         }
     }
 }

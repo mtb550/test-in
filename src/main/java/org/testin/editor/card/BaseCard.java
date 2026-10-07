@@ -104,6 +104,13 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         return order.isEmpty() || title.isEmpty() ? order + title : order + " " + title;
     }
 
+    protected static @NotNull JBLabel createDetailLabel() {
+        final @NotNull JBLabel label = new JBLabel();
+        label.setForeground(UIUtil.getContextHelpForeground());
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return label;
+    }
+
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-003
     public void applyListLayout(final @NotNull JList<?> list) {
         titleArea.setFont(Fonts.title());
@@ -175,12 +182,5 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         if (isRowHovered) {
             CardTitle.drawDescriptionActionIcons(this, g, titleWidth, hoveredAction, hoverButtons, automation);
         }
-    }
-
-    protected static @NotNull JBLabel createDetailLabel() {
-        final @NotNull JBLabel label = new JBLabel();
-        label.setForeground(UIUtil.getContextHelpForeground());
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        return label;
     }
 }

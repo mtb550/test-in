@@ -16,11 +16,11 @@
 
 package org.testin.indexer;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

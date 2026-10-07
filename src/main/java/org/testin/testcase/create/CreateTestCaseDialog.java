@@ -38,11 +38,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
-    private final @NotNull TestSetDirectoryDto dir;
-    private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
     // Rule-INTERNAL-054
     private static final @NotNull StatusBarItem ADD_FIELD = StatusBarShortcut.hint(addFieldKeys(), Bundle.message("dialog.key.add.field"));
-
+    private final @NotNull TestSetDirectoryDto dir;
+    private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
     private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
     // UC-EDITOR-PANEL-005, Rule-CODEGEN-001

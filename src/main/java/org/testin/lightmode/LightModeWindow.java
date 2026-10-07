@@ -39,10 +39,10 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.model.Automated;
 import org.testin.model.StatusBarItem;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.status.RunItemStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseEditorAttributes;
@@ -120,12 +120,10 @@ final class LightModeWindow {
     private final @NotNull JComponent runItemStatusRow = runItemStatusButtons();
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
+    private final @NotNull LightModeZoom zoom = LightModeZoom.remembered();
     private @NotNull Optional<UUID> shownTestCase = Optional.empty();
     private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private @NotNull Optional<FailureForm> capture = Optional.empty();
-
-    private final @NotNull LightModeZoom zoom = LightModeZoom.remembered();
-
     private boolean detailsKeyHeld = false;
 
     LightModeWindow(final @NotNull TestRunEditor editor, final @NotNull Runnable onClosed) {

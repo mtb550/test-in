@@ -21,15 +21,15 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.NodeStatus;
+import org.testin.model.markers.AbstractMarker;
+import org.testin.model.markers.Marker;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestRunPackageDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
-import org.testin.model.markers.AbstractMarker;
-import org.testin.model.markers.Marker;
+import org.testin.model.status.NodeStatus;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 

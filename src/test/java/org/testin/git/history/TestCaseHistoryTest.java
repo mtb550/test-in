@@ -27,8 +27,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -54,7 +54,8 @@ public class TestCaseHistoryTest {
 
     private static @NotNull Map<String, String> versions(final @NotNull List<HistoryCommit> commits, final @NotNull List<TestCaseDto> versions) {
         final @NotNull Map<String, String> byObject = new HashMap<>();
-        for (int at = 0; at < commits.size(); at++) byObject.put(commits.get(at).objectName(), MAPPER.writeValueAsString(versions.get(at)));
+        for (int at = 0; at < commits.size(); at++)
+            byObject.put(commits.get(at).objectName(), MAPPER.writeValueAsString(versions.get(at)));
         return byObject;
     }
 

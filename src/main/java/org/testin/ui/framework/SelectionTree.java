@@ -73,6 +73,14 @@ public final class SelectionTree implements DialogComponent {
         panel = DialogStyle.section(Caption.header(title, trailing), ScrollPaneFactory.createScrollPane(tree, true));
     }
 
+    private static boolean allChecked(final @NotNull CheckedTreeNode node) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (!((CheckedTreeNode) node.getChildAt(i)).isChecked()) return false;
+        }
+
+        return true;
+    }
+
     // Rule-TREE-PANEL-130, Rule-TREE-PANEL-131
     public void show(final @NotNull Predicate<Object> leafShown) {
         tree.setModel(new DefaultTreeModel(copyShown(full, leafShown)));
@@ -147,14 +155,6 @@ public final class SelectionTree implements DialogComponent {
         }
 
         return false;
-    }
-
-    private static boolean allChecked(final @NotNull CheckedTreeNode node) {
-        for (int i = 0; i < node.getChildCount(); i++) {
-            if (!((CheckedTreeNode) node.getChildAt(i)).isChecked()) return false;
-        }
-
-        return true;
     }
 
     private boolean isLeaf(final @NotNull CheckedTreeNode node) {

@@ -65,6 +65,9 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
         return hint("Tab", Bundle.message("shortcut.navigate"));
     }
 
+    private static void nothing() {
+    }
+
     public boolean isBindable() {
         return shortcut != Shortcuts.EMPTY;
     }
@@ -77,8 +80,5 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     @Override
     public @NotNull String getShortcutText() {
         return displayText;
-    }
-
-    private static void nothing() {
     }
 }

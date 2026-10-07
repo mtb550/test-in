@@ -92,7 +92,8 @@ public class StacktraceWindowIdeTest extends BasePlatformTestCase {
         for (final String above : List.of("Log in with a valid user", "The session stays until the tester signs out", "The session was dropped")) {
             final @NotNull JBLabel label = labelHolding(drawn, above);
             assertTrue("\"" + above + "\" is not drawn above the error", topOf(label, window) < topOf(box, window));
-            assertFalse("\"" + above + "\" shares the error's box", SwingUtilities.isDescendingFrom(label, box));        }
+            assertFalse("\"" + above + "\" shares the error's box", SwingUtilities.isDescendingFrom(label, box));
+        }
     }
 
     // Rule-VIEW-PANEL-036

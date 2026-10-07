@@ -36,11 +36,6 @@ import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestRuns;
-import org.testin.model.status.PackageStatus;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.status.TestSetStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestRunDto;
 import org.testin.model.node.DirectoryDto;
@@ -49,6 +44,11 @@ import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestRunPackageDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.PackageStatus;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.status.TestSetStatus;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.form.TestRunConfigurationDialog;
@@ -88,6 +88,25 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
     private TestSetDirectoryDto inside;
     private TestCaseDto inInside;
 
+    private static @NotNull Map<TestRunConfiguration, String> everyQuestionAnswered() {
+        final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
+            if (field.isChoice()) answers.put(field, field.getOptions().getFirst());
+        }
+        return answers;
+    }
+
+    private static boolean answers(final @NotNull Shortcut shortcut, final @NotNull KeyStroke key) {
+        return shortcut instanceof final KeyboardShortcut keyboard && key.equals(keyboard.getFirstKeyStroke()) && keyboard.getSecondKeyStroke() == null;
+    }
+
+    private static @NotNull AnAction actionFor(final @NotNull JComponent component, final @NotNull KeyStroke key) {
+        return ActionUtil.getActions(component).stream()
+                .filter(action -> Arrays.stream(action.getShortcutSet().getShortcuts()).anyMatch(shortcut -> answers(shortcut, key)))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError(component.getClass().getSimpleName() + " does not answer " + key));
+    }
+
     @Override
     public void setUp() {
         super.setUp();
@@ -125,14 +144,6 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
 
     private @NotNull BoundTestProject bound() {
         return Services.getInstance(getProject(), BoundTestProject.class);
-    }
-
-    private static @NotNull Map<TestRunConfiguration, String> everyQuestionAnswered() {
-        final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
-        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            if (field.isChoice()) answers.put(field, field.getOptions().getFirst());
-        }
-        return answers;
     }
 
     private @NotNull TestRunDirectoryDto cycle1In(final @NotNull DirectoryDto parent, final @NotNull List<TestRunItems> results) {
@@ -187,17 +198,6 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
 
     private @NotNull List<DirectoryDto> theTestRunsUnder(final @NotNull DirectoryDto parent) {
         return nodes().getChildren(parent.getPath());
-    }
-
-    private static boolean answers(final @NotNull Shortcut shortcut, final @NotNull KeyStroke key) {
-        return shortcut instanceof final KeyboardShortcut keyboard && key.equals(keyboard.getFirstKeyStroke()) && keyboard.getSecondKeyStroke() == null;
-    }
-
-    private static @NotNull AnAction actionFor(final @NotNull JComponent component, final @NotNull KeyStroke key) {
-        return ActionUtil.getActions(component).stream()
-                .filter(action -> Arrays.stream(action.getShortcutSet().getShortcuts()).anyMatch(shortcut -> answers(shortcut, key)))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError(component.getClass().getSimpleName() + " does not answer " + key));
     }
 
     // Rule-TREE-PANEL-030

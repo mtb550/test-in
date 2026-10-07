@@ -42,12 +42,12 @@ import org.testin.indexer.TestCases;
 import org.testin.model.Automated;
 import org.testin.model.Groups;
 import org.testin.model.Priority;
-import org.testin.model.status.RunItemStatus;
-import org.testin.model.status.TestCaseStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.status.TestCaseStatus;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseEditorAttributes;
@@ -63,45 +63,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
-
-    private @NotNull TestProjectDirectoryDto aTestProject() {
-        return EditorFixtures.testProject(getProject(), root);
-    }
-
-    private @NotNull TestSetDirectoryDto aTestSet(final @NotNull TestProjectDirectoryDto tp) {
-        return EditorFixtures.testSet(getProject(), tp, "Checkout");
-    }
-
-    private @NotNull List<TestCaseDto> createdTestCases(final @NotNull TestSetDirectoryDto ts, final int count) {
-        final @NotNull List<TestCaseDto> made = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            final @NotNull TestCaseDto tc = TestCaseDto.builder()
-                    .id(UUID.randomUUID())
-                    .description("Test case number " + (i + 1))
-                    .order(String.format("m%04d", i))
-                    .priority(i == 0 ? Priority.HIGH : Priority.LOW)
-                    .group(new ArrayList<>(i % 2 == 0 ? List.of("Smoke") : List.of()))
-                    .module(i % 3 == 0 ? "Payments" : "")
-                    .build();
-            tc.setParent(ts);
-            Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
-            made.add(tc);
-        }
-        return made;
-    }
-
-    private @NotNull TestCaseEditor openedTestSet(final int count) {
-        final @NotNull TestSetDirectoryDto ts = aTestSet(aTestProject());
-        createdTestCases(ts, count);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-    }
-
-    private @NotNull TestRunEditor openedTestRun(final int count) {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
-        final @NotNull List<TestCaseDto> testCases = createdTestCases(aTestSet(tp), count);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
 
     private static @NotNull FilterPopupBtn filterOf(final @NotNull AbstractTestinEditor<?, ?> editor) {
         return editor.getToolBar().getToolbarItem(FilterPopupBtn.class);
@@ -162,6 +123,45 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         editor.setCurrentPage(3);
         editor.refreshView();
         assertEquals("the editor did not move to page 3", 3, editor.getCurrentPage());
+    }
+
+    private @NotNull TestProjectDirectoryDto aTestProject() {
+        return EditorFixtures.testProject(getProject(), root);
+    }
+
+    private @NotNull TestSetDirectoryDto aTestSet(final @NotNull TestProjectDirectoryDto tp) {
+        return EditorFixtures.testSet(getProject(), tp, "Checkout");
+    }
+
+    private @NotNull List<TestCaseDto> createdTestCases(final @NotNull TestSetDirectoryDto ts, final int count) {
+        final @NotNull List<TestCaseDto> made = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final @NotNull TestCaseDto tc = TestCaseDto.builder()
+                    .id(UUID.randomUUID())
+                    .description("Test case number " + (i + 1))
+                    .order(String.format("m%04d", i))
+                    .priority(i == 0 ? Priority.HIGH : Priority.LOW)
+                    .group(new ArrayList<>(i % 2 == 0 ? List.of("Smoke") : List.of()))
+                    .module(i % 3 == 0 ? "Payments" : "")
+                    .build();
+            tc.setParent(ts);
+            Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
+            made.add(tc);
+        }
+        return made;
+    }
+
+    private @NotNull TestCaseEditor openedTestSet(final int count) {
+        final @NotNull TestSetDirectoryDto ts = aTestSet(aTestProject());
+        createdTestCases(ts, count);
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    }
+
+    private @NotNull TestRunEditor openedTestRun(final int count) {
+        final @NotNull TestProjectDirectoryDto tp = aTestProject();
+        final @NotNull List<TestCaseDto> testCases = createdTestCases(aTestSet(tp), count);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-094

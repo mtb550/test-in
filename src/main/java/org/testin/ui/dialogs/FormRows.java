@@ -24,8 +24,8 @@ import org.testin.ui.framework.Spacing;
 
 import javax.swing.JComponent;
 import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 
 public final class FormRows extends JBPanel<FormRows> {
     private final @NotNull GridBagConstraints gbc = new GridBagConstraints();

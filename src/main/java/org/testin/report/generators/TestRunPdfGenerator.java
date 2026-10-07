@@ -41,17 +41,17 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.ReportColor;
+import org.testin.model.TestRunDto;
 import org.testin.model.bug.BugIssueUrl;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.ReportColor;
+import org.testin.model.markers.DetailRow;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.result.ResultAnalysis;
 import org.testin.model.result.TestRunConfiguration;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.result.TestRunSummary;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.markers.DetailRow;
 import org.testin.notifications.Notifier;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
@@ -304,7 +304,8 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(0));
             table.addCell(testCaseCell);
 
-            if (section.isWithFailureDetail()) addFailureDetail(table, testCaseCell, item, rowBg, boldFont, regularFont);
+            if (section.isWithFailureDetail())
+                addFailureDetail(table, testCaseCell, item, rowBg, boldFont, regularFont);
 
             idx++;
         }

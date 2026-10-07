@@ -19,10 +19,10 @@ package org.testin.indexer;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
-import org.testin.model.status.ProjectStatus;
+import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.node.DirectoryDto;
 import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.markers.TestProjectMarker;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 
 import java.io.IOException;

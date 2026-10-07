@@ -52,10 +52,8 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
-    private static final int MIN_CHARACTERS = 30;
-
     public static final @NotNull Icon NO_ICON = EmptyIcon.ICON_0;
-
+    private static final int MIN_CHARACTERS = 30;
     // Rule-INTERNAL-105
     private static final @NotNull Color ACCENT = JBUI.CurrentTheme.Button.defaultButtonColorStart();
 

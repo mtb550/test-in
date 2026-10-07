@@ -36,11 +36,11 @@ import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.Automated;
-import org.testin.model.status.TestCaseStatus;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.status.TestCaseStatus;
 import org.testin.services.Services;
 import org.testin.testrun.form.TestRunFormFilter;
 import org.testin.util.Bundle;
@@ -58,24 +58,6 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
     private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
 
     private @NotNull List<TestCaseDto> testCases = List.of();
-
-    private void threeStatesOfAutomation() {
-        testSet = createdTestSet("Checkout");
-        final @NotNull TestCaseDto written = createdTestCase(testSet, "Log in with a valid user", "m0001");
-        final @NotNull TestCaseDto empty = createdTestCase(testSet, "Log in with a wrong password", "m0002");
-        final @NotNull TestCaseDto missing = indexedTestCase(testSet, "Log in with a locked account", "m0003");
-        settled();
-        final @NotNull PsiMethod method = writtenMethodOf(GENERATED_CLASS, written);
-        writtenByTheTester(method, "System.out.println(1);");
-        settled();
-        testCases = List.of(written, empty, missing);
-    }
-
-    private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestCaseDto> covered) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
-        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-    }
 
     private static @NotNull List<AnAction> childrenOf(final @NotNull DefaultActionGroup group) {
         return Arrays.stream(group.getChildren(ActionManager.getInstance())).filter(action -> !(action instanceof Separator)).toList();
@@ -98,13 +80,31 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
         return childrenOf((DefaultActionGroup) entry(filter, name)).stream().map(FilterMenuEntriesIdeTest::nameOf).toList();
     }
 
+    private static @NotNull List<String> shown(final @NotNull AbstractTestinEditor<?, ?> editor) {
+        return editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList();
+    }
+
+    private void threeStatesOfAutomation() {
+        testSet = createdTestSet("Checkout");
+        final @NotNull TestCaseDto written = createdTestCase(testSet, "Log in with a valid user", "m0001");
+        final @NotNull TestCaseDto empty = createdTestCase(testSet, "Log in with a wrong password", "m0002");
+        final @NotNull TestCaseDto missing = indexedTestCase(testSet, "Log in with a locked account", "m0003");
+        settled();
+        final @NotNull PsiMethod method = writtenMethodOf(GENERATED_CLASS, written);
+        writtenByTheTester(method, "System.out.println(1);");
+        settled();
+        testCases = List.of(written, empty, missing);
+    }
+
+    private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestCaseDto> covered) {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
+    }
+
     private void choose(final @NotNull AbstractTestinEditor<?, ?> editor, final @NotNull String menu, final @NotNull String option) {
         final @NotNull AnAction chosen = childrenOf((DefaultActionGroup) entry(filterOf(editor), menu)).stream().filter(action -> nameOf(action).equals(option)).findFirst().orElseThrow();
         Gestures.press(getProject(), chosen, editor.getList());
-    }
-
-    private static @NotNull List<String> shown(final @NotNull AbstractTestinEditor<?, ?> editor) {
-        return editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList();
     }
 
     private void awaitTheAnswers(final @NotNull AbstractTestinEditor<?, ?> editor) {
