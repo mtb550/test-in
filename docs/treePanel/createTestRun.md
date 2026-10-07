@@ -145,7 +145,7 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    answers are:
 
    | Field       | Offers                                |
-      |-------------|---------------------------------------|
+   |-------------|---------------------------------------|
    | Test Type   | *Functional Test*, *Performance Test* |
    | Platform    | *Web*, *Mobile*                       |
    | Component   | *Frontend*, *Backend*                 |

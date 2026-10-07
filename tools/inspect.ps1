@@ -1848,7 +1848,7 @@ function Read-UnusedImports([string[]] $scopes)
             foreach ($import in [regex]::Matches($source, $declared))
             {
                 $name = $import.Groups[2].Value
-                $owner = $name.Substring(0, $name.LastIndexOf('.'))
+                $owner = $name.Substring(0,$name.LastIndexOf('.'))
                 $simple = $name.Substring($name.LastIndexOf('.') + 1)
                 $isStatic = $import.Groups[1].Success
 
@@ -1856,7 +1856,7 @@ function Read-UnusedImports([string[]] $scopes)
                 {
                     "$simple is in $owner, which needs no import"
                 }
-                elseif (-not [regex]::IsMatch($code, "\b$( [regex]::Escape($simple) )\b"))
+                elseif (-not [regex]::IsMatch($code, "\b$([regex]::Escape($simple) )\b"))
                 {
                     "nothing in the file names $simple"
                 }
