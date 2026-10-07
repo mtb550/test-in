@@ -184,8 +184,10 @@ function Resolve-Inspector
         Move-Item -Path "$devKit.part" -Destination $devKit
     }
 
+    $formatter = Join-Path $ide.FullName 'bin' ($launcher -replace '^inspect', 'format')
+
     Write-Host "Inspector: $inspect, with Plugin DevKit for $build"
-    return [pscustomobject]@{ Launcher = $inspect; DevKit = $devKit }
+    return [pscustomobject]@{ Launcher = $inspect; Formatter = $formatter; DevKit = $devKit }
 }
 
 function Invoke-Inspector([object] $inspector, [string] $outPath)
@@ -1821,6 +1823,69 @@ function Read-UnicodeEscapes([string[]] $scopes)
     }
 }
 
+function Read-UnformattedJava([object] $inspector, [string[]] $scopes)
+{
+    <#
+        A Java file IntelliJ's Reformat Code would change.
+
+        Muteb reformats in the IDE before committing, and asked CI to say when a
+        file was pushed without it (7 October 2026). This runs the IDE's own
+        command-line formatter in dry-run mode with the project's code style, so
+        the answer is the IDE's. Java only: two reformats in a row changed no
+        Java file, but moved a Markdown table's separator row three spaces right
+        each time and flipped a space in PowerShell back and forth, and the dry
+        run says build.gradle.kts needs reformatting when formatting it changes
+        nothing. A check on any of those would fail every push.
+
+        The formatter exits 0 either way, so its verdict is read from what it
+        prints. It cannot share the inspector's IDE directories while the
+        inspector runs, and is given its own.
+    #>
+    $scratch = Join-Path ([System.IO.Path]::GetTempPath()) 'testin-format'
+    if (Test-Path $scratch)
+    {
+        Remove-Item -Path $scratch -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    New-Item -ItemType Directory -Force -Path $scratch | Out-Null
+
+    $s = $scratch -replace '\\', '/'
+    $propsFile = Join-Path $scratch 'idea.properties'
+    @"
+idea.config.path=$s/config
+idea.system.path=$s/system
+idea.log.path=$s/log
+idea.plugins.path=$s/plugins
+"@ | Set-Content -Path $propsFile -Encoding utf8
+
+    $codeStyle = Join-Path $repo '.idea' 'codeStyles' 'Project.xml'
+    $env:IDEA_PROPERTIES = $propsFile
+    try
+    {
+        $said = & $inspector.Formatter -dry -r -s $codeStyle -m '*.java' @scopes 2>&1
+    }
+    finally
+    {
+        Remove-Item Env:\IDEA_PROPERTIES -ErrorAction SilentlyContinue
+    }
+
+    foreach ($line in $said)
+    {
+        $match = [regex]::Match("$line", '^Checking (.+)\.\.\.Needs reformatting$')
+        if (-not $match.Success)
+        {
+            continue
+        }
+
+        [pscustomobject]@{
+            Path = ([System.IO.Path]::GetFullPath($match.Groups[1].Value)).Substring($repo.Length + 1).Replace('\', '/')
+            Line = 1
+            Inspection = 'UnformattedJava'
+            Severity = 'ERROR'
+            Message = 'Reformat Code in the IDE changes this file. Reformat it before committing.'
+        }
+    }
+}
+
 function Read-UnusedImports([string[]] $scopes)
 {
     <#
@@ -2092,6 +2157,10 @@ $problems += @(Read-UnusedLambdaParameters $everyTree)
 $problems += @(Read-QualifiedClassNames $everyTree)
 $problems += @(Read-UnicodeEscapes $everyTree)
 $problems += @(Read-UnusedImports $everyTree)
+if (-not $Quick -and -not $ReportOnly)
+{
+    $problems += @(Read-UnformattedJava (Resolve-Inspector) $everyTree)
+}
 $problems += @(Read-ColorCodes $everyTree)
 $problems += @(Read-HelpersNamedLikeTests $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
