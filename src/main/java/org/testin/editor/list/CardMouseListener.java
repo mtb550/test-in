@@ -39,6 +39,7 @@ import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.awt.Component;
+import java.awt.Point;
 import javax.swing.SwingUtilities;
 import java.awt.Cursor;
 import java.awt.Rectangle;
@@ -145,7 +146,7 @@ public class CardMouseListener extends MouseAdapter {
             needsRepaint = true;
         }
 
-        final @NotNull String tip = currentAction.map(Offered::hintText).orElseGet(() -> priorityTipUnder(e, index));
+        final @NotNull String tip = currentAction.map(Offered::hintText).orElseGet(() -> tipUnder(e, index));
         if (!tip.equals(shownTip)) {
             shownTip = tip;
             Tooltip.set(list, tip);
@@ -197,14 +198,15 @@ public class CardMouseListener extends MouseAdapter {
         return CardTitle.descriptionActionIcons(titleWidth, buttons).at(xInCell, yInCell);
     }
 
-    // Rule-EDITOR-PANEL-267
-    private @NotNull String priorityTipUnder(final @NotNull MouseEvent e, final int index) {
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
+    private @NotNull String tipUnder(final @NotNull MouseEvent e, final int index) {
         if (index == -1) return "";
 
         final @NotNull Rectangle bounds = list.getCellBounds(index, index);
-        if (!CardTitle.priorityMargin(list).contains(e.getX() - bounds.x, e.getY() - bounds.y)) return "";
+        final @NotNull Point inCell = new Point(e.getX() - bounds.x, e.getY() - bounds.y);
+        if (!CardTitle.isInTheLeadColumn(inCell)) return "";
 
         final @NotNull Component card = list.getCellRenderer().getListCellRendererComponent(list, list.getModel().getElementAt(index), index, false, false);
-        return card instanceof BaseCard drawn ? drawn.priorityTooltip() : "";
+        return card instanceof BaseCard drawn ? drawn.tooltipAt(inCell, bounds.getSize()) : "";
     }
 }

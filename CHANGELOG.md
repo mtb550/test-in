@@ -43,6 +43,9 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **A card's detail lines lead with the field's icon, not its name:** E for Expected Result, S for Steps, T for Test
+  Data and so on, the letters the update menu and History show. Hovering the icon names the field, and a screen reader
+  still hears the name. A field with no icon, such as Run Item Status, keeps its name.
 - **The tree is drawn in the IDE's own interface font again,** like IntelliJ's own trees, rather than at the code
   editor's size, and Ctrl and the mouse wheel over it no longer change the text size. The gesture still works over the
   editor panel, the view panel and light mode.
@@ -131,8 +134,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 ### Fixed
 
 - **Every test run recorded in one commit shows its own test cases from it,** not only the first one read. A Committed
-  test run whose commit is not read yet keeps the run item status of a deleted test case instead of reading Removed,
-  and a commit that Git failed to read once is read again rather than remembered as empty.
+  test run whose commit is not read yet keeps the run item status of a deleted test case instead of reading Removed.
+  A commit that Git failed to read once is read again rather than remembered as empty.
 - **A Committed test run is read from the right commit after a rebase:** when a pull rewrote the commit it names, as
   Commit & Push and Sync do once a teammate pushed first, it is read from the commit the rebase made, on every clone.
 - **A record commit that fails says your commit is in,** instead of reporting the whole commit as failed.
@@ -144,7 +147,7 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
   could not be read for, no bug link left clears it, a Git hint about one test project is not cleared by another,
   Sync clears the no-repository hint once the folder is a repository, and choosing the test project testin.yml names
   clears the code-off hint. A hint with a link wraps to the hint's own width.
-- **A read the IDE cancelled is no longer logged as an error.**
+- **A read the IDE canceled is no longer logged as an error.**
 - **The Medium introduction links to the First run guide where it is now.**
 - History opened from a committed test run no longer shows a *Not committed yet* card made of the commit's own text:
   the History tab always reads the test case as it is now.

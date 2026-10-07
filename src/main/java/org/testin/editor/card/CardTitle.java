@@ -24,9 +24,11 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
+import java.awt.Point;
 import javax.swing.Icon;
 import javax.swing.JList;
 import java.awt.Component;
@@ -86,6 +88,11 @@ public final class CardTitle {
         }
     }
 
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
+    public static boolean isInTheLeadColumn(final @NotNull Point at) {
+        return at.x < JBUI.scale(16) + CreateTestCaseFields.DESCRIPTION.getIcon().getIconWidth();
+    }
+
     // Rule-EDITOR-PANEL-267
     public static @NotNull Rectangle priorityMargin(final @NotNull Component c) {
         return new Rectangle(0, JBUI.scale(12), JBUI.scale(16), c.getFontMetrics(Fonts.title()).getHeight());
@@ -97,10 +104,9 @@ public final class CardTitle {
 
         final @NotNull Rectangle margin = priorityMargin(c);
         final int width = Math.max(2, margin.height / 6);
-        final int arc = width;
         final int inset = margin.height / 8;
 
         g.setColor(priority.getColor());
-        g.fillRoundRect(margin.x + (margin.width - width) / 2, margin.y + inset, width, margin.height - 2 * inset, arc, arc);
+        g.fillRect(margin.x + (margin.width - width) / 2, margin.y + inset, width, margin.height - 2 * inset);
     }
 }

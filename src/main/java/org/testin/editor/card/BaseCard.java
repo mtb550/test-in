@@ -21,6 +21,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.VerticalLayout;
+import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
@@ -31,13 +32,20 @@ import org.testin.editor.EditorColors;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
 import org.testin.services.Services;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Fonts;
 
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.Optional;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JList;
 import javax.swing.JTextArea;
 import java.awt.BorderLayout;
@@ -49,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.swing.SwingUtilities;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull JTextArea titleArea = Prose.of("");
@@ -135,7 +144,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
-    // Rule-INTERNAL-122, Rule-EDITOR-PANEL-267
+    // Rule-INTERNAL-122, Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         plainTitle = title;
 
@@ -159,9 +168,11 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
                 return newLbl;
             });
 
-            lbl.setText(attrName + ": " + value);
+            final @NotNull Optional<Icon> icon = CreateTestCaseFields.iconOf(attrName);
+            lbl.setIcon(icon.orElse(EmptyIcon.ICON_0));
+            lbl.setText(icon.isPresent() ? value : attrName + ": " + value);
             lbl.setVisible(true);
-            spoken.add(lbl.getText());
+            spoken.add(attrName + ": " + value);
         });
 
         getAccessibleContext().setAccessibleName(title);
@@ -189,8 +200,34 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    // Rule-EDITOR-PANEL-267
-    public @NotNull String priorityTooltip() {
-        return priority == Priority.DEFAULT ? "" : priority.tooltip();
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
+    public @NotNull String tooltipAt(final @NotNull Point at, final @NotNull Dimension cell) {
+        if (CardTitle.priorityMargin(this).contains(at)) return priority == Priority.DEFAULT ? "" : priority.tooltip();
+
+        layOutAs(cell);
+        return attributeLabels.entrySet().stream()
+                .filter(line -> line.getValue().isVisible() && CreateTestCaseFields.iconOf(line.getKey()).isPresent())
+                .filter(line -> iconOf(line.getValue()).contains(at))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("");
+    }
+
+    // Rule-EDITOR-PANEL-269
+    public void layOutAs(final @NotNull Dimension cell) {
+        setSize(cell);
+        layOut(this);
+    }
+
+    private static void layOut(final @NotNull Component component) {
+        if (!(component instanceof Container container)) return;
+
+        container.doLayout();
+        for (final Component child : container.getComponents()) layOut(child);
+    }
+
+    private @NotNull Rectangle iconOf(final @NotNull JBLabel line) {
+        final @NotNull Rectangle bounds = SwingUtilities.convertRectangle(line.getParent(), line.getBounds(), this);
+        return new Rectangle(bounds.x, bounds.y, line.getInsets().left + line.getIcon().getIconWidth(), bounds.height);
     }
 }

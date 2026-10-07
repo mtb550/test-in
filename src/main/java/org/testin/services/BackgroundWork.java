@@ -166,7 +166,7 @@ public final class BackgroundWork {
 
     private static void logFailure(final @NotNull String what, final @NotNull Throwable cause) {
         final @NotNull Throwable reason = cause instanceof CompletionException wrapped ? Optional.ofNullable(wrapped.getCause()).orElse(cause) : cause;
-        if (reason instanceof CancellationException || reason instanceof ProcessCanceledException) return;
+        if (reason instanceof CancellationException) return;
 
         Logger.error(what + " failed: " + FailureText.of(reason));
     }
