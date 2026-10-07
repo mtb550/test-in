@@ -26,12 +26,14 @@ import org.testin.model.status.RunItemStatus;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
+import org.testin.util.Display;
 import org.testin.view.Drawn;
 
 import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -81,5 +83,19 @@ public class CardDetailIconsIdeTest extends BasePlatformTestCase {
 
         final @NotNull JBLabel line = theLineSaying(card, RunItemStatus.FAILED.getLabel());
         assertTrue("a field with no icon lost its name: " + line.getText(), line.getText().startsWith(TestRunEditorAttributes.RUN_STATUS.getName() + ": "));
+    }
+
+    // Rule-EDITOR-PANEL-270
+    public void testHoveringTheDurationBadgeOnACardSaysDuration() {
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
+        final @NotNull TestRunItems runItem = new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.PASSED).setDuration(Duration.ofSeconds(42)).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
+        final @NotNull TestRunCard card = new TestRunCard(getProject());
+        card.updateData(0, Set.of(TestRunEditorAttributes.DURATION), runItem, BaseCard.titleText(1, true, tc.getDescription()));
+        card.layOutAs(CELL);
+
+        final @NotNull JBLabel badge = Drawn.first(card, JBLabel.class, label -> label.isVisible() && Display.formatDuration(Duration.ofSeconds(42)).equals(label.getText()));
+        final @NotNull Rectangle at = SwingUtilities.convertRectangle(badge.getParent(), badge.getBounds(), card);
+
+        assertEquals(TestRunEditorAttributes.DURATION.getName(), card.tooltipAt(new Point(at.x + at.width / 2, at.y + at.height / 2), CELL));
     }
 }

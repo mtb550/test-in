@@ -43,6 +43,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **A run item's duration is a badge on its card,** the same clock badge the view panel draws, beside the run item
+  status, instead of a Duration line. Hovering it says Duration, on the card and in the view panel.
 - **A card's detail lines lead with the field's icon, not its name:** E for Expected Result, S for Steps, T for Test
   Data and so on, the letters the update menu and History show. Hovering the icon names the field, and a screen reader
   still hears the name. A field with no icon, such as Run Item Status, keeps its name.

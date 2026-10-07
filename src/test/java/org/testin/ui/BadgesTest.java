@@ -24,9 +24,11 @@ import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
+import org.testin.util.Display;
 import org.testng.annotations.Test;
 
 import java.awt.Color;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -188,5 +190,29 @@ public class BadgesTest {
         assertNotEquals(Badges.readableOn(Color.GREEN).getRGB(), Color.WHITE.getRGB(), "nor white on bright green");
         assertEquals(Badges.readableOn(Color.RED).getRGB(), Color.WHITE.getRGB(), "a deep red badge keeps its white words");
         assertEquals(Badges.readableOn(Color.BLUE).getRGB(), Color.WHITE.getRGB());
+    }
+
+    // Rule-EDITOR-PANEL-270
+    @Test
+    public void aRunItemsDurationIsABadgeOnItsCardAndNeverALine() {
+        final List<Badge> badges = new ArrayList<>();
+        final Map<String, String> details = new HashMap<>();
+
+        TestRunEditorAttributes.DURATION.applyToUI(TestRunItems.builder().status(RunItemStatus.PASSED).duration(Duration.ofSeconds(42)).build(), badges, details);
+
+        assertEquals(badges.size(), 1, "the duration is not one badge");
+        assertTrue(badges.getFirst() instanceof Framed framed && framed.text().equals(Display.formatDuration(Duration.ofSeconds(42))), "the badge does not show the duration");
+        assertTrue(details.isEmpty(), "the duration is still drawn as a line");
+        assertEquals(badges.getFirst().tooltip(), TestRunEditorAttributes.DURATION.getName(), "hovering the duration badge does not say Duration");
+    }
+
+    // Rule-EDITOR-PANEL-270
+    @Test
+    public void aRunItemNotRunYetHasNoDurationBadge() {
+        final List<Badge> badges = new ArrayList<>();
+
+        TestRunEditorAttributes.DURATION.applyToUI(TestRunItems.builder().status(RunItemStatus.PASSED).build(), badges, new HashMap<>());
+
+        assertTrue(badges.isEmpty(), "a run item with no duration drew a badge");
     }
 }

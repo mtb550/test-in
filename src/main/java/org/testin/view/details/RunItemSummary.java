@@ -78,8 +78,7 @@ public final class RunItemSummary extends AbstractDetails {
         final @NotNull List<Badge> badges = new ArrayList<>();
         badges.add(new Pill(runItem.shownStatus().getLabel(), runItem.shownStatus().getRowColor()));
 
-        final @NotNull String duration = TestRunEditorAttributes.DURATION.getRunItemValueExtractor().apply(runItem);
-        if (!duration.isBlank()) badges.add(Badges.createDurationBadge(duration));
+        Badges.addDurationBadge(badges, TestRunEditorAttributes.DURATION.gridValue(runItem));
 
         return badges;
     }

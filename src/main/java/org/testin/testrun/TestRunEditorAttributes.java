@@ -149,7 +149,13 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.run.item.duration"),
             ToolBarDefault.ON,
             item -> Display.formatDuration(item.getDuration())
-    ),
+    ) {
+        // Rule-EDITOR-PANEL-270
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+            Badges.addDurationBadge(badges, gridValue(runItem));
+        }
+    },
 
     EXECUTED_BY(
             Bundle.message("attribute.run.item.executed.by"),

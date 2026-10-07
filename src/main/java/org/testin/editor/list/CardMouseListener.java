@@ -198,14 +198,12 @@ public class CardMouseListener extends MouseAdapter {
         return CardTitle.descriptionActionIcons(titleWidth, buttons).at(xInCell, yInCell);
     }
 
-    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-EDITOR-PANEL-270
     private @NotNull String tipUnder(final @NotNull MouseEvent e, final int index) {
         if (index == -1) return "";
 
         final @NotNull Rectangle bounds = list.getCellBounds(index, index);
         final @NotNull Point inCell = new Point(e.getX() - bounds.x, e.getY() - bounds.y);
-        if (!CardTitle.isInTheLeadColumn(inCell)) return "";
-
         final @NotNull Component card = list.getCellRenderer().getListCellRendererComponent(list, list.getModel().getElementAt(index), index, false, false);
         return card instanceof BaseCard drawn ? drawn.tooltipAt(inCell, bounds.getSize()) : "";
     }

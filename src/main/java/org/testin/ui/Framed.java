@@ -25,7 +25,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 // Rule-VIEW-PANEL-086
-public record Framed(@NotNull String text, @NotNull Icon icon) implements Badge {
+public record Framed(@NotNull String text, @NotNull Icon icon, @NotNull String tooltip) implements Badge {
     @Override
     public @NotNull Color ink() {
         return UIUtil.getLabelForeground();

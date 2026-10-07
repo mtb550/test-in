@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
 import org.testin.model.status.ExecutionStatusBadge;
+import org.testin.util.Bundle;
 import org.testin.util.FixedColors;
 import org.testin.util.Fonts;
 
@@ -98,8 +99,9 @@ public final class Badges {
     }
 
     // Rule-VIEW-PANEL-086
-    public static @NotNull Badge createDurationBadge(final @NotNull String duration) {
-        return new Framed(duration, CLOCK);
+    // Rule-EDITOR-PANEL-270, Rule-VIEW-PANEL-086
+    public static void addDurationBadge(final @NotNull List<Badge> badges, final @NotNull String duration) {
+        if (!duration.isBlank()) badges.add(new Framed(duration, CLOCK, Bundle.message("attribute.run.item.duration")));
     }
 
     // Rule-VIEW-PANEL-085
@@ -151,7 +153,7 @@ public final class Badges {
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, BADGE_PAD_H + badge.notch()));
 
             setFont(Fonts.badge());
-            Tooltip.set(this, badge instanceof Pill pill ? pill.tooltip() : "");
+            Tooltip.set(this, badge.tooltip());
 
             setVisible(true);
         }

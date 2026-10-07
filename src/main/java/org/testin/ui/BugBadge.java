@@ -23,7 +23,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Optional;
 
-public record BugBadge(@NotNull String text, @NotNull Color color) implements Badge {
+public record BugBadge(@NotNull String text, @NotNull Color color, @NotNull String tooltip) implements Badge {
+    public BugBadge(final @NotNull String text, final @NotNull Color color) {
+        this(text, color, "");
+    }
+
     @Override
     public @NotNull Color ink() {
         return Badges.readableOn(color);

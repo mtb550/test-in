@@ -37,6 +37,9 @@ public sealed interface Badge permits Pill, Tag, BugBadge, Framed {
 
     void paint(final @NotNull Graphics2D g2, final int width, final int height);
 
+    @NotNull
+    String tooltip();
+
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253
     default @NotNull Optional<Badge> pairedWith(final @NotNull String value) {
         return Optional.empty();

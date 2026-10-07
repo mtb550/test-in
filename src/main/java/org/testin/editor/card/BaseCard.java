@@ -75,6 +75,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     @Setter
     private @NotNull List<Offered> hoverButtons = List.of();
     private @NotNull String plainTitle = "";
+    private @NotNull List<Badge> shownBadges = List.of();
     private int titleColumnWidth = Integer.MAX_VALUE;
     private int titleWidth;
 
@@ -152,6 +153,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
         Badges.showBadges(badgePanel, badges);
+        shownBadges = List.copyOf(badges);
 
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
@@ -200,11 +202,15 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-EDITOR-PANEL-270
     public @NotNull String tooltipAt(final @NotNull Point at, final @NotNull Dimension cell) {
         if (CardTitle.priorityMargin(this).contains(at)) return priority == Priority.DEFAULT ? "" : priority.tooltip();
 
         layOutAs(cell);
+        for (int i = 0; i < shownBadges.size(); i++) {
+            if (SwingUtilities.convertRectangle(badgePanel, badgePanel.getComponent(i).getBounds(), this).contains(at))
+                return shownBadges.get(i).tooltip();
+        }
         return attributeLabels.entrySet().stream()
                 .filter(line -> line.getValue().isVisible() && CreateTestCaseFields.iconOf(line.getKey()).isPresent())
                 .filter(line -> iconOf(line.getValue()).contains(at))

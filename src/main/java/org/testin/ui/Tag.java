@@ -24,7 +24,11 @@ import javax.swing.Icon;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-public record Tag(@NotNull String text, @NotNull Color color) implements Badge {
+public record Tag(@NotNull String text, @NotNull Color color, @NotNull String tooltip) implements Badge {
+    public Tag(final @NotNull String text, final @NotNull Color color) {
+        this(text, color, "");
+    }
+
     @Override
     public @NotNull Color ink() {
         return Badges.readableOn(color);

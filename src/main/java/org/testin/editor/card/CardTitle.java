@@ -24,11 +24,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
-import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
-import java.awt.Point;
 import javax.swing.Icon;
 import javax.swing.JList;
 import java.awt.Component;
@@ -86,11 +84,6 @@ public final class CardTitle {
         } else {
             baseIcon.paintIcon(c, g, x, y);
         }
-    }
-
-    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
-    public static boolean isInTheLeadColumn(final @NotNull Point at) {
-        return at.x < JBUI.scale(16) + CreateTestCaseFields.DESCRIPTION.getIcon().getIconWidth();
     }
 
     // Rule-EDITOR-PANEL-267
