@@ -37,7 +37,6 @@ import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Fonts;
 
-import java.awt.Rectangle;
 import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JTextArea;
@@ -50,7 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.swing.SwingUtilities;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull JTextArea titleArea = Prose.of("");
@@ -137,7 +135,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
-    // Rule-INTERNAL-122
+    // Rule-INTERNAL-122, Rule-EDITOR-PANEL-267
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         plainTitle = title;
 
@@ -148,7 +146,9 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
-        final @NotNull List<String> spoken = new ArrayList<>(badges.stream().map(Badge::text).toList());
+        final @NotNull List<String> spoken = new ArrayList<>();
+        if (priority != Priority.DEFAULT) spoken.add(priority.getLabel());
+        spoken.addAll(badges.stream().map(Badge::text).toList());
 
         details.forEach((attrName, value) -> {
             if (value.isBlank()) return;
@@ -179,25 +179,18 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195
+    // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195, Rule-EDITOR-PANEL-267
     @Override
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
-        drawPriorityTouch(g);
+        CardTitle.drawPriorityBar(this, g, priority);
         if (isRowHovered) {
             CardTitle.drawDescriptionActionIcons(this, g, titleWidth, hoveredAction, hoverButtons, automation);
         }
     }
 
-    private void drawPriorityTouch(final @NotNull Graphics g) {
-        if (priority == Priority.DEFAULT) return;
-
-        final @NotNull Rectangle title = SwingUtilities.convertRectangle(titleArea.getParent(), titleArea.getBounds(), this);
-        final int line = titleArea.getFontMetrics(titleArea.getFont()).getHeight();
-        final int width = Math.max(2, line / 6);
-        final int inset = line / 8;
-
-        g.setColor(priority.getColor());
-        g.fillRoundRect((title.x - width) / 2, title.y + inset, width, line - 2 * inset, width, width);
+    // Rule-EDITOR-PANEL-267
+    public @NotNull String priorityTooltip() {
+        return priority == Priority.DEFAULT ? "" : priority.tooltip();
     }
 }

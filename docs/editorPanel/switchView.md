@@ -71,9 +71,9 @@ There is no key for this. The button is on the toolbar.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  #  | Description                | Expected Result       | Priority | Group│
 ├────────────────────────────────────────────────────────────────────────────┤
-│  1  | Log in with a valid user   | The dashboard opens.  | P1       | Smoke│
-│  2  | Log in with a locked accou.| The account is refus. | P2       |      │
-│  3  | Log in with the wrong pass.| The password is refu. | P1       | Smoke│
+│  1  | Log in with a valid user   | The dashboard opens.  | High     | Smoke│
+│  2  | Log in with a locked accou.| The account is refus. | Medium   |      │
+│  3  | Log in with the wrong pass.| The password is refu. | High     | Smoke│
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 

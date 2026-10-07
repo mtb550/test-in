@@ -53,9 +53,9 @@ The table takes up the middle of the import dialog.
 │  | Login | Checkout |                                                │
 │                                                                      │
 │  [x]  | #   | Description         | Priority | Group    | Module     │
-│  [x]  | 1   | Log in with a valid | P1     v | Smoke    | Accounts   │
+│  [x]  | 1   | Log in with a valid | High   v | Smoke    | Accounts   │
 │  [ ]  | 2   | Description         | Priority | Group    | Module     │
-│  [x]  | 3   | Log out             | P3     v | Smoke    | Accounts   │
+│  [x]  | 3   | Log out             | Low    v | Smoke    | Accounts   │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 

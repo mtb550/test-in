@@ -141,12 +141,12 @@ public class TestCaseFormIdeTest extends AbstractTempRootIdeTest {
     }
 
     // Rule-EDITOR-PANEL-247
-    public void testPriorityIsRadioButtonsReadingNumberAndWordWithTheLowestChosen() {
+    public void testPriorityIsRadioButtonsReadingTheirWordWithTheLowestChosen() {
         final @NotNull List<JRadioButton> radios = radiosIn(new PrioritySection().getWrapper());
 
-        assertEquals("priority does not read its number and its word", Set.of("P3 (Low)", "P2 (Medium)", "P1 (High)"), radios.stream().map(JRadioButton::getText).collect(Collectors.toSet()));
+        assertEquals("priority does not read its word", Set.of("Low", "Medium", "High"), radios.stream().map(JRadioButton::getText).collect(Collectors.toSet()));
         assertEquals("a priority is offered twice", 3, radios.size());
-        assertEquals("the lowest priority is not chosen to start with", Optional.of(Priority.LOW.getNumberAndWord()), chosen(radios));
+        assertEquals("the lowest priority is not chosen to start with", Optional.of(Priority.LOW.getLabel()), chosen(radios));
         assertTrue("priority is offered as a list", Drawn.components(new PrioritySection().getWrapper()).stream().noneMatch(component -> component instanceof JComboBox<?> || component instanceof JList<?>));
     }
 

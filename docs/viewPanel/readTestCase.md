@@ -82,6 +82,9 @@ There is no key for this. It is what the **Details** tab shows.
   drawn straight under the badges with nothing to open. The state is remembered
   for the IDE rather than for one test case, so a tester who opens it keeps it
   open for the next test case they read.
+- **Rule-VIEW-PANEL-114** — The priority badge says High or Medium, and hovering
+  it says Priority: High or Priority: Medium, so it is not read as the bug's
+  priority, which uses the same words.
 
 ## The screen
 
@@ -91,7 +94,7 @@ There is no key for this. It is what the **Details** tab shows.
 │                                                                          │
 │   Log in with a valid user                                               │
 │                                                                          │
-│   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
+│   ( High ) ( Smoke )        [ go to code ] [ run ] [ tc ]                │
 │                                                                          │
 │   EXPECTED RESULT                                                        │
 │   The dashboard opens.                                                   │

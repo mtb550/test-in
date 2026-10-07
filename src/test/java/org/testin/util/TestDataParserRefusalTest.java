@@ -31,22 +31,22 @@ public class TestDataParserRefusalTest {
     @Test
     public void aPriorityItCannotReadIsRefused() {
         assertTrue(TestDataParser.priority("Urgent", Priority.HIGH).isEmpty(),
-                "answering P3 is how 200 imported test cases all became the lowest priority");
+                "answering Low is how 200 imported test cases all became the lowest priority");
     }
 
     // Rule-SHARE-106
     @Test
     public void aBlankPriorityKeepsWhatTheTestCaseHad() {
         assertEquals(TestDataParser.priority("  ", Priority.HIGH).orElseThrow(), Priority.HIGH,
-                "a priority has no empty form, so a blank cell says nothing rather than saying P3");
+                "a priority has no empty form, so a blank cell says nothing rather than saying Low");
     }
 
     @Test
-    public void aPriorityIsReadByItsLabelAndByItsName() {
+    public void aPriorityIsReadByItsWordInAnyCase() {
         assertEquals(TestDataParser.priority(Priority.HIGH.getLabel(), Priority.LOW).orElseThrow(), Priority.HIGH,
-                "the label is what the column shows, so it is what a tester retypes");
+                "the word is what the column shows, so it is what a tester retypes");
         assertEquals(TestDataParser.priority("high", Priority.LOW).orElseThrow(), Priority.HIGH,
-                "a sheet exported before the labels became P1 to P3 still says High");
+                "a tester typing the word in lower case is still understood");
     }
 
     @Test

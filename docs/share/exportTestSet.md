@@ -44,8 +44,8 @@ There is no key for this. The menu entry is **Export**.
 │  | Login |                                                   │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │[x]| # | Description        | Expected Result | Priority│  │
-│  │[x]| 1 | Log in with a val..| The dashboard.. | P1      │  │
-│  │[x]| 2 | Log in with a loc..| The account is..| P2      │  │
+│  │[x]| 1 | Log in with a val..| The dashboard.. | High    │  │
+│  │[x]| 2 | Log in with a loc..| The account is..| Medium  │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
 │  DESTINATION                                                 │

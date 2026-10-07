@@ -46,8 +46,8 @@ The same dialog as [UC-SHARE-001](exportTestSet.md), with more than one tab.
 │  | Login | Checkout | Search | Payments |                    │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │[x]| #  | Description       | Expected Result| Priority │  │
-│  │[x]| 1  | Pay with a saved. | The order is.. | P1       │  │
-│  │[x]| 2  | Pay with an expi. | The card is r..| P2       │  │
+│  │[x]| 1  | Pay with a saved. | The order is.. | High     │  │
+│  │[x]| 2  | Pay with an expi. | The card is r..| Medium   │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
 │  DESTINATION                                                 │

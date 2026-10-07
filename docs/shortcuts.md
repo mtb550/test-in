@@ -302,7 +302,7 @@ one again.
 
 `H` `M` `L` were drawn beside the priorities and `E` beside the empty bug
 priority, and nothing answered to any of them. They were removed rather than
-bound: the priorities render `P1` `P2` `P3`, so the letters matched nothing a
+bound: the priorities rendered `P1` `P2` `P3` then, so the letters matched nothing a
 tester could see, and `E` named a choice the failure dialog does not offer at
 all. Choosing a priority is the mouse or the arrow keys, which is what the hint
 beside it now says. [#283](https://github.com/mtb550/test-in/issues/283).

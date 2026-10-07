@@ -56,7 +56,7 @@ The icon is the last of the three, on the line under the title.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│   ( P1 )  ( Smoke )          [ go to code ]  [ run ]  [ tc ]               │
+│   ( High )  ( Smoke )          [ go to code ]  [ run ]  [ tc ]             │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 

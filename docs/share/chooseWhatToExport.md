@@ -48,9 +48,9 @@ The table takes up the middle of the export dialog.
 │  | Login | Checkout |                                                │
 │                                                                      │
 │  [x]  | #   | Description          | Priority  | Group               │
-│  [x]  | 1   | Log in with a valid  | P1     v  | Smoke, Regression   │
-│  [ ]  | 2   | Log in with a lock.  | P2     v  | Regression          │
-│  [x]  | 3   | Log out              | P3     v  | <No Group>          │
+│  [x]  | 1   | Log in with a valid  | High   v  | Smoke, Regression   │
+│  [ ]  | 2   | Log in with a lock.  | Medium v  | Regression          │
+│  [x]  | 3   | Log out              | Low    v  | <No Group>          │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -63,7 +63,7 @@ The table takes up the middle of the export dialog.
 
 ## The two special columns
 
-**Priority** is a list offering **P1**, **P2** and **P3**.
+**Priority** is a list offering **High**, **Medium** and **Low**.
 
 **Group** opens a picker. Clicking the cell opens a window. It lists **<No
 Group>** first, then every group this test project has used, in alphabetical

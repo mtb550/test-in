@@ -55,10 +55,11 @@ public final class Badges {
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
     private static final @NotNull Icon CLOCK = IconUtil.resizeSquared(AllIcons.Vcs.History, 14);
 
+    // Rule-VIEW-PANEL-114, Rule-EDITOR-PANEL-268
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
         if (tc.getPriority() == Priority.DEFAULT) return;
 
-        badges.add(new Pill(tc.getPriority().getLabel(), tc.getPriority().getColor()));
+        badges.add(new Pill(tc.getPriority().getLabel(), tc.getPriority().getColor(), tc.getPriority().tooltip()));
     }
 
     // UC-EDITOR-PANEL-001
@@ -150,6 +151,7 @@ public final class Badges {
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, BADGE_PAD_H + badge.notch()));
 
             setFont(Fonts.badge());
+            Tooltip.set(this, badge.tooltip());
 
             setVisible(true);
         }

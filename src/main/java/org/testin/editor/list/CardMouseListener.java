@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.WheelForwarding;
+import org.testin.editor.card.BaseCard;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.card.CardTitle;
 import org.testin.editor.card.Offered;
@@ -37,6 +38,7 @@ import org.testin.ui.Tooltip;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
+import java.awt.Component;
 import javax.swing.SwingUtilities;
 import java.awt.Cursor;
 import java.awt.Rectangle;
@@ -54,6 +56,7 @@ public class CardMouseListener extends MouseAdapter {
     private final @NotNull List<String> path;
     private final @NotNull TestinEditor editor;
     private final @NotNull Notifier notifier;
+    private @NotNull String shownTip = "";
 
     public CardMouseListener(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu cm) {
         this.p = p;
@@ -140,8 +143,12 @@ public class CardMouseListener extends MouseAdapter {
         if (!actionName.equals(editor.getHoveredIconAction())) {
             editor.setHoveredIconAction(actionName);
             needsRepaint = true;
+        }
 
-            Tooltip.set(list, currentAction.map(Offered::hintText).orElse(""));
+        final @NotNull String tip = currentAction.map(Offered::hintText).orElseGet(() -> priorityTipUnder(e, index));
+        if (!tip.equals(shownTip)) {
+            shownTip = tip;
+            Tooltip.set(list, tip);
         }
 
         if (!needsRepaint) return;
@@ -160,6 +167,7 @@ public class CardMouseListener extends MouseAdapter {
             final int before = editor.getHoveredIndex();
             editor.setHoveredIndex(-1);
             editor.setHoveredIconAction("");
+            shownTip = "";
             Tooltip.set(list, "");
             repaintRow(before);
         }
@@ -187,5 +195,16 @@ public class CardMouseListener extends MouseAdapter {
         final int titleWidth = CardTitle.titleWidth(list, editor.cardTitle(tc), buttons.size());
 
         return CardTitle.descriptionActionIcons(titleWidth, buttons).at(xInCell, yInCell);
+    }
+
+    // Rule-EDITOR-PANEL-267
+    private @NotNull String priorityTipUnder(final @NotNull MouseEvent e, final int index) {
+        if (index == -1) return "";
+
+        final @NotNull Rectangle bounds = list.getCellBounds(index, index);
+        if (!CardTitle.priorityMargin(list).contains(e.getX() - bounds.x, e.getY() - bounds.y)) return "";
+
+        final @NotNull Component card = list.getCellRenderer().getListCellRendererComponent(list, list.getModel().getElementAt(index), index, false, false);
+        return card instanceof BaseCard drawn ? drawn.priorityTooltip() : "";
     }
 }

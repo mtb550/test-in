@@ -35,7 +35,7 @@ public class PrioritySection implements CreateTestCaseSection {
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-031, Rule-EDITOR-PANEL-247
     public PrioritySection() {
         priority = ComponentDialogBase.<Priority>radios("")
-                .options(Priority.CHOICES, Priority::getNumberAndWord)
+                .options(Priority.CHOICES, Priority::getLabel)
                 .select(Priority.DEFAULT)
                 .build()
                 .getComponent();

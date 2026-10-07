@@ -47,7 +47,7 @@ public class TestRunCard extends BaseCard {
         content.add(changedSince, 2);
     }
 
-    // UC-EDITOR-PANEL-030
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-267
     public void updateData(final @NotNull Integer index, final @NotNull Set<TestRunEditorAttributes> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
         this.automation = automationState.of(runItem.getId());
         this.priority = activeDetails.contains(TestRunEditorAttributes.PRIORITY) ? runItem.shownTestCase().getPriority() : Priority.DEFAULT;

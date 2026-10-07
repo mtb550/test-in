@@ -45,7 +45,7 @@ The three buttons sit on the line under the title, beside the badges.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│   ( P1 ) ( Smoke )        [ go to code ]  [ run ]  [ tc ]                  │
+│   ( High ) ( Smoke )        [ go to code ]  [ run ]  [ tc ]                │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 

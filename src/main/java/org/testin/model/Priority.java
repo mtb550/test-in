@@ -30,21 +30,18 @@ import java.util.List;
 @AllArgsConstructor
 public enum Priority {
     HIGH(
-            "P1",
             Bundle.message("priority.high"),
             JBColor.RED.brighter().brighter(),
             true
     ),
 
     MEDIUM(
-            "P2",
             Bundle.message("priority.medium"),
             JBColor.BLUE.brighter(),
             true
     ),
 
     LOW(
-            "P3",
             Bundle.message("priority.low"),
             JBColor.GRAY.brighter(),
             true
@@ -57,12 +54,11 @@ public enum Priority {
     public static final @NotNull Priority DEFAULT = LOW;
 
     private final @NotNull String label;
-    private final @NotNull String word;
     private final @NotNull Color color;
     private final boolean active;
 
-    // Rule-EDITOR-PANEL-247
-    public @NotNull String getNumberAndWord() {
-        return Bundle.message("priority.choice", label, word);
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-268, Rule-VIEW-PANEL-114
+    public @NotNull String tooltip() {
+        return Bundle.message("priority.tooltip", label);
     }
 }

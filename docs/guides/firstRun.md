@@ -120,7 +120,7 @@ The card appears:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  1. Log in with a valid user.                    ( P1 ) ( Regression )   │
+│▌ 1. Log in with a valid user.                           ( Regression )   │
 │     Expected Result: The dashboard opens.                                │
 └──────────────────────────────────────────────────────────────────────────┘
 ```

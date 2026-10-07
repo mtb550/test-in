@@ -54,7 +54,7 @@ table.
   among the ones the change touched. Blank is not unreadable, and is never
   counted as unreadable — it clears a date and the groups, and it leaves the
   status alone. A blank priority in a bulk edit sets the default priority,
-  P3 (Low); in a cell it leaves the priority alone.
+  Low; in a cell it leaves the priority alone.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -82,9 +82,9 @@ No dialog opens. The cell itself becomes a box.
 ┌──────────────────────────────────────────────────────────────────────────┐
 │  #  | Description                 | Expected Result       | Priority     │
 ├──────────────────────────────────────────────────────────────────────────┤
-│  1  | Log in with a valid user    | The dashboard opens.  | P1           │
-│  2  | Log in with a locked accou. |[The account is refu ] | P2           │
-│  3  | Log in with the wrong pass. | The password is ref.  | P1           │
+│  1  | Log in with a valid user    | The dashboard opens.  | High         │
+│  2  | Log in with a locked accou. |[The account is refu ] | Medium       │
+│  3  | Log in with the wrong pass. | The password is ref.  | High         │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 

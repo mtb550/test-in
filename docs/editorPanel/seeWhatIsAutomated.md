@@ -58,8 +58,8 @@ set at once, and the status bar says the same thing as a number.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  1  Sign in with a correct username and password   [C] [>]   │
-│     P1   Regression                                          │
+│▌ 1  Sign in with a correct username and password   [C] [>]   │
+│     Regression                                               │
 └──────────────────────────────────────────────────────────────┘
 ```
 

@@ -53,7 +53,7 @@ Select several test cases, then `F2` or the field's own letter.
   among the ones the change touched. Blank is not unreadable, and is never
   counted as unreadable — it clears a date and the groups, and it leaves the
   status alone. A blank priority in a bulk edit sets the default priority,
-  P3 (Low); in a cell it leaves the priority alone.
+  Low; in a cell it leaves the priority alone.
 - **Rule-EDITOR-PANEL-046** — The whole gesture is one entry on the undo
   history.
 - **Rule-EDITOR-PANEL-224** — A description is refused here for the two reasons
@@ -147,7 +147,7 @@ one description clash with each other; two rows that swap their descriptions do
 not (Rule-EDITOR-PANEL-224).
 
 **If a priority is edited to nothing** — it is set to the default priority,
-P3 (Low), and counted among the test cases the edit changed.
+Low, and counted among the test cases the edit changed.
 
 **If a value is not one Testin can read** — a priority or a status it does not
 know — that test case is left exactly as it was and is not counted

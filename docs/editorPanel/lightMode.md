@@ -123,7 +123,7 @@ nothing to judge until the test run is going.
 │  [D] Sign in with a correct username and password                          │
 │  [E] The dashboard opens and the account name is shown in the header.      │
 │                                                                            │
-│      [ P1 ]  [ Accounts ]                                                  │
+│      [ High ]  [ Accounts ]                                                │
 │      1. Open the sign-in page.                                             │
 │  [S] 2. Type the username.                                                 │
 │      3. Type the password.                                                 │
@@ -659,6 +659,9 @@ as progress.
   as the index holds it, never onto the copy the window was drawn from. A
   failure saved while the test run is read again, or while a sync is bringing it
   in, is kept.
+- **Rule-EDITOR-PANEL-268** — The priority badge says High or Medium, and
+  hovering it says Priority: High or Priority: Medium, so it is not read as the
+  bug's priority, which uses the same words.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a test run of a
 hundred test cases is a hundred of these, and the tester is watching the

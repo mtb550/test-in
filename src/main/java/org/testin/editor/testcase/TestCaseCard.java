@@ -50,7 +50,7 @@ public class TestCaseCard extends BaseCard {
         super(p);
     }
 
-    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021, Rule-EDITOR-PANEL-267
     public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final @NotNull String title) {
         badges.clear();
         details.clear();

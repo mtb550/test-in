@@ -50,8 +50,8 @@ sheets gives it six tabs.
 │  | Login | Checkout | Search | Cart | Profile | Admin |      │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │[x]| #  | Description       | Expected Result | Priority│  │
-│  │[x]| 1  | Log in with a va. | The dashboard.. | P1      │  │
-│  │[x]| 2  | Log in with a lo. | The account i.. | P2      │  │
+│  │[x]| 1  | Log in with a va. | The dashboard.. | High    │  │
+│  │[x]| 2  | Log in with a lo. | The account i.. | Medium  │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
 │                                          [ Import ]          │

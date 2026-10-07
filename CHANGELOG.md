@@ -32,7 +32,7 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
   whose body you wrote is asked about before it is written over, **Ctrl+Z** takes a written body back, and **Show what
   the agent said** opens what was asked and what came back.
 - **Filter the Create Test Run dialog:** the editor's Filter menu narrows the test cases shown — every Smoke test case,
-  every P1 — and a test case stays ticked while the filter hides it. **Status**, the test case's own status, joins the
+  every High priority — and a test case stays ticked while the filter hides it. **Status**, the test case's own status, joins the
   Filter menu in both editors, and **Run Item Status** joins it in the test run editor.
 - **A test case id finds the test runs that ran it:** the search returns the test case and one row for each test run
   that covers it, and that row opens the test run on the result it recorded.
@@ -43,6 +43,13 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **On an editor's card, a test case's priority is a short bar beside its description, not a badge:** red for High,
+  blue for Medium, nothing for Low, while the Priority field is shown, in both editors. No text moves for it, and a
+  screen reader still hears the priority. Light mode and the view panel keep the priority badge.
+- **A priority is named High, Medium or Low everywhere, never P1, P2 or P3:** the badge, the Priority column, the
+  import and export columns, the Filter menu, the test case dialogs, the history and the HTML report. An import cell
+  reading P1 is not understood any more and is refused like any other unreadable value. Hovering the bar or the
+  priority badge says *Priority: High*, so it is not read as the bug's priority, which uses the same words.
 - **A committed test run stays read-only everywhere:** Run on its test cases is gray and says why, and Result Analysis
   opens read-only. Completing a test run offers the commit only when its test project is under Git.
 - **A test case opened from a search result can be edited:** F2 writes it to the test set that holds it.
@@ -83,8 +90,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
   soon as Fields does. A field the list does not offer is always shown.
 - **A test case the filter hides is named in a red refusal,** not in a blue notice that looked like the success just
   before it.
-- **A choice from a fixed list is radio buttons:** the six questions of Create Test Run, Priority — P3 (Low), P2
-  (Medium), P1 (High) — and Status in the test case dialogs, and the format in Generate Report and Export. A group in
+- **A choice from a fixed list is radio buttons:** the six questions of Create Test Run, Priority — Low, Medium,
+  High — and Status in the test case dialogs, and the format in Generate Report and Export. A group in
   the import and export preview is a checkbox list under its cell.
 - **Dialogs read as one card:** every confirmation has a button naming what it does — Remove, Move, Rename — and a move
   is one row from where a node is to where it lands. Rename says what it is renaming and where, and a place is named
@@ -105,7 +112,7 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 - **A hint or a path sits right after the name** in search results and picker lists alike, instead of in a column.
 - **One name for Navigate to Test Method:** the view panel's first button reads **Navigate to Test Method**, as the menu
   and the card do. Its icon still says what automation is there.
-- **A blank priority in a bulk edit is P3 (Low),** the default priority, and a blank value in a bulk edit is never
+- **A blank priority in a bulk edit is Low,** the default priority, and a blank value in a bulk edit is never
   counted among the values Testin could not read.
 - **History tells a test case's bugs from Git:** each time a test run recorded, changed or cleared a bug on the test
   case, History shows a bug card of its own beside the test case's entries, with its bug severity, bug priority and

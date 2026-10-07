@@ -67,7 +67,7 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 │                                                                          │
 │   Log in with a valid user                                               │
 │                                                                          │
-│   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
+│   ( High ) ( Smoke )        [ go to code ] [ run ] [ tc ]                │
 │                                                                          │
 │   EXECUTION RESULT ────────────────────────────────────────────────────  │
 │   ( Failed ) ( 02:14 ) ( Blocker / High )  #123                          │

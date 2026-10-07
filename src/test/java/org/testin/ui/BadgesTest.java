@@ -22,6 +22,7 @@ import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.status.RunItemStatus;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
@@ -115,6 +117,31 @@ public class BadgesTest {
                 "severity first, because the enum offers it first");
         assertEquals(((BugBadge) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
                 "the color is the first half's");
+    }
+
+    // Rule-VIEW-PANEL-114, Rule-EDITOR-PANEL-268
+    @Test
+    public void thePriorityBadgeNamesItsFieldOnHover() {
+        final List<Badge> badges = new ArrayList<>();
+
+        Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.HIGH));
+
+        assertEquals(badges.getFirst().text(), "High", "the badge does not say the priority's word");
+        assertEquals(badges.getFirst().tooltip(), "Priority: High", "hovering the badge does not name the field, so it reads like the bug's priority");
+    }
+
+    // Rule-EDITOR-PANEL-267
+    @Test
+    public void anEditorsCardDrawsThePriorityAsNeitherABadgeNorALine() {
+        final TestCaseDto tc = new TestCaseDto().setPriority(Priority.HIGH);
+        final List<Badge> badges = new ArrayList<>();
+        final Map<String, String> details = new HashMap<>();
+
+        TestCaseEditorAttributes.PRIORITY.applyToUI(tc, badges, details);
+        TestRunEditorAttributes.PRIORITY.applyToUI(TestRunItems.pendingFor(tc), badges, details);
+
+        assertTrue(badges.isEmpty(), "an editor's card still draws the priority as a badge");
+        assertTrue(details.isEmpty(), "an editor's card draws the priority as a detail line");
     }
 
     @Test

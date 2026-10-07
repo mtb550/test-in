@@ -91,7 +91,7 @@ There is no key for this. The button's tooltip reads **Filter**.
 
 1. **Reset Filters** — always the first entry, and gray while no filter is on. It
    is [UC-EDITOR-PANEL-021](clearFilters.md).
-2. **Priority** — **P1**, **P2** and **P3**, each with its own color.
+2. **Priority** — **High**, **Medium** and **Low**, each with its own color.
 3. **Automation** — the three automation states, which is
    [UC-EDITOR-PANEL-047](seeWhatIsAutomated.md).
 4. **Group** — every group Testin knows, with **No Group** first.
