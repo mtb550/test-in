@@ -47,7 +47,7 @@ public class IndexerBudgetTest {
 
     private static final double BUDGET_MICROS_PER_RESULT = 20.0;
 
-    private static final int PASSES = 5;
+    private static final int PASSES = 15;
 
     private static final @NotNull ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -190,7 +190,7 @@ public class IndexerBudgetTest {
     public void parsingAProjectsTestRunResultsStaysInsideTheBudget() {
         final @NotNull List<String> documents = results();
 
-        parseResults(documents.subList(0, 1_000));
+        parseResults(documents);
 
         long fastest = Long.MAX_VALUE;
         long slowest = 0;

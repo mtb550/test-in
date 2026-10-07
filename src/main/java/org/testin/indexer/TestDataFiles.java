@@ -19,6 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.util.TimeoutUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -33,16 +34,21 @@ import org.testin.util.Mapper;
 
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestDataFiles {
+    private static final int MOVE_ATTEMPTS = 6;
+    private static final long MOVE_PAUSE_MILLIS = 25;
+
     private final @NotNull Project p;
 
     private final @NotNull OwnWrites ownWrites = Services.getInstance(OwnWrites.class);
@@ -128,19 +134,56 @@ final class TestDataFiles {
 
             FileUtil.createParentDirs(path.toFile());
             Files.write(beside, jsonBytes);
-            try {
-                Files.move(beside, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (final AtomicMoveNotSupportedException notOnThisFileSystem) {
-                Files.move(beside, path, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            ownWrites.wrote(p, path, jsonBytes);
-            return true;
         } catch (final IOException ex) {
             reportWriteFailure(path, ex);
             forget(beside);
             return false;
         }
+
+        if (!movedInto(beside, path)) {
+            forget(beside);
+            return false;
+        }
+
+        ownWrites.wrote(p, path, jsonBytes);
+        return true;
+    }
+
+    // Rule-INTERNAL-113
+    private boolean movedInto(final @NotNull Path beside, final @NotNull Path path) {
+        @NotNull Optional<IOException> failure = moveOnce(beside, path);
+        for (int attempt = 1; attempt < MOVE_ATTEMPTS && isHeldByAReader(failure); attempt++) {
+            Logger.debug("Writing " + path.getFileName() + " waits for a reader to let go of it, attempt " + attempt);
+            TimeoutUtil.sleep(MOVE_PAUSE_MILLIS * attempt);
+            failure = moveOnce(beside, path);
+        }
+
+        failure.ifPresent(ex -> reportWriteFailure(path, ex));
+        return failure.isEmpty();
+    }
+
+    private static @NotNull Optional<IOException> moveOnce(final @NotNull Path beside, final @NotNull Path path) {
+        try {
+            Files.move(beside, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            return Optional.empty();
+        } catch (final AtomicMoveNotSupportedException notOnThisFileSystem) {
+            return movePlainly(beside, path);
+        } catch (final IOException ex) {
+            return Optional.of(ex);
+        }
+    }
+
+    private static @NotNull Optional<IOException> movePlainly(final @NotNull Path beside, final @NotNull Path path) {
+        try {
+            Files.move(beside, path, StandardCopyOption.REPLACE_EXISTING);
+            return Optional.empty();
+        } catch (final IOException ex) {
+            return Optional.of(ex);
+        }
+    }
+
+    private static boolean isHeldByAReader(final @NotNull Optional<IOException> failure) {
+        return failure.filter(FileSystemException.class::isInstance).isPresent();
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-036, Rule-INTERNAL-113

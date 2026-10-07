@@ -135,6 +135,8 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Fixed
 
+- **Saving no longer fails when the IDE or a virus scanner is reading the file at that moment:** on Windows a file
+  being read cannot be replaced, so Testin waits a moment and tries again rather than reporting the save as failed.
 - **Every test run recorded in one commit shows its own test cases from it,** not only the first one read. A Committed
   test run whose commit is not read yet keeps the run item status of a deleted test case instead of reading Removed.
   A commit that Git failed to read once is read again rather than remembered as empty.

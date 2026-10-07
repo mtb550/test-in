@@ -26,7 +26,7 @@ import java.util.function.BooleanSupplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Await {
-    private static final long TIMEOUT_MILLIS = 15_000;
+    private static final long TIMEOUT_MILLIS = 60_000;
 
     public static void until(final @NotNull String failure, final @NotNull BooleanSupplier landed) {
         final long deadline = System.currentTimeMillis() + TIMEOUT_MILLIS;

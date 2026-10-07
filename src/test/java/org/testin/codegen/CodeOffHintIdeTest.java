@@ -77,6 +77,7 @@ public class CodeOffHintIdeTest extends BasePlatformTestCase {
             assertEquals("choosing the test project testin.yml names left the hint waiting", List.of(), waiting());
         } finally {
             TestinYml.save(getProject(), TestinYml.lines(""));
+            bound.choose("");
             Services.getInstance(getProject(), Hints.class).clear(SetupStep.TEST_PROJECT_LINK);
         }
     }
