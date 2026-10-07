@@ -37,6 +37,7 @@ import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
+import org.testin.util.Display;
 import org.testin.util.Fonts;
 
 import java.awt.Container;
@@ -63,6 +64,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull JTextArea titleArea = Prose.of("");
     protected final @NotNull JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
+    private final @NotNull Map<String, String> lineTooltips = new HashMap<>();
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
     // Rule-CODEGEN-082
@@ -145,7 +147,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
-    // Rule-INTERNAL-122, Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269
+    // Rule-INTERNAL-122, Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-INTERNAL-132
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         plainTitle = title;
 
@@ -172,7 +174,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
             final @NotNull Optional<Icon> icon = UpdateTestCaseFields.iconOf(attrName);
             lbl.setIcon(icon.orElse(EmptyIcon.ICON_0));
-            lbl.setText(icon.isPresent() ? value : attrName + ": " + value);
+            lbl.setText(Display.shortDates(icon.isPresent() ? value : attrName + ": " + value));
+            lineTooltips.put(attrName, Display.dateTooltip(value));
             lbl.setVisible(true);
             spoken.add(attrName + ": " + value);
         });
@@ -202,7 +205,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-EDITOR-PANEL-270
+    // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-EDITOR-PANEL-270, Rule-INTERNAL-132
     public @NotNull String tooltipAt(final @NotNull Point at, final @NotNull Dimension cell) {
         if (CardTitle.priorityMargin(this).contains(at)) return priority == Priority.DEFAULT ? "" : priority.tooltip();
 
@@ -212,11 +215,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
                 return shownBadges.get(i).tooltip();
         }
         return attributeLabels.entrySet().stream()
-                .filter(line -> line.getValue().isVisible() && UpdateTestCaseFields.iconOf(line.getKey()).isPresent())
-                .filter(line -> iconOf(line.getValue()).contains(at))
-                .map(Map.Entry::getKey)
+                .filter(line -> line.getValue().isVisible() && boundsOf(line.getValue()).contains(at))
+                .map(line -> isOnIcon(line.getKey(), line.getValue(), at) ? line.getKey() : lineTooltips.getOrDefault(line.getKey(), ""))
                 .findFirst()
                 .orElse("");
+    }
+
+    private boolean isOnIcon(final @NotNull String attrName, final @NotNull JBLabel line, final @NotNull Point at) {
+        return UpdateTestCaseFields.iconOf(attrName).isPresent() && iconOf(line).contains(at);
     }
 
     // Rule-EDITOR-PANEL-269
@@ -233,7 +239,11 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     private @NotNull Rectangle iconOf(final @NotNull JBLabel line) {
-        final @NotNull Rectangle bounds = SwingUtilities.convertRectangle(line.getParent(), line.getBounds(), this);
+        final @NotNull Rectangle bounds = boundsOf(line);
         return new Rectangle(bounds.x, bounds.y, line.getInsets().left + line.getIcon().getIconWidth(), bounds.height);
+    }
+
+    private @NotNull Rectangle boundsOf(final @NotNull JBLabel line) {
+        return SwingUtilities.convertRectangle(line.getParent(), line.getBounds(), this);
     }
 }

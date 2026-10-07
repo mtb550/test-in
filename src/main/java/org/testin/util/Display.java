@@ -48,6 +48,16 @@ public final class Display {
         return Config.isNotExecuted(at) ? "" : at.format(Config.getDateFormatterPattern());
     }
 
+    // Rule-INTERNAL-132
+    public static @NotNull String shortDates(final @NotNull String text) {
+        return Config.DATE_TEXT.matcher(text).replaceAll("$1");
+    }
+
+    // Rule-INTERNAL-132
+    public static @NotNull String dateTooltip(final @NotNull String text) {
+        return Config.DATE_TEXT.matcher(text).find() ? text : "";
+    }
+
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-006
     public static @NotNull String whoAndWhen(final @NotNull String who, final @NotNull ZonedDateTime at) {
         final @NotNull String when = formatDate(at);

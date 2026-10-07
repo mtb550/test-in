@@ -34,7 +34,6 @@ import org.testin.util.Mapper;
 
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -101,7 +100,7 @@ public final class BugHistory {
         final @NotNull List<String> lines = record.lines().filter(line -> !line.isBlank()).toList();
         final String @NotNull [] fields = lines.getFirst().split(TestCaseHistory.FIELD, -1);
 
-        return new BugCommit(fields[0], fields[1], ZonedDateTime.parse(fields[2]), lines.stream().skip(1)
+        return new BugCommit(fields[0], fields[1], TestCaseHistory.authoredAt(fields[2]), lines.stream().skip(1)
                 .filter(line -> line.strip().endsWith(FileKind.RUN_ITEM.getExtension()))
                 .map(ChangedFile::of)
                 .toList());

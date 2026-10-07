@@ -219,6 +219,13 @@ and which keys it answers, and the shell builds the rest.
   grid are both named Test cases, and the explorer tree by its tool window.
   Moving through a search's results with the arrow keys says the result
   reached, because the keyboard stays in the search box.
+- **Rule-INTERNAL-132** — A date on a screen shows only its day, as 17-09-2026,
+  and hovering it shows the full date and time it was stored with, as Thursday
+  17-09-2026 At 06:10:00 [Asia/Riyadh]. That holds on the cards and in the grid
+  of both editors, in the details panel, in History and in a node's details. A
+  Git commit's time is shown in the IDE's own time zone, the zone Testin stores
+  its own dates in. Reports, bug issues and exported files keep the full text,
+  because nothing can be hovered there.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

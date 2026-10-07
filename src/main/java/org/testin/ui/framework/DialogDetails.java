@@ -22,6 +22,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.Tooltip;
+import org.testin.util.Display;
 import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
@@ -56,12 +58,14 @@ public final class DialogDetails implements DialogComponent {
     }
 
     // Rule-INTERNAL-096
+    // Rule-INTERNAL-132
     private static @NotNull JBLabel wrappingValue(final @NotNull String value) {
         final @NotNull JBLabel label = new JBLabel();
         label.setFont(Fonts.value());
         label.setText("<html><div style='width:" + label.getFontMetrics(Fonts.value()).charWidth('m') * VALUE_CHARACTERS + "px'>"
-                + StringUtil.escapeXmlEntities(value) + "</div></html>");
+                + StringUtil.escapeXmlEntities(Display.shortDates(value)) + "</div></html>");
         label.setBorder(JBUI.Borders.emptyLeft(Spacing.XL));
+        Tooltip.set(label, Display.dateTooltip(value));
         return label;
     }
 

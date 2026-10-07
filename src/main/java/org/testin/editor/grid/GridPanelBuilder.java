@@ -38,8 +38,10 @@ import org.testin.model.ToolBarAttribute;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
+import org.testin.ui.Tooltip;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Bundle;
+import org.testin.util.Display;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -121,11 +123,12 @@ public class GridPanelBuilder {
                 wrapper.add(textArea, c);
             }
 
-            // Rule-EDITOR-PANEL-250, Rule-INTERNAL-122
+            // Rule-EDITOR-PANEL-250, Rule-INTERNAL-122, Rule-INTERNAL-132
             @Override
             public @NotNull Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
                 final @NotNull String raw = Objects.toString(value, "");
-                textArea.setText(raw);
+                textArea.setText(Display.shortDates(raw));
+                Tooltip.set(wrapper, Display.dateTooltip(raw));
                 wrapper.getAccessibleContext().setAccessibleName(raw);
                 textArea.setFont(table.getFont());
                 textArea.setForeground(isSelected ? EditorColors.SELECTION_FOREGROUND : table.getForeground());

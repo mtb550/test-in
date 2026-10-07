@@ -36,6 +36,7 @@ import org.testin.util.Mapper;
 
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,11 +91,16 @@ public final class TestCaseHistory {
         return Arrays.stream(log.split(RECORD)).filter(record -> !record.isBlank()).map(record -> commit(record, path)).toList();
     }
 
+    // Rule-INTERNAL-132
+    static @NotNull ZonedDateTime authoredAt(final @NotNull String isoTime) {
+        return ZonedDateTime.parse(isoTime).withZoneSameInstant(ZoneId.systemDefault());
+    }
+
     private static @NotNull HistoryCommit commit(final @NotNull String record, final @NotNull String path) {
         final @NotNull List<String> lines = record.lines().filter(line -> !line.isBlank()).toList();
         final String @NotNull [] fields = lines.getFirst().split(FIELD, -1);
 
-        return new HistoryCommit(fields[0], fields[1], ZonedDateTime.parse(fields[2]), fields.length > 3 ? fields[3] : "", lines.size() > 1 ? lines.getLast().strip() : path);
+        return new HistoryCommit(fields[0], fields[1], authoredAt(fields[2]), fields.length > 3 ? fields[3] : "", lines.size() > 1 ? lines.getLast().strip() : path);
     }
 
     // Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-098, Rule-VIEW-PANEL-113

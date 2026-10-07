@@ -43,6 +43,10 @@ longer keeps a copy of its test case, and the copies earlier builds wrote are no
 
 ### Changed
 
+- **A date shows its day:** the cards and the grid of both editors, the details panel, History and a node's details
+  show a date as 17-09-2026. Hover it for the full date and time, as Thursday 17-09-2026 At 06:10:00 [Asia/Riyadh].
+  History's Git dates now name the IDE's time zone, not an offset such as [+03:00]. Reports, bug issues and exported
+  files keep the full date and time.
 - **Reference has its letter:** the update menu opens Reference with **R**, as the copy menu already copies it, and a
   card line or a History row for Reference leads with its **R** icon, as every other field does. Status, the one field
   with no letter, now sits last on the update menu.

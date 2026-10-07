@@ -22,7 +22,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Prose;
+import org.testin.util.Display;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
@@ -35,12 +37,13 @@ public final class CaptionValueRow {
     private static final int CAPTION_GAP = 2;
     private static final int SIDE = 16;
 
-    // Rule-VIEW-PANEL-006
+    // Rule-VIEW-PANEL-006, Rule-INTERNAL-132
     public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull String valueText, final int row) {
         if (valueText.trim().isEmpty()) return row;
 
-        final @NotNull JTextArea valueArea = Prose.of(valueText);
+        final @NotNull JTextArea valueArea = Prose.of(Display.shortDates(valueText));
         valueArea.setFont(Fonts.body());
+        Tooltip.set(valueArea, Display.dateTooltip(valueText));
 
         return add(panel, gbc, caption, valueArea, row);
     }

@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -34,6 +35,24 @@ public class DisplayFormatTest {
         final @NotNull ZonedDateTime at = ZonedDateTime.of(2026, 9, 13, 14, 14, 0, 0, ZoneOffset.UTC);
 
         assertEquals(Display.whoAndWhen("Muteb", at), "Muteb on " + Display.formatDate(at), "the name, then on, then the date");
+    }
+
+    // Rule-INTERNAL-132
+    @Test
+    public void aDateOnAScreenShowsItsDayAndKeepsTheRestForTheTooltip() {
+        final @NotNull ZonedDateTime at = ZonedDateTime.of(2026, 9, 17, 6, 10, 0, 0, ZoneId.of("Asia/Riyadh"));
+        final @NotNull String full = Display.whoAndWhen("Muteb", at);
+
+        assertEquals(Display.shortDates(Display.formatDate(at)), "17-09-2026", "the day alone, in the order the full date reads");
+        assertEquals(Display.shortDates(full), "Muteb on 17-09-2026", "a date inside a sentence is shortened in place");
+        assertEquals(Display.dateTooltip(full), full, "hovering shows the full date and time");
+    }
+
+    // Rule-INTERNAL-132
+    @Test
+    public void textWithoutADateIsShownAsItIsAndHasNoTooltip() {
+        assertEquals(Display.shortDates("Login works."), "Login works.");
+        assertEquals(Display.dateTooltip("Login works."), "", "nothing to hover for");
     }
 
     @Test

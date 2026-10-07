@@ -285,10 +285,12 @@ public class HistoryTab {
         return text(value, Fonts.strong(), UIUtil.getLabelForeground());
     }
 
+    // Rule-INTERNAL-132
     private static @NotNull JBLabel text(final @NotNull String value, final @NotNull Font font, final @NotNull Color color) {
-        final @NotNull JBLabel label = new JBLabel(value);
+        final @NotNull JBLabel label = new JBLabel(Display.shortDates(value));
         label.setFont(font);
         label.setForeground(color);
+        Tooltip.set(label, Display.dateTooltip(value));
         return label;
     }
 
