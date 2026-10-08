@@ -31,6 +31,6 @@ public final class CardEdge {
 
     // Rule-EDITOR-PANEL-267, Rule-VIEW-PANEL-105
     public static @NotNull Border of(final @NotNull Optional<Color> color) {
-        return color.<Border>map(shown -> JBUI.Borders.customLine(shown, 0, WIDTH, 0, 0)).orElseGet(() -> JBUI.Borders.emptyLeft(WIDTH));
+        return color.map(shown -> JBUI.Borders.customLine(shown, 0, WIDTH, 0, 0)).orElseGet(() -> JBUI.Borders.emptyLeft(WIDTH));
     }
 }

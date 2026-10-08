@@ -28,11 +28,6 @@ public record BugCard(@NotNull String hash, @NotNull String who, @NotNull ZonedD
         return event.kind();
     }
 
-    @Override
-    public @NotNull String message() {
-        return "";
-    }
-
     // Rule-VIEW-PANEL-107
     static @NotNull BugCard notCommitted(final @NotNull BugEvent event) {
         if (event.kind() == BugEventKind.REMOVED) return new BugCard("", "", Config.NOT_EXECUTED, event);

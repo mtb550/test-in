@@ -37,8 +37,6 @@ public sealed interface HistoryCard permits HistoryEntry, BugCard {
 
     @NotNull ZonedDateTime when();
 
-    @NotNull String message();
-
     // Rule-VIEW-PANEL-098
     default boolean isCommitted() {
         return !hash().isEmpty();

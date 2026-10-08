@@ -78,8 +78,10 @@ final class HistoryCardView {
     // Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-115
     static @NotNull JComponent of(final @NotNull Project p, final @NotNull HistoryCard card, final @NotNull TestCaseDto tc, final int index) {
         return switch (card) {
-            case HistoryEntry entry -> openDiffOnClick(p, card(index, head(card, Stream.empty()), summed(rows(entry)), Optional.empty()), entry, tc);
-            case BugCard bug -> card(index, head(card, Stream.of(testRun(p, bug.event(), tc))), bugRows(p, bug.event()), Optional.of(bug.event().kind().barOf(bug.event().runItem())));
+            case HistoryEntry entry ->
+                    openDiffOnClick(p, card(index, head(card, Stream.empty(), Stream.of(muted(entry.message()))), summed(rows(entry)), Optional.empty()), entry, tc);
+            case BugCard bug ->
+                    card(index, head(card, Stream.of(testRun(p, bug.event(), tc)), Stream.empty()), bugRows(p, bug.event()), Optional.of(bug.event().kind().barOf(bug.event().runItem())));
         };
     }
 
@@ -96,12 +98,12 @@ final class HistoryCardView {
     }
 
     // Rule-VIEW-PANEL-115
-    private static @NotNull JComponent head(final @NotNull HistoryCard card, final @NotNull Stream<JComponent> subject) {
+    private static @NotNull JComponent head(final @NotNull HistoryCard card, final @NotNull Stream<JComponent> subject, final @NotNull Stream<JComponent> trailing) {
         final @NotNull JBPanel<?> head = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 10, 0));
         head.setOpaque(false);
 
         Stream.of(Stream.of(pill(new Pill(card.kind().getLabel(), card.kind().getColor()))), subject, commit(card),
-                        Stream.of(strong(card.who()), muted(Display.formatDate(card.when())), muted(card.message())))
+                        Stream.of(strong(card.who()), muted(Display.formatDate(card.when()))), trailing)
                 .flatMap(part -> part)
                 .filter(part -> !(part instanceof JBLabel label) || !label.getText().isBlank())
                 .forEach(head::add);
@@ -173,7 +175,8 @@ final class HistoryCardView {
             case CHANGED -> event.changes().stream().map(HistoryCardView::line).toList();
             case CLEARED ->
                     List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.cleared.why", event.runItem().getStatus().getLabel()))));
-            case REMOVED -> List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.removed"))));
+            case REMOVED ->
+                    List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.removed"))));
         };
     }
 

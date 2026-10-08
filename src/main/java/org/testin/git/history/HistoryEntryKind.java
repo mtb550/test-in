@@ -41,8 +41,5 @@ public enum HistoryEntryKind implements CardKind {
 
     private final @NotNull String label;
 
-    @Override
-    public @NotNull Color getColor() {
-        return PLAIN;
-    }
+    private final @NotNull Color color = PLAIN;
 }

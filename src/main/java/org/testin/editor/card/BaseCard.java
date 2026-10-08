@@ -211,7 +211,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-EDITOR-PANEL-270, Rule-INTERNAL-132
     public @NotNull String tooltipAt(final @NotNull Point at, final @NotNull Dimension cell) {
-        if (CardTitle.priorityMargin(cell.height).contains(at)) return priority == Priority.DEFAULT ? "" : priority.tooltip();
+        if (CardTitle.priorityMargin(cell.height).contains(at))
+            return priority == Priority.DEFAULT ? "" : priority.tooltip();
 
         layOutAs(cell);
         for (int i = 0; i < shownBadges.size(); i++) {

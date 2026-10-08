@@ -6,12 +6,15 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 2.14.0-alpha - 2026-10-09
+
 **Before you update:** wipe your test data. This build reads format 3 and converts nothing, so every test project an
-earlier build wrote is refused as written by an older Testin: remove it and create it again. Format 3 renames three keys
-so each says the business word - a folder marker's `modifiedBy` and `modifiedAt` are now `updatedBy` and `updatedAt`, and
-a test case's `group` is now `groups`, and a test run's configuration answer `COMMIT_ID` is now `COMMIT` - and renames two marker files: the Test Cases folder's `.tcd` is now `.tcf`
-and the Test Runs folder's `.trd` is now `.trf`. `testin.yml` spells its remote `repoUrl` instead of `RepoUrl`: edit
-that one line in a committed `testin.yml`. A team sharing a test project should update together.
+earlier build wrote is refused as written by an older Testin: remove it and create it again. Format 3 renames four keys
+so each says the business word - a folder marker's `modifiedBy` and `modifiedAt` are now `updatedBy` and `updatedAt`,
+and a test case's `group` is now `groups`, and a test run's configuration answer `COMMIT_ID` is now `COMMIT` - and
+renames two marker files: the Test Cases folder's `.tcd` is now `.tcf` and the Test Runs folder's `.trd` is now `.trf`.
+`testin.yml` spells its remote `repoUrl` instead of `RepoUrl`: edit that one line in a committed `testin.yml`. A team
+sharing a test project should update together.
 
 ### Added
 
@@ -19,8 +22,7 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
   as the update and copy menus show it. IntelliJ's Find and Replace bar no longer opens inside a field of any Testin
   dialog, where `Ctrl+R` used to open Replace.
 - **A committed test run is the record:** committing in View Pending Commits makes every Completed test run of the test
-  project **Committed**, and Testin commits its `.tr` with that commit straight after, in the same push. From then
-  on
+  project **Committed**, and Testin commits its `.tr` with that commit straight after, in the same push. From then on
   its run items show each test case as that commit holds it, edited or deleted since, and say *Changed since this test
   run was committed* where it differs today. A Committed test run takes nothing more; F2 on one of its run items says to
   change the test case in its test set.
@@ -35,8 +37,8 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
   whose body you wrote is asked about before it is written over, **Ctrl+Z** takes a written body back, and **Show what
   the agent said** opens what was asked and what came back.
 - **Filter the Create Test Run dialog:** the editor's Filter menu narrows the test cases shown — every Smoke test case,
-  every High priority — and a test case stays ticked while the filter hides it. **Status**, the test case's own status, joins the
-  Filter menu in both editors, and **Run Item Status** joins it in the test run editor.
+  every High priority — and a test case stays ticked while the filter hides it. **Status**, the test case's own status,
+  joins the Filter menu in both editors, and **Run Item Status** joins it in the test run editor.
 - **A test case id finds the test runs that ran it:** the search returns the test case and one row for each test run
   that covers it, and that row opens the test run on the result it recorded.
 - **A screen reader can follow Testin:** every field, icon button, card, grid cell and view panel tab says its name, the
@@ -48,8 +50,6 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 
 - **Hovering a bug badge names each half:** *Bug Severity: Major, Bug Priority: High*, on a test run's card and
   in the view panel, so `Major / High` never has to be decoded.
-- **A card's priority bar runs its full height:** red for High, blue for Medium down the card's left edge, as wide
-  as a bug card's bar in History, instead of a short mark beside the description.
 - **Every History card opens with what it is:** Created, Updated or Removed for a test case, Bug for a bug, which
   no longer says Bug in. A committed card adds the commit's short hash; one not committed yet shows none.
   A commit that could not be read or changed no field is Updated, with a line saying which.
@@ -78,9 +78,10 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 - **The tree is drawn in the IDE's own interface font again,** like IntelliJ's own trees, rather than at the code
   editor's size, and Ctrl and the mouse wheel over it no longer change the text size. The gesture still works over the
   editor panel, the view panel and light mode.
-- **On an editor's card, a test case's priority is a short bar beside its description, not a badge:** red for High,
-  blue for Medium, nothing for Low, while the Priority field is shown, in both editors. No text moves for it, and a
-  screen reader still hears the priority. Light mode and the view panel keep the priority badge.
+- **On an editor's card, a test case's priority is a bar down its left edge, not a badge:** red for High, blue for
+  Medium, nothing for Low, while the Priority field is shown, in both editors, as wide as a bug card's bar in History.
+  No text moves for it, and a screen reader still hears the priority. Light mode and the view panel keep the priority
+  badge.
 - **A priority is named High, Medium or Low everywhere:** the badge, the Priority column, the
   import and export columns, the Filter menu, the test case dialogs, the history and the HTML report. An import cell
   reading anything else is refused like any other value Testin cannot read. Hovering the bar or the
@@ -180,7 +181,7 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
   clears the code-off hint. A hint with a link wraps to the hint's own width.
 - **A read the IDE canceled is no longer logged as an error.**
 - **The Medium introduction links to the First run guide where it is now.**
-- History opened from a committed test run no longer shows a *Not committed yet* card made of the commit's own text:
+- History opened from a committed test run no longer shows an uncommitted card made of the commit's own text:
   the History tab always reads the test case as it is now.
 - **An imported test case is new:** a JSON file no longer brings its status and its order into the test set that imports
   it.
