@@ -33,6 +33,7 @@ import org.testin.model.node.TestRunNode;
 import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.Tooltip;
@@ -90,8 +91,8 @@ public final class Bug {
         if (!runItem.isFailed()) return Optional.empty();
 
         final @NotNull List<Badge> bug = new ArrayList<>();
-        Badges.addBugBadge(bug, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
-        Badges.addBugBadge(bug, runItem.getBugPriority().getLabel(), runItem.getBugSeverity().getColor());
+        Badges.addBugBadge(bug, TestRunEditorAttributes.BUG_SEVERITY.getName(), runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
+        Badges.addBugBadge(bug, TestRunEditorAttributes.BUG_PRIORITY.getName(), runItem.getBugPriority().getLabel(), runItem.getBugSeverity().getColor());
 
         final @NotNull JBPanel<?> holder = AbstractDetails.row(0);
         Badges.showBadges(holder, bug);

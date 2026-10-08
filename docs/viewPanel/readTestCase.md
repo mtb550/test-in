@@ -69,8 +69,8 @@ There is no key for this. It is what the **Details** tab shows.
   heading over the whole panel names nothing.
 - **Rule-VIEW-PANEL-086** — What a test run recorded is one line under the
   band's name: the run item status in its own color, how long it took, the bug's
-  severity and priority as one chip, then the issue and the link that raises
-  one. The duration carries a clock and a plain frame with nothing filled in, so
+  severity and priority as one chip, which names each half on hover as a test
+  run's card does, then the issue and the link that raises one. The duration carries a clock and a plain frame with nothing filled in, so
   it reads as a measurement rather than a run item status, and it is not the
   notched shape a group badge uses. Who ran it and when close the band as a row of their own, in
   the words **Created** already uses (Rule-VIEW-PANEL-061), because a name and a

@@ -95,12 +95,12 @@ public class BadgesTest {
     @Test
     public void oneHalfOnItsOwnIsThatHalf() {
         final List<Badge> severityOnly = new ArrayList<>();
-        Badges.addBugBadge(severityOnly, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        Badges.addBugBadge(severityOnly, "Bug Severity", BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
         assertEquals(severityOnly.size(), 1);
         assertTrue(severityOnly.getFirst() instanceof BugBadge bug && bug.text().equals("Major"));
 
         final List<Badge> priorityOnly = new ArrayList<>();
-        Badges.addBugBadge(priorityOnly, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        Badges.addBugBadge(priorityOnly, "Bug Priority", BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
         assertEquals(priorityOnly.size(), 1);
         assertTrue(priorityOnly.getFirst() instanceof BugBadge bug && bug.text().equals("High"),
                 "the survivor keeps its own color, which is why BugPriority still declares one");
@@ -111,14 +111,27 @@ public class BadgesTest {
     public void bothHalvesJoinIntoOneBadge() {
         final List<Badge> badges = new ArrayList<>();
 
-        Badges.addBugBadge(badges, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
-        Badges.addBugBadge(badges, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        Badges.addBugBadge(badges, "Bug Severity", BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        Badges.addBugBadge(badges, "Bug Priority", BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
 
         assertEquals(badges.size(), 1, "two halves, one badge");
         assertTrue(badges.getFirst() instanceof BugBadge bug && bug.text().equals("Major / High"),
                 "severity first, because the enum offers it first");
         assertEquals(((BugBadge) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
                 "the color is the first half's");
+    }
+
+    // Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-086
+    @Test
+    public void hoveringTheBugBadgeNamesEachHalf() {
+        final List<Badge> both = new ArrayList<>();
+        Badges.addBugBadge(both, "Bug Severity", BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
+        Badges.addBugBadge(both, "Bug Priority", BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        assertEquals(both.getFirst().tooltip(), "Bug Severity: Major, Bug Priority: High");
+
+        final List<Badge> priorityOnly = new ArrayList<>();
+        Badges.addBugBadge(priorityOnly, "Bug Priority", BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
+        assertEquals(priorityOnly.getFirst().tooltip(), "Bug Priority: High", "one half on its own names that half");
     }
 
     // Rule-VIEW-PANEL-114, Rule-EDITOR-PANEL-268

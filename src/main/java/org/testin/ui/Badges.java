@@ -79,19 +79,20 @@ public final class Badges {
         return new Pill(executionStatus.label(), executionStatus.color());
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253
-    public static void addBugBadge(final @NotNull List<Badge> badges, final @NotNull String value, final @NotNull Color color) {
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-086
+    public static void addBugBadge(final @NotNull List<Badge> badges, final @NotNull String name, final @NotNull String value, final @NotNull Color color) {
         if (value.isBlank()) return;
+        final @NotNull String said = name + ": " + value;
 
         for (int i = 0; i < badges.size(); i++) {
-            final @NotNull Optional<Badge> paired = badges.get(i).pairedWith(value);
+            final @NotNull Optional<Badge> paired = badges.get(i).pairedWith(value, said);
             if (paired.isPresent()) {
                 badges.set(i, paired.orElseThrow());
                 return;
             }
         }
 
-        badges.add(new BugBadge(value, color));
+        badges.add(new BugBadge(value, color, said));
     }
 
     public static @NotNull Badge createGroupBadge(final @NotNull String group) {

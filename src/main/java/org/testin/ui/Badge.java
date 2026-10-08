@@ -41,7 +41,7 @@ public sealed interface Badge permits Pill, Tag, BugBadge, Framed {
     String tooltip();
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253
-    default @NotNull Optional<Badge> pairedWith(final @NotNull String value) {
+    default @NotNull Optional<Badge> pairedWith(final @NotNull String value, final @NotNull String said) {
         return Optional.empty();
     }
 }

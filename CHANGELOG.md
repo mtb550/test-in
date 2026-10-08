@@ -46,6 +46,8 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 
 ### Changed
 
+- **Hovering a bug badge names each half:** *Bug Severity: Major, Bug Priority: High*, on a test run's card and
+  in the view panel, so `Major / High` never has to be decoded.
 - **A card's priority bar runs its full height:** red for High, blue for Medium down the card's left edge, as wide
   as a bug card's bar in History, instead of a short mark beside the description.
 - **Every History card opens with what it is:** Created, Updated or Removed for a test case, Bug for a bug, which

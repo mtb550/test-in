@@ -118,7 +118,7 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addBugBadge(badges, getRunItemValueExtractor().apply(runItem), runItem.getBugSeverity().getColor());
+            Badges.addBugBadge(badges, getName(), getRunItemValueExtractor().apply(runItem), runItem.getBugSeverity().getColor());
         }
     },
 
@@ -129,7 +129,7 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addBugBadge(badges, getRunItemValueExtractor().apply(runItem), runItem.getBugPriority().getColor());
+            Badges.addBugBadge(badges, getName(), getRunItemValueExtractor().apply(runItem), runItem.getBugPriority().getColor());
         }
     },
 

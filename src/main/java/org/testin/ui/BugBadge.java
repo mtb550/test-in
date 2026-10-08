@@ -24,10 +24,6 @@ import java.awt.Graphics2D;
 import java.util.Optional;
 
 public record BugBadge(@NotNull String text, @NotNull Color color, @NotNull String tooltip) implements Badge {
-    public BugBadge(final @NotNull String text, final @NotNull Color color) {
-        this(text, color, "");
-    }
-
     @Override
     public @NotNull Color ink() {
         return Badges.readableOn(color);
@@ -48,9 +44,9 @@ public record BugBadge(@NotNull String text, @NotNull Color color, @NotNull Stri
         Badges.fillPill(g2, color, width, height);
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-086
     @Override
-    public @NotNull Optional<Badge> pairedWith(final @NotNull String value) {
-        return Optional.of(new BugBadge(text + Badges.PAIR_JOIN + value, color));
+    public @NotNull Optional<Badge> pairedWith(final @NotNull String value, final @NotNull String said) {
+        return Optional.of(new BugBadge(text + Badges.PAIR_JOIN + value, color, tooltip + ", " + said));
     }
 }
