@@ -16,11 +16,16 @@
 
 package org.testin.model.testrun;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
+import org.testin.model.bug.BugPriority;
+import org.testin.model.bug.BugSeverity;
 import org.testin.model.status.RunItemStatus;
+import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +35,32 @@ import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 public class RunItemTest {
+
+    // Rule-INTERNAL-135
+    @Test
+    public void aPassedRunItemStoresNoFailureDetail() {
+        final @NotNull RunItem runItem = RunItem.builder().id(UUID.randomUUID()).status(RunItemStatus.FAILED).actualResult("The session was dropped")
+                .stacktrace("java.lang.AssertionError").bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl("https://github.com/acme/cases/issues/7").build();
+        runItem.recordRunItemStatus(RunItemStatus.PASSED, "muteb");
+
+        final @NotNull String json = RealMapper.build().writeValueAsString(runItem);
+
+        for (final String key : List.of("actualResult", "stacktrace", "screenshots", "bugSeverity", "bugPriority", "bugIssueUrl")) {
+            assertFalse(json.contains("\"" + key + "\""), "a passed run item stored " + key + ": " + json);
+        }
+        assertTrue(json.contains("PASSED"), json);
+    }
+
+    // Rule-INTERNAL-135
+    @Test
+    public void aKeyLeftOutReadsBackAsAFreshRunItemHoldsIt() {
+        final @NotNull RunItem read = RealMapper.build().readValue("{\"id\" : \"" + UUID.randomUUID() + "\", \"status\" : \"PASSED\"}", RunItem.class);
+
+        assertEquals(read.getBugSeverity(), BugSeverity.DEFAULT);
+        assertEquals(read.getBugPriority(), BugPriority.DEFAULT);
+        assertEquals(read.getActualResult(), "");
+        assertEquals(read.getDuration(), Duration.ZERO);
+    }
 
     @Test
     public void shownTestCaseIsTheWiredTestCase() {

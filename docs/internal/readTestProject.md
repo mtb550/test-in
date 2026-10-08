@@ -36,7 +36,7 @@ There is no key for this. It starts on its own.
   a file named `.tr` or a file named `.trp`.
 - **Rule-INTERNAL-011** — A file's name says what it is: every file ending in
   `.tc` directly inside a test set is a test case, and every file ending in `.ri`
-  directly inside a test run is one test case's result. Nothing looks inside a
+  directly inside a test run is one run item. Nothing looks inside a
   file to decide what it is.
 - **Rule-INTERNAL-012** — A test case is known by its file name. What the file
   says its own name is does not decide.
@@ -122,6 +122,12 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-124** — A test project whose read fails part-way is never
   counted as read. Testin says it could not read it and why, keeps none of it as
   current, and reads it again on the next refresh.
+- **Rule-INTERNAL-135** — A stored file holds only the values that differ from a
+  fresh one, and a key it leaves out reads back as a fresh one holds it. So an
+  empty field is not written, and a passed run item stores no failure detail: no
+  actual result, stacktrace, screenshots, bug severity, bug priority or bug
+  issue. When a test case or a node was created is always written, because a
+  fresh one holds the moment it was made.
 
 ## The budget
 

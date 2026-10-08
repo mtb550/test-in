@@ -22,6 +22,7 @@ import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestCasesFolderMarker;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestSetMarker;
+import org.testin.model.status.TestSetStatus;
 import org.testng.annotations.Test;
 
 import java.time.ZoneId;
@@ -57,7 +58,7 @@ public class MarkerJsonTest {
     }
 
     @Test
-    public void writesTheAuditBlockAndTheStatusAndNothingElse() {
+    public void writesWhatDiffersFromAFreshMarkerAndNothingElse() {
         try {
             final TestSetMarker marker = new TestSetMarker();
             marker.setCreatedBy("mtb");
@@ -65,9 +66,12 @@ public class MarkerJsonTest {
             final String json = mapper.writeValueAsString(marker);
 
             assertTrue(json.contains("\"createdBy\":\"mtb\""), json);
-            assertTrue(json.contains("\"updatedBy\""), json);
-            assertTrue(json.contains("\"status\":\"ACTIVE\""), json);
+            assertTrue(json.contains("\"createdAt\""), "when a node was created is always written: " + json);
+            assertFalse(json.contains("\"status\""), "a fresh marker's status is the default, so it is not written: " + json);
             assertFalse(json.contains("statusLabel"), json);
+
+            marker.setStatus(TestSetStatus.DEPRECATED);
+            assertTrue(mapper.writeValueAsString(marker).contains("\"status\":\"DEPRECATED\""), "a status a tester chose is written");
         } catch (final Exception ex) {
             throw new AssertionError(ex);
         }

@@ -19,6 +19,7 @@ package org.testin.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +47,8 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+// Rule-INTERNAL-135
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @ToString
 public final class TestCaseDto {
     @NonNull
@@ -99,6 +102,7 @@ public final class TestCaseDto {
 
     @NonNull
     @Builder.Default
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private volatile ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 

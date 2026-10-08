@@ -33,7 +33,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
 public class ByteIdenticalSaveTest {
 
@@ -115,8 +115,18 @@ public class ByteIdenticalSaveTest {
     public void nothingTypedIsNothingStored() {
         final String json = saved();
 
-        assertTrue(json.contains("\"module\" : \"\""), "an empty module gained something: " + json);
-        assertTrue(json.contains("\"preConditions\" : \"\""), "empty preconditions gained something");
-        assertTrue(json.contains("\"updatedBy\" : \"\""), "an empty updatedBy gained something");
+        assertFalse(json.contains("\"module\""), "an empty module was written: " + json);
+        assertFalse(json.contains("\"preConditions\""), "empty preconditions were written: " + json);
+        assertFalse(json.contains("\"updatedBy\""), "an empty updatedBy was written: " + json);
+    }
+
+    // Rule-INTERNAL-135
+    @Test
+    public void aTestCaseAtItsDefaultPriorityAndStatusStoresNeither() {
+        final String json = RealMapper.build().writeValueAsString(TestCaseDto.builder().description("Log in with a valid user").build());
+
+        assertFalse(json.contains("\"priority\""), "the default priority, Low, was written: " + json);
+        assertFalse(json.contains("\"status\""), "the default status, Pending, was written: " + json);
+        assertFalse(json.contains("\"groups\""), "an empty list of groups was written: " + json);
     }
 }

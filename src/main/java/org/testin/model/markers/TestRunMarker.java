@@ -18,7 +18,6 @@ package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -46,11 +45,9 @@ public class TestRunMarker extends AbstractMarker {
     private TestRunStatus status = TestRunStatus.CREATED;
 
     @NonNull
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<TestRunConfiguration, String> configuration = new EnumMap<>(TestRunConfiguration.class);
 
     @NonNull
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<TestRunResultAnalysis, String> resultAnalysis = new EnumMap<>(TestRunResultAnalysis.class);
 
     @NonNull
@@ -63,7 +60,6 @@ public class TestRunMarker extends AbstractMarker {
 
     // Rule-EDITOR-PANEL-239
     @NonNull
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String commit = "";
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-022, Rule-INTERNAL-117

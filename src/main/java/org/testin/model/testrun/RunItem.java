@@ -50,6 +50,8 @@ import java.util.UUID;
 @Accessors(chain = true)
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
+// Rule-INTERNAL-135
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class RunItem {
     @JsonIgnore
     @Getter(AccessLevel.NONE)
@@ -101,7 +103,6 @@ public class RunItem {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     @NotNull
     @Builder.Default
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> screenshots = List.of();
     @NotNull
     @Builder.Default

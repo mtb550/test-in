@@ -317,6 +317,15 @@ unknown key and skips it. Adding a field is therefore always safe: an older
 build reading a newer file drops the field, and writes the file back without it.
 That is the trade — forward compatibility is a *read*, not a round trip.
 
+**A file holds only what differs from a fresh one** (Rule-INTERNAL-135). Every
+stored type carries `@JsonInclude(NON_DEFAULT)`, so a value equal to what a
+newly made test case, run item or marker holds is left out, and a missing key
+reads back as exactly that value: an empty field, a default bug severity, a
+passed run item's cleared failure detail. `createdAt` is the one exception and
+is always written, because a fresh object holds the moment it was made. The
+price is that **changing a field's default is a format change**: every file
+that left the key out would silently take the new default.
+
 **A renamed field is not read under its old name.** No `@JsonAlias`, no
 converter: a rename moves the format number on, and a project in an older
 format is refused (Rule-INTERNAL-091). Format 3 renamed three keys so each says

@@ -46,6 +46,9 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 
 ### Changed
 
+- **Test data files hold only what was set:** a value equal to a fresh one is not written, so an empty field, a
+  default bug severity or priority, and a passed run item's cleared failure detail no longer fill the files and
+  their Git diffs. A key left out reads back as it always did.
 - **A section that opens and closes says so the same way everywhere:** a blue chevron, the word Collapse or Expand at
   the end of its line, and Click to collapse or Click to expand when hovered. The Test Case band of the details panel
   now shows all three, as Create Test Run's sections do.

@@ -33,19 +33,20 @@ import java.time.temporal.ChronoUnit;
 @Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
+// Rule-INTERNAL-135
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @ToString
 public abstract class AbstractMarker implements Marker {
     // Rule-INTERNAL-090, Rule-TREE-PANEL-051, Rule-INTERNAL-083
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @NonNull
     private String id = "";
 
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AbstractMarker.Unordered.class)
     private int order = Marker.NOT_ORDERED;
     @NonNull
     private String createdBy = "";
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private ZonedDateTime createdAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
     @NonNull
     private String updatedBy = "";
@@ -63,15 +64,4 @@ public abstract class AbstractMarker implements Marker {
         return Config.isNotExecuted(updatedAt) ? createdAt : updatedAt;
     }
 
-    static final class Unordered {
-        @Override
-        public boolean equals(final Object value) {
-            return value instanceof Integer order && order == Marker.NOT_ORDERED;
-        }
-
-        @Override
-        public int hashCode() {
-            return Marker.NOT_ORDERED;
-        }
-    }
 }

@@ -50,8 +50,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
 
@@ -146,11 +148,17 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
 
             final @NotNull Map<?, ?> keyboardFile = writtenRunItem(tr, testCases.getFirst());
             final @NotNull Map<?, ?> automationFile = writtenRunItem(tr, testCases.get(1));
-            assertEquals("the automation's run item status is written in another shape", keyboardFile.keySet(), automationFile.keySet());
+            assertEquals("the automation's run item status is written in another shape, apart from the duration only it measured", withoutDuration(keyboardFile), withoutDuration(automationFile));
             assertEquals(keyboardFile.get("status"), automationFile.get("status"));
         } finally {
             Disposer.dispose(editor);
         }
+    }
+
+    private static @NotNull Set<Object> withoutDuration(final @NotNull Map<?, ?> written) {
+        final @NotNull Set<Object> keys = new HashSet<>(written.keySet());
+        keys.remove("duration");
+        return keys;
     }
 
     // Rule-EDITOR-PANEL-183

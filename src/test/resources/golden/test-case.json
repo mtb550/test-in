@@ -9,10 +9,7 @@
   "reference" : "JIRA-1",
   "groups" : [ "smoke", "régression" ],
   "createdBy" : "Muteb",
-  "updatedBy" : "",
   "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
   "updatedAt" : "Thursday 10-09-2026 At 01:23:59 [Europe/London]",
-  "module" : "",
-  "testData" : "{\"user\": \"admin\"}",
-  "preConditions" : ""
+  "testData" : "{\"user\": \"admin\"}"
 }
