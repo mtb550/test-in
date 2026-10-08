@@ -460,7 +460,7 @@ public final class TestRunWordGenerator {
         final @NotNull XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
         final @NotNull XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
-        styledRun(p.createRun(), Bundle.message("report.footer.prefix"), ReportFont.CAPTION, DARK_GRAY);
+        styledRun(p.createRun(), ReportText.footerLead(), ReportFont.CAPTION, DARK_GRAY);
 
         final @NotNull XWPFHyperlinkRun link = p.createHyperlinkRun(ReportText.PLUGIN_URL);
         styledRun(link, ReportText.PLUGIN_NAME, ReportFont.CAPTION, LINK_BLUE);

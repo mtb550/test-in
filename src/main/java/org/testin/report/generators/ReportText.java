@@ -19,6 +19,7 @@ package org.testin.report.generators;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -27,6 +28,10 @@ import java.util.stream.Collectors;
 public final class ReportText {
     public static final @NotNull String PLUGIN_NAME = "Testin";
     public static final @NotNull String PLUGIN_URL = "https://plugins.jetbrains.com/plugin/31514-testin";
+
+    public static @NotNull String footerLead() {
+        return Bundle.message("report.footer.prefix") + " ";
+    }
 
     public static @NotNull String joined(final @NotNull String separator, final String @NotNull ... parts) {
         return Arrays.stream(parts)

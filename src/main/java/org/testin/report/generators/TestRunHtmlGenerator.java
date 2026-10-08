@@ -136,7 +136,7 @@ public final class TestRunHtmlGenerator {
         }
 
         html.append("<div class='footer'>")
-                .append(Bundle.message("report.footer.prefix"))
+                .append(ReportText.footerLead())
                 .append("<a href='").append(ReportText.PLUGIN_URL).append("' target='_blank'>Testin</a>")
                 .append(Bundle.message("report.footer.suffix"))
                 .append("</div>");

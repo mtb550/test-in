@@ -196,7 +196,7 @@ public final class TestRunPdfGenerator {
                 footerCanvas.add(para()
                         .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                         .setTextAlignment(TextAlignment.CENTER)
-                        .add(text(Bundle.message("report.footer.prefix")))
+                        .add(text(ReportText.footerLead()))
                         .add(new Link(ReportText.PLUGIN_NAME, PdfAction.createURI(ReportText.PLUGIN_URL))
                                 .setFontColor(LINK_BLUE))
                         .add(text(Bundle.message("report.footer.suffix"))));
