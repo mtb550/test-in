@@ -20,7 +20,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunNode;
 
 import java.util.Optional;
 
@@ -45,7 +45,7 @@ public final class LightMode implements Disposable {
     }
 
     // UC-EDITOR-PANEL-046
-    public void refresh(final @NotNull TestRunDirectoryDto testRun) {
+    public void refresh(final @NotNull TestRunNode testRun) {
         if (!testRun.isOpen()) {
             closeIfShowing(testRun);
             return;
@@ -54,12 +54,12 @@ public final class LightMode implements Disposable {
         window.filter(open -> open.shows(testRun)).ifPresent(LightModeWindow::refresh);
     }
 
-    private void closeIfShowing(final @NotNull TestRunDirectoryDto testRun) {
+    private void closeIfShowing(final @NotNull TestRunNode testRun) {
         window.filter(open -> open.shows(testRun)).ifPresent(LightModeWindow::close);
     }
 
     // UC-EDITOR-PANEL-046
-    public void editorClosing(final @NotNull TestRunDirectoryDto testRun) {
+    public void editorClosing(final @NotNull TestRunNode testRun) {
         window.filter(open -> open.shows(testRun)).ifPresent(open -> {
             open.closeQuietly();
             window = Optional.empty();
@@ -67,11 +67,11 @@ public final class LightMode implements Disposable {
     }
 
     // UC-EDITOR-PANEL-046
-    public void tick(final @NotNull TestRunDirectoryDto testRun) {
+    public void tick(final @NotNull TestRunNode testRun) {
         window.filter(open -> open.shows(testRun)).ifPresent(LightModeWindow::tick);
     }
 
-    public boolean isOpenOn(final @NotNull TestRunDirectoryDto testRun) {
+    public boolean isOpenOn(final @NotNull TestRunNode testRun) {
         return window.filter(open -> open.shows(testRun)).isPresent();
     }
 

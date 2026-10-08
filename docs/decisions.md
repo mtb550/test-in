@@ -43,10 +43,10 @@ reason: a decision nobody can find the history of gets made again every year.
 nodes from it, both editors read test cases out of it, the view panel shows one
 test case, the report writes a test run out. When each of them read the disk
 for itself, "does this node exist" was a `Files.exists` in one place, a cache
-lookup in another, and a stale `DirectoryDto` in a third.
+lookup in another, and a stale `Node` in a third.
 
 **Decision.** `org.testin.indexer` is the only package that touches test data.
-Everything else holds `DirectoryDto` and `TestCaseDto` objects the indexer
+Everything else holds `Node` and `TestCaseDto` objects the indexer
 served, and asks the indexer to create, move, rename, copy or delete. Inside the
 indexer, the VFS operation happens first and the cache is updated after it
 succeeds.
@@ -79,7 +79,7 @@ and never saves the drawn form; an editable surface loads the **raw** value when
 editing begins. `Rule-EDITOR-PANEL-005` states it for a tester, and
 `Rule-VIEW-PANEL-026` names the four fields that are formatted at all.
 
-**Consequences.** `TestCaseEditorAttributes` answers both questions in one place:
+**Consequences.** `TestSetEditorAttributes` answers both questions in one place:
 `displayValue` for a reader and `gridValue` for a cell. Reference, module and
 test data are never formatted. An identifier and a label are not sentences. Test
 data is a value that gets used rather than read, so a character the display
@@ -383,7 +383,7 @@ settings, its dependency and its local test server are removed (#334).
 **Consequences.** No SSH client ships in the plugin, and Testin keeps no
 password of its own. A test run change is written the moment it is made, with
 nothing held for a sync. `testin.yml` loses the `connection` key, which only
-ever told Git from SFTP: `location: remote` with a `RepoUrl` is a Git project.
+ever told Git from SFTP: `location: remote` with a `repoUrl` is a Git project.
 A file that still has `connection` or the server keys has them skipped as
 unknown keys, each named in the log. So an old Git file still clones, an old
 SFTP file is not shared, and the test project either one names is still read. A

@@ -22,10 +22,10 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -58,26 +58,26 @@ public final class TestRuns {
         return indexer.getStore();
     }
 
-    private @NotNull TestRunWriter testRunWriter() {
-        return indexer.getTestRunWriter();
+    private @NotNull RunItemWriter runItemWriter() {
+        return indexer.getRunItemWriter();
     }
 
-    public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return withTestCasesShown(testRunPath, store().getTestRunByPath(testRunPath));
+    public @NotNull RunItems getRunItems(final @NotNull Path testRunPath) {
+        return withTestCasesShown(testRunPath, store().getRunItems(testRunPath));
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
-    private @NotNull TestRunDto withTestCasesShown(final @NotNull Path testRunPath, final @NotNull TestRunDto testRun) {
+    private @NotNull RunItems withTestCasesShown(final @NotNull Path testRunPath, final @NotNull RunItems runItems) {
         final @NotNull IndexerDataStore store = store();
         final @NotNull String commit = commitOf(testRunPath);
         final @NotNull Map<UUID, Optional<TestCaseDto>> inCommit = recorded.getOrDefault(recordedAt.getOrDefault(testRunPath, commit), Map.of());
-        testRun.getResults().forEach(item -> item.showing(store.findTestCase(item.getId()), inCommit.getOrDefault(item.getId(), Optional.empty()), Optional.ofNullable(lastInGit.get(item.getId())), !commit.isEmpty()));
-        return testRun;
+        runItems.getAll().forEach(runItem -> runItem.showing(store.findTestCase(runItem.getId()), inCommit.getOrDefault(runItem.getId(), Optional.empty()), Optional.ofNullable(lastInGit.get(runItem.getId())), !commit.isEmpty()));
+        return runItems;
     }
 
     // Rule-EDITOR-PANEL-239
     public @NotNull String commitOf(final @NotNull Path testRunPath) {
-        return store().findTestRunDir(testRunPath).map(dir -> dir.getMarker().getCommit()).orElse("");
+        return store().findTestRunNode(testRunPath).map(dir -> dir.getMarker().getCommit()).orElse("");
     }
 
     // Rule-EDITOR-PANEL-239, Rule-SHARE-130
@@ -102,52 +102,52 @@ public final class TestRuns {
     }
 
     // Rule-VIEW-PANEL-092
-    public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
-        return store().getTestRunsByPath().entrySet().stream()
+    public @NotNull Map<Path, RunItems> getAllRunItems() {
+        return store().getRunItemsByPath().entrySet().stream()
                 .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), Map.Entry::getValue));
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-107
-    public @NotNull Map<Path, TestRunItems> runItemsOf(final @NotNull UUID testCaseId) {
-        final @NotNull Map<Path, TestRunItems> runItems = new HashMap<>();
-        store().getTestRunsByPath().forEach((testRun, tr) -> tr.resultOf(testCaseId).ifPresent(runItem -> runItems.put(Path.of(testRun), runItem)));
+    public @NotNull Map<Path, RunItem> runItemsOf(final @NotNull UUID testCaseId) {
+        final @NotNull Map<Path, RunItem> runItems = new HashMap<>();
+        store().getRunItemsByPath().forEach((testRunPath, held) -> held.runItemOf(testCaseId).ifPresent(runItem -> runItems.put(Path.of(testRunPath), runItem)));
         return runItems;
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-051
-    public @NotNull Optional<TestRunDirectoryDto> findTestRunDir(final @NotNull Path testRunPath) {
-        return store().findTestRunDir(testRunPath);
+    public @NotNull Optional<TestRunNode> findTestRunNode(final @NotNull Path testRunPath) {
+        return store().findTestRunNode(testRunPath);
     }
 
-    public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
-        return store().findTestRun(testRunPath).map(testRun -> withTestCasesShown(testRunPath, testRun));
+    public @NotNull Optional<RunItems> findRunItems(final @NotNull Path testRunPath) {
+        return store().findRunItems(testRunPath).map(runItems -> withTestCasesShown(testRunPath, runItems));
     }
 
-    public void changeTestRun(final @NotNull Path testRunPath, final @NotNull Consumer<TestRunDto> change) {
-        findTestRun(testRunPath).ifPresentOrElse(testRun -> {
+    public void changeRunItems(final @NotNull Path testRunPath, final @NotNull Consumer<RunItems> change) {
+        findRunItems(testRunPath).ifPresentOrElse(runItems -> {
             // Rule-INTERNAL-011
-            final @NotNull Set<UUID> gone = testRun.coveredIds();
-            change.accept(testRun);
-            gone.removeAll(testRun.coveredIds());
+            final @NotNull Set<UUID> gone = runItems.coveredIds();
+            change.accept(runItems);
+            gone.removeAll(runItems.coveredIds());
 
-            testRunWriter().persist(testRunPath, testRun, gone);
+            runItemWriter().persist(testRunPath, runItems, gone);
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + testRunPath.getFileName()));
     }
 
     // Rule-INTERNAL-011
-    public void changeResult(final @NotNull Path testRunPath, final @NotNull UUID testCaseId, final @NotNull Consumer<TestRunItems> change) {
-        findTestRun(testRunPath).ifPresentOrElse(testRun -> testRun.resultOf(testCaseId).ifPresentOrElse(result -> {
-                    change.accept(result);
-                    testRunWriter().persistResult(testRunPath, testRun, result);
-                }, () -> Logger.warn("'" + testRunPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
+    public void changeRunItem(final @NotNull Path testRunPath, final @NotNull UUID testCaseId, final @NotNull Consumer<RunItem> change) {
+        findRunItems(testRunPath).ifPresentOrElse(runItems -> runItems.runItemOf(testCaseId).ifPresentOrElse(runItem -> {
+                    change.accept(runItem);
+                    runItemWriter().persistRunItem(testRunPath, runItems, runItem);
+                }, () -> Logger.warn("'" + testRunPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its run item was dropped")),
                 () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + testRunPath.getFileName()));
     }
 
     public void changeTestRunMarker(final @NotNull Path testRunPath, final @NotNull Consumer<TestRunMarker> change) {
-        store().findTestRunDir(testRunPath).ifPresentOrElse(dir -> {
+        store().findTestRunNode(testRunPath).ifPresentOrElse(dir -> {
             final @NotNull TestRunMarker marker = dir.getMarker();
             change.accept(marker);
-            testRunWriter().persistMarker(testRunPath, () -> notSaved(testRunPath));
+            runItemWriter().persistMarker(testRunPath, () -> notSaved(testRunPath));
             indexer.announce(testRunPath);
         }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + testRunPath.getFileName()));
     }
@@ -161,30 +161,30 @@ public final class TestRuns {
         });
     }
 
-    public void saveTestRun(final @NotNull Path testRunPath) {
-        changeTestRun(testRunPath, _ -> {
+    public void saveRunItems(final @NotNull Path testRunPath) {
+        changeRunItems(testRunPath, _ -> {
         });
     }
 
-    public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        testRunWriter().create(testRunPath, tr);
+    public void putRunItems(final @NotNull Path testRunPath, final @NotNull RunItems runItems) {
+        runItemWriter().create(testRunPath, runItems);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     public @NotNull List<String> storeScreenshots(final @NotNull Path testRunPath, final @NotNull List<byte[]> pngs) {
-        return testRunWriter().storeScreenshots(testRunPath, pngs);
+        return runItemWriter().storeScreenshots(testRunPath, pngs);
     }
 
     public byte @NotNull [] screenshot(final @NotNull Path testRunPath, final @NotNull String name) {
-        return testRunWriter().readScreenshot(testRunPath, name);
+        return runItemWriter().readScreenshot(testRunPath, name);
     }
 
     // Rule-SHARE-130
     public void awaitWrites() {
-        testRunWriter().awaitWrites();
+        runItemWriter().awaitWrites();
     }
 
-    public @NotNull List<byte[]> screenshots(final @NotNull Path testRunPath, final @NotNull TestRunItems item) {
-        return item.getScreenshots().stream().map(name -> screenshot(testRunPath, name)).toList();
+    public @NotNull List<byte[]> screenshots(final @NotNull Path testRunPath, final @NotNull RunItem runItem) {
+        return runItem.getScreenshots().stream().map(name -> screenshot(testRunPath, name)).toList();
     }
 }

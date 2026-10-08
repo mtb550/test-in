@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunNode;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -41,18 +41,18 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     // UC-TREE-PANEL-020
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        TreeValues.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
+        TreeValues.selected(tree, TestRunNode.class).ifPresent(this::askForStatus);
     }
 
-    private void askForStatus(final @NotNull TestRunDirectoryDto testRunDto) {
-        new TestRunStatusMenuDialog(p, testRunDto.getMarker().getStatus(), selectedStatus ->
-                statusChange.apply(testRunDto, selectedStatus)).show();
+    private void askForStatus(final @NotNull TestRunNode testRunNode) {
+        new TestRunStatusMenuDialog(p, testRunNode.getMarker().getStatus(), selectedStatus ->
+                statusChange.apply(testRunNode, selectedStatus)).show();
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, TreeValues.selected(tree, TestRunDirectoryDto.class).filter(TestRunDirectoryDto::isOpen).isPresent(),
+        GrayWithReason.unless(this, e, TreeValues.selected(tree, TestRunNode.class).filter(TestRunNode::isOpen).isPresent(),
                 Bundle.message("test.run.not.open.description"));
     }
 

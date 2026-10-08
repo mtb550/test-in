@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.explorer.tree.TreeTransferPayload;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
@@ -40,11 +40,11 @@ record PasteNodeWork(@NotNull Project p, @NotNull TreeTransferHandler transferHa
     }
 
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-006
-    void paste(final @NotNull Transferable contents, final @NotNull DirectoryDto target) {
+    void paste(final @NotNull Transferable contents, final @NotNull Node target) {
         try {
             final @NotNull TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
-            final @NotNull List<DirectoryDto> nodes = payload.nodes().stream()
+            final @NotNull List<Node> nodes = payload.nodes().stream()
                     .filter(node -> transferHandler.canTransferInto(node, target))
                     .toList();
 

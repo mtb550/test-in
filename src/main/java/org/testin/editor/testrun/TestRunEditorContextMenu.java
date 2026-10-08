@@ -24,7 +24,7 @@ import org.testin.actions.EscapeAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testrun.SetTestCaseStatusGroup;
@@ -33,7 +33,7 @@ public class TestRunEditorContextMenu extends AbstractEditorContextMenu {
     private final @NotNull Project p;
     private final @NotNull TestinEditor ui;
 
-    public TestRunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
+    public TestRunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull Node dir, final @NotNull JBList<TestCaseDto> list) {
         super();
         this.p = p;
         this.ui = ui;

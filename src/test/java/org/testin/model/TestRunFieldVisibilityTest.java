@@ -17,7 +17,7 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.testrun.TestRunConfiguration;
 import org.testng.annotations.Test;
 
 import java.util.EnumMap;

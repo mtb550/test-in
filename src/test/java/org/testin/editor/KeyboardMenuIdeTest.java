@@ -35,13 +35,13 @@ import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.clipboard.CutTestCaseAction;
 import org.testin.clipboard.PasteTestCaseAction;
 import org.testin.editor.grid.GridKeys;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.testcase.RemoveTestCaseAction;
 import org.testin.undo.UndoAction;
 import org.testin.util.Bundle;
@@ -125,18 +125,18 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
         return Objects.requireNonNullElse(shown.getDescription(), "");
     }
 
-    private @NotNull TestCaseEditor aTestCaseEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+    private @NotNull TestSetEditor aTestSetEditor() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         EditorFixtures.testCases(getProject(), ts, 2);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     private @NotNull TestRunEditor aTestRunEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Payments");
         final @NotNull List<TestCaseDto> inTheTestRun = EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, inTheTestRun.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, inTheTestRun.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
@@ -146,20 +146,20 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-213
     public void testTheClipboardAndHistoryEntriesAreUnderActionsAndTheirKeysStillWork() {
-        final @NotNull TestCaseEditor testCaseEditor = aTestCaseEditor();
+        final @NotNull TestSetEditor testSetEditor = aTestSetEditor();
         final @NotNull TestRunEditor testRunEditor = aTestRunEditor();
         try {
-            assertTheSevenAreUnderActionsAndTheirKeysStillWork("test case editor", testCaseEditor);
+            assertTheSevenAreUnderActionsAndTheirKeysStillWork("test set editor", testSetEditor);
             assertTheSevenAreUnderActionsAndTheirKeysStillWork("test run editor", testRunEditor);
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }
 
     // Rule-EDITOR-PANEL-214
     public void testATestRunEditorShowsTheSameSevenAndRefusesFourWithTheirReason() {
-        final @NotNull TestCaseEditor testCaseEditor = aTestCaseEditor();
+        final @NotNull TestSetEditor testSetEditor = aTestSetEditor();
         final @NotNull TestRunEditor testRunEditor = aTestRunEditor();
         final @NotNull Map<Class<?>, String> refusedInATestRun = Map.of(
                 CopyTestCaseAction.class, Bundle.message("copy.test.case.disabled.description"),
@@ -167,7 +167,7 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
                 PasteTestCaseAction.class, Bundle.message("paste.test.case.disabled.description"),
                 RemoveTestCaseAction.class, Bundle.message("remove.test.case.disabled.description"));
         try {
-            testCaseEditor.getList().setSelectedIndex(0);
+            testSetEditor.getList().setSelectedIndex(0);
             testRunEditor.getList().setSelectedIndex(0);
             CopyPasteManager.getInstance().setContents(new StringSelection("plain words"));
 
@@ -182,29 +182,29 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
                 assertEquals(nameOf(entry) + " does not say why it is gray in a test run", refusedInATestRun.get(kind), said(inTheTestRun));
             }
 
-            for (final AnAction entry : childrenOf(actionsEntryOf(testCaseEditor))) {
+            for (final AnAction entry : childrenOf(actionsEntryOf(testSetEditor))) {
                 final @NotNull Class<?> kind = unwrapped(entry).getClass();
                 if (!refusedInATestRun.containsKey(kind) || kind == PasteTestCaseAction.class) continue;
 
-                assertTrue(nameOf(entry) + " is gray in a test case editor with a test case selected", updated(testCaseEditor, entry).isEnabled());
+                assertTrue(nameOf(entry) + " is gray in a test set editor with a test case selected", updated(testSetEditor, entry).isEnabled());
             }
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }
 
     // Rule-EDITOR-PANEL-230
     public void testAnEntryThatCannotWorkIsGrayAndSaysWhy() {
-        final @NotNull TestCaseEditor testCaseEditor = aTestCaseEditor();
+        final @NotNull TestSetEditor testSetEditor = aTestSetEditor();
         final @NotNull TestRunEditor testRunEditor = aTestRunEditor();
         try {
             CopyPasteManager.getInstance().setContents(new StringSelection("plain words"));
-            testCaseEditor.getList().clearSelection();
+            testSetEditor.getList().clearSelection();
             testRunEditor.getList().clearSelection();
 
             final @NotNull List<String> silent = new ArrayList<>();
-            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testCaseEditor, testRunEditor)) {
+            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testSetEditor, testRunEditor)) {
                 final @NotNull List<AnAction> entries = new ArrayList<>(childrenOf(editor.contextMenu));
                 entries.addAll(childrenOf(actionsEntryOf(editor)));
                 for (final AnAction entry : entries) {
@@ -220,11 +220,11 @@ public class KeyboardMenuIdeTest extends AbstractTempRootIdeTest {
             }
             assertEquals("these entries are gray with nothing selected and do not say why", List.of(), silent);
 
-            final @NotNull Presentation paste = updated(testCaseEditor, childrenOf(actionsEntryOf(testCaseEditor)).get(3));
+            final @NotNull Presentation paste = updated(testSetEditor, childrenOf(actionsEntryOf(testSetEditor)).get(3));
             assertFalse("Paste works with no test cases on the clipboard", paste.isEnabled());
             assertEquals("Paste does not give the clipboard its own reason", Bundle.message("paste.test.case.nothing.description"), said(paste));
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }

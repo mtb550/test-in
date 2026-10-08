@@ -20,7 +20,7 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.services.Services;
 
 import java.io.IOException;
@@ -56,13 +56,13 @@ public class WatchedProjectsIdeTest extends AbstractTempRootIdeTest {
     public void testATestProjectIsReadAgainAndForgottenOnceItsMarkerIsGone() {
         final Path project = root.resolve("NAFATH");
         WriteAction.runAndWait(() -> nodes().addTestProject(
-                Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(project)));
+                Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(project)));
 
         indexer().rescanChangedProject(project, new EmptyProgressIndicator());
         assertTrue("a test project with its marker was not read again", nodes().nodeExists(project));
 
         try {
-            Files.delete(project.resolve(DirectoryType.TP.getMarker()));
+            Files.delete(project.resolve(NodeType.TP.getMarker()));
         } catch (final IOException ex) {
             throw new AssertionError("could not remove the marker", ex);
         }

@@ -71,7 +71,7 @@ creating, cloning, renaming, committing and pushing never do.
   with a remote - without any account or token. It shows the file and each line
   first, and writes nothing until the tester presses **Save**.
 - **Rule-TREE-PANEL-114** — It changes only `testinProject`, `location` and
-  `RepoUrl`. Every other line of the file - comments, `bugRepoUrl`, keys Testin
+  `repoUrl`. Every other line of the file - comments, `bugRepoUrl`, keys Testin
   does not know - stays as it was.
 
 ## The preview
@@ -84,7 +84,7 @@ creating, cloning, renaming, committing and pushing never do.
 │                                                              │
 │  testinProject: NAFATH             was Checkout          (2) │
 │  location: remote                  was local                 │
-│  RepoUrl: https://github.com/acme/nafath-test-cases.git  new │
+│  repoUrl: https://github.com/acme/nafath-test-cases.git  new │
 │                                                              │
 │  Everything else in the file stays as it is.                 │
 │  The file is committed: this names NAFATH for everyone who   │
@@ -104,7 +104,7 @@ creating, cloning, renaming, committing and pushing never do.
 1. The tester presses **Save to testin.yml** at the top of the Testin panel.
 2. Testin works out the lines. `testinProject` is the test project open in the
    tree. When its folder is a Git repository with a remote, `location: remote`
-   and `RepoUrl`, the remote's address without any account or token; when it
+   and `repoUrl`, the remote's address without any account or token; when it
    has no remote, `location: local`.
 3. The preview opens.
 4. The tester presses `Enter`. Testin writes the lines, reads the file again,
@@ -129,7 +129,7 @@ cannot be read - correct it by hand first.* Lines written into a broken file
 could leave it broken, and make code look on.
 
 **If the Git plugin is not installed** - only `testinProject` is written;
-`location` and `RepoUrl` stay as they are, rather than calling a Git project
+`location` and `repoUrl` stay as they are, rather than calling a Git project
 local.
 
 **If the file cannot be written** - nothing changes, and *testin.yml could not

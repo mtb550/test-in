@@ -27,13 +27,13 @@ import org.testin.FilesUnder;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.statusbar.StatusBar;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -84,7 +84,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
             typedInto(grid, 0, "Slow but it passed");
             typedInto(grid, 1, "Not tried yet");
 
-            assertEquals("Slow but it passed", fixture.resultOf(testCases.get(0)).getActualResult());
+            assertEquals("Slow but it passed", fixture.runItemOf(testCases.get(0)).getActualResult());
             assertEquals("typing changed a recorded run item status", RunItemStatus.PASSED, fixture.statusOf(testCases.get(0)));
             assertEquals("typing recorded a run item status", RunItemStatus.PENDING, fixture.statusOf(testCases.get(1)));
         } finally {
@@ -119,7 +119,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
         final @NotNull UUID removed = UUID.randomUUID();
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(
                 EditorFixtures.pending(testCases.getFirst()),
-                new TestRunItems().setId(removed).setActualResult("Kept from before")), testCases);
+                new RunItem().setId(removed).setActualResult("Kept from before")), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         try {
             final @NotNull JBTable grid = theGridOf(editor);
@@ -127,7 +127,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
             final int liveRow = 1 - removedRow;
 
             typedInto(grid, liveRow, "The dashboard stayed blank");
-            assertEquals("the cell does not hold what was stored", fixture.resultOf(testCases.getFirst()).getActualResult(), grid.getModel().getValueAt(liveRow, ACTUAL_RESULT));
+            assertEquals("the cell does not hold what was stored", fixture.runItemOf(testCases.getFirst()).getActualResult(), grid.getModel().getValueAt(liveRow, ACTUAL_RESULT));
 
             typedInto(grid, removedRow, "Typed over a removed test case");
             assertEquals("the cell kept what was typed though nothing was stored", "Kept from before", grid.getModel().getValueAt(removedRow, ACTUAL_RESULT));
@@ -156,20 +156,20 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
     }
 
     // Rule-EDITOR-PANEL-179
-    public void testTheThreeTestRunLabelsAreHiddenWithNothingToSayAndNeverInATestCaseEditor() {
+    public void testTheThreeTestRunLabelsAreHiddenWithNothingToSayAndNeverInATestSetEditor() {
         for (final JComponent label : theThreeTestRunLabels(new StatusBar()))
             assertFalse("a test run label shows on a fresh status bar", label.isVisible());
 
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Payments");
         EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestCaseEditor testCaseEditor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
         final @NotNull TestRunEditor testRunEditor = fixture.opened(getTestRootDisposable());
         try {
-            testCaseEditor.refreshView();
-            for (final JComponent label : theThreeTestRunLabels(testCaseEditor.getStatusBar()))
-                assertFalse("a test case editor shows a test run label", label.isVisible());
+            testSetEditor.refreshView();
+            for (final JComponent label : theThreeTestRunLabels(testSetEditor.getStatusBar()))
+                assertFalse("a test set editor shows a test run label", label.isVisible());
 
             final @NotNull List<JComponent> inTheTestRun = theThreeTestRunLabels(testRunEditor.getStatusBar());
             assertTrue("the test run's status is not shown", inTheTestRun.get(0).isVisible());
@@ -179,7 +179,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
             testRunEditor.refreshAfterTestRunStatusChanged();
             assertTrue("the figures are hidden though a run item status was recorded", inTheTestRun.get(1).isVisible());
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }

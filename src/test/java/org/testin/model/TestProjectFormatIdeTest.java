@@ -19,6 +19,7 @@ package org.testin.model;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.TestProjectMarker;
+import org.testin.util.Bundle;
 
 import java.util.Optional;
 
@@ -38,13 +39,11 @@ public class TestProjectFormatIdeTest extends BasePlatformTestCase {
     }
 
     // Rule-INTERNAL-091
-    public void testAProjectWithNoFormatIsRefusedAndNamesTheReleaseThatConvertsIt() {
-        final @NotNull Optional<String> refused = refusalFor(0);
+    public void testAProjectInAnOlderFormatIsRefusedAndToldToBeCreatedAgain() {
+        final @NotNull Optional<String> refused = refusalFor(TestProjectMarker.FORMAT - 1);
 
-        assertTrue("a project written before the format number is not read at all", refused.isPresent());
-        assertTrue("the refusal has to name the release that brings it forward, or the tester cannot act on it: "
-                        + refused.orElseThrow(),
-                refused.orElseThrow().contains(TestProjectMarker.CONVERTING_RELEASE));
+        assertEquals("an older project is not read, converted or repaired: the tester is told to create it again",
+                Optional.of(Bundle.message("scan.older.format")), refused);
     }
 
     // Rule-INTERNAL-091

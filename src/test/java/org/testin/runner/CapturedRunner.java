@@ -21,7 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.ExtensionTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.Failure;
+import org.testin.model.testrun.Failure;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.services.Services;
 

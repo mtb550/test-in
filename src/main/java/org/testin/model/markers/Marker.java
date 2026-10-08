@@ -45,25 +45,25 @@ public interface Marker {
 
     void setCreatedAt(@NotNull ZonedDateTime createdAt);
 
-    @NotNull String getModifiedBy();
+    @NotNull String getUpdatedBy();
 
-    void setModifiedBy(@NotNull String modifiedBy);
+    void setUpdatedBy(@NotNull String updatedBy);
 
-    @NotNull ZonedDateTime getModifiedAt();
+    @NotNull ZonedDateTime getUpdatedAt();
 
-    void setModifiedAt(@NotNull ZonedDateTime modifiedAt);
+    void setUpdatedAt(@NotNull ZonedDateTime updatedAt);
 
     default void stampCreated(final @NotNull String tester) {
         final @NotNull ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
         setCreatedBy(tester);
         setCreatedAt(now);
-        setModifiedBy(tester);
-        setModifiedAt(now);
+        setUpdatedBy(tester);
+        setUpdatedAt(now);
     }
 
     default void touch(final @NotNull String tester) {
-        setModifiedBy(tester);
-        setModifiedAt(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS));
+        setUpdatedBy(tester);
+        setUpdatedAt(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS));
     }
 
     default @NotNull NodeStatus status() {

@@ -11,7 +11,7 @@
   ],
   "priority" : "HIGH",
   "reference" : "",
-  "group" : [
+  "groups" : [
     "SECURITY",
     "REGRESSION"
   ],

@@ -20,7 +20,7 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.ShownFields;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 import org.testin.view.Drawn;
@@ -90,9 +90,9 @@ public class DetailsRowsIdeTest extends BasePlatformTestCase {
 
     // Rule-VIEW-PANEL-103
     public void testAFieldUntickedInFieldsIsStillDrawn() {
-        final @NotNull Set<TestCaseEditorAttributes> was = ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class);
-        final @NotNull Set<TestCaseEditorAttributes> chosen = EnumSet.allOf(TestCaseEditorAttributes.class);
-        chosen.removeAll(Set.of(TestCaseEditorAttributes.STEPS, TestCaseEditorAttributes.MODULE));
+        final @NotNull Set<TestSetEditorAttributes> was = ShownFields.read(ShownFields.IN_TEST_SETS, TestSetEditorAttributes.class);
+        final @NotNull Set<TestSetEditorAttributes> chosen = EnumSet.allOf(TestSetEditorAttributes.class);
+        chosen.removeAll(Set.of(TestSetEditorAttributes.STEPS, TestSetEditorAttributes.MODULE));
         ShownFields.write(ShownFields.IN_TEST_SETS, chosen);
         try {
             final @NotNull List<String> words = Drawn.words(Drawn.detailsTab(getProject(), everyFieldFilled(), Optional.empty(), PATH));

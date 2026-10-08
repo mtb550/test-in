@@ -40,10 +40,10 @@ import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -76,7 +76,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull ZonedDateTime CREATED = ZonedDateTime.of(2026, 8, 20, 3, 33, 24, 0, ZoneId.of("Asia/Riyadh"));
 
     private final @NotNull StandInEditorProvider standIn = new StandInEditorProvider();
-    private TestProjectDirectoryDto testProject;
+    private TestProjectNode testProject;
 
     private static @NotNull TestCaseDto aTestCase(final @NotNull String description) {
         return TestCaseDto.builder().description(description).createdBy("Sara").createdAt(CREATED).updatedBy("Sara").updatedAt(CREATED).build();
@@ -153,11 +153,11 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
         return FileTypes.JSON.importToFile(getProject(), file);
     }
 
-    private void imported(final @NotNull DirectoryDto into, final @NotNull Map<String, List<TestCaseDto>> sheets) {
+    private void imported(final @NotNull Node into, final @NotNull Map<String, List<TestCaseDto>> sheets) {
         imported(into, sheets, new EmptyProgressIndicator());
     }
 
-    private void imported(final @NotNull DirectoryDto into, final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull ProgressIndicator indicator) {
+    private void imported(final @NotNull Node into, final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull ProgressIndicator indicator) {
         if (into.holdsTestCases()) anEditorStandsOpenOn(into);
         final int total = sheets.values().stream().mapToInt(List::size).sum();
         final @NotNull Future<?> running = ApplicationManager.getApplication().executeOnPooledThread(() -> new ImportWork(getProject()).importInBackground(into, sheets, false, total, indicator));
@@ -170,7 +170,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private void anEditorStandsOpenOn(final @NotNull DirectoryDto testSet) {
+    private void anEditorStandsOpenOn(final @NotNull Node testSet) {
         if (Arrays.stream(FileEditorManager.getInstance(getProject()).getOpenFiles()).anyMatch(open -> open.getPath().equals(testSet.getPath().toAbsolutePath().toString())))
             return;
 
@@ -185,7 +185,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-002
     public void testAnImportNeverOverwritesAnExistingTestCase() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         final @NotNull TestCaseDto existing = new NodesOnDisk(getProject()).testCase(login);
         final @NotNull Path existingFile = login.getPath().resolve(existing.getId() + ".tc");
         final byte @NotNull [] before = bytesOf(existingFile);
@@ -200,7 +200,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-026
     public void testAnImportedTestCaseKeepsTheAuditTheFileCarried() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
 
         imported(login, read(aFile("Login.json", sheets("Login", aTestCase("log in with a valid user")))));
 
@@ -212,20 +212,20 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-027
     public void testEverySheetGoesIntoTheOneTestSet() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused"));
         twoSheets.put("Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"))));
-        final @NotNull List<String> foldersBefore = foldersIn(testProject.getTestCasesDirectory().getPath());
+        final @NotNull List<String> foldersBefore = foldersIn(testProject.getTestCasesFolder().getPath());
 
         imported(login, read(aFile("Plan.json", twoSheets)));
 
         assertEquals(3, filesOfTestCasesIn(login.getPath()).size());
-        assertEquals("a sheet became a test set of its own", foldersBefore, foldersIn(testProject.getTestCasesDirectory().getPath()));
+        assertEquals("a sheet became a test set of its own", foldersBefore, foldersIn(testProject.getTestCasesFolder().getPath()));
     }
 
     // UC-SHARE-005, Rule-SHARE-030
     public void testImportingTheSameFileTwiceMakesTwoCopies() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         final @NotNull File file = aFile("Login.json", sheets("Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused")));
 
         imported(login, read(file));
@@ -239,7 +239,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-006, Rule-SHARE-031
     public void testOneTestSetIsMadeForEachSheetNamedWithoutItsSpecialCharacters() {
-        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
+        final @NotNull TestSetPackageNode web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesFolder(), "Web");
         final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("Log/in: Flow*", aTestCase("log in with a valid user"));
         twoSheets.put("Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"))));
 
@@ -250,7 +250,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SHARE-128
     public void testASheetNamedOnlyWithSpecialCharactersBecomesImportedSheet() {
-        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
+        final @NotNull TestSetPackageNode web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesFolder(), "Web");
 
         imported(web, read(aFile("Plan.json", sheets("*?*", aTestCase("log in with a valid user")))));
 
@@ -259,7 +259,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-006, Rule-SHARE-032
     public void testTheTestSetsAreMadeBeforeAnyTestCaseIsWritten() {
-        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
+        final @NotNull TestSetPackageNode web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesFolder(), "Web");
         final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("Login", aTestCase("log in with a valid user"));
         twoSheets.put("Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"))));
         final @NotNull List<String> atTheFirstWrite = new CopyOnWriteArrayList<>();
@@ -273,21 +273,21 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-006, Rule-SHARE-033
     public void testNoEditorIsOpenedAfterAnImportIntoAPackage() {
-        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
+        final @NotNull TestSetPackageNode web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesFolder(), "Web");
 
         imported(web, read(aFile("Plan.json", sheets("Login", aTestCase("log in with a valid user")))));
         assertEquals("the import into the package wrote nothing", 1, filesOfTestCasesIn(web.getPath().resolve("Login")).size());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         assertEquals("an editor was opened after an import into a package", 0, FileEditorManager.getInstance(getProject()).getOpenFiles().length);
 
-        final @NotNull TestSetDirectoryDto signup = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Signup");
+        final @NotNull TestSetNode signup = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Signup");
         imported(signup, read(aFile("Signup.json", sheets("Signup", aTestCase("sign up with a new address")))));
         Await.until("an import into a test set opens its editor again, so the package's would have been seen", () -> standIn.opened.get() == 2);
     }
 
     // UC-SHARE-007, Rule-SHARE-037
     public void testAnImportThatStopsSaysHowManyWereWrittenAndKeepsThem() {
-        final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
+        final @NotNull TestSetPackageNode web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesFolder(), "Web");
         final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("A Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused"));
         twoSheets.put("B Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"), aTestCase("pay with a wallet"), aTestCase("pay on delivery"))));
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();

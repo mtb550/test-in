@@ -24,7 +24,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
@@ -88,7 +88,7 @@ class TestCaseDetails extends JBPanel<TestCaseDetails> {
         addRow(CreateTestCaseFields.STEPS.getIcon(), Display.numberedSteps(tc.getSteps()));
 
         addRow(CreateTestCaseFields.TEST_DATA.getIcon(), tc.getTestData());
-        addRow(CreateTestCaseFields.PRE_CONDITIONS.getIcon(), TestCaseEditorAttributes.PRE_CONDITIONS.displayValue(tc));
+        addRow(CreateTestCaseFields.PRE_CONDITIONS.getIcon(), TestSetEditorAttributes.PRE_CONDITIONS.displayValue(tc));
 
         if (cutOff) addCutOffNotice();
     }

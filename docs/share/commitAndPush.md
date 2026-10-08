@@ -66,7 +66,7 @@ something else.
 ## What Testin refuses
 
 **If no remote is set** — when `testin.yml` names this test project, says
-`location: remote` and gives its `RepoUrl`, that address becomes the remote and
+`location: remote` and gives its `repoUrl`, that address becomes the remote and
 the push goes on. For any other test project a window titled **Configure
 Remote** asks for one. It
 says the repository has nowhere to push to yet, names the remote the address

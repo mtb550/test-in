@@ -21,7 +21,7 @@ import com.intellij.ui.components.JBPanel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.testrun.TestRunEditorAttributes;
 
 import java.awt.GridBagConstraints;
@@ -29,7 +29,7 @@ import java.awt.GridBagConstraints;
 @RequiredArgsConstructor
 public final class RunItemAttributeRow extends AbstractDetails {
     private final @NotNull TestRunEditorAttributes attribute;
-    private final @NotNull TestRunItems runItem;
+    private final @NotNull RunItem runItem;
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-031
     @Override

@@ -18,7 +18,7 @@ package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.MultiLineField;
@@ -26,7 +26,7 @@ import org.testin.util.Bundle;
 
 public record StacktraceSection(@NotNull ComponentDialogBase<MultiLineField> component) implements FailureSection {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
-    public static @NotNull StacktraceSection of(final @NotNull Project p, final @NotNull TestRunItems runItem) {
+    public static @NotNull StacktraceSection of(final @NotNull Project p, final @NotNull RunItem runItem) {
         return new StacktraceSection(ComponentDialogBase.multiLineField(p, TestRunEditorAttributes.STACKTRACE.getName(), Bundle.message("dialog.failure.placeholder.error"), runItem.getStacktrace()));
     }
 

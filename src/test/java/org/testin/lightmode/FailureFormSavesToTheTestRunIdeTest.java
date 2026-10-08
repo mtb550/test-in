@@ -19,15 +19,15 @@ package org.testin.lightmode;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 
@@ -45,33 +45,33 @@ public class FailureFormSavesToTheTestRunIdeTest extends AbstractTempRootIdeTest
 
     private @NotNull Path aTestRunWithOneFailure() {
         final @NotNull Path testRunPath = WriteAction.computeAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+            final @NotNull NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
-            final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
+            final @NotNull TestProjectNode tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes.addTestProject(tp);
 
-            final @NotNull TestSetDirectoryDto ts = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Checkout"), tp.getTestCasesDirectory());
+            final @NotNull TestSetNode ts = mapper.getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Checkout"), tp.getTestCasesFolder());
             nodes.addTestSet(ts);
             Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(),
                     TestCaseDto.builder().id(FAILED_TEST_CASE).description("Refuse an expired card").order("m").build());
 
-            final @NotNull Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
-            nodes.addTestRunDir(mapper.setTestRunNode(path, tp.getTestRunsDirectory()));
+            final @NotNull Path path = tp.getTestRunsFolder().getPath().resolve("Cycle-1");
+            nodes.addTestRunNode(mapper.setTestRunNode(path, tp.getTestRunsFolder()));
             return path;
         });
 
-        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(List.of(
-                new TestRunItems().setId(FAILED_TEST_CASE).setStatus(RunItemStatus.FAILED))));
+        indexedTestRuns().putRunItems(testRunPath, new RunItems().setAll(List.of(
+                new RunItem().setId(FAILED_TEST_CASE).setStatus(RunItemStatus.FAILED))));
         return testRunPath;
     }
 
     // Rule-EDITOR-PANEL-256, Rule-PRODUCT-008
     public void testTheFormWritesTheFailureOntoTheTestRunTheIndexHolds() {
         final @NotNull Path testRunPath = aTestRunWithOneFailure();
-        assertTrue("the test run was not indexed", indexedTestRuns().findTestRun(testRunPath).isPresent());
-        assertTrue("the test run does not cover the test case", indexedTestRuns().getTestRunByPath(testRunPath).resultOf(FAILED_TEST_CASE).isPresent());
+        assertTrue("the test run was not indexed", indexedTestRuns().findRunItems(testRunPath).isPresent());
+        assertTrue("the test run does not cover the test case", indexedTestRuns().getRunItems(testRunPath).runItemOf(FAILED_TEST_CASE).isPresent());
 
-        final @NotNull TestRunItems editorsOwnRow = new TestRunItems().setId(FAILED_TEST_CASE).setStatus(RunItemStatus.FAILED).setActualResult(TYPED);
+        final @NotNull RunItem editorsOwnRow = new RunItem().setId(FAILED_TEST_CASE).setStatus(RunItemStatus.FAILED).setActualResult(TYPED);
 
         final @NotNull FailureForm form = new FailureForm(getProject(), testRunPath, editorsOwnRow, 1f, () -> {
         }, () -> {
@@ -79,6 +79,6 @@ public class FailureFormSavesToTheTestRunIdeTest extends AbstractTempRootIdeTest
 
         assertTrue("the form refused to save a failure the test run covers", form.save());
         assertEquals("the failure was written somewhere other than the test run the index holds", TYPED,
-                indexedTestRuns().getTestRunByPath(testRunPath).resultOf(FAILED_TEST_CASE).map(TestRunItems::getActualResult).orElse(""));
+                indexedTestRuns().getRunItems(testRunPath).runItemOf(FAILED_TEST_CASE).map(RunItem::getActualResult).orElse(""));
     }
 }

@@ -20,8 +20,8 @@ import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
 
@@ -42,7 +42,7 @@ public class BugFactsTest {
         final UUID id = UUID.randomUUID();
         final TestCaseDto tc = TestCaseDto.builder().id(id).description("  Log in with a valid user ").expectedResult("Welcome")
                 .steps(List.of("Open", "Log in")).testData("user=a").build();
-        final TestRunItems item = TestRunItems.builder().id(id).status(RunItemStatus.FAILED).actualResult("Error page")
+        final RunItem runItem = RunItem.builder().id(id).status(RunItemStatus.FAILED).actualResult("Error page")
                 .bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).stacktrace("boom")
                 .executedBy("Muteb").executedAt(ZonedDateTime.of(2026, 9, 13, 14, 14, 0, 0, ZoneId.of("Asia/Riyadh"))).build();
         final TestRunMarker testRunMarker = new TestRunMarker();
@@ -51,7 +51,7 @@ public class BugFactsTest {
                 TestRunConfiguration.BROWSER, "Chrome",
                 TestRunConfiguration.COMMIT_ID, "933a3984")));
 
-        final BugFacts facts = BugFacts.of(item, tc, testRunMarker, "Sprint 7", List.of());
+        final BugFacts facts = BugFacts.of(runItem, tc, testRunMarker, "Sprint 7", List.of());
 
         assertEquals(facts.title(), "Log in with a valid user.", "the description as the Details tab shows it");
         assertEquals(facts.expectedResult(), "Welcome.");
@@ -71,8 +71,8 @@ public class BugFactsTest {
     @Test
     public void aRunItemNobodyExecutedHasNoExecuted() {
         final TestCaseDto tc = TestCaseDto.builder().build();
-        final TestRunItems item = TestRunItems.builder().id(tc.getId()).build();
+        final RunItem runItem = RunItem.builder().id(tc.getId()).build();
 
-        assertEquals(BugFacts.of(item, tc, new TestRunMarker(), "Sprint 7", List.of()).executed(), "");
+        assertEquals(BugFacts.of(runItem, tc, new TestRunMarker(), "Sprint 7", List.of()).executed(), "");
     }
 }

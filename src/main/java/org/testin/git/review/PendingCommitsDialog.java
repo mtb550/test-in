@@ -25,7 +25,7 @@ import org.testin.git.change.FieldChange;
 import org.testin.git.change.PendingChange;
 import org.testin.git.change.TestCaseChangeComparator;
 import org.testin.indexer.TestCases;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.notifications.Done;
@@ -74,7 +74,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
                 .column(Bundle.message("dialog.pending.column.change.type"), 150)
-                .column(DirectoryType.TS.getDescription(), 150)
+                .column(NodeType.TS.getDescription(), 150)
                 .column(Bundle.message("caption.name"), 240)
                 .column(Bundle.message("dialog.pending.column.before"), 180)
                 .column(Bundle.message("dialog.pending.column.after"), 180)

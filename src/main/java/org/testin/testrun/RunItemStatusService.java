@@ -28,10 +28,10 @@ import org.testin.help.Guides;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.Failure;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.Failure;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -65,15 +65,15 @@ public final class RunItemStatusService {
         }
 
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        if (editor.runItem(currentTc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
+        if (editor.runItem(currentTc.getId()).filter(RunItem::isRemoved).isPresent()) {
             passDeleted(editor, executingIndex);
             return;
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        if (!recordOn(editor, currentTc.getId(), status, item -> {
+        if (!recordOn(editor, currentTc.getId(), status, runItem -> {
             editor.getWalk().stopTheClock();
-            item.recordRunItemStatus(status, tester);
+            runItem.recordRunItemStatus(status, tester);
         })) return;
 
         confirmRunItemStatus(status, 1);
@@ -99,26 +99,26 @@ public final class RunItemStatusService {
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        recordOn(editor, tc.getId(), status, item -> {
-            if (!clockCounted) item.recordDuration(duration);
-            failure.recordOn(item);
-            item.recordRunItemStatus(status, tester);
+        recordOn(editor, tc.getId(), status, runItem -> {
+            if (!clockCounted) runItem.recordDuration(duration);
+            failure.recordOn(runItem);
+            runItem.recordRunItemStatus(status, tester);
         });
     }
 
     // UC-EDITOR-PANEL-038, Rule-EDITOR-PANEL-240
     private boolean correct(final @NotNull TestRunEditor editor, final @NotNull TestCaseDto tc, final @NotNull RunItemStatus status) {
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        return recordOn(editor, tc.getId(), status, item -> item.recordRunItemStatus(status, tester));
+        return recordOn(editor, tc.getId(), status, runItem -> runItem.recordRunItemStatus(status, tester));
     }
 
     // Rule-EDITOR-PANEL-225
-    private boolean recordOn(final @NotNull TestRunEditor editor, final @NotNull UUID testCaseId, final @NotNull RunItemStatus status, final @NotNull Consumer<TestRunItems> runItemStatus) {
+    private boolean recordOn(final @NotNull TestRunEditor editor, final @NotNull UUID testCaseId, final @NotNull RunItemStatus status, final @NotNull Consumer<RunItem> runItemStatus) {
         final @NotNull Path testRunPath = editor.getParent().getPath();
-        final @NotNull Optional<TestRunDto> held = heldTestRun(testRunPath);
+        final @NotNull Optional<RunItems> held = heldTestRun(testRunPath);
         if (held.isEmpty() || liveItem(held.orElseThrow(), testRunPath, testCaseId).isEmpty()) return false;
 
-        Services.getInstance(p, TestRuns.class).changeResult(testRunPath, testCaseId, runItemStatus);
+        Services.getInstance(p, TestRuns.class).changeRunItem(testRunPath, testCaseId, runItemStatus);
         offerBugReports(status);
 
         Logger.trace("[RunItemStatusService]: Status updated -> " + testCaseId + " = " + status);
@@ -130,41 +130,41 @@ public final class RunItemStatusService {
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167, Rule-EDITOR-PANEL-256
     public boolean recordFailureDetails(final @NotNull Path testRunPath, final @NotNull UUID testCaseId, final @NotNull FailureFields fields) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-        final @NotNull Optional<TestRunDto> testRun = heldTestRun(testRunPath);
-        if (testRun.isEmpty()) return false;
+        final @NotNull Optional<RunItems> runItems = heldTestRun(testRunPath);
+        if (runItems.isEmpty()) return false;
 
-        if (liveItem(testRun.orElseThrow(), testRunPath, testCaseId).isEmpty()) return false;
+        if (liveItem(runItems.orElseThrow(), testRunPath, testCaseId).isEmpty()) return false;
 
         fields.storePasted(pasted -> testRuns.storeScreenshots(testRunPath, pasted));
 
-        testRuns.changeResult(testRunPath, testCaseId, fields::applyTo);
+        testRuns.changeRunItem(testRunPath, testCaseId, fields::applyTo);
 
         return true;
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-225, Rule-TREE-PANEL-009, Rule-PRODUCT-011
-    public @NotNull Optional<TestRunDto> heldTestRun(final @NotNull Path testRunPath) {
+    public @NotNull Optional<RunItems> heldTestRun(final @NotNull Path testRunPath) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-        final @NotNull Optional<TestRunDto> testRun = testRuns.findTestRun(testRunPath);
+        final @NotNull Optional<RunItems> runItems = testRuns.findRunItems(testRunPath);
 
-        if (testRun.isEmpty()) {
+        if (runItems.isEmpty()) {
             Logger.warn("[RunItemStatusService]: '" + testRunPath.getFileName() + "' is no longer indexed - nothing recorded");
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.item.status.test.run.gone"));
-            return testRun;
+            return runItems;
         }
 
-        final @NotNull Optional<String> signedOff = testRuns.findTestRunDir(testRunPath).flatMap(TestRunDirectoryDto::whySignedOff);
+        final @NotNull Optional<String> signedOff = testRuns.findTestRunNode(testRunPath).flatMap(TestRunNode::whySignedOff);
         if (signedOff.isPresent()) {
             Logger.info("[RunItemStatusService]: '" + testRunPath.getFileName() + "' is signed off - nothing recorded");
             Services.getInstance(p, Notifier.class).softRefuse(p, signedOff.orElseThrow());
             return Optional.empty();
         }
 
-        return testRun;
+        return runItems;
     }
 
-    private @NotNull Optional<TestRunItems> liveItem(final @NotNull TestRunDto testRun, final @NotNull Path testRunPath, final @NotNull UUID testCaseId) {
-        final @NotNull Optional<TestRunItems> found = testRun.resultOf(testCaseId);
+    private @NotNull Optional<RunItem> liveItem(final @NotNull RunItems runItems, final @NotNull Path testRunPath, final @NotNull UUID testCaseId) {
+        final @NotNull Optional<RunItem> found = runItems.runItemOf(testCaseId);
 
         if (found.isEmpty()) {
             Logger.warn("[RunItemStatusService]: '" + testRunPath.getFileName() + "' does not cover " + testCaseId + " - nothing recorded");
@@ -208,8 +208,8 @@ public final class RunItemStatusService {
         return selected.stream()
                 .map(tc -> editor.runItem(tc.getId()))
                 .flatMap(Optional::stream)
-                .filter(item -> !item.isRemoved())
-                .flatMap(item -> item.wouldClear(status, Failure.NONE).stream())
+                .filter(runItem -> !runItem.isRemoved())
+                .flatMap(runItem -> runItem.wouldClear(status, Failure.NONE).stream())
                 .distinct()
                 .toList();
     }
@@ -228,7 +228,7 @@ public final class RunItemStatusService {
     }
 
     private void recordOne(final @NotNull RunItemStatus status, final @NotNull TestRunEditor editor, final @NotNull TestCaseDto tc) {
-        if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
+        if (editor.runItem(tc.getId()).filter(RunItem::isRemoved).isPresent()) {
             refuseRemoved();
             return;
         }
@@ -240,13 +240,13 @@ public final class RunItemStatusService {
     }
 
     private void recordMany(final @NotNull RunItemStatus status, final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        final @NotNull Optional<TestRunDto> held = heldTestRun(editor.getParent().getPath());
+        final @NotNull Optional<RunItems> held = heldTestRun(editor.getParent().getPath());
         if (held.isEmpty()) return;
 
         final @NotNull List<UUID> judged = new ArrayList<>();
 
         for (final TestCaseDto tc : selectedItems) {
-            if (held.orElseThrow().resultOf(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) continue;
+            if (held.orElseThrow().runItemOf(tc.getId()).filter(runItem -> !runItem.isRemoved()).isEmpty()) continue;
 
             judged.add(tc.getId());
 
@@ -255,7 +255,7 @@ public final class RunItemStatusService {
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-        judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.recordRunItemStatus(status, tester)));
+        judged.forEach(id -> testRuns.changeRunItem(editor.getParent().getPath(), id, runItem -> runItem.recordRunItemStatus(status, tester)));
         if (!judged.isEmpty()) offerBugReports(status);
         triggerFilterRefresh(editor);
 

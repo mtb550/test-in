@@ -20,10 +20,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
@@ -31,7 +31,7 @@ import java.util.List;
 
 public abstract class AbstractViewPanelIdeTest extends AbstractTempRootIdeTest {
     protected ViewOnScreen view;
-    protected TestProjectDirectoryDto testProject;
+    protected TestProjectNode testProject;
     private String rootBefore = "";
 
     private static @NotNull AppSettingsState settings() {
@@ -53,16 +53,16 @@ public abstract class AbstractViewPanelIdeTest extends AbstractTempRootIdeTest {
         super.tearDown();
     }
 
-    protected @NotNull TestSetDirectoryDto aTestSet(final @NotNull String name) {
+    protected @NotNull TestSetNode aTestSet(final @NotNull String name) {
         return EditorFixtures.testSet(getProject(), testProject, name);
     }
 
-    protected @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description, final @NotNull String order) {
+    protected @NotNull TestCaseDto aTestCase(final @NotNull TestSetNode ts, final @NotNull String description, final @NotNull String order) {
         return EditorFixtures.testCase(getProject(), ts, description, order);
     }
 
-    protected @NotNull TestRunDirectoryDto aTestRun(final @NotNull List<TestRunItems> results) {
-        return EditorFixtures.testRun(getProject(), testProject, results);
+    protected @NotNull TestRunNode aTestRun(final @NotNull List<RunItem> runItems) {
+        return EditorFixtures.testRun(getProject(), testProject, runItems);
     }
 
     protected @NotNull List<String> details() {

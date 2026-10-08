@@ -19,8 +19,8 @@ package org.testin.indexer;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 
 import java.io.IOException;
@@ -40,13 +40,13 @@ public class IndexAnnouncesIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestSetDirectoryDto aTestSetNotYetAdded() {
+    private @NotNull TestSetNode aTestSetNotYetAdded() {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-            final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("Checkout"));
+            final @NotNull NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
+            final @NotNull TestProjectNode tp = mapper.setTestProjectNode(root.resolve("Checkout"));
             nodes().addTestProject(tp);
 
-            return mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            return mapper.getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Login"), tp.getTestCasesFolder());
         });
     }
 
@@ -62,7 +62,7 @@ public class IndexAnnouncesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
     public void testARecordedChangeIsAnnouncedOnceAfterItIsRecorded() {
-        final @NotNull TestSetDirectoryDto ts = aTestSetNotYetAdded();
+        final @NotNull TestSetNode ts = aTestSetNotYetAdded();
         listenFor(ts.getPath());
 
         assertTrue("the test set was not added", WriteAction.computeAndWait(() -> nodes().addTestSet(ts)));
@@ -74,7 +74,7 @@ public class IndexAnnouncesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
     public void testAChangeThatWasNotRecordedIsNotAnnounced() {
-        final @NotNull TestSetDirectoryDto ts = aTestSetNotYetAdded();
+        final @NotNull TestSetNode ts = aTestSetNotYetAdded();
         try {
             Files.writeString(ts.getPath(), "a file where the test set's folder would go");
         } catch (final IOException ex) {

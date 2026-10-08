@@ -17,7 +17,7 @@
 package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -35,8 +35,8 @@ public class RenamedPathsTest {
     private static final @NotNull Path CASES = Path.of("NAFATH", "Test Cases");
     private static final @NotNull RenamedPaths ACCOUNTS = new RenamedPaths(CASES.resolve("Accounts"), CASES.resolve("Users"));
 
-    private static @NotNull TestSetDirectoryDto aTestSetAt(final @NotNull Path path) {
-        final @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private static @NotNull TestSetNode aTestSetAt(final @NotNull Path path) {
+        final @NotNull TestSetNode testSet = new TestSetNode();
         testSet.setPath(path);
         return testSet;
     }
@@ -53,9 +53,9 @@ public class RenamedPathsTest {
     // Rule-TREE-PANEL-100
     @Test
     public void aNodeUnderTheRenamedFolderMovesWithItAndKeepsItsIdentity() {
-        final @NotNull TestSetDirectoryDto login = aTestSetAt(CASES.resolve("Accounts").resolve("Login"));
-        final @NotNull TestSetDirectoryDto payments = aTestSetAt(CASES.resolve("Payments"));
-        final @NotNull Map<String, TestSetDirectoryDto> testSets = new HashMap<>(Map.of(login.getPath().toString(), login, payments.getPath().toString(), payments));
+        final @NotNull TestSetNode login = aTestSetAt(CASES.resolve("Accounts").resolve("Login"));
+        final @NotNull TestSetNode payments = aTestSetAt(CASES.resolve("Payments"));
+        final @NotNull Map<String, TestSetNode> testSets = new HashMap<>(Map.of(login.getPath().toString(), login, payments.getPath().toString(), payments));
 
         ACCOUNTS.moveNodesUnder(testSets);
 

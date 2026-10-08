@@ -24,26 +24,26 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.open.TestinEditors;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.editor.toolbar.RefreshBtn;
-import org.testin.editor.toolbar.TestCaseDetailsPopupBtn;
+import org.testin.editor.toolbar.TestSetDetailsPopupBtn;
 import org.testin.filter.FilterPopupBtn;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,13 +60,13 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
         return editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList();
     }
 
-    private @NotNull TestSetDirectoryDto aTestSet() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+    private @NotNull TestSetNode aTestSet() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         return EditorFixtures.testSet(getProject(), tp, "Checkout");
     }
 
-    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description, final @NotNull String order, final @NotNull Priority priority, final @NotNull String group) {
-        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order(order).priority(priority).group(new ArrayList<>(List.of(group))).build();
+    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetNode ts, final @NotNull String description, final @NotNull String order, final @NotNull Priority priority, final @NotNull String group) {
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order(order).priority(priority).groups(new ArrayList<>(List.of(group))).build();
         tc.setParent(ts);
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
         return tc;
@@ -74,13 +74,13 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-117
     public void testRefreshKeepsTheFiltersAndTheSearchAndReadsTheDataAgain() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet();
+        final @NotNull TestSetNode ts = aTestSet();
         final @NotNull String oldGroup = "Old-" + UUID.randomUUID();
         final @NotNull String newGroup = "New-" + UUID.randomUUID();
         final @NotNull TestCaseDto renamed = aTestCase(ts, "Log in with a valid user", "m0001", Priority.HIGH, oldGroup);
         final @NotNull TestCaseDto wrongPassword = aTestCase(ts, "Log in with a wrong password", "m0002", Priority.LOW, oldGroup);
         final @NotNull TestCaseDto card = aTestCase(ts, "Pay by card", "m0003", Priority.HIGH, oldGroup);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         final @NotNull TestCaseValues values = Services.getInstance(getProject(), TestCaseValues.class);
         try {
@@ -90,12 +90,12 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
             editor.getToolBar().getSearchTxt().setText("Log in");
             Await.until("the search never narrowed the list", () -> editor.getCurrentTestCases().size() == 1);
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
-            final @NotNull Set<TestCaseEditorAttributes> fields = editor.getToolBar().getToolbarItem(TestCaseDetailsPopupBtn.class).getSelectedDetails();
+            final @NotNull Set<TestSetEditorAttributes> fields = editor.getToolBar().getToolbarItem(TestSetDetailsPopupBtn.class).getSelectedDetails();
             Await.until("the group was never offered", () -> values.getGroups().contains(oldGroup));
 
             aTestCase(ts, "Log in with a new user", "m0004", Priority.HIGH, newGroup);
             for (final TestCaseDto regrouped : List.of(renamed, wrongPassword, card)) {
-                Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), regrouped.edit().group(new ArrayList<>(List.of(newGroup))).build());
+                Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), regrouped.edit().groups(new ArrayList<>(List.of(newGroup))).build());
             }
 
             pressRefresh(editor);
@@ -105,7 +105,7 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
             assertEquals("Log in", editor.getToolBar().getSearchTxt().getText());
             assertEquals(Set.of(Priority.HIGH), filters.getSelectedPriority());
             assertEquals("refresh left the grid", ViewMode.GRID_VIEW, editor.getToolBar().getCurrentView());
-            assertEquals("refresh changed the fields shown", fields, editor.getToolBar().getToolbarItem(TestCaseDetailsPopupBtn.class).getSelectedDetails());
+            assertEquals("refresh changed the fields shown", fields, editor.getToolBar().getToolbarItem(TestSetDetailsPopupBtn.class).getSelectedDetails());
             Await.until("the group filter still offers a group no test case uses", () -> values.getGroups().contains(newGroup) && !values.getGroups().contains(oldGroup));
             Await.until("refresh did not say so", () -> balloons.contains(Done.REFRESHED.getOutcome()));
         } finally {
@@ -115,9 +115,9 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-118
     public void testRefreshLandsOnThePageHoldingTheSelectedTestCase() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet();
+        final @NotNull TestSetNode ts = aTestSet();
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), ts, 5);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         try {
             editor.choosePageSize(2);
             editor.selectTestCase(testCases.get(4));
@@ -141,10 +141,10 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-118
     public void testRefreshInATestRunEditorLandsOnThePageHoldingTheSelectedTestCase() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet();
+        final @NotNull TestSetNode ts = aTestSet();
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), ts, 5);
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
         try {
             editor.choosePageSize(2);
@@ -155,7 +155,7 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
             pressRefresh(editor);
 
-            Await.until("refresh did not read the test run again", () -> editor.run().isPresent() && editor.getAllTestCases().size() == 5);
+            Await.until("refresh did not read the test run again", () -> editor.loadedRunItems().isPresent() && editor.getAllTestCases().size() == 5);
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             assertEquals("refresh did not land on the page holding the selected test case", 1, editor.getCurrentPage());
             assertEquals("refresh forgot which test case was selected", testCases.get(4).getId(), editor.getList().getSelectedValue().getId());
@@ -167,9 +167,9 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-119
     public void testTheTestersRefreshReloadsEvenWithAGridCellOpen() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet();
+        final @NotNull TestSetNode ts = aTestSet();
         EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         try {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -188,13 +188,13 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-119
     public void testARefreshTestinStartsLeavesABusyEditorAlone() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet();
+        final @NotNull TestSetNode ts = aTestSet();
         EditorFixtures.testCases(getProject(), ts, 2);
         final @NotNull TestinEditors editors = Services.getInstance(getProject(), TestinEditors.class);
         editors.open(ts, true);
         Await.until("the test set never opened in an editor", () -> editors.editorFor(ts).isPresent());
-        final @NotNull TestCaseEditor editor = (TestCaseEditor) editors.editorFor(ts).orElseThrow();
-        Await.until("the test case editor never loaded", () -> !editor.isLoading());
+        final @NotNull TestSetEditor editor = (TestSetEditor) editors.editorFor(ts).orElseThrow();
+        Await.until("the test set editor never loaded", () -> !editor.isLoading());
         try {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -219,10 +219,10 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-120
     public void testRefreshInATestRunEditorStopsTheExecutionAndReadsTheTestRunAgain() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet();
+        final @NotNull TestSetNode ts = aTestSet();
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
@@ -230,13 +230,13 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             assertTrue(editor.getWalk().isExecuting());
 
-            Services.getInstance(getProject(), TestRuns.class).putTestRun(tr.getPath(), new TestRunDto().setResults(new ArrayList<>(List.of(
+            Services.getInstance(getProject(), TestRuns.class).putRunItems(tr.getPath(), new RunItems().setAll(new ArrayList<>(List.of(
                     EditorFixtures.pending(testCases.get(0)),
                     EditorFixtures.pending(testCases.get(1)).setStatus(RunItemStatus.PASSED)))));
 
             pressRefresh(editor);
 
-            Await.until("refresh did not read the test run again", () -> editor.runItem(testCases.get(1).getId()).map(TestRunItems::getStatus).filter(RunItemStatus.PASSED::equals).isPresent());
+            Await.until("refresh did not read the test run again", () -> editor.runItem(testCases.get(1).getId()).map(RunItem::getStatus).filter(RunItemStatus.PASSED::equals).isPresent());
             assertFalse("refresh did not stop the execution", editor.getWalk().isExecuting());
             assertFalse("the clock kept running on the copy refresh replaced", editor.getWalk().clockIsOn(testCases.get(0).getId()));
             Await.until("the message did not say the execution stopped: " + balloons, () -> balloons.contains(Done.REFRESHED_EXECUTION_STOPPED.getOutcome()));

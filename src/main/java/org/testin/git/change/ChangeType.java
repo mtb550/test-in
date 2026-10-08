@@ -56,7 +56,7 @@ public enum ChangeType {
 
     CHANGE_GROUP(
             Bundle.message("change.change.group"),
-            (draft, old) -> draft.group(new ArrayList<>(old.getGroup()))
+            (draft, old) -> draft.groups(new ArrayList<>(old.getGroups()))
     ),
 
     CHANGE_STATUS(

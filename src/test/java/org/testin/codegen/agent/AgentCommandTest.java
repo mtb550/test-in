@@ -20,7 +20,7 @@ package org.testin.codegen.agent;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -97,7 +97,7 @@ public class AgentCommandTest {
     // Rule-CODEGEN-086
     @Test
     public void thePromptSaysWhereTheTestCaseSitsAndWhichClassHoldsItsMethod() {
-        final TestSetDirectoryDto login = new TestSetDirectoryDto();
+        final TestSetNode login = new TestSetNode();
         login.setPath2(new ArrayList<>(List.of("NAFATH", "Test Cases", "Accounts", "Login")));
         final TestCaseDto tc = aTestCase();
         tc.setParent(login);

@@ -216,7 +216,7 @@
          every action bound to a keystroke, runs whichever one is enabled, and
          says nothing when two are - and a component input map cannot rescue it,
          because a registered shortcut is dispatched first. That is how
-         CTRL+SHIFT+C quietly did CopyPaths in a test case editor for weeks.
+         CTRL+SHIFT+C quietly did CopyPaths in a test set editor for weeks.
          DeclaredShortcutsTest reads this file to check no two Testin actions
          ever claim one key by accident.
 
@@ -371,7 +371,7 @@
             <!-- The third action on F2, and the same argument as the two before
                  it: F2 changes the thing in front of you, and which thing that
                  is depends on where you are standing. Update Test Case answers
-                 in the test case editor, Failed Test Case Details in the test
+                 in the test set editor, Failed Test Case Details in the test
                  run editor, and this one in the tree. Each is gray where the others answer,
                  so only one can ever take the key. -->
             <keyboard-shortcut keymap="$default" first-keystroke="F2"/>

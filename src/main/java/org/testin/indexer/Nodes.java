@@ -20,15 +20,15 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.markers.AbstractMarker;
 import org.testin.model.markers.Marker;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.status.NodeStatus;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
@@ -72,7 +72,7 @@ public final class Nodes {
         return indexer().getStore();
     }
 
-    public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
+    public @NotNull Map<String, TestProjectNode> getTestProjectsByPath() {
         return store().getTestProjectsByPath();
     }
 
@@ -83,12 +83,12 @@ public final class Nodes {
         return renaming.map(self -> !sameFile(self, wanted)).orElse(true);
     }
 
-    public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {
+    public @NotNull List<Node> getChildren(final @NotNull Path parentPath) {
         return store().getChildren(parentPath);
     }
 
-    public @NotNull List<DirectoryDto> getAllNodes() {
-        return List.copyOf(store().allDirectories());
+    public @NotNull List<Node> getAllNodes() {
+        return List.copyOf(store().allNodes());
     }
 
     // UC-INTERNAL-005
@@ -172,32 +172,32 @@ public final class Nodes {
     }
 
     // UC-TREE-PANEL-002
-    public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+    public boolean addTestProject(final @NotNull TestProjectNode tp) {
         return indexer().announcedIf(store().addTestProject(tp), tp.getPath());
     }
 
-    public boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
+    public boolean addTestSet(final @NotNull TestSetNode ts) {
         return indexer().announcedIf(store().addTestSet(ts), ts.getPath());
     }
 
-    public boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
+    public boolean addTestSetPackage(final @NotNull TestSetPackageNode tsp) {
         return indexer().announcedIf(store().addTestSetPackage(tsp), tsp.getPath());
     }
 
-    public boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        return indexer().announcedIf(store().addTestRunDir(trd), trd.getPath());
+    public boolean addTestRunNode(final @NotNull TestRunNode testRunNode) {
+        return indexer().announcedIf(store().addTestRunNode(testRunNode), testRunNode.getPath());
     }
 
-    public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
+    public boolean addTestRunPackage(final @NotNull TestRunPackageNode trp) {
         return indexer().announcedIf(store().addTestRunPackage(trp), trp.getPath());
     }
 
-    public boolean persistMarker(final @NotNull DirectoryDto dto) {
+    public boolean persistMarker(final @NotNull Node dto) {
         return indexer().announcedIf(store().persistMarker(dto), dto.getPath());
     }
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-055, Rule-INTERNAL-117
-    public boolean reorder(final @NotNull DirectoryDto node, final int order) {
+    public boolean reorder(final @NotNull Node node, final int order) {
         final @NotNull Marker marker = node.getMarker();
         final int was = marker.getOrder();
         marker.setOrder(order);
@@ -209,11 +209,11 @@ public final class Nodes {
     }
 
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-062, Rule-INTERNAL-117
-    public boolean mark(final @NotNull DirectoryDto node, final @NotNull NodeStatus status, final @NotNull String tester) {
+    public boolean mark(final @NotNull Node node, final @NotNull NodeStatus status, final @NotNull String tester) {
         final @NotNull Marker marker = node.getMarker();
         final @NotNull NodeStatus before = marker.status();
-        final @NotNull String modifiedByBefore = marker.getModifiedBy();
-        final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
+        final @NotNull String updatedByBefore = marker.getUpdatedBy();
+        final @NotNull ZonedDateTime updatedAtBefore = marker.getUpdatedAt();
 
         marker.applyStatus(status);
         marker.touch(tester);
@@ -221,16 +221,16 @@ public final class Nodes {
         if (persistMarker(node)) return true;
 
         marker.applyStatus(before);
-        marker.setModifiedBy(modifiedByBefore);
-        marker.setModifiedAt(modifiedAtBefore);
+        marker.setUpdatedBy(updatedByBefore);
+        marker.setUpdatedAt(updatedAtBefore);
         return false;
     }
 
-    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass) {
+    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull NodeType kind, final @NotNull Class<M> markerClass) {
         return store().readMarker(dirPath, kind, markerClass);
     }
 
-    public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
+    public @NotNull Optional<Node> find(final @NotNull Path path) {
         return store().findByPath(path);
     }
 

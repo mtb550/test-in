@@ -38,17 +38,17 @@ public class TestCaseDisplayValueTest {
     // Rule-VIEW-PANEL-026
     @Test
     public void theFourProseRowsReadCapitalizedAndClosed() {
-        assertEquals(TestCaseEditorAttributes.DESCRIPTION.displayValue(TYPED), "Log in with a valid user.");
-        assertEquals(TestCaseEditorAttributes.EXPECTED_RESULT.displayValue(TYPED), "The dashboard opens.");
-        assertEquals(TestCaseEditorAttributes.STEPS.displayValue(TYPED), "Open the login page.");
-        assertEquals(TestCaseEditorAttributes.PRE_CONDITIONS.displayValue(TYPED), "A user exists.");
+        assertEquals(TestSetEditorAttributes.DESCRIPTION.displayValue(TYPED), "Log in with a valid user.");
+        assertEquals(TestSetEditorAttributes.EXPECTED_RESULT.displayValue(TYPED), "The dashboard opens.");
+        assertEquals(TestSetEditorAttributes.STEPS.displayValue(TYPED), "Open the login page.");
+        assertEquals(TestSetEditorAttributes.PRE_CONDITIONS.displayValue(TYPED), "A user exists.");
     }
 
     // Rule-VIEW-PANEL-026
     @Test
     public void referenceModuleAndTestDataReadAsTheTesterTypedThem() {
-        assertEquals(TestCaseEditorAttributes.REFERENCE.displayValue(TYPED), "jira-412", "a reference is an identifier");
-        assertEquals(TestCaseEditorAttributes.MODULE.displayValue(TYPED), "accounts", "a module is a label");
-        assertEquals(TestCaseEditorAttributes.TEST_DATA.displayValue(TYPED), "user = muteb");
+        assertEquals(TestSetEditorAttributes.REFERENCE.displayValue(TYPED), "jira-412", "a reference is an identifier");
+        assertEquals(TestSetEditorAttributes.MODULE.displayValue(TYPED), "accounts", "a module is a label");
+        assertEquals(TestSetEditorAttributes.TEST_DATA.displayValue(TYPED), "user = muteb");
     }
 }

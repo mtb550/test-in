@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
@@ -53,8 +53,8 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
-    protected @NotNull TestCaseEditorAttributes attribute() {
-        return TestCaseEditorAttributes.DESCRIPTION;
+    protected @NotNull TestSetEditorAttributes attribute() {
+        return TestSetEditorAttributes.DESCRIPTION;
     }
 
     @Override

@@ -23,10 +23,10 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.ShownFields;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.view.Drawn;
 
 import javax.swing.ListModel;
@@ -44,14 +44,14 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String LOGIN_TEST = "nafath.LoginTest";
 
-    private @NotNull Set<TestCaseEditorAttributes> shownBefore = Set.of();
+    private @NotNull Set<TestSetEditorAttributes> shownBefore = Set.of();
 
-    private static int numberOnTheCard(final @NotNull TestCaseEditor editor, final @NotNull TestCaseDto tc) {
+    private static int numberOnTheCard(final @NotNull TestSetEditor editor, final @NotNull TestCaseDto tc) {
         final @NotNull String title = editor.cardTitle(tc);
         return Integer.parseInt(title.substring(0, title.indexOf('.')));
     }
 
-    private static @NotNull List<TestCaseDto> cardsDrawn(final @NotNull TestCaseEditor editor) {
+    private static @NotNull List<TestCaseDto> cardsDrawn(final @NotNull TestSetEditor editor) {
         final @NotNull ListModel<?> cards = Drawn.components(editor.getComponent()).stream().filter(JBList.class::isInstance).map(JBList.class::cast).findFirst()
                 .orElseThrow(() -> new AssertionError("the editor draws no card list")).getModel();
         final @NotNull List<TestCaseDto> drawn = new ArrayList<>();
@@ -59,18 +59,18 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
         return drawn;
     }
 
-    private static int numberInTheGrid(final @NotNull TestCaseEditor editor, final @NotNull TestCaseDto tc) {
+    private static int numberInTheGrid(final @NotNull TestSetEditor editor, final @NotNull TestCaseDto tc) {
         editor.onToolBarSwitchedToGridView();
         final @NotNull JBTable grid = Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst()
                 .orElseThrow(() -> new AssertionError("the editor draws no grid"));
         for (int row = 0; row < grid.getModel().getRowCount(); row++) {
-            if (tc.getDescription().equals(grid.getModel().getValueAt(row, TestCaseEditorAttributes.DESCRIPTION.column())))
-                return Integer.parseInt(String.valueOf(grid.getModel().getValueAt(row, TestCaseEditorAttributes.ORDER.column())));
+            if (tc.getDescription().equals(grid.getModel().getValueAt(row, TestSetEditorAttributes.DESCRIPTION.column())))
+                return Integer.parseInt(String.valueOf(grid.getModel().getValueAt(row, TestSetEditorAttributes.ORDER.column())));
         }
         throw new AssertionError("the grid has no row for '" + tc.getDescription() + "'");
     }
 
-    private static void filteredTo(final @NotNull TestCaseEditor editor, final @NotNull String query) {
+    private static void filteredTo(final @NotNull TestSetEditor editor, final @NotNull String query) {
         editor.getToolBar().getSearchTxt().setText(query);
         editor.onToolBarSearchValueChanged();
     }
@@ -87,8 +87,8 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        shownBefore = ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class);
-        ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.allOf(TestCaseEditorAttributes.class));
+        shownBefore = ShownFields.read(ShownFields.IN_TEST_SETS, TestSetEditorAttributes.class);
+        ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.allOf(TestSetEditorAttributes.class));
     }
 
     @Override
@@ -97,18 +97,18 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
         super.tearDown();
     }
 
-    private @NotNull TestCaseEditor opened(final @NotNull TestSetDirectoryDto ts) {
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    private @NotNull TestSetEditor opened(final @NotNull TestSetNode ts) {
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-025
     public void testATestCasesNumberIsItsPlaceInItsTestSetCountingFromOne() {
-        final @NotNull TestSetDirectoryDto payment = indexedTestSet("Payment", theTestCasesDirectory());
+        final @NotNull TestSetNode payment = indexedTestSet("Payment", theTestCasesDirectory());
         final @NotNull TestCaseDto accepted = indexedTestCase(payment, "Card is accepted", "d");
         final @NotNull TestCaseDto declined = indexedTestCase(payment, "Card is declined", "b");
         final @NotNull TestCaseDto expired = indexedTestCase(payment, "Card has expired", "c");
 
-        final @NotNull TestCaseEditor editor = opened(payment);
+        final @NotNull TestSetEditor editor = opened(payment);
 
         assertEquals("the first test case in the test set is not number one", 1, numberOnTheCard(editor, declined));
         assertEquals(2, numberOnTheCard(editor, expired));
@@ -117,10 +117,10 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
 
     // UC-INTERNAL-004, Rule-INTERNAL-026
     public void testTheNumberIsWorkedOutWhenDrawnAndStoredNowhere() {
-        final @NotNull TestSetDirectoryDto payment = indexedTestSet("Payment", theTestCasesDirectory());
+        final @NotNull TestSetNode payment = indexedTestSet("Payment", theTestCasesDirectory());
         final @NotNull TestCaseDto declined = indexedTestCase(payment, "Card is declined", "b");
         indexedTestCase(payment, "Card is accepted", "c");
-        final @NotNull TestCaseEditor editor = opened(payment);
+        final @NotNull TestSetEditor editor = opened(payment);
         assertEquals(1, numberOnTheCard(editor, declined));
         final byte @NotNull [] before = fileOf(declined);
 
@@ -133,12 +133,12 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
 
     // UC-INTERNAL-004, Rule-INTERNAL-027
     public void testTheCardTheGridRowAndTheGeneratedMethodReadTheSameNumber() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto open = createdTestCase(login, "Open the start page", "b");
         final @NotNull TestCaseDto logIn = createdTestCase(login, "Log in with a valid user", "c");
         final @NotNull TestCaseDto logOut = createdTestCase(login, "Log out", "d");
 
-        final @NotNull TestCaseEditor editor = opened(login);
+        final @NotNull TestSetEditor editor = opened(login);
         filteredTo(editor, "Log");
 
         for (final TestCaseDto tc : List.of(logIn, logOut)) {
@@ -151,11 +151,11 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
 
     // UC-INTERNAL-004, Rule-INTERNAL-028
     public void testAFilterNeverRenumbers() {
-        final @NotNull TestSetDirectoryDto payment = indexedTestSet("Payment", theTestCasesDirectory());
+        final @NotNull TestSetNode payment = indexedTestSet("Payment", theTestCasesDirectory());
         indexedTestCase(payment, "Card is declined", "b");
         indexedTestCase(payment, "Card has expired", "c");
         final @NotNull TestCaseDto accepted = indexedTestCase(payment, "Card is accepted", "d");
-        final @NotNull TestCaseEditor editor = opened(payment);
+        final @NotNull TestSetEditor editor = opened(payment);
 
         filteredTo(editor, "accepted");
 

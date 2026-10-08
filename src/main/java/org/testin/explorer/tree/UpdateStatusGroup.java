@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.model.markers.Marker;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.model.status.NodeStatus;
 
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.List;
 public class UpdateStatusGroup extends DefaultActionGroup {
     private static @NotNull List<NodeStatus> statuses(final @NotNull AnActionEvent e) {
         return TestinData.singleSelectedNode(e)
-                .map(DirectoryDto::getMarker)
+                .map(Node::getMarker)
                 .map(Marker::statuses)
                 .orElseGet(List::of);
     }

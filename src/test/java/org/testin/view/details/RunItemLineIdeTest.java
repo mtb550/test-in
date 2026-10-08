@@ -20,13 +20,13 @@ import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -51,8 +51,8 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
         return TestCaseDto.builder().id(TEST_CASE_ID).description("Log in with a valid user").expectedResult("The dashboard opens").build();
     }
 
-    private static @NotNull TestRunItems failed(final @NotNull String bugIssueUrl) {
-        return TestRunItems.builder().id(TEST_CASE_ID).status(RunItemStatus.FAILED).duration(Duration.ofSeconds(134)).bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).stacktrace("java.lang.AssertionError: expected [true]").bugIssueUrl(bugIssueUrl).build();
+    private static @NotNull RunItem failed(final @NotNull String bugIssueUrl) {
+        return RunItem.builder().id(TEST_CASE_ID).status(RunItemStatus.FAILED).duration(Duration.ofSeconds(134)).bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).stacktrace("java.lang.AssertionError: expected [true]").bugIssueUrl(bugIssueUrl).build();
     }
 
     private static @NotNull Component rowOf(final @NotNull Component drawn) {
@@ -63,19 +63,19 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull List<String> shownTestRunPath() {
         final @NotNull Path testRunPath = WriteAction.computeAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+            final @NotNull NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
-            final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
+            final @NotNull TestProjectNode tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes.addTestProject(tp);
 
-            final @NotNull Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
-            nodes.addTestRunDir(mapper.setTestRunNode(path, tp.getTestRunsDirectory()));
+            final @NotNull Path path = tp.getTestRunsFolder().getPath().resolve("Cycle-1");
+            nodes.addTestRunNode(mapper.setTestRunNode(path, tp.getTestRunsFolder()));
             return path;
         });
         return List.of(testRunPath.toString());
     }
 
-    private @NotNull JBPanel<?> drawn(final @NotNull TestRunItems runItem, final @NotNull List<String> testRunPath) {
+    private @NotNull JBPanel<?> drawn(final @NotNull RunItem runItem, final @NotNull List<String> testRunPath) {
         return Drawn.detailsTab(getProject(), aTestCase(), Optional.of(runItem), testRunPath);
     }
 
@@ -96,14 +96,14 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-VIEW-PANEL-033
     public void testATestCaseTheTestRunHasNotReachedReadsPending() {
-        final @NotNull List<String> words = Drawn.words(drawn(TestRunItems.builder().id(TEST_CASE_ID).build(), shownTestRunPath()));
+        final @NotNull List<String> words = Drawn.words(drawn(RunItem.builder().id(TEST_CASE_ID).build(), shownTestRunPath()));
 
         assertTrue("an unreached test case does not read Pending: " + words, words.contains(Bundle.message("status.run.item.pending")));
     }
 
     // Rule-VIEW-PANEL-031
     public void testAnEmptyTestRunValueIsNotDrawn() {
-        final @NotNull List<String> words = Drawn.words(drawn(TestRunItems.builder().id(TEST_CASE_ID).status(RunItemStatus.PASSED).build(), shownTestRunPath()));
+        final @NotNull List<String> words = Drawn.words(drawn(RunItem.builder().id(TEST_CASE_ID).status(RunItemStatus.PASSED).build(), shownTestRunPath()));
 
         assertFalse("an empty actual result was drawn: " + words, words.contains(Bundle.message("attribute.run.item.actual.result").toUpperCase(Locale.ROOT)));
         assertFalse("an empty executed by was drawn: " + words, words.contains(Bundle.message("attribute.run.item.executed.by").toUpperCase(Locale.ROOT)));

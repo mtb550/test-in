@@ -29,10 +29,10 @@ import org.testin.help.Hint;
 import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.bug.BugIssue;
 import org.testin.model.bug.BugIssueUrl;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -62,10 +62,10 @@ public final class BugIssueStates {
         this.gh = ApplicationManager.getApplication().isUnitTestMode() ? Optional.empty() : Optional.of(GitHubCli::onPath);
     }
 
-    static @NotNull Map<BugRepository, Set<Integer>> filedIn(final @NotNull Collection<TestRunDto> testRuns) {
+    static @NotNull Map<BugRepository, Set<Integer>> filedIn(final @NotNull Collection<RunItems> testRuns) {
         return testRuns.stream()
-                .flatMap(testRun -> testRun.getResults().stream())
-                .map(TestRunItems::bugIssue)
+                .flatMap(testRun -> testRun.getAll().stream())
+                .map(RunItem::bugIssue)
                 .flatMap(Optional::stream)
                 .map(BugIssueUrl::issue)
                 .flatMap(Optional::stream)
@@ -80,7 +80,7 @@ public final class BugIssueStates {
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-007, Rule-VIEW-PANEL-092
     public void readAll(final @NotNull Runnable redraw) {
-        final @NotNull Map<BugRepository, Set<Integer>> filed = filedIn(Services.getInstance(p, TestRuns.class).getAllTestRuns().values());
+        final @NotNull Map<BugRepository, Set<Integer>> filed = filedIn(Services.getInstance(p, TestRuns.class).getAllRunItems().values());
         final @NotNull Hints hints = Services.getInstance(p, Hints.class);
         if (filed.isEmpty()) {
             hints.clear(SetupStep.BUG_STATES);

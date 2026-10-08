@@ -27,17 +27,17 @@ import org.testin.Gestures;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.toolbar.RefreshBtn;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.model.status.RunItemStatus;
 import org.testin.runner.CapturedRunner;
@@ -64,7 +64,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     }
 
     private @NotNull List<TestCaseDto> automatedTestCases(final int count) {
-        final @NotNull TestSetDirectoryDto ts = createdTestSet("Checkout");
+        final @NotNull TestSetNode ts = createdTestSet("Checkout");
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
         for (int i = 0; i < count; i++)
             made.add(createdTestCase(ts, "Test case number " + (i + 1), String.format("m%04d", i)));
@@ -72,23 +72,23 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
         return made;
     }
 
-    private @NotNull TestRunDirectoryDto aTestRun(final @NotNull String name, final @NotNull List<TestRunItems> results) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = WriteAction.computeAndWait(() -> {
-            final @NotNull TestRunDirectoryDto made = Services.getInstance(getProject(), DirectoryMapper.class).setTestRunNode(tp.getTestRunsDirectory().getPath().resolve(name), tp.getTestRunsDirectory());
-            Services.getInstance(getProject(), Nodes.class).addTestRunDir(made);
+    private @NotNull TestRunNode aTestRun(final @NotNull String name, final @NotNull List<RunItem> runItems) {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = WriteAction.computeAndWait(() -> {
+            final @NotNull TestRunNode made = Services.getInstance(getProject(), NodeMapper.class).setTestRunNode(tp.getTestRunsFolder().getPath().resolve(name), tp.getTestRunsFolder());
+            Services.getInstance(getProject(), Nodes.class).addTestRunNode(made);
             return made;
         });
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(tr.getPath(), new TestRunDto().setResults(new ArrayList<>(results)));
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(tr.getPath(), new RunItems().setAll(new ArrayList<>(runItems)));
         return tr;
     }
 
-    private @NotNull TestRunEditor opened(final @NotNull TestRunDirectoryDto tr) {
+    private @NotNull TestRunEditor opened(final @NotNull TestRunNode tr) {
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
-    private @NotNull TestRunItems resultOf(final @NotNull TestRunDirectoryDto tr, final @NotNull TestCaseDto tc) {
-        return Services.getInstance(getProject(), TestRuns.class).getTestRunByPath(tr.getPath()).resultOf(tc.getId()).orElseThrow();
+    private @NotNull RunItem runItemOf(final @NotNull TestRunNode tr, final @NotNull TestCaseDto tc) {
+        return Services.getInstance(getProject(), TestRuns.class).getRunItems(tr.getPath()).runItemOf(tc.getId()).orElseThrow();
     }
 
     private void reported(final @NotNull TestCaseDto tc, final @NotNull ExecutionStatus status, final @NotNull Duration duration) {
@@ -96,7 +96,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
-    private @NotNull Map<?, ?> writtenRunItem(final @NotNull TestRunDirectoryDto tr, final @NotNull TestCaseDto tc) {
+    private @NotNull Map<?, ?> writtenRunItem(final @NotNull TestRunNode tr, final @NotNull TestCaseDto tc) {
         Services.getInstance(getProject(), TestRuns.class).awaitWrites();
         try {
             return Services.getInstance(getProject(), Mapper.class).readValue(Files.readString(tr.getPath().resolve(FileKind.RUN_ITEM.fileName(tc.getId()))), Map.class);
@@ -108,8 +108,8 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-180
     public void testTheEditorClaimsTheTestCaseSoTheStatusComesBackToItsOwnTestRun() {
         final @NotNull TestCaseDto tc = automatedTestCases(1).getFirst();
-        final @NotNull TestRunDirectoryDto running = aTestRun("Cycle-1", List.of(EditorFixtures.pending(tc)));
-        final @NotNull TestRunDirectoryDto alsoShowing = aTestRun("Cycle-2", List.of(EditorFixtures.pending(tc)));
+        final @NotNull TestRunNode running = aTestRun("Cycle-1", List.of(EditorFixtures.pending(tc)));
+        final @NotNull TestRunNode alsoShowing = aTestRun("Cycle-2", List.of(EditorFixtures.pending(tc)));
         final @NotNull TestRunEditor claiming = opened(running);
         final @NotNull TestRunEditor other = opened(alsoShowing);
         try {
@@ -118,8 +118,8 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
 
             reported(tc, ExecutionStatus.PASSED, Duration.ofMillis(84));
 
-            Await.until("the run item status did not come back to the test run that ran it", () -> resultOf(running, tc).getStatus() == RunItemStatus.PASSED);
-            assertEquals("the run item status went to another editor showing the same test case", RunItemStatus.PENDING, resultOf(alsoShowing, tc).getStatus());
+            Await.until("the run item status did not come back to the test run that ran it", () -> runItemOf(running, tc).getStatus() == RunItemStatus.PASSED);
+            assertEquals("the run item status went to another editor showing the same test case", RunItemStatus.PENDING, runItemOf(alsoShowing, tc).getStatus());
         } finally {
             Disposer.dispose(claiming);
             Disposer.dispose(other);
@@ -129,7 +129,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-182
     public void testARunItemStatusFromTheAutomationIsWrittenAsTheKeyboardsIs() {
         final @NotNull List<TestCaseDto> testCases = automatedTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aTestRun("Cycle-1", testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = aTestRun("Cycle-1", testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.getList().setSelectedIndex(0);
@@ -137,10 +137,10 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
 
             CardHoverAction.RUN_TEST_METHOD.executeFor(editor, testCases.get(1));
             reported(testCases.get(1), ExecutionStatus.PASSED, Duration.ofMillis(84));
-            Await.until("the automation's run item status was not recorded", () -> resultOf(tr, testCases.get(1)).getStatus() == RunItemStatus.PASSED);
+            Await.until("the automation's run item status was not recorded", () -> runItemOf(tr, testCases.get(1)).getStatus() == RunItemStatus.PASSED);
 
-            final @NotNull TestRunItems byKeyboard = resultOf(tr, testCases.getFirst());
-            final @NotNull TestRunItems byAutomation = resultOf(tr, testCases.get(1));
+            final @NotNull RunItem byKeyboard = runItemOf(tr, testCases.getFirst());
+            final @NotNull RunItem byAutomation = runItemOf(tr, testCases.get(1));
             assertEquals("the automation's run item status was recorded under another tester", byKeyboard.getExecutedBy(), byAutomation.getExecutedBy());
             assertFalse("the automation's run item status says no time it was recorded", Config.isNotExecuted(byAutomation.getExecutedAt()));
 
@@ -156,7 +156,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-183
     public void testTheClockThatWasCountingKeepsItsTimeWhenTheAutomationSetsTheRunItemStatus() {
         final @NotNull List<TestCaseDto> testCases = automatedTestCases(2);
-        final @NotNull TestRunDirectoryDto tr = aTestRun("Cycle-1", testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = aTestRun("Cycle-1", testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.onStartExecutionClicked();
@@ -170,8 +170,8 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
 
             reported(testCases.getFirst(), ExecutionStatus.PASSED, Duration.ofMillis(84));
 
-            Await.until("the automation's run item status was not recorded", () -> resultOf(tr, testCases.getFirst()).getStatus() == RunItemStatus.PASSED);
-            final @NotNull Duration kept = resultOf(tr, testCases.getFirst()).getDuration();
+            Await.until("the automation's run item status was not recorded", () -> runItemOf(tr, testCases.getFirst()).getStatus() == RunItemStatus.PASSED);
+            final @NotNull Duration kept = runItemOf(tr, testCases.getFirst()).getDuration();
             assertTrue("the framework's 84 ms replaced the time the clock counted: " + kept, kept.compareTo(Duration.ofMillis(1200)) >= 0);
         } finally {
             Disposer.dispose(editor);
@@ -181,7 +181,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-152
     public void testOnlyTheTestersStopOrClosingTheTabEndsTheAutomationThisEditorStarted() {
         final @NotNull List<TestCaseDto> testCases = automatedTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aTestRun("Cycle-1", testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = aTestRun("Cycle-1", testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = opened(tr);
         final @NotNull TestNGExecution execution = Services.getInstance(getProject(), TestNGExecution.class);
         try {
@@ -189,7 +189,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
             assertTrue(execution.isRunning(testCases.getFirst().getId()));
 
             editor.getToolBar().getToolbarItem(RefreshBtn.class).doClick();
-            Await.until("refresh never finished", () -> editor.run().isPresent());
+            Await.until("refresh never finished", () -> editor.loadedRunItems().isPresent());
             editor.getList().setSelectedIndex(1);
             Gestures.press(getProject(), TestRunFixture.keyFor(editor, RunItemStatus.BLOCKED), editor.getList());
             assertTrue("something other than the tester's stop ended the automation", execution.isRunning(testCases.getFirst().getId()));
@@ -210,7 +210,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-184, Rule-EDITOR-PANEL-185
     public void testRunningTheWholeTestRunHandsOnlyThePendingOnesOverAsOneExecution() {
         final @NotNull List<TestCaseDto> testCases = automatedTestCases(4);
-        final @NotNull TestRunDirectoryDto tr = aTestRun("Cycle-1", List.of(
+        final @NotNull TestRunNode tr = aTestRun("Cycle-1", List.of(
                 EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.PASSED),
                 EditorFixtures.pending(testCases.get(1)),
                 EditorFixtures.pending(testCases.get(2)).setStatus(RunItemStatus.FAILED),
@@ -223,7 +223,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
             assertEquals("the whole test run was not one execution of the pending test cases only", List.of(List.of(testCases.get(1), testCases.get(3))), runner.runs());
 
             reported(testCases.getFirst(), ExecutionStatus.FAILED, Duration.ofMillis(5));
-            assertEquals("a test case already judged was run again", RunItemStatus.PASSED, resultOf(tr, testCases.getFirst()).getStatus());
+            assertEquals("a test case already judged was run again", RunItemStatus.PASSED, runItemOf(tr, testCases.getFirst()).getStatus());
         } finally {
             Disposer.dispose(editor);
         }
@@ -232,7 +232,7 @@ public class AutomationFromTheTestRunIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-187
     public void testTheMethodsRunInTheOrderOfTheTestSet() {
         final @NotNull List<TestCaseDto> testCases = automatedTestCases(4);
-        final @NotNull TestRunDirectoryDto tr = aTestRun("Cycle-1", List.of(
+        final @NotNull TestRunNode tr = aTestRun("Cycle-1", List.of(
                 EditorFixtures.pending(testCases.get(3)),
                 EditorFixtures.pending(testCases.get(1)),
                 EditorFixtures.pending(testCases.getFirst()),

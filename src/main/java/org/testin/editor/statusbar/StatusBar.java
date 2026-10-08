@@ -30,7 +30,7 @@ import org.testin.git.history.HistoryCard;
 import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.result.Segment;
+import org.testin.model.testrun.Segment;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;

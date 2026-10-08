@@ -29,11 +29,11 @@ import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.Failure;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.Failure;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
@@ -70,30 +70,30 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull List<TestCaseDto> createdTestCases(final int count) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         return EditorFixtures.testCases(getProject(), ts, count);
     }
 
-    private @NotNull TestRunDirectoryDto aTestRunOver(final @NotNull List<TestRunItems> results) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        return EditorFixtures.testRun(getProject(), tp, results);
+    private @NotNull TestRunNode aTestRunOver(final @NotNull List<RunItem> runItems) {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        return EditorFixtures.testRun(getProject(), tp, runItems);
     }
 
-    private @NotNull TestRunDirectoryDto aPendingTestRunOver(final @NotNull List<TestCaseDto> testCases) {
+    private @NotNull TestRunNode aPendingTestRunOver(final @NotNull List<TestCaseDto> testCases) {
         return aTestRunOver(testCases.stream().map(EditorFixtures::pending).toList());
     }
 
-    private @NotNull TestRunEditor opened(final @NotNull TestRunDirectoryDto tr) {
+    private @NotNull TestRunEditor opened(final @NotNull TestRunNode tr) {
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
-    private @NotNull RunItemStatus statusOf(final @NotNull TestRunDirectoryDto tr, final @NotNull TestCaseDto tc) {
-        return theTestRuns().getTestRunByPath(tr.getPath()).resultOf(tc.getId()).map(TestRunItems::getStatus).orElseThrow();
+    private @NotNull RunItemStatus statusOf(final @NotNull TestRunNode tr, final @NotNull TestCaseDto tc) {
+        return theTestRuns().getRunItems(tr.getPath()).runItemOf(tc.getId()).map(RunItem::getStatus).orElseThrow();
     }
 
-    private @NotNull TestRunItems resultOf(final @NotNull TestRunDirectoryDto tr, final @NotNull TestCaseDto tc) {
-        return theTestRuns().getTestRunByPath(tr.getPath()).resultOf(tc.getId()).orElseThrow();
+    private @NotNull RunItem runItemOf(final @NotNull TestRunNode tr, final @NotNull TestCaseDto tc) {
+        return theTestRuns().getRunItems(tr.getPath()).runItemOf(tc.getId()).orElseThrow();
     }
 
     private void record(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
@@ -101,7 +101,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
-    private @NotNull String fileOf(final @NotNull TestRunDirectoryDto tr, final @NotNull TestCaseDto tc) {
+    private @NotNull String fileOf(final @NotNull TestRunNode tr, final @NotNull TestCaseDto tc) {
         theTestRuns().awaitWrites();
         try {
             return Files.readString(tr.getPath().resolve(FileKind.RUN_ITEM.fileName(tc.getId())));
@@ -110,7 +110,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull List<String> everyFileOf(final @NotNull TestRunDirectoryDto tr) {
+    private @NotNull List<String> everyFileOf(final @NotNull TestRunNode tr) {
         theTestRuns().awaitWrites();
         final @NotNull List<String> read = new ArrayList<>();
         try (final Stream<Path> files = Files.list(tr.getPath())) {
@@ -140,8 +140,8 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-139, Rule-EDITOR-PANEL-153
     public void testTheWalkLandsOnlyOnTestCasesWaitingForARunItemStatus() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(4);
-        final @NotNull TestRunItems judgedBySomeoneElse = EditorFixtures.pending(testCases.get(0)).setStatus(RunItemStatus.FAILED).setExecutedBy("Sara");
-        final @NotNull TestRunItems judgedInTheFirstSitting = EditorFixtures.pending(testCases.get(2)).setStatus(RunItemStatus.PASSED);
+        final @NotNull RunItem judgedBySomeoneElse = EditorFixtures.pending(testCases.get(0)).setStatus(RunItemStatus.FAILED).setExecutedBy("Sara");
+        final @NotNull RunItem judgedInTheFirstSitting = EditorFixtures.pending(testCases.get(2)).setStatus(RunItemStatus.PASSED);
         final @NotNull TestRunEditor editor = opened(aTestRunOver(List.of(judgedBySomeoneElse, EditorFixtures.pending(testCases.get(1)), judgedInTheFirstSitting, EditorFixtures.pending(testCases.get(3)))));
         try {
             editor.onStartExecutionClicked();
@@ -158,7 +158,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-131
     public void testStartingMarksTheTestRunInProgressAndStampsWhenExecutionBegan() {
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(createdTestCases(2));
+        final @NotNull TestRunNode tr = aPendingTestRunOver(createdTestCases(2));
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             assertTrue("a test run nobody started already says when execution began", Config.isNotExecuted(tr.getMarker().getExecutionStartedAt()));
@@ -190,7 +190,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-134
     public void testReachingTheEndOfTheListEndsTheWalkAndNothingMore() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(2);
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.getToolBar().getSearchTxt().setText(testCases.getFirst().getDescription());
@@ -262,7 +262,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-149, Rule-EDITOR-PANEL-151
     public void testStoppingWritesTheTestRunAsItStandsAndStampsTheEnd() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(2);
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.onStartExecutionClicked();
@@ -272,7 +272,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
             editor.onStopExecutionClicked();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-            final @NotNull TestRunItems written = Services.getInstance(getProject(), Mapper.class).readValue(fileOf(tr, testCases.getFirst()), TestRunItems.class);
+            final @NotNull RunItem written = Services.getInstance(getProject(), Mapper.class).readValue(fileOf(tr, testCases.getFirst()), RunItem.class);
             assertTrue("the time the clock counted was not written down by the stop: " + written.getDuration(), written.getDuration().compareTo(Duration.ofSeconds(1)) >= 0);
             assertFalse("stopping did not stamp when execution ended", Config.isNotExecuted(editor.getParent().getMarker().getExecutionEndedAt()));
         } finally {
@@ -283,7 +283,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-150
     public void testStoppingChangesNoRunItemStatusAndNoStatus() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.onStartExecutionClicked();
@@ -308,7 +308,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-156, Rule-EDITOR-PANEL-157, Rule-EDITOR-PANEL-158
     public void testARunItemStatusRecordedAwayFromTheWalkIsNotTimedAndLeavesTheWalkAlone() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aTestRunOver(List.of(
+        final @NotNull TestRunNode tr = aTestRunOver(List.of(
                 EditorFixtures.pending(testCases.get(0)),
                 EditorFixtures.pending(testCases.get(1)),
                 EditorFixtures.pending(testCases.get(2)).setDuration(Duration.ofSeconds(7))));
@@ -322,7 +322,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
             assertEquals("a run item status could not be recorded away from the walk", RunItemStatus.BLOCKED, statusOf(tr, testCases.get(2)));
-            assertEquals("a run item status recorded away from the walk was timed", Duration.ofSeconds(7), resultOf(tr, testCases.get(2)).getDuration());
+            assertEquals("a run item status recorded away from the walk was timed", Duration.ofSeconds(7), runItemOf(tr, testCases.get(2)).getDuration());
             assertTrue("recording away from the walk stopped it", editor.getWalk().isExecuting());
             assertEquals("recording away from the walk moved it", testCases.get(0).getId(), walkingOn(editor));
         } finally {
@@ -333,7 +333,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-156
     public void testARunItemStatusCanBeRecordedWithNoWalkGoing() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(2);
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             runItemStatuses().applyStatus(editor, List.of(testCases.get(1)), RunItemStatus.FAILED);
@@ -350,10 +350,10 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     public void testSeveralAtOnceSkipsTheRemovedOnesAndTimesNone() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(2);
         final @NotNull UUID removed = UUID.randomUUID();
-        final @NotNull TestRunDirectoryDto tr = aTestRunOver(List.of(
+        final @NotNull TestRunNode tr = aTestRunOver(List.of(
                 EditorFixtures.pending(testCases.get(0)),
                 EditorFixtures.pending(testCases.get(1)),
-                new TestRunItems().setId(removed)));
+                new RunItem().setId(removed)));
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             final @NotNull List<TestCaseDto> everyRow = new ArrayList<>(editor.getAllTestCases());
@@ -364,9 +364,9 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
 
             assertEquals(RunItemStatus.BLOCKED, statusOf(tr, testCases.get(0)));
             assertEquals(RunItemStatus.BLOCKED, statusOf(tr, testCases.get(1)));
-            assertEquals("a test case removed from its test set was given the run item status", RunItemStatus.PENDING, theTestRuns().getTestRunByPath(tr.getPath()).resultOf(removed).orElseThrow().getStatus());
-            assertEquals("a run item status given to several at once was timed", Duration.ZERO, resultOf(tr, testCases.get(0)).getDuration());
-            assertEquals(Duration.ZERO, resultOf(tr, testCases.get(1)).getDuration());
+            assertEquals("a test case removed from its test set was given the run item status", RunItemStatus.PENDING, theTestRuns().getRunItems(tr.getPath()).runItemOf(removed).orElseThrow().getStatus());
+            assertEquals("a run item status given to several at once was timed", Duration.ZERO, runItemOf(tr, testCases.get(0)).getDuration());
+            assertEquals(Duration.ZERO, runItemOf(tr, testCases.get(1)).getDuration());
         } finally {
             Disposer.dispose(editor);
         }
@@ -375,7 +375,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-227
     public void testTheWalkFollowsTheTestCaseBeingExecutedNotItsPlace() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.onStartExecutionClicked();
@@ -399,7 +399,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-125
     public void testOpeningATestRunNeverRewritesIt() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aTestRunOver(List.of(
+        final @NotNull TestRunNode tr = aTestRunOver(List.of(
                 EditorFixtures.pending(testCases.get(0)).setStatus(RunItemStatus.PASSED),
                 EditorFixtures.pending(testCases.get(1)),
                 EditorFixtures.pending(testCases.get(2))));
@@ -441,7 +441,7 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-242
     public void testAStatusFromTheAutomationMovesTheWalkOnAsTheTestersOwnDoes() {
         final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
-        final @NotNull TestRunDirectoryDto tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
         final @NotNull TestRunEditor editor = opened(tr);
         try {
             editor.onStartExecutionClicked();

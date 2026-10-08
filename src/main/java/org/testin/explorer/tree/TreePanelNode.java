@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
@@ -69,14 +69,14 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
     @Override
     public @NotNull Collection<? extends AbstractTreeNode<?>> getChildren() {
         final @NotNull Object value = getValue();
-        if (value instanceof TestProjectDirectoryDto projectDirectory) {
-            if (projectDirectory.getMarker().getStatus() != ProjectStatus.ACTIVE) return List.of();
+        if (value instanceof TestProjectNode testProjectNode) {
+            if (testProjectNode.getMarker().getStatus() != ProjectStatus.ACTIVE) return List.of();
             return List.of(
-                    child(projectDirectory.getTestCasesDirectory()),
-                    child(projectDirectory.getTestRunsDirectory())
+                    child(testProjectNode.getTestCasesFolder()),
+                    child(testProjectNode.getTestRunsFolder())
             );
         }
-        if (!(value instanceof DirectoryDto directory)) return List.of();
+        if (!(value instanceof Node directory)) return List.of();
 
         try {
             // Rule-INTERNAL-091
@@ -84,7 +84,7 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
             if (refused.isPresent()) return List.of(child(new TreeLoadError(refused.orElseThrow())));
 
             final @NotNull List<TreePanelNode> children = new ArrayList<>();
-            for (final DirectoryDto child : nodes.getChildren(directory.getPath())) {
+            for (final Node child : nodes.getChildren(directory.getPath())) {
                 children.add(child(child));
             }
             return children;
@@ -106,7 +106,7 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-127
     @Override
     public @NotNull LeafState getLeafState() {
-        if (!(getValue() instanceof DirectoryDto directory)) return LeafState.ALWAYS;
+        if (!(getValue() instanceof Node directory)) return LeafState.ALWAYS;
 
         return directory.mayHaveChildren() ? LeafState.ASYNC : LeafState.ALWAYS;
     }
@@ -122,18 +122,18 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
     }
 
     private @NotNull Object identity() {
-        return getValue() instanceof DirectoryDto directory ? directory.getPath() : getValue();
+        return getValue() instanceof Node directory ? directory.getPath() : getValue();
     }
 
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-008
     @Override
     public boolean isIncludedInExpandAll() {
-        return !(getValue() instanceof DirectoryDto directory && directory.isRetired());
+        return !(getValue() instanceof Node directory && directory.isRetired());
     }
 
     @Override
     protected void update(final @NotNull PresentationData presentation) {
         final @NotNull Object value = getValue();
-        presentation.setPresentableText(value instanceof DirectoryDto directory ? directory.getName() : String.valueOf(value));
+        presentation.setPresentableText(value instanceof Node directory ? directory.getName() : String.valueOf(value));
     }
 }

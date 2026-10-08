@@ -21,8 +21,8 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.Said;
 import org.testin.indexer.NodeCounter;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.ui.framework.ShownDialog;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ import java.util.List;
 
 public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
-    private TestSetDirectoryDto login;
+    private TestSetNode login;
 
     private static @NotNull String bytesOf(final @NotNull Path file) {
         try {
@@ -46,8 +46,8 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
     protected void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        login = made.testSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        login = made.testSet(tp.getTestCasesFolder(), "Login");
         made.testCase(login);
         made.testCase(login);
     }

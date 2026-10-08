@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.TestCaseStatus;
 import org.testin.util.Bundle;
 
@@ -79,7 +79,7 @@ public final class TestCaseDto {
     @NonNull
     @Builder.Default
     @JsonIgnore
-    private volatile TestSetDirectoryDto parent = new TestSetDirectoryDto();
+    private volatile TestSetNode parent = new TestSetNode();
 
     @NonNull
     @Builder.Default
@@ -87,7 +87,7 @@ public final class TestCaseDto {
 
     @NonNull
     @Builder.Default
-    private volatile List<String> group = new ArrayList<>();
+    private volatile List<String> groups = new ArrayList<>();
 
     @NonNull
     @Builder.Default
@@ -148,7 +148,7 @@ public final class TestCaseDto {
 
     // Rule-INTERNAL-117
     public @NotNull TestCaseDtoBuilder edit() {
-        return toBuilder().steps(new ArrayList<>(steps)).group(new ArrayList<>(group));
+        return toBuilder().steps(new ArrayList<>(steps)).groups(new ArrayList<>(groups));
     }
 
     // Rule-INTERNAL-117, Rule-EDITOR-PANEL-238
@@ -166,7 +166,7 @@ public final class TestCaseDto {
         priority = edited.priority;
         parent = edited.parent;
         reference = edited.reference;
-        group = new ArrayList<>(edited.group);
+        groups = new ArrayList<>(edited.groups);
         module = edited.module;
         testData = edited.testData;
         preConditions = edited.preConditions;

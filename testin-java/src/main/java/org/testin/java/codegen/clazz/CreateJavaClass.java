@@ -22,14 +22,14 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
 import java.util.List;
 
-public class CreateJavaClass implements GenAction<DirectoryDto> {
+public class CreateJavaClass implements GenAction<Node> {
     // UC-CODEGEN-001
     @Override
-    public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public void execute(final @NotNull Project p, final @NotNull Node dir) {
         final @NotNull List<String> fqcn = Fqcn.ofClass(dir);
         if (fqcn.isEmpty()) return;
 

@@ -28,7 +28,7 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.actions.TestinData;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -58,7 +58,7 @@ public class AutomateTestCaseIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-071
     public void testTheEntryIsGrayWithTheReasonWhereThereIsNoMethodToWrite() {
-        final @NotNull TestSetDirectoryDto login = indexedTestSet("Login", theTestCasesDirectory());
+        final @NotNull TestSetNode login = indexedTestSet("Login", theTestCasesDirectory());
 
         final @NotNull AnActionEvent noDescription = updated(indexedTestCase(login, "", "b"));
         assertTrue("the entry was left off the menu", noDescription.getPresentation().isVisible());

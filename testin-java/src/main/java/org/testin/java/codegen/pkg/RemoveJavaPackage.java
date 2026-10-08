@@ -21,12 +21,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
-public class RemoveJavaPackage implements GenAction<DirectoryDto> {
+public class RemoveJavaPackage implements GenAction<Node> {
     // UC-CODEGEN-018, Rule-CODEGEN-059
     @Override
-    public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public void execute(final @NotNull Project p, final @NotNull Node dir) {
         final @NotNull String packagePath = String.join("/", Fqcn.ofPackage(dir));
 
         JavaSourceRoot.writeInRoot(p, testSourceRoot ->

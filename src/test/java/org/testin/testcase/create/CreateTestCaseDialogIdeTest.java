@@ -22,11 +22,11 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseAction;
@@ -51,7 +51,7 @@ public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull CreateTestCaseDialog shown() {
-        final @NotNull TestSetDirectoryDto testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        final @NotNull TestSetNode testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), testSet, 3);
 
         final @NotNull CreateTestCaseDialog dialog = new CreateTestCaseDialog(getProject(), testSet, saved::add);
@@ -144,9 +144,9 @@ public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-030, Rule-EDITOR-PANEL-008
     public void testANewTestCaseSortsLastAndConfirmsItselfOnce() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), ts, 3);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         ShownDialog.open(getProject(), CreateTestCaseDialog.class, () -> CreateTestCaseAction.openCreateDialog(getProject(), editor, ts));

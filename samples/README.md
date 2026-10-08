@@ -17,11 +17,11 @@ came from a real test project, and nothing here should.
 
     testin-root/         what the rootTestinPath setting points at
       Demo/                                  .tp   the test project, format 2
-        Test Cases/                          .tcd
+        Test Cases/                          .tcf
           Login/                             .ts   3 test cases, one .tc each
           Checkout/                          .tsp  a test set package
             Payment/                         .ts   3 test cases, one .tc each
-        Test Runs/                           .trd
+        Test Runs/                           .trf
           Cycle-1/                           .tr   completed; six results, one .ri each
           Regression/                        .trp  a test run package
             Cycle-2/                         .tr   in progress; two results

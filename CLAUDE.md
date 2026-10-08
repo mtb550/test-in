@@ -17,8 +17,8 @@ going stale (#99).
 2. **The VFS operation succeeds first, then the cache is updated.** Never the
    other way round: the cache update persists markers, marker writes create
    directories, and the reverse order produces phantom directories and "already
-   exists in VFS" errors. One deliberate exception: a test run's results are
-   put in the cache first and written by `TestRunWriter`'s background queue, so
+   exists in VFS" errors. One deliberate exception: a test run's run items are
+   put in the cache first and written by `RunItemWriter`'s background queue, so
    recording a run item status never waits on the disk.
 3. **Swing is read and written only on the EDT.** Short work with no UI of its
    own goes to `executeOnPooledThread` and finishes with `invokeLater`; long
@@ -28,7 +28,7 @@ going stale (#99).
 4. **Formatting is display-only.** Rendering may reformat a value; saving never
    does. The stored JSON is byte-identical to what the tester typed, so an
    editable surface loads the raw value and a read-only one loads the formatted
-   value - `gridValue` and `displayValue` on `TestCaseEditorAttributes`.
+   value - `gridValue` and `displayValue` on `TestSetEditorAttributes`.
 
 The fifth is not in that document, because it is about where a value is kept
 rather than how the plugin is shaped:
@@ -129,7 +129,7 @@ silently has no effect costs more than the setting it was meant to hold.
   `.idea/inspectionProfiles/Testin.xml` for exactly this reason — what it argues
   for instead is a nullable field, which is the thing the codebase spent a sweep
   removing. Turning it back on means reversing that decision, not tidying up.
-- Node behavior is declared on the node: capability flags on `DirectoryDto`
+- Node behavior is declared on the node: capability flags on `Node`
   (`isRenamable`, `isTransferable`, `acceptsTransferred`, ...) instead of
   instanceof chains at call sites. Enums carry their own presentation and
   actions (see `RunItemStatus`, `TestRunStatus`).
@@ -242,7 +242,7 @@ silently has no effect costs more than the setting it was meant to hold.
   below. `DeclaredContractsTest` scans the main and test trees for them, holds
   the same three with their reasons and fails on a fourth, so this list can no
   longer drift from the code unnoticed. Do not sweep them again:
-  - `NodesTransferable.getTransferData`, and the one `TransferListener` builds
+  - `NodesTransferable.getTransferData`, and the one `TestCaseTransferHandler` builds
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".

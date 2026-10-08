@@ -29,7 +29,7 @@ import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -66,7 +66,7 @@ public final class BoundTestProject {
     }
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-001
-    public @NotNull Optional<TestProjectDirectoryDto> get() {
+    public @NotNull Optional<TestProjectNode> get() {
         final @NotNull String name = name();
         if (name.isEmpty()) return Optional.empty();
 

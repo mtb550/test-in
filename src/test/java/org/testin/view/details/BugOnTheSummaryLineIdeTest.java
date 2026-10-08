@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
 import org.testin.view.AbstractViewPanelIdeTest;
@@ -39,10 +39,10 @@ public class BugOnTheSummaryLineIdeTest extends AbstractViewPanelIdeTest {
     private static final @NotNull String ISSUE = "https://github.com/mtb550/test-in/issues/412";
 
     private TestCaseDto tc;
-    private TestRunDirectoryDto tr;
+    private TestRunNode tr;
 
-    private static @NotNull TestRunItems recorded(final @NotNull TestCaseDto tc, final @NotNull RunItemStatus status, final @NotNull String bugIssueUrl) {
-        return TestRunItems.builder().id(tc.getId()).status(status).bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl(bugIssueUrl).build();
+    private static @NotNull RunItem recorded(final @NotNull TestCaseDto tc, final @NotNull RunItemStatus status, final @NotNull String bugIssueUrl) {
+        return RunItem.builder().id(tc.getId()).status(status).bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl(bugIssueUrl).build();
     }
 
     private static @NotNull Component rowOf(final @NotNull Component drawn) {
@@ -55,10 +55,10 @@ public class BugOnTheSummaryLineIdeTest extends AbstractViewPanelIdeTest {
     protected void setUp() {
         super.setUp();
         tc = aTestCase(aTestSet("Login"), "Log in with a valid user", "a");
-        tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
+        tr = aTestRun(List.of(RunItem.builder().id(tc.getId()).build()));
     }
 
-    private @NotNull JBPanel<?> drawn(final @NotNull TestRunItems runItem) {
+    private @NotNull JBPanel<?> drawn(final @NotNull RunItem runItem) {
         return Drawn.detailsTab(getProject(), tc, Optional.of(runItem), tr.getPath2());
     }
 

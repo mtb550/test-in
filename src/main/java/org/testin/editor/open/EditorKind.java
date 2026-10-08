@@ -19,10 +19,10 @@ package org.testin.editor.open;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 import org.testin.util.Bundle;
 
 import java.util.Map;
@@ -30,28 +30,28 @@ import java.util.Map;
 @AllArgsConstructor
 public enum EditorKind {
     // UC-EDITOR-PANEL-001
-    TEST(
+    TEST_SET(
             "test",
-            new EditorType("Test Case", Bundle.message("editor.type.test.case.description"), DirectoryType.TS.getIcon(), TestCaseEditor::new)
+            new EditorType("Test Case", Bundle.message("editor.type.test.set.description"), NodeType.TS.getIcon(), TestSetEditor::new)
     ),
 
-    RUN(
+    TEST_RUN(
             "run",
-            new EditorType("Test Run", Bundle.message("editor.type.test.run.description"), DirectoryType.TR.getIcon(), TestRunEditor::new)
+            new EditorType("Test Run", Bundle.message("editor.type.test.run.description"), NodeType.TR.getIcon(), TestRunEditor::new)
     );
 
     // Rule-EDITOR-PANEL-001
-    private static final @NotNull Map<DirectoryType, EditorKind> OPENS = Map.of(
-            DirectoryType.TS, TEST,
-            DirectoryType.TR, RUN);
+    private static final @NotNull Map<NodeType, EditorKind> OPENS = Map.of(
+            NodeType.TS, TEST_SET,
+            NodeType.TR, TEST_RUN);
 
     private final @NotNull String word;
     @Getter
     private final @NotNull EditorType fileType;
 
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-001
-    public static @NotNull EditorKind of(final @NotNull DirectoryDto dir) {
-        return OPENS.getOrDefault(dir.getType(), TEST);
+    public static @NotNull EditorKind of(final @NotNull Node dir) {
+        return OPENS.getOrDefault(dir.getType(), TEST_SET);
     }
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022

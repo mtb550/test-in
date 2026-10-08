@@ -28,7 +28,7 @@ import org.testin.help.Guide;
 import org.testin.help.Guides;
 import org.testin.help.Hints;
 import org.testin.help.SetupStep;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
@@ -61,7 +61,7 @@ public final class SaveTestinYml {
             return;
         }
 
-        final @NotNull TestProjectDirectoryDto open = Services.getInstance(p, BoundTestProject.class).get().orElseThrow();
+        final @NotNull TestProjectNode open = Services.getInstance(p, BoundTestProject.class).get().orElseThrow();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<String, String> lines = linesFor(p, open);
@@ -73,7 +73,7 @@ public final class SaveTestinYml {
     }
 
     // Rule-TREE-PANEL-113
-    private static @NotNull Map<String, String> linesFor(final @NotNull Project p, final @NotNull TestProjectDirectoryDto open) {
+    private static @NotNull Map<String, String> linesFor(final @NotNull Project p, final @NotNull TestProjectNode open) {
         if (!OptionalPlugin.GIT.isAvailable()) return TestinYml.lines(open.getName());
 
         final @NotNull Path folder = open.getPath();

@@ -40,14 +40,14 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunFixture;
-import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.testrun.failure.FailureDetailDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
@@ -190,8 +190,8 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull List<TestCaseDto> aTestSetWithSteps(final int count, final int steps) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Test case number " + (i + 1)).expectedResult("It works " + (i + 1))
@@ -272,13 +272,13 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             press(frame, RunItemStatus.PASSED.getMenuEntry().shortcut());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-            assertEquals("light mode recorded somewhere the editor does not see", RunItemStatus.PASSED, editor.runItem(fixture.testCases().getFirst().getId()).map(TestRunItems::getStatus).orElseThrow());
+            assertEquals("light mode recorded somewhere the editor does not see", RunItemStatus.PASSED, editor.runItem(fixture.testCases().getFirst().getId()).map(RunItem::getStatus).orElseThrow());
             assertEquals(RunItemStatus.PASSED, fixture.statusOf(fixture.testCases().getFirst()));
             Await.until("the editor's walk did not move with light mode", () -> editor.getWalk().getCurrentlyExecutingIndex() == 1);
 
             editor.getList().setSelectedIndex(1);
             fixture.press(editor, RunItemStatus.BLOCKED);
-            final @NotNull String third = TestCaseEditorAttributes.DESCRIPTION.displayValue(fixture.testCases().get(2));
+            final @NotNull String third = TestSetEditorAttributes.DESCRIPTION.displayValue(fixture.testCases().get(2));
             Await.until("light mode did not follow the run item status the editor recorded: " + describedIn(frame), () -> describedIn(frame).equals(third));
         } finally {
             Disposer.dispose(editor);
@@ -458,7 +458,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             final @NotNull JBLabel name = everythingIn(frame).stream().filter(JBLabel.class::isInstance).map(JBLabel.class::cast)
                     .filter(label -> "Checkout".equals(label.getText())).findFirst().orElseThrow(() -> new AssertionError("light mode does not show the test set's name"));
             final @NotNull JTextArea description = everythingIn(frame).stream().filter(JTextArea.class::isInstance).map(JTextArea.class::cast)
-                    .filter(area -> area.getText().equals(TestCaseEditorAttributes.DESCRIPTION.displayValue(fixture.testCases().getFirst()))).findFirst().orElseThrow();
+                    .filter(area -> area.getText().equals(TestSetEditorAttributes.DESCRIPTION.displayValue(fixture.testCases().getFirst()))).findFirst().orElseThrow();
 
             assertNull("the test set's name carries an icon", name.getIcon());
             assertTrue("the test set's name is not in a frame of its own", name.getBorder() instanceof CompoundBorder);
@@ -488,7 +488,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             typed.setText("The dashboard stayed blank");
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final @NotNull TestCaseDto walked = fixture.testCases().getFirst();
-            Services.getInstance(getProject(), TestRuns.class).changeTestRun(fixture.testRun().getPath(), testRun -> testRun.getResults().removeIf(item -> item.getId().equals(walked.getId())));
+            Services.getInstance(getProject(), TestRuns.class).changeRunItems(fixture.testRun().getPath(), testRun -> testRun.getAll().removeIf(runItem -> runItem.getId().equals(walked.getId())));
 
             press(frame, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -512,7 +512,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             final @NotNull List<String> inTheForm = Drawn.words(theOne(frame, FailureForm.class));
 
             final @NotNull TestCaseDto walked = fixture.testCases().getFirst();
-            final @NotNull FailedResultDialog dialog = new FailedResultDialog(getProject(), fixture.testRun().getPath(), fixture.resultOf(walked), _ -> {
+            final @NotNull FailureDetailDialog dialog = new FailureDetailDialog(getProject(), fixture.testRun().getPath(), fixture.runItemOf(walked), _ -> {
             });
             final @NotNull List<String> inTheDialog = ShownDialog.wordsOf(dialog).stream()
                     .filter(word -> !word.equals(walked.getDescription()) && !word.equals(walked.getExpectedResult())).toList();
@@ -542,7 +542,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             assertSpellChecked("light mode's form", inTheForm);
             assertTrue("light mode does not offer the corrections key while the form is open", Drawn.holds(Drawn.words(frame.getRootPane()), Bundle.message("dialog.key.corrections")));
 
-            final @NotNull FailedResultDialog dialog = new FailedResultDialog(getProject(), fixture.testRun().getPath(), fixture.resultOf(fixture.testCases().getFirst()), _ -> {
+            final @NotNull FailureDetailDialog dialog = new FailureDetailDialog(getProject(), fixture.testRun().getPath(), fixture.runItemOf(fixture.testCases().getFirst()), _ -> {
             });
             final @NotNull JComponent fields = new JPanel();
             ShownDialog.componentsOf(dialog).forEach(component -> fields.add(component.getComponent().getPanel()));

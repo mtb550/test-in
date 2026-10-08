@@ -30,14 +30,14 @@ import org.testin.Said;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.open.TestinEditors;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.details.ActionIcons;
@@ -56,7 +56,7 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
     private static final @NotNull String TO_THE_METHOD = Bundle.message("action.Testin.NavigateToTestMethod.text");
     private static final @NotNull String RUN = Bundle.message("action.Testin.RunTestMethod.text");
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private static @NotNull AnAction navigateToTestCase() {
         return ActionManager.getInstance().getAction("Testin.NavigateToTestCase");
@@ -79,9 +79,9 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
         return made;
     }
 
-    private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestRunItems> results) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, results);
+    private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<RunItem> runItems) {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, runItems);
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
@@ -95,8 +95,8 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
 
             Gestures.press(getProject(), navigateToTestCase(), testRun.getList());
 
-            Await.until("the test case's own test set did not open in the test case editor", () -> editors.editorFor(testSet).filter(TestCaseEditor.class::isInstance).isPresent());
-            final @NotNull TestCaseEditor opened = (TestCaseEditor) editors.editorFor(testSet).orElseThrow();
+            Await.until("the test case's own test set did not open in the test set editor", () -> editors.editorFor(testSet).filter(TestSetEditor.class::isInstance).isPresent());
+            final @NotNull TestSetEditor opened = (TestSetEditor) editors.editorFor(testSet).orElseThrow();
             assertEquals("a test set other than the test case's own opened", List.of(testSet.getPath().toAbsolutePath()), editors.openNodePaths());
             Await.until("the test case was not selected in its test set", () -> Optional.ofNullable(opened.getList().getSelectedValue()).map(TestCaseDto::getId).filter(testCases.get(1).getId()::equals).isPresent());
         } finally {
@@ -109,12 +109,12 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
     public void testItIsOfferedOnATestRunsCardsAndMenuAndNotInATestSet() {
         final @NotNull List<TestCaseDto> testCases = automatedTestCases();
         final @NotNull TestRunEditor testRun = aTestRunEditorOver(testCases.stream().map(EditorFixtures::pending).toList());
-        final @NotNull TestCaseEditor testSetEditor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         try {
             assertTrue("a test run's card does not offer it", CardHoverAction.onCard(getProject(), testRun.getParent(), testCases.getFirst()).stream().anyMatch(offered -> offered.action() == CardHoverAction.NAVIGATE_TO_TEST_CASE));
             assertTrue("the test run editor's menu does not offer it", entriesOf(testRun.contextMenu).contains("Testin.NavigateToTestCase"));
             assertTrue("a test set's card offers it", CardHoverAction.onCard(getProject(), testSet, testCases.getFirst()).stream().noneMatch(offered -> offered.action() == CardHoverAction.NAVIGATE_TO_TEST_CASE));
-            assertFalse("the test case editor's menu offers it", entriesOf(testSetEditor.contextMenu).contains("Testin.NavigateToTestCase"));
+            assertFalse("the test set editor's menu offers it", entriesOf(testSetEditor.contextMenu).contains("Testin.NavigateToTestCase"));
         } finally {
             Disposer.dispose(testRun);
             Disposer.dispose(testSetEditor);
@@ -123,7 +123,7 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-EDITOR-PANEL-236
     public void testATestCaseInNoTestSetIsRefusedAndNothingOpens() {
-        final @NotNull TestRunEditor testRun = aTestRunEditorOver(List.of(new TestRunItems().setId(UUID.randomUUID())));
+        final @NotNull TestRunEditor testRun = aTestRunEditorOver(List.of(new RunItem().setId(UUID.randomUUID())));
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             testRun.getList().setSelectedIndex(0);

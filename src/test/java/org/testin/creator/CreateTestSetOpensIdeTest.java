@@ -23,8 +23,8 @@ import org.testin.NodesOnDisk;
 import org.testin.TreeGesture;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
@@ -42,13 +42,13 @@ public class CreateTestSetOpensIdeTest extends AbstractOpenEditorsIdeTest {
 
     // Rule-TREE-PANEL-026
     public void testANewTestSetOpensInItsEditorAtOnce() {
-        final @NotNull TestProjectDirectoryDto tp = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
+        final @NotNull TestProjectNode tp = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
 
-        TreeGesture.pressed(getProject(), new CreateTreeNodeAction(), List.of(tp.getTestCasesDirectory()));
+        TreeGesture.pressed(getProject(), new CreateTreeNodeAction(), List.of(tp.getTestCasesFolder()));
         ShownDialog.typed(getProject(), CreateTestDialog.class, "Login");
         ShownDialog.press(getProject(), CreateTestDialog.class, Shortcuts.Enter);
 
-        final @NotNull Optional<DirectoryDto> created = Services.getInstance(getProject(), Nodes.class).find(tp.getTestCasesDirectory().getPath().resolve("Login"));
+        final @NotNull Optional<Node> created = Services.getInstance(getProject(), Nodes.class).find(tp.getTestCasesFolder().getPath().resolve("Login"));
         assertTrue("the test set was not created", created.isPresent());
         Await.until("the new test set did not open in its editor", () -> openOn(created.orElseThrow()).size() == 1);
     }

@@ -29,13 +29,13 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
-import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.testrun.failure.FailureDetailDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 
@@ -46,16 +46,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> testCases, @NotNull TestRunDirectoryDto testRun) {
+public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> testCases, @NotNull TestRunNode testRun) {
 
-    public static @NotNull TestRunFixture of(final @NotNull Project p, final @NotNull Path root, final @NotNull List<TestRunItems> results, final @NotNull List<TestCaseDto> testCases) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(p, root);
-        return new TestRunFixture(p, testCases, EditorFixtures.testRun(p, tp, results));
+    public static @NotNull TestRunFixture of(final @NotNull Project p, final @NotNull Path root, final @NotNull List<RunItem> runItems, final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(p, root);
+        return new TestRunFixture(p, testCases, EditorFixtures.testRun(p, tp, runItems));
     }
 
     public static @NotNull List<TestCaseDto> testCasesIn(final @NotNull Project p, final @NotNull Path root, final int count) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(p, root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(p, tp, "Checkout");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(p, root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(p, tp, "Checkout");
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Test case number " + (i + 1)).expectedResult("It works " + (i + 1)).order(String.format("m%04d", i)).build();
@@ -86,12 +86,12 @@ public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> test
         return EditorFixtures.openTestRunEditor(p, testRun, owner);
     }
 
-    public @NotNull TestRunItems resultOf(final @NotNull TestCaseDto tc) {
-        return Services.getInstance(p, TestRuns.class).getTestRunByPath(testRun.getPath()).resultOf(tc.getId()).orElseThrow();
+    public @NotNull RunItem runItemOf(final @NotNull TestCaseDto tc) {
+        return Services.getInstance(p, TestRuns.class).getRunItems(testRun.getPath()).runItemOf(tc.getId()).orElseThrow();
     }
 
     public @NotNull RunItemStatus statusOf(final @NotNull TestCaseDto tc) {
-        return resultOf(tc).getStatus();
+        return runItemOf(tc).getStatus();
     }
 
     public void press(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
@@ -99,7 +99,7 @@ public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> test
     }
 
     public @NotNull Optional<JComponent> failureDialog() {
-        return Optional.of(FailedResultDialog.class).filter(kind -> ShownDialog.isOpen(p, kind)).map(kind -> ShownDialog.content(p, kind));
+        return Optional.of(FailureDetailDialog.class).filter(kind -> ShownDialog.isOpen(p, kind)).map(kind -> ShownDialog.content(p, kind));
     }
 
     public @NotNull JComponent openFailureDialog() {

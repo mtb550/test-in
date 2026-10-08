@@ -21,13 +21,13 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
 import org.testin.indexer.Nodes;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.services.Services;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Removals {
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-046
-    public static @NotNull RemoveHandler of(final @NotNull DirectoryType type) {
+    public static @NotNull RemoveHandler of(final @NotNull NodeType type) {
         return switch (type) {
             case TP ->
                     (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestProject(dir.getPath(), removed -> {
@@ -35,7 +35,7 @@ public final class Removals {
                         onRemoved.accept(removed);
                     });
 
-            case TCD, TRD ->
+            case TCF, TRF ->
                     (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).refuseRemove(dir.getPath(), onRemoved);
 
             case TSP ->

@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.JComponent;
@@ -38,7 +38,7 @@ public final class SheetPreview implements DialogComponent {
     private static final @NotNull DefaultTableModel NO_MODEL = new DefaultTableModel();
 
     private final @NotNull Project p;
-    private final @NotNull List<TestCaseEditorAttributes> attributes;
+    private final @NotNull List<TestSetEditorAttributes> attributes;
 
     private final @NotNull JBTabbedPane tabs = new JBTabbedPane();
     private final @NotNull Map<String, DefaultTableModel> models = new LinkedHashMap<>();

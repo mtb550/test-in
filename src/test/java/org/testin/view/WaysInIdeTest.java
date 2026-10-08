@@ -26,9 +26,9 @@ import org.testin.actions.TestinData;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.grid.GridKeys;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -40,7 +40,7 @@ import static org.testin.view.Drawn.holds;
 
 public class WaysInIdeTest extends AbstractViewPanelIdeTest {
 
-    private TestSetDirectoryDto ts;
+    private TestSetNode ts;
     private List<TestCaseDto> testCases;
 
     @Override
@@ -50,8 +50,8 @@ public class WaysInIdeTest extends AbstractViewPanelIdeTest {
         testCases = List.of(aTestCase(ts, "Log in with a valid user", "a"), aTestCase(ts, "Log in with a locked user", "b"), aTestCase(ts, "Log in with no password", "c"));
     }
 
-    private @NotNull TestCaseEditor anEditor() {
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    private @NotNull TestSetEditor anEditor() {
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     private void assertTheShownTestCasesAre(final int handed) {
@@ -68,7 +68,7 @@ public class WaysInIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-010, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-013, Rule-VIEW-PANEL-022
     public void testViewDetailsOnSeveralCardsHandsThemAllAndShowsTheFirst() {
-        final @NotNull TestCaseEditor editor = anEditor();
+        final @NotNull TestSetEditor editor = anEditor();
         final @NotNull ViewDetailsAction action = new ViewDetailsAction();
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action, SimpleDataContext.builder()
                 .add(CommonDataKeys.PROJECT, getProject())
@@ -84,8 +84,8 @@ public class WaysInIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-013, Rule-VIEW-PANEL-022
     public void testFollowingASelectionOfSeveralHandsThemAll() {
-        final @NotNull TestCaseEditor editor = anEditor();
-        editor.onToolBarSwitchedToListView();
+        final @NotNull TestSetEditor editor = anEditor();
+        editor.onToolBarSwitchedToCardView();
         view.getPanel().show(List.of(testCases.getFirst()), ts.getPath2());
 
         final @NotNull JBList<?> list = (JBList<?>) editor.getPreferredFocusedComponent();
@@ -97,8 +97,8 @@ public class WaysInIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-010, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-022
     public void testADoubleClickOnACardHandsThatOneTestCase() {
-        final @NotNull TestCaseEditor editor = anEditor();
-        editor.onToolBarSwitchedToListView();
+        final @NotNull TestSetEditor editor = anEditor();
+        editor.onToolBarSwitchedToCardView();
         final @NotNull JBList<?> list = (JBList<?>) editor.getPreferredFocusedComponent();
         list.setSize(600, 600);
         list.setSelectionInterval(0, 2);
@@ -114,7 +114,7 @@ public class WaysInIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-010, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-022
     public void testEnterOnTheGridNumberHandsThatOneTestCase() {
-        final @NotNull TestCaseEditor editor = anEditor();
+        final @NotNull TestSetEditor editor = anEditor();
         editor.onToolBarSwitchedToGridView();
         settled();
         final @NotNull JBTable grid = Drawn.components(editor.getComponent()).stream()

@@ -20,16 +20,16 @@ import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -70,23 +70,23 @@ public class BugFilingIdeTest extends AbstractTempRootIdeTest {
         return root.resolve("NAFATH").resolve("Test Runs").resolve("Sprint 7");
     }
 
-    private @NotNull RunItem indexedRunItem(final RunItemStatus status) {
-        return runItem(indexedTestCase(), status);
+    private @NotNull RunItemPath indexedRunItemPath(final RunItemStatus status) {
+        return runItemPathOf(indexedTestCase(), status);
     }
 
-    private @NotNull RunItem runItem(final UUID testCaseId, final RunItemStatus status) {
-        final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
-        indexedTestRuns().putTestRun(sprint7TestRunPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
-        return new RunItem(sprint7TestRunPath(), testCaseId);
+    private @NotNull RunItemPath runItemPathOf(final UUID testCaseId, final RunItemStatus status) {
+        final RunItem runItem = RunItem.builder().id(testCaseId).status(status).build();
+        indexedTestRuns().putRunItems(sprint7TestRunPath(), RunItems.builder().all(new ArrayList<>(List.of(runItem))).build());
+        return new RunItemPath(sprint7TestRunPath(), testCaseId);
     }
 
     private @NotNull UUID indexedTestCase() {
-        final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
-            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
+        final TestSetNode ts = WriteAction.computeAndWait(() -> {
+            final NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
+            final TestProjectNode tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
-            final TestSetDirectoryDto set = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetNode set = mapper.getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Login"), tp.getTestCasesFolder());
             nodes().addTestSet(set);
             return set;
         });
@@ -97,46 +97,46 @@ public class BugFilingIdeTest extends AbstractTempRootIdeTest {
         return tc.getId();
     }
 
-    private @NotNull String storedLink(final RunItem item) {
-        return indexedTestRuns().findTestRun(item.testRunPath()).flatMap(item::in).orElseThrow().getBugIssueUrl();
+    private @NotNull String storedLink(final RunItemPath runItemPath) {
+        return indexedTestRuns().findRunItems(runItemPath.testRunPath()).flatMap(runItemPath::in).orElseThrow().getBugIssueUrl();
     }
 
     // Rule-VIEW-PANEL-074
     public void testAFailedRunItemKeepsTheIssue() {
-        final RunItem item = indexedRunItem(RunItemStatus.FAILED);
+        final RunItemPath runItemPath = indexedRunItemPath(RunItemStatus.FAILED);
 
-        assertEquals(Optional.empty(), BugFiling.store(getProject(), item, ISSUE));
-        assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(item));
+        assertEquals(Optional.empty(), BugFiling.store(getProject(), runItemPath, ISSUE));
+        assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(runItemPath));
 
-        final Path result = item.testRunPath().resolve(FileKind.RUN_ITEM.fileName(item.id()));
+        final Path result = runItemPath.testRunPath().resolve(FileKind.RUN_ITEM.fileName(runItemPath.id()));
         Await.until("the link did not reach the test case's own result file", () -> read(result).contains(ISSUE));
     }
 
     // Rule-VIEW-PANEL-074
     public void testARunItemNoLongerFailedIsNotWritten() {
-        final RunItem item = indexedRunItem(RunItemStatus.PASSED);
+        final RunItemPath runItemPath = indexedRunItemPath(RunItemStatus.PASSED);
 
-        assertEquals(Optional.of(Bundle.message("bug.not.stored.no.longer.failed")), BugFiling.store(getProject(), item, ISSUE));
-        assertEquals("a passed run item was given a bug", "", storedLink(item));
+        assertEquals(Optional.of(Bundle.message("bug.not.stored.no.longer.failed")), BugFiling.store(getProject(), runItemPath, ISSUE));
+        assertEquals("a passed run item was given a bug", "", storedLink(runItemPath));
     }
 
     // Rule-VIEW-PANEL-074
     public void testATestRunRenamedOrRemovedIsNotBroughtBack() {
-        final RunItem gone = new RunItem(sprint7TestRunPath(), UUID.randomUUID());
+        final RunItemPath gone = new RunItemPath(sprint7TestRunPath(), UUID.randomUUID());
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), gone, ISSUE));
-        assertTrue("storing on the old path registered the test run again", indexedTestRuns().findTestRun(sprint7TestRunPath()).isEmpty());
+        assertTrue("storing on the old path registered the test run again", indexedTestRuns().findRunItems(sprint7TestRunPath()).isEmpty());
     }
 
     public void testARemovedRunItemIsNotWritten() {
-        final RunItem item = indexedRunItem(RunItemStatus.REMOVED);
+        final RunItemPath runItemPath = indexedRunItemPath(RunItemStatus.REMOVED);
 
-        assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
+        assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), runItemPath, ISSUE));
     }
 
     public void testARunItemWhoseTestCaseIsGoneIsNotWritten() {
-        final RunItem item = runItem(UUID.randomUUID(), RunItemStatus.FAILED);
+        final RunItemPath runItemPath = runItemPathOf(UUID.randomUUID(), RunItemStatus.FAILED);
 
-        assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
+        assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), runItemPath, ISSUE));
     }
 }

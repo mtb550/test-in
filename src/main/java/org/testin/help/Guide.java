@@ -62,8 +62,8 @@ public enum Guide {
     ),
 
     TEST_CASE_EDITOR_SHORTCUTS(
-            Bundle.message("guide.test.case.editor.shortcuts"),
-            "guides/testCaseEditorShortcuts.md"
+            Bundle.message("guide.test.set.editor.shortcuts"),
+            "guides/testSetEditorShortcuts.md"
     ),
 
     TEST_RUN_EDITOR_SHORTCUTS(

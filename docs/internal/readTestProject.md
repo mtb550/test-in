@@ -15,10 +15,10 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-003** — A folder is a test project only if it holds a file
   named `.tp`.
 - **Rule-INTERNAL-091** — A test project says which format its files are in, in
-  its `.tp`. This build reads format 2 and nothing else: a project without the
-  number, or with a lower one, is shown refused and named the release that
-  brings it forward - 2.13.0-alpha - and a project with a higher number is
-  refused as written by a newer Testin. A refused project is not read and not
+  its `.tp`. This build reads format 3 and nothing else: a project without the
+  number, or with a lower one, is shown refused as written by an older Testin,
+  to be removed and created again, because nothing converts it; a project with
+  a higher number is refused as written by a newer Testin. A refused project is not read and not
   written: no file inside it is opened.
 - **Rule-INTERNAL-004** — Only the folders directly inside the Testin folder are
   looked at. A test project one level deeper is not found.
@@ -134,7 +134,7 @@ measured rather than estimated.
 | **Reading ten thousand**          | 214 ms   | 400 ms |
 | **Held in memory, per test case** | 1.5 KB   | 4 KB   |
 | **Held in memory, ten thousand**  | 14.6 MB  | 40 MB  |
-| **Reading one test run result**   | 8.8 µs   | 20 µs  |
+| **Reading one run item**          | 8.8 µs   | 20 µs  |
 | **Reading four thousand**         | 35 ms    | 80 ms  |
 
 The results are their own line because they are their own files: since #305 a

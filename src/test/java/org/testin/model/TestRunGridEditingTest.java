@@ -20,8 +20,8 @@ package org.testin.model;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.result.Failure;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.Failure;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
@@ -36,8 +36,8 @@ import static org.testng.Assert.assertTrue;
 
 public class TestRunGridEditingTest {
 
-    private static @NotNull TestRunItems item() {
-        return TestRunItems.builder().id(UUID.randomUUID()).build();
+    private static @NotNull RunItem runItem() {
+        return RunItem.builder().id(UUID.randomUUID()).build();
     }
 
     // Rule-EDITOR-PANEL-171
@@ -63,7 +63,7 @@ public class TestRunGridEditingTest {
 
     @Test
     public void typingIntoTheCellIsWhatTheTestRunThenHolds() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
 
         TestRunEditorAttributes.ACTUAL_RESULT.getRunItemValueSetter().execute(row, "The balance showed 0.00");
 
@@ -72,13 +72,13 @@ public class TestRunGridEditingTest {
 
     @Test
     public void aRowWithNothingTypedLosesNothingByPassing() {
-        assertEquals(item().wouldClear(RunItemStatus.PASSED, Failure.NONE), List.of(),
+        assertEquals(runItem().wouldClear(RunItemStatus.PASSED, Failure.NONE), List.of(),
                 "the ordinary case asks the tester nothing");
     }
 
     @Test
     public void passingNamesEverythingItWouldErase() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
         row.setActualResult("The balance showed 0.00");
         row.setStacktrace("java.lang.AssertionError");
         row.setBugSeverity(BugSeverity.MAJOR);
@@ -90,7 +90,7 @@ public class TestRunGridEditingTest {
 
     @Test
     public void onlyWhatIsActuallyFilledInIsNamed() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
         row.setActualResult("The balance showed 0.00");
 
         assertEquals(row.wouldClear(RunItemStatus.PASSED, Failure.NONE), List.of("the actual result"),
@@ -99,7 +99,7 @@ public class TestRunGridEditingTest {
 
     @Test
     public void aRunItemStatusThatErasesNothingAsksNothing() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
         row.setActualResult("The balance showed 0.00");
 
         assertEquals(row.wouldClear(RunItemStatus.FAILED, Failure.NONE), List.of(),
@@ -109,7 +109,7 @@ public class TestRunGridEditingTest {
 
     @Test
     public void passingStillClearsWhatItAlwaysCleared() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
         row.setActualResult("The balance showed 0.00");
         row.setStacktrace("java.lang.AssertionError");
         row.setBugSeverity(BugSeverity.MAJOR);
@@ -127,7 +127,7 @@ public class TestRunGridEditingTest {
 
     @Test
     public void failingKeepsWhatTheTesterTyped() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
         row.setActualResult("The balance showed 0.00");
 
         row.recordRunItemStatus(RunItemStatus.FAILED, "mtb");
@@ -138,7 +138,7 @@ public class TestRunGridEditingTest {
 
     @Test
     public void whatAPassClearsAndWhatItWarnsAboutAreTheOneList() {
-        final TestRunItems row = item();
+        final RunItem row = runItem();
         row.setActualResult("The balance showed 0.00");
         row.setBugSeverity(BugSeverity.MAJOR);
 

@@ -20,14 +20,14 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.StandIn;
 import org.testin.creator.NodeCreators;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.status.PackageStatus;
 import org.testin.model.status.ProjectStatus;
 import org.testin.model.status.TestRunStatus;
@@ -45,46 +45,46 @@ import static org.testng.Assert.assertTrue;
 
 public class TreeNodeKindsTest {
 
-    private static @NotNull List<DirectoryDto> everyKind() {
-        return List.of(new TestProjectDirectoryDto(), new TestCasesMainDirectoryDto(), new TestRunsMainDirectoryDto(),
-                new TestSetPackageDirectoryDto(), new TestRunPackageDirectoryDto(), new TestSetDirectoryDto(), new TestRunDirectoryDto());
+    private static @NotNull List<Node> everyKind() {
+        return List.of(new TestProjectNode(), new TestCasesFolderNode(), new TestRunsFolderNode(),
+                new TestSetPackageNode(), new TestRunPackageNode(), new TestSetNode(), new TestRunNode());
     }
 
-    private static @NotNull TestRunDirectoryDto testRunIn(final @NotNull TestRunStatus status) {
-        final @NotNull TestRunDirectoryDto testRun = new TestRunDirectoryDto();
+    private static @NotNull TestRunNode testRunIn(final @NotNull TestRunStatus status) {
+        final @NotNull TestRunNode testRun = new TestRunNode();
         testRun.getMarker().changeStatus(status);
         return testRun;
     }
 
-    private static @NotNull String name(final @NotNull DirectoryDto node) {
+    private static @NotNull String name(final @NotNull Node node) {
         return node.getClass().getSimpleName();
     }
 
     // Rule-TREE-PANEL-002
     @Test
     public void theTwoContainersAreNeverCreatedAndComeWithTheTestProject() {
-        for (final DirectoryDto node : everyKind()) {
-            assertFalse(node.childKinds().contains(DirectoryType.TCD), name(node) + " offers to create Test Cases");
-            assertFalse(node.childKinds().contains(DirectoryType.TRD), name(node) + " offers to create Test Runs");
+        for (final Node node : everyKind()) {
+            assertFalse(node.childKinds().contains(NodeType.TCF), name(node) + " offers to create Test Cases");
+            assertFalse(node.childKinds().contains(NodeType.TRF), name(node) + " offers to create Test Runs");
         }
 
         final @NotNull Project p = StandIn.of(Project.class);
-        final @NotNull DirectoryDto parent = new TestProjectDirectoryDto();
-        for (final DirectoryType container : List.of(DirectoryType.TCD, DirectoryType.TRD)) {
+        final @NotNull Node parent = new TestProjectNode();
+        for (final NodeType container : List.of(NodeType.TCF, NodeType.TRF)) {
             assertTrue(NodeCreators.of(p, container).execute("Extra", parent, Path.of("root", "Extra")).isEmpty(),
                     container.getDescription() + " was created from the tree");
         }
 
-        final @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
-        assertEquals(testProject.fixedChildren().stream().map(DirectoryDto::getType).toList(), List.of(DirectoryType.TCD, DirectoryType.TRD),
+        final @NotNull TestProjectNode testProject = new TestProjectNode();
+        assertEquals(testProject.fixedChildren().stream().map(Node::getType).toList(), List.of(NodeType.TCF, NodeType.TRF),
                 "a test project does not arrive holding its two containers");
     }
 
     // Rule-TREE-PANEL-022
     @Test
     public void onlyATestSetAndATestRunOpenInAnEditor() {
-        for (final DirectoryDto node : everyKind()) {
-            final boolean opens = node instanceof TestSetDirectoryDto || node instanceof TestRunDirectoryDto;
+        for (final Node node : everyKind()) {
+            final boolean opens = node instanceof TestSetNode || node instanceof TestRunNode;
 
             assertEquals(node.isOpenableInEditor(), opens, name(node) + (opens ? " does not open" : " has nothing to open, and opens"));
         }
@@ -93,21 +93,21 @@ public class TreeNodeKindsTest {
     // Rule-TREE-PANEL-024
     @Test
     public void underTestCasesOnlyATestSetOrATestSetPackageIsCreated() {
-        assertEquals(new TestCasesMainDirectoryDto().childKinds(), List.of(DirectoryType.TS, DirectoryType.TSP));
-        assertEquals(new TestSetPackageDirectoryDto().childKinds(), List.of(DirectoryType.TS, DirectoryType.TSP));
+        assertEquals(new TestCasesFolderNode().childKinds(), List.of(NodeType.TS, NodeType.TSP));
+        assertEquals(new TestSetPackageNode().childKinds(), List.of(NodeType.TS, NodeType.TSP));
     }
 
     // Rule-TREE-PANEL-032
     @Test
     public void underTestRunsOnlyATestRunOrATestRunPackageIsCreated() {
-        assertEquals(new TestRunsMainDirectoryDto().childKinds(), List.of(DirectoryType.TR, DirectoryType.TRP));
-        assertEquals(new TestRunPackageDirectoryDto().childKinds(), List.of(DirectoryType.TR, DirectoryType.TRP));
+        assertEquals(new TestRunsFolderNode().childKinds(), List.of(NodeType.TR, NodeType.TRP));
+        assertEquals(new TestRunPackageNode().childKinds(), List.of(NodeType.TR, NodeType.TRP));
     }
 
     // Rule-TREE-PANEL-025
     @Test
     public void nothingIsCreatedUnderATestProjectATestSetOrATestRun() {
-        for (final DirectoryDto node : List.of(new TestProjectDirectoryDto(), new TestSetDirectoryDto(), new TestRunDirectoryDto())) {
+        for (final Node node : List.of(new TestProjectNode(), new TestSetNode(), new TestRunNode())) {
             assertFalse(node.canCreateChildren(), name(node) + " offers to create a node under it");
             assertTrue(node.childKinds().isEmpty(), name(node) + " names kinds it would create");
         }
@@ -116,34 +116,34 @@ public class TreeNodeKindsTest {
     // Rule-TREE-PANEL-028
     @Test
     public void aTestSetPackageHoldsAnotherTestSetPackage() {
-        assertTrue(new TestSetPackageDirectoryDto().childKinds().contains(DirectoryType.TSP));
-        assertTrue(new TestSetPackageDirectoryDto().acceptsTransferred(new TestSetPackageDirectoryDto()));
+        assertTrue(new TestSetPackageNode().childKinds().contains(NodeType.TSP));
+        assertTrue(new TestSetPackageNode().acceptsTransferred(new TestSetPackageNode()));
     }
 
     // Rule-TREE-PANEL-034
     @Test
     public void aTestRunPackageHoldsAnotherTestRunPackage() {
-        assertTrue(new TestRunPackageDirectoryDto().childKinds().contains(DirectoryType.TRP));
-        assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()));
+        assertTrue(new TestRunPackageNode().childKinds().contains(NodeType.TRP));
+        assertTrue(new TestRunPackageNode().acceptsTransferred(new TestRunPackageNode()));
     }
 
     // Rule-TREE-PANEL-080
     @Test
     public void runTestsIsOfferedOnTheTestCaseSideAndOnATestRun() {
-        for (final DirectoryDto node : everyKind()) {
-            final boolean runsTestCases = node instanceof TestCasesMainDirectoryDto || node instanceof TestSetPackageDirectoryDto || node instanceof TestSetDirectoryDto;
+        for (final Node node : everyKind()) {
+            final boolean runsTestCases = node instanceof TestCasesFolderNode || node instanceof TestSetPackageNode || node instanceof TestSetNode;
 
             assertEquals(node.isTestCaseContainer(), runsTestCases, name(node) + (runsTestCases ? " is not offered Run Tests" : " is offered Run Tests"));
         }
 
-        assertTrue(new TestRunDirectoryDto().isOpen(), "a new test run is not offered Run Tests");
+        assertTrue(new TestRunNode().isOpen(), "a new test run is not offered Run Tests");
     }
 
     // Rule-TREE-PANEL-094
     @Test
     public void aSignedOffTestRunIsRemovedButNotRenamedNumberedOrDragged() {
         for (final TestRunStatus status : TestRunStatus.values()) {
-            final @NotNull TestRunDirectoryDto testRun = testRunIn(status);
+            final @NotNull TestRunNode testRun = testRunIn(status);
             final boolean signedOff = status.isTerminal();
 
             assertTrue(testRun.isRemovable(), "a " + status + " test run cannot be removed");
@@ -156,22 +156,22 @@ public class TreeNodeKindsTest {
     // Rule-TREE-PANEL-099
     @Test
     public void aNodeSaysItsStatusOnlyWhenItIsNotActive() {
-        final @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+        final @NotNull TestProjectNode testProject = new TestProjectNode();
         assertEquals(testProject.statusShownInTree(), "", "an active test project says Active");
         testProject.getMarker().setStatus(ProjectStatus.INACTIVE);
         assertEquals(testProject.statusShownInTree(), ProjectStatus.INACTIVE.getLabel());
 
-        final @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+        final @NotNull TestSetNode testSet = new TestSetNode();
         assertEquals(testSet.statusShownInTree(), "", "an active test set says Active");
         testSet.getMarker().setStatus(TestSetStatus.DEPRECATED);
         assertEquals(testSet.statusShownInTree(), TestSetStatus.DEPRECATED.getLabel());
 
-        final @NotNull TestSetPackageDirectoryDto testSetPackage = new TestSetPackageDirectoryDto();
+        final @NotNull TestSetPackageNode testSetPackage = new TestSetPackageNode();
         assertEquals(testSetPackage.statusShownInTree(), "", "an active package says Active");
         testSetPackage.getMarker().setStatus(PackageStatus.ARCHIVED);
         assertEquals(testSetPackage.statusShownInTree(), PackageStatus.ARCHIVED.getLabel());
 
-        assertEquals(new TestCasesMainDirectoryDto().statusShownInTree(), "", "a container has no status to say");
+        assertEquals(new TestCasesFolderNode().statusShownInTree(), "", "a container has no status to say");
 
         for (final TestRunStatus status : TestRunStatus.values()) {
             assertEquals(testRunIn(status).statusShownInTree(), status.getLabel(), "a test run does not always say its status");
@@ -181,7 +181,7 @@ public class TreeNodeKindsTest {
     // Rule-TREE-PANEL-005
     @Test
     public void aNodeNameIsNeverEmpty() {
-        for (final DirectoryType kind : DirectoryType.values()) {
+        for (final NodeType kind : NodeType.values()) {
             for (final String empty : List.of("", " ", "\t")) {
                 assertEquals(Refused.ofName(kind, empty), Optional.of(Refused.NOT_ONE_FOLDER), kind + " takes the name '" + empty + "'");
                 assertFalse(kind.canTakeName(empty), kind + " takes the name '" + empty + "'");
@@ -192,7 +192,7 @@ public class TreeNodeKindsTest {
     // Rule-TREE-PANEL-095
     @Test
     public void aNodeNameIsOneFolderAndAJavaPackageNameWhereItBecomesOne() {
-        for (final DirectoryType kind : DirectoryType.values()) {
+        for (final NodeType kind : NodeType.values()) {
             for (final String path : List.of("Login/Admin", "Login\\Admin", "..", ".")) {
                 assertEquals(Refused.ofName(kind, path), Optional.of(Refused.NOT_ONE_FOLDER), kind + " takes the path '" + path + "' as a name");
             }
@@ -200,7 +200,7 @@ public class TreeNodeKindsTest {
             assertEquals(Refused.ofName(kind, "Login"), Optional.empty(), kind + " refuses an ordinary name");
         }
 
-        for (final DirectoryType becomesAJavaPackage : List.of(DirectoryType.TP, DirectoryType.TSP)) {
+        for (final NodeType becomesAJavaPackage : List.of(NodeType.TP, NodeType.TSP)) {
             for (final String javaWord : List.of("new", "class", "import")) {
                 assertEquals(Refused.ofName(becomesAJavaPackage, javaWord), Optional.of(Refused.NOT_A_JAVA_NAME),
                         becomesAJavaPackage + " takes '" + javaWord + "', which Java refuses as a package");

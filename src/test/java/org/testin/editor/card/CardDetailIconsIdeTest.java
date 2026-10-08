@@ -18,13 +18,13 @@ package org.testin.editor.card;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.testcase.TestCaseCard;
-import org.testin.editor.testrun.TestRunCard;
+import org.testin.editor.testset.TestCaseCard;
+import org.testin.editor.testrun.RunItemCard;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Display;
@@ -52,7 +52,7 @@ public class CardDetailIconsIdeTest extends BasePlatformTestCase {
     private @NotNull TestCaseCard aCardWithItsExpectedResult() {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").expectedResult(EXPECTED).build();
         final @NotNull TestCaseCard card = new TestCaseCard(getProject());
-        card.updateData(0, tc, Set.of(TestCaseEditorAttributes.EXPECTED_RESULT), BaseCard.titleText(1, true, tc.getDescription()));
+        card.updateData(0, tc, Set.of(TestSetEditorAttributes.EXPECTED_RESULT), BaseCard.titleText(1, true, tc.getDescription()));
         card.layOutAs(CELL);
         return card;
     }
@@ -65,14 +65,14 @@ public class CardDetailIconsIdeTest extends BasePlatformTestCase {
         assertSame("the line does not lead with the field's icon", CreateTestCaseFields.EXPECTED_RESULT.getIcon(), line.getIcon());
         assertEquals("the line still names its field", EXPECTED, line.getText());
         assertTrue("a screen reader no longer hears the field's name: " + card.getAccessibleContext().getAccessibleDescription(),
-                Objects.requireNonNullElse(card.getAccessibleContext().getAccessibleDescription(), "").contains(TestCaseEditorAttributes.EXPECTED_RESULT.getName() + ": " + EXPECTED));
+                Objects.requireNonNullElse(card.getAccessibleContext().getAccessibleDescription(), "").contains(TestSetEditorAttributes.EXPECTED_RESULT.getName() + ": " + EXPECTED));
     }
 
     // Rule-EDITOR-PANEL-269
     public void testAReferenceLineLeadsWithItsR() {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").reference(REFERENCE).build();
         final @NotNull TestCaseCard card = new TestCaseCard(getProject());
-        card.updateData(0, tc, Set.of(TestCaseEditorAttributes.REFERENCE), BaseCard.titleText(1, true, tc.getDescription()));
+        card.updateData(0, tc, Set.of(TestSetEditorAttributes.REFERENCE), BaseCard.titleText(1, true, tc.getDescription()));
         card.layOutAs(CELL);
 
         final @NotNull JBLabel line = theLineSaying(card, REFERENCE);
@@ -85,14 +85,14 @@ public class CardDetailIconsIdeTest extends BasePlatformTestCase {
         final @NotNull TestCaseCard card = aCardWithItsExpectedResult();
         final @NotNull Rectangle line = SwingUtilities.convertRectangle(theLineSaying(card, EXPECTED).getParent(), theLineSaying(card, EXPECTED).getBounds(), card);
 
-        assertEquals(TestCaseEditorAttributes.EXPECTED_RESULT.getName(), card.tooltipAt(new Point(line.x + 2, line.y + line.height / 2), CELL));
+        assertEquals(TestSetEditorAttributes.EXPECTED_RESULT.getName(), card.tooltipAt(new Point(line.x + 2, line.y + line.height / 2), CELL));
     }
 
     // Rule-EDITOR-PANEL-269
     public void testAFieldWithNoIconKeepsItsName() {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
-        final @NotNull TestRunItems runItem = new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.FAILED).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
-        final @NotNull TestRunCard card = new TestRunCard(getProject());
+        final @NotNull RunItem runItem = new RunItem().setId(tc.getId()).setStatus(RunItemStatus.FAILED).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
+        final @NotNull RunItemCard card = new RunItemCard(getProject());
         card.updateData(0, Set.of(TestRunEditorAttributes.RUN_STATUS), runItem, BaseCard.titleText(1, true, tc.getDescription()));
 
         final @NotNull JBLabel line = theLineSaying(card, RunItemStatus.FAILED.getLabel());
@@ -102,8 +102,8 @@ public class CardDetailIconsIdeTest extends BasePlatformTestCase {
     // Rule-EDITOR-PANEL-270
     public void testHoveringTheDurationBadgeOnACardSaysDuration() {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
-        final @NotNull TestRunItems runItem = new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.PASSED).setDuration(Duration.ofSeconds(42)).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
-        final @NotNull TestRunCard card = new TestRunCard(getProject());
+        final @NotNull RunItem runItem = new RunItem().setId(tc.getId()).setStatus(RunItemStatus.PASSED).setDuration(Duration.ofSeconds(42)).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
+        final @NotNull RunItemCard card = new RunItemCard(getProject());
         card.updateData(0, Set.of(TestRunEditorAttributes.DURATION), runItem, BaseCard.titleText(1, true, tc.getDescription()));
         card.layOutAs(CELL);
 

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunNode;
 import org.testin.util.Bundle;
 
 public class ReCreateTestRunAction extends AbstractAnyProjectAction {
@@ -39,7 +39,7 @@ public class ReCreateTestRunAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-021, Rule-TREE-PANEL-069
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        GrayWithReason.unless(this, e, TestinData.singleSelected(e, TestRunDirectoryDto.class).isPresent(),
+        GrayWithReason.unless(this, e, TestinData.singleSelected(e, TestRunNode.class).isPresent(),
                 Bundle.message("recreate.test.run.disabled.description"));
     }
 

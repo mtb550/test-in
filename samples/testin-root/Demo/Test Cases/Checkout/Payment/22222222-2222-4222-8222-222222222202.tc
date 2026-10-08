@@ -11,7 +11,7 @@
   ],
   "priority" : "MEDIUM",
   "reference" : "",
-  "group" : [
+  "groups" : [
     "VALIDATION"
   ],
   "createdBy" : "Testin Sample",

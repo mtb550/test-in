@@ -42,16 +42,16 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.ReportColor;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.bug.BugIssueUrl;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
 import org.testin.model.markers.DetailRow;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.notifications.Notifier;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
@@ -83,7 +83,7 @@ public final class TestRunPdfGenerator {
     private @NotNull Optional<PdfFont> printsWith = Optional.empty();
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunNode testRunNode, final @NotNull RunItems runItems) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PdfDocument pdf = new PdfDocument(new PdfWriter(baos));
              Document document = new Document(pdf, pdf.getDefaultPageSize(), false)) {
@@ -100,11 +100,11 @@ public final class TestRunPdfGenerator {
                     .setFont(boldFont).setFontSize(ReportFont.TITLE.pt()).setFontColor(DARK_NAVY)
                     .setMarginBottom(2));
 
-            document.add(para(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))
+            document.add(para(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(testRunNode.getMarker()), TestRunConfiguration.COMPONENT.valueIn(testRunNode.getMarker()))))
                     .setFont(regularFont).setFontSize(ReportFont.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
                     .setMarginBottom(0));
 
-            document.add(para(trDir.getName())
+            document.add(para(testRunNode.getName())
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
@@ -123,13 +123,13 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(12);
             document.add(sec1);
 
-            final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
+            final @NotNull TestRunSummary summary = TestRunSummary.of(runItems.getAll());
 
             Table overviewTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
-            for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, summary)) {
+            for (final DetailRow row : ReportOverview.rowsFor(projectName, testRunNode, summary)) {
                 addOverviewRow(overviewTable, row.caption(), row.value(), boldFont, regularFont);
             }
 
@@ -146,7 +146,7 @@ public final class TestRunPdfGenerator {
             document.add(sec2);
 
             document.add(para(
-                    Bundle.message("report.summary.named", trDir.getName(),
+                    Bundle.message("report.summary.named", testRunNode.getName(),
                             String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"))
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
@@ -166,16 +166,16 @@ public final class TestRunPdfGenerator {
 
             document.add(statsTable);
 
-            final boolean analyzed = ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis());
+            final boolean analyzed = TestRunResultAnalysis.anyWrittenIn(testRunNode.getMarker().getResultAnalysis());
 
-            if (analyzed) addAnalysis(document, trDir, summary, boldFont, regularFont);
+            if (analyzed) addAnalysis(document, testRunNode, summary, boldFont, regularFont);
 
             int sectionNumber = analyzed ? 4 : 3;
             for (final ReportSection section : ReportSection.values()) {
                 final long count = section.count(summary);
                 if (count == 0) continue;
 
-                buildTestCaseTable(document, String.valueOf(sectionNumber++), section, section.description(String.valueOf(count)), tr, boldFont, regularFont);
+                buildTestCaseTable(document, String.valueOf(sectionNumber++), section, section.description(String.valueOf(count)), runItems, boldFont, regularFont);
             }
 
             float pageWidth = pdf.getDefaultPageSize().getWidth();
@@ -215,7 +215,7 @@ public final class TestRunPdfGenerator {
     }
 
     // UC-REPORT-001
-    private void addAnalysis(final @NotNull Document document, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunSummary summary, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
+    private void addAnalysis(final @NotNull Document document, final @NotNull TestRunNode testRunNode, final @NotNull TestRunSummary summary, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
         document.add(para(Bundle.message("report.heading.analysis"))
                 .setFont(boldFont)
                 .setFontSize(ReportFont.SECTION.pt())
@@ -225,8 +225,8 @@ public final class TestRunPdfGenerator {
                 .setMarginBottom(9)
                 .setMarginTop(20));
 
-        for (final ResultAnalysis section : ResultAnalysis.values()) {
-            final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
+        for (final TestRunResultAnalysis section : TestRunResultAnalysis.values()) {
+            final @NotNull String written = section.writtenIn(testRunNode.getMarker().getResultAnalysis());
             if (written.isEmpty()) continue;
 
             document.add(para(section.heading(summary))
@@ -248,7 +248,7 @@ public final class TestRunPdfGenerator {
     }
 
     // UC-REPORT-001, Rule-REPORT-024
-    private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull ReportSection section, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
+    private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull ReportSection section, final @NotNull String description, final @NotNull RunItems runItems, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
         document.add(para(sectionNumber + ". " + section.getTitle())
                 .setFont(boldFont)
                 .setFontSize(ReportFont.SECTION.pt())
@@ -278,8 +278,8 @@ public final class TestRunPdfGenerator {
 
         int idx = 1;
         boolean alt = true;
-        for (TestRunItems item : tr.getResults()) {
-            if (!section.matches(item)) continue;
+        for (RunItem runItem : runItems.getAll()) {
+            if (!section.matches(runItem)) continue;
             ProgressManager.checkCanceled();
 
             DeviceRgb rowBg = alt ? LIGHT_BG : WHITE;
@@ -293,7 +293,7 @@ public final class TestRunPdfGenerator {
                             .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
-            final @NotNull String testCaseName = item.shownTestCase().getDescription();
+            final @NotNull String testCaseName = runItem.shownTestCase().getDescription();
             final @NotNull String tcName = testCaseName.isEmpty() ? "—" : testCaseName;
             final @NotNull Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)
@@ -305,7 +305,7 @@ public final class TestRunPdfGenerator {
             table.addCell(testCaseCell);
 
             if (section.isWithFailureDetail())
-                addFailureDetail(table, testCaseCell, item, rowBg, boldFont, regularFont);
+                addFailureDetail(table, testCaseCell, runItem, rowBg, boldFont, regularFont);
 
             idx++;
         }
@@ -313,20 +313,20 @@ public final class TestRunPdfGenerator {
         document.add(table);
     }
 
-    private void addFailureDetail(final @NotNull Table table, final @NotNull Cell testCaseCell, final @NotNull TestRunItems item, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
-        final @NotNull String actualResult = item.getActualResult();
+    private void addFailureDetail(final @NotNull Table table, final @NotNull Cell testCaseCell, final @NotNull RunItem runItem, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
+        final @NotNull String actualResult = runItem.getActualResult();
         final @NotNull Paragraph actual = para(Bundle.message("report.actual.result", actualResult.isEmpty() ? "—" : actualResult))
                 .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY);
 
-        item.bugIssue().ifPresent(url -> actual.add(text(" ("))
+        runItem.bugIssue().ifPresent(url -> actual.add(text(" ("))
                 .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
                 .add(text(")")));
         testCaseCell.add(actual);
 
-        final @NotNull BugPriority pri = item.getBugPriority();
+        final @NotNull BugPriority pri = runItem.getBugPriority();
         table.addCell(runItemStatusCell(pri.getLabel(), rgb(pri.getEmphasis().getHexColor()), rowBg, boldFont));
 
-        final @NotNull BugSeverity sev = item.getBugSeverity();
+        final @NotNull BugSeverity sev = runItem.getBugSeverity();
         table.addCell(runItemStatusCell(sev.getLabel(), rgb(sev.getEmphasis().getHexColor()), rowBg, boldFont));
     }
 

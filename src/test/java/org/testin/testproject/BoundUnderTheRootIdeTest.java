@@ -19,7 +19,7 @@ package org.testin.testproject;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
@@ -29,7 +29,7 @@ public class BoundUnderTheRootIdeTest extends AbstractTempRootIdeTest {
     public void testTheBoundTestProjectIsTheOneUnderTheCurrentTestinRoot() {
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
         made.testProject(root.resolve("stale").resolve("Checkout"));
-        final @NotNull TestProjectDirectoryDto current = made.testProject(root.resolve("current").resolve("Checkout"));
+        final @NotNull TestProjectNode current = made.testProject(root.resolve("current").resolve("Checkout"));
 
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         final @NotNull String wasRoot = settings.rootTestinPath;

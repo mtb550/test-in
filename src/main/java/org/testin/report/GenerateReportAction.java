@@ -33,8 +33,8 @@ import org.testin.importexport.FileTypes;
 import org.testin.importexport.exports.ExportNotice;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
@@ -52,13 +52,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GenerateReportAction extends AbstractProjectAction {
-    private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedTestRun;
+    private final @NotNull Supplier<Optional<TestRunNode>> selectedTestRun;
     private final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
     private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.ToolbarDecorator.Export);
-        this.selectedTestRun = () -> TreeValues.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
+        this.selectedTestRun = () -> TreeValues.valueOf(tree.getLastSelectedPathComponent(), TestRunNode.class);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 
@@ -112,19 +112,19 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     // UC-REPORT-001, Rule-REPORT-003
-    private void processAndSave(final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
+    private void processAndSave(final @NotNull TestRunNode tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
         BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> writeReport(tr, format, outputFile, indicator));
     }
 
     // UC-REPORT-001, Rule-REPORT-003
-    void writeReport(final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile, final @NotNull ProgressIndicator indicator) {
+    void writeReport(final @NotNull TestRunNode tr, final @NotNull FileTypes format, final @NotNull File outputFile, final @NotNull ProgressIndicator indicator) {
         final @NotNull Path dirPath = tr.getPath();
 
         // Rule-EDITOR-PANEL-239
         TestRunFromGit.read(p, dirPath);
-        final @NotNull TestRunDto testRunData = testRuns.getTestRunByPath(dirPath);
+        final @NotNull RunItems runItems = testRuns.getRunItems(dirPath);
 
-        final byte[] fileBytes = format.generateReport(p, tr, testRunData);
+        final byte[] fileBytes = format.generateReport(p, tr, runItems);
 
         // Rule-REPORT-003
         indicator.checkCanceled();

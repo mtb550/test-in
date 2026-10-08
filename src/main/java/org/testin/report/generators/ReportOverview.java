@@ -21,10 +21,10 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunExecution;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.model.testrun.TestRunExecution;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 
@@ -36,12 +36,12 @@ public final class ReportOverview {
     private static final @NotNull String NOT_RECORDED = Bundle.message("report.overview.not.recorded");
 
     // Rule-REPORT-002
-    public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunSummary summary) {
-        final @NotNull TestRunMarker marker = trDir.getMarker();
+    public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunNode testRunNode, final @NotNull TestRunSummary summary) {
+        final @NotNull TestRunMarker marker = testRunNode.getMarker();
         final @NotNull List<DetailRow> rows = new ArrayList<>();
 
         rows.add(new DetailRow(Bundle.message("report.overview.project"), projectName));
-        rows.add(new DetailRow(Bundle.message("node.tr"), trDir.getName()));
+        rows.add(new DetailRow(Bundle.message("node.tr"), testRunNode.getName()));
 
         for (final TestRunConfiguration field : TestRunConfiguration.values()) addConfiguration(rows, field, marker);
 

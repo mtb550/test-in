@@ -16,8 +16,8 @@
 
 package org.testin.model;
 
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -38,11 +38,11 @@ public class RunItemScreenshotsJsonTest {
 
     @Test
     public void theTestRunFileNamesTheScreenshotsAndHoldsNoPicture() {
-        final TestRunItems written = TestRunItems.builder().id(UUID.randomUUID()).stacktrace("boom").screenshots(List.of(NAME)).build();
+        final RunItem written = RunItem.builder().id(UUID.randomUUID()).stacktrace("boom").screenshots(List.of(NAME)).build();
 
         try {
             final String json = new String(RealMapper.build().writeValueAsBytes(written), StandardCharsets.UTF_8);
-            final TestRunItems read = RealMapper.build().readValue(json, TestRunItems.class);
+            final RunItem read = RealMapper.build().readValue(json, RunItem.class);
 
             assertTrue(json.contains("\"" + NAME + "\""), "the file is named: " + json);
             assertFalse(json.contains("iVBORw"), "and no base64 of the picture is written: " + json);
@@ -56,7 +56,7 @@ public class RunItemScreenshotsJsonTest {
     @Test
     public void aRunItemWithNoScreenshotWritesNoKey() {
         try {
-            final String json = new String(RealMapper.build().writeValueAsBytes(TestRunItems.builder().id(UUID.randomUUID()).build()), StandardCharsets.UTF_8);
+            final String json = new String(RealMapper.build().writeValueAsBytes(RunItem.builder().id(UUID.randomUUID()).build()), StandardCharsets.UTF_8);
 
             assertFalse(json.contains("screenshots"), json);
         } catch (final Exception e) {
@@ -69,14 +69,14 @@ public class RunItemScreenshotsJsonTest {
         final Set<String> taken = new HashSet<>();
 
         IntStream.range(0, 1000).forEach(_ -> {
-            final String name = TestRunDirectoryDto.newScreenshotName(taken);
+            final String name = TestRunNode.newScreenshotName(taken);
 
             assertTrue(name.matches("[0-9a-z]{5}\\.png"), name);
             assertTrue(taken.add(name), "a name the test run already holds: " + name);
-            assertTrue(TestRunDirectoryDto.isScreenshotName(name));
+            assertTrue(TestRunNode.isScreenshotName(name));
         });
 
-        assertFalse(TestRunDirectoryDto.isScreenshotName("Cycle 1.tr"));
-        assertFalse(TestRunDirectoryDto.isScreenshotName("my notes.png"), "a PNG put there by hand under another name is not a screenshot");
+        assertFalse(TestRunNode.isScreenshotName("Cycle 1.tr"));
+        assertFalse(TestRunNode.isScreenshotName("my notes.png"), "a PNG put there by hand under another name is not a screenshot");
     }
 }

@@ -32,8 +32,8 @@ import org.testin.config.TestinYml;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.Failure;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.Failure;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.notifications.Done;
 import org.testin.runner.TestCaseExecutionListener;
@@ -237,7 +237,7 @@ public class PanelActionsIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-VIEW-PANEL-049
     public void testSavingAChangeRewritesTheAutomationCodeForThatField() {
-        final @NotNull TestSetDirectoryDto ts = createdTestSet("Login");
+        final @NotNull TestSetNode ts = createdTestSet("Login");
         final @NotNull TestCaseDto tc = createdTestCase(ts, "Log in with a valid user", "b");
         settled();
         assertEquals("\"Log in with a valid user\"", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "description"));

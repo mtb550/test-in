@@ -27,9 +27,9 @@ import org.testin.NodesOnDisk;
 import org.testin.TestinLog;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
 import org.testin.model.FileKind;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
@@ -49,9 +49,9 @@ import java.util.stream.Stream;
 
 public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
-    private @NotNull TestProjectDirectoryDto nafath = new TestProjectDirectoryDto();
+    private @NotNull TestProjectNode nafath = new TestProjectNode();
 
-    private static @NotNull Path theFileOf(final @NotNull TestSetDirectoryDto ts) {
+    private static @NotNull Path theFileOf(final @NotNull TestSetNode ts) {
         try (Stream<Path> inside = Files.list(ts.getPath())) {
             return inside.filter(file -> FileKind.of(file) == FileKind.TEST_CASE).findFirst().orElseThrow(() -> new AssertionError(ts.getName() + " holds no test case"));
         } catch (final IOException ex) {
@@ -93,13 +93,13 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
         return Services.getInstance(getProject(), UndoHistories.class);
     }
 
-    private @NotNull TestSetDirectoryDto aTestSetHolding(final @NotNull String name) {
-        final @NotNull TestSetDirectoryDto ts = new NodesOnDisk(getProject()).testSet(nafath.getTestCasesDirectory(), name);
+    private @NotNull TestSetNode aTestSetHolding(final @NotNull String name) {
+        final @NotNull TestSetNode ts = new NodesOnDisk(getProject()).testSet(nafath.getTestCasesFolder(), name);
         new NodesOnDisk(getProject()).testCase(ts);
         return ts;
     }
 
-    private void removedByTheTester(final @NotNull List<? extends DirectoryDto> removed) {
+    private void removedByTheTester(final @NotNull List<? extends Node> removed) {
         new RemoveWork(getProject()).confirm(List.copyOf(removed));
         ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
 
@@ -122,7 +122,7 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-037
     public void testTestinKeepsItsOwnCopySoCtrlZPutsTheRemovedNodeBack() {
-        final @NotNull TestSetDirectoryDto login = aTestSetHolding("Login");
+        final @NotNull TestSetNode login = aTestSetHolding("Login");
         final @NotNull Path testCase = theFileOf(login);
         final @NotNull String content = read(testCase);
 
@@ -138,8 +138,8 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-040
     public void testOnePressOfCtrlZPutsBackEverythingOneDeleteRemoved() {
-        final @NotNull TestSetDirectoryDto login = aTestSetHolding("Login");
-        final @NotNull TestSetDirectoryDto payment = aTestSetHolding("Payment");
+        final @NotNull TestSetNode login = aTestSetHolding("Login");
+        final @NotNull TestSetNode payment = aTestSetHolding("Payment");
 
         removedByTheTester(List.of(login, payment));
         pressedCtrlZ();
@@ -152,7 +152,7 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-041
     public void testARemovalWhoseCopyCouldNotBeMadeStillHappensAndCannotBeUndone() {
-        final @NotNull TestSetDirectoryDto login = aTestSetHolding("Login");
+        final @NotNull TestSetNode login = aTestSetHolding("Login");
         final @NotNull Path staging = Path.of(PathManager.getSystemPath(), "testin", "deleted");
         final @NotNull Path stagingAside = staging.resolveSibling("deleted-aside-" + getName());
 
@@ -176,7 +176,7 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-063
     public void testACtrlZThatCouldNotPutEverythingBackSaysOnlyWhatWentWrong() {
-        final @NotNull TestSetDirectoryDto login = aTestSetHolding("Login");
+        final @NotNull TestSetNode login = aTestSetHolding("Login");
         final @NotNull Path testCase = theFileOf(login);
 
         removedByTheTester(List.of(login));

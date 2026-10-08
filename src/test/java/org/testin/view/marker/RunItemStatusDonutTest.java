@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeCount;
 import org.testin.model.NodeFigures;
 import org.testin.model.NodeStatistics;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.TestRunSummary;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;

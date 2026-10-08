@@ -46,7 +46,7 @@ public class ChangeTypeRevertTest {
                 .module("committed module")
                 .testData("committed data")
                 .preConditions("committed preconditions")
-                .group(new ArrayList<>(List.of("Smoke")))
+                .groups(new ArrayList<>(List.of("Smoke")))
                 .build();
     }
 
@@ -61,7 +61,7 @@ public class ChangeTypeRevertTest {
                 .module("edited module")
                 .testData("edited data")
                 .preConditions("edited preconditions")
-                .group(new ArrayList<>(List.of("Regression")))
+                .groups(new ArrayList<>(List.of("Regression")))
                 .build();
     }
 
@@ -138,11 +138,11 @@ public class ChangeTypeRevertTest {
         final TestCaseDto current = reverted(ChangeType.CHANGE_GROUP, reverted(ChangeType.CHANGE_STEPS, edited(), committed), committed);
 
         current.getSteps().add("typed after the revert");
-        current.getGroup().add("Regression");
+        current.getGroups().add("Regression");
 
         assertEquals(committed.getSteps(), List.of("committed first", "committed second"),
                 "the committed steps were shared, not copied");
-        assertEquals(committed.getGroup(), List.of("Smoke"),
+        assertEquals(committed.getGroups(), List.of("Smoke"),
                 "the committed groups were shared, not copied");
     }
 

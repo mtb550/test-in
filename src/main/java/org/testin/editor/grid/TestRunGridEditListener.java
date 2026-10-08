@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.testrun.RunItemStatusService;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -60,13 +60,13 @@ public class TestRunGridEditListener extends AbstractGridEditListener {
 
         if (!attr.isEdited()) return GridEdit.UNCHANGED;
 
-        final @NotNull Optional<TestRunItems> found = editor.runItem(onThisRow.getId());
+        final @NotNull Optional<RunItem> found = editor.runItem(onThisRow.getId());
         if (found.isEmpty()) return GridEdit.UNCHANGED;
-        final @NotNull TestRunItems item = found.orElseThrow();
+        final @NotNull RunItem runItem = found.orElseThrow();
 
-        final @NotNull String before = attr.getRunItemValueExtractor().apply(item);
+        final @NotNull String before = attr.getRunItemValueExtractor().apply(runItem);
 
-        if (item.isRemoved()) {
+        if (runItem.isRemoved()) {
             model.setValueAt(before, row, col);
             runItemStatusService.refuseRemoved();
             return GridEdit.REFUSED;
@@ -79,8 +79,8 @@ public class TestRunGridEditListener extends AbstractGridEditListener {
         }
 
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
-        testRuns.changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunItemValueSetter().execute(result, typed));
-        final @NotNull String after = attr.getRunItemValueExtractor().apply(item);
+        testRuns.changeRunItem(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunItemValueSetter().execute(result, typed));
+        final @NotNull String after = attr.getRunItemValueExtractor().apply(runItem);
 
         model.setValueAt(after, row, col);
 

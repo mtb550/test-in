@@ -19,7 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.markers.AbstractMarker;
 import org.testin.model.markers.Marker;
 import org.testin.services.Services;
@@ -55,7 +55,7 @@ final class MarkerFiles {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass) {
+    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull NodeType kind, final @NotNull Class<M> markerClass) {
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
         if (!Files.exists(markerFile)) return defaultFor(markerClass, kind);
@@ -92,7 +92,7 @@ final class MarkerFiles {
 
     // Rule-INTERNAL-090, Rule-TREE-PANEL-051
     boolean giveFreshId(final @NotNull Path markerFile) {
-        final @NotNull Optional<DirectoryType> kind = DirectoryType.byMarker(String.valueOf(markerFile.getFileName()));
+        final @NotNull Optional<NodeType> kind = NodeType.byMarker(String.valueOf(markerFile.getFileName()));
         if (kind.isEmpty()) return false;
 
         try {
@@ -117,16 +117,16 @@ final class MarkerFiles {
     }
 
     void touched(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
-        final @NotNull String modifiedByBefore = marker.getModifiedBy();
-        final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
+        final @NotNull String updatedByBefore = marker.getUpdatedBy();
+        final @NotNull ZonedDateTime updatedAtBefore = marker.getUpdatedAt();
 
         marker.touch(tester());
         if (testDataFiles.alreadyHolds(dirPath.resolve(markerFileName), marker)) return;
         if (write(dirPath, markerFileName, marker)) return;
 
         // Rule-INTERNAL-123
-        marker.setModifiedBy(modifiedByBefore);
-        marker.setModifiedAt(modifiedAtBefore);
+        marker.setUpdatedBy(updatedByBefore);
+        marker.setUpdatedAt(updatedAtBefore);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
@@ -137,12 +137,12 @@ final class MarkerFiles {
         return taken;
     }
 
-    boolean has(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
+    boolean has(final @NotNull Path dirPath, final @NotNull NodeType kind) {
         return Files.exists(dirPath.resolve(kind.getMarker()));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-009
-    @NotNull Optional<DirectoryType> markedAs(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family) {
+    @NotNull Optional<NodeType> markedAs(final @NotNull Path dirPath, final @NotNull List<NodeType> family) {
         return family.stream().filter(kind -> has(dirPath, kind)).findFirst();
     }
 
@@ -150,7 +150,7 @@ final class MarkerFiles {
         return settings.testerName;
     }
 
-    private <M> @NotNull M defaultFor(final @NotNull Class<M> markerClass, final @NotNull DirectoryType kind) {
+    private <M> @NotNull M defaultFor(final @NotNull Class<M> markerClass, final @NotNull NodeType kind) {
         try {
             return markerClass.getDeclaredConstructor().newInstance();
         } catch (final ReflectiveOperationException ex) {

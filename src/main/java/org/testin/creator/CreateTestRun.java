@@ -20,14 +20,14 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.open.TestinEditors;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.TestRunConfiguration;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -52,7 +52,7 @@ public class CreateTestRun implements NodeCreator {
     private final @NotNull BoundTestProject boundTestProject;
     private final @NotNull Nodes nodes;
     private final @NotNull Notifier notifier;
-    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull NodeMapper directoryMapper;
     private final @NotNull TestRuns testRuns;
     private final @NotNull TestinEditors editors;
 
@@ -61,68 +61,68 @@ public class CreateTestRun implements NodeCreator {
         this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
         this.nodes = Services.getInstance(p, Nodes.class);
         this.notifier = Services.getInstance(p, Notifier.class);
-        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.directoryMapper = Services.getInstance(p, NodeMapper.class);
         this.testRuns = Services.getInstance(p, TestRuns.class);
         this.editors = Services.getInstance(p, TestinEditors.class);
     }
 
     // UC-TREE-PANEL-009
     @Override
-    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public @NotNull Optional<Node> execute(final @NotNull String name, final @NotNull Node parentNode, final @NotNull Path newDirPath) {
         boundTestProject.get().ifPresentOrElse(
-                tp -> configureTestRun(tp.getTestCasesDirectory(), name, parentDir, Set.of(), Map.of()),
+                tp -> configureTestRun(tp.getTestCasesFolder(), name, parentNode, Set.of(), Map.of()),
                 () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
 
         return Optional.empty();
     }
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021
-    public void configureTestRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceTestCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
+    public void configureTestRun(final @NotNull Node testCasesRoot, final @NotNull String name, final @NotNull Node parentNode, final @NotNull Set<UUID> sourceTestCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
         new TestRunForm(p).open(testCasesRoot, name, sourceTestCases, List.of(), sourceConfiguration,
-                new TestRunFormAction(Bundle.message("test.run.create.title"), Bundle.message("test.run.create.button"), (form, selection) -> create(form, selection, parentDir)));
+                new TestRunFormAction(Bundle.message("test.run.create.title"), Bundle.message("test.run.create.button"), (form, selection) -> create(form, selection, parentNode)));
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-004
-    private boolean create(final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull DirectoryDto parentDir) {
+    private boolean create(final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Node parentNode) {
         final @NotNull String name = form.getTestRunName();
         if (name.isEmpty()) {
             notifier.softRefuse(p, Bundle.message("test.run.needs.a.name"));
             return false;
         }
 
-        if (!nodes.nodeExists(parentDir.getPath())) {
-            notifier.softRefuse(p, Bundle.message("test.run.parent.gone", parentDir.getName()));
+        if (!nodes.nodeExists(parentNode.getPath())) {
+            notifier.softRefuse(p, Bundle.message("test.run.parent.gone", parentNode.getName()));
             return false;
         }
 
-        final @NotNull Path savePath = parentDir.getPath().resolve(name);
+        final @NotNull Path savePath = parentNode.getPath().resolve(name);
         if (nodes.nodeExists(savePath)) {
             notifier.softRefuse(p, Refused.ALREADY_EXISTS, name);
             return false;
         }
 
-        final @NotNull TestRunDirectoryDto testRunDir = directoryMapper.setTestRunNode(savePath, parentDir);
+        final @NotNull TestRunNode testRunDir = directoryMapper.setTestRunNode(savePath, parentNode);
         write(form, selection, savePath, testRunDir);
 
         return true;
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-031
-    private void write(final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TestRunDirectoryDto trDir) {
+    private void write(final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TestRunNode testRunNode) {
         final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
 
-        final @NotNull TestRunDto tr = new TestRunDto().coverOnly(TestRunForm.checkedTestCases(selection));
+        final @NotNull RunItems runItems = new RunItems().coverOnly(TestRunForm.checkedTestCases(selection));
 
         BackgroundWork.run(p, Bundle.message("test.run.task.creating", savePath.getFileName()), Bundle.message("test.run.create.failed.title"), _ -> {
-            trDir.getMarker().configure(TestRunConfiguration.answered(configuration));
+            testRunNode.getMarker().configure(TestRunConfiguration.answered(configuration));
 
-            if (!nodes.addTestRunDir(trDir)) return;
+            if (!nodes.addTestRunNode(testRunNode)) return;
 
-            testRuns.putTestRun(savePath, tr);
+            testRuns.putRunItems(savePath, runItems);
             nodes.refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                editors.open(trDir);
+                editors.open(testRunNode);
 
                 notifier.softShow(p, Done.CREATED);
             });

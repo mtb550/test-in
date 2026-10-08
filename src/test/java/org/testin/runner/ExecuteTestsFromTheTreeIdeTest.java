@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Said;
 import org.testin.TreeGesture;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
 
@@ -39,7 +39,7 @@ public class ExecuteTestsFromTheTreeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-078
     public void testANodeWithNoTestCasesSaysSoAndRunsNothing() {
-        final @NotNull TestSetDirectoryDto empty = createdTestSet("Empty");
+        final @NotNull TestSetNode empty = createdTestSet("Empty");
         final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         TreeGesture.pressed(getProject(), runTests(), List.of(empty));
 
@@ -50,7 +50,7 @@ public class ExecuteTestsFromTheTreeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-079
     public void testWithoutTestNgRunStaysOnTheMenuGrayAndSaysWhatItNeeds() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         indexedTestCase(login, "Log in with a valid user", "m");
         assertTrue("Run is gray with the TestNG plugin present", TreeGesture.updated(getProject(), runTests(), List.of(login)).isEnabled());
 

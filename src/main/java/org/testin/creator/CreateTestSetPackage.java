@@ -18,28 +18,28 @@ package org.testin.creator;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
 public class CreateTestSetPackage implements NodeCreator {
-    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull NodeMapper directoryMapper;
     private final @NotNull Nodes nodes;
 
     public CreateTestSetPackage(final @NotNull Project p) {
-        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.directoryMapper = Services.getInstance(p, NodeMapper.class);
         this.nodes = Services.getInstance(p, Nodes.class);
     }
 
     // UC-TREE-PANEL-008, Rule-TREE-PANEL-027
     @Override
-    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        TestSetPackageDirectoryDto tsp = directoryMapper.getTestSetPackageNode(newDirPath, parentDir);
+    public @NotNull Optional<Node> execute(final @NotNull String name, final @NotNull Node parentNode, final @NotNull Path newDirPath) {
+        TestSetPackageNode tsp = directoryMapper.getTestSetPackageNode(newDirPath, parentNode);
 
         return nodes.addTestSetPackage(tsp) ? Optional.of(tsp) : Optional.empty();
     }

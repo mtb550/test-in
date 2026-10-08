@@ -43,7 +43,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     @Getter
     private final @NotNull Map<Class<? extends ToolbarItem>, ToolbarItem> toolbarItems = new HashMap<>();
     @Getter
-    private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
+    private @NotNull ViewMode currentView = ViewMode.CARD_VIEW;
 
     public AbstractToolbarPanel(final @NotNull Toolbar callbacks) {
         super(new GridBagLayout());
@@ -121,10 +121,10 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
     private void wireViewButtons() {
         final @NotNull GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
-        final @NotNull ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
+        final @NotNull CardViewBtn listBtn = getToolbarItem(CardViewBtn.class);
 
         gridBtn.addActionListener(_ -> setView(ViewMode.GRID_VIEW));
-        listBtn.addActionListener(_ -> setView(ViewMode.LIST_VIEW));
+        listBtn.addActionListener(_ -> setView(ViewMode.CARD_VIEW));
 
         updateViewButtons();
     }
@@ -138,9 +138,9 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-016
     private void updateViewButtons() {
         final @NotNull GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
-        final @NotNull ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
+        final @NotNull CardViewBtn listBtn = getToolbarItem(CardViewBtn.class);
 
-        gridBtn.setVisible(currentView == ViewMode.LIST_VIEW);
+        gridBtn.setVisible(currentView == ViewMode.CARD_VIEW);
         listBtn.setVisible(currentView == ViewMode.GRID_VIEW);
 
         revalidate();

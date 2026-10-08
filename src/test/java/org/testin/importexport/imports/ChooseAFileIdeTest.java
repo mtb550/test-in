@@ -39,7 +39,7 @@ import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.importexport.FileTypes;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 
@@ -76,7 +76,7 @@ public class ChooseAFileIdeTest extends AbstractTempRootIdeTest {
         final @NotNull File plan = root.resolve("Plan.json").toFile();
         FileTypes.JSON.exportToFile(getProject(), plan, Map.of("Login", List.of(TestCaseDto.builder().description("log in with a valid user").build())));
         final @NotNull VirtualFile chosen = Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(plan)).orElseThrow(() -> new AssertionError("the plan was not written: " + plan));
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(new NodesOnDisk(getProject()).testProject(root.resolve("Demo")).getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(new NodesOnDisk(getProject()).testProject(root.resolve("Demo")).getTestCasesFolder(), "Login");
 
         new ImportWork(getProject()).openImportDialog(login);
         Await.until("the import did not ask for a file", () -> !asked.isEmpty());

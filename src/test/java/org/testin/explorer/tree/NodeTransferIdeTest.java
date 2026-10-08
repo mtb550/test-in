@@ -21,9 +21,9 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
@@ -36,16 +36,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class NodeTransferIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull List<Path> revealed = new CopyOnWriteArrayList<>();
-    private @NotNull TestSetPackageDirectoryDto payments = new TestSetPackageDirectoryDto();
-    private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
+    private @NotNull TestSetPackageNode payments = new TestSetPackageNode();
+    private @NotNull TestSetNode login = new TestSetNode();
 
     @Override
     protected void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        payments = made.testSetPackage(tp.getTestCasesDirectory(), "Payments");
-        login = made.testSet(made.testSetPackage(tp.getTestCasesDirectory(), "Checkout"), "Login");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        payments = made.testSetPackage(tp.getTestCasesFolder(), "Payments");
+        login = made.testSet(made.testSetPackage(tp.getTestCasesFolder(), "Checkout"), "Login");
         made.testCase(login);
         undoHistories().forget(UndoScope.TREE);
     }

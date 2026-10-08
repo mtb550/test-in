@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestRunNode;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -57,7 +57,7 @@ public interface TestinEditor extends Disposable {
     default void launching(final @NotNull UUID testCaseId) {
     }
 
-    @NotNull DirectoryDto getParent();
+    @NotNull Node getParent();
 
     @NotNull StatusBar getStatusBar();
 
@@ -163,7 +163,7 @@ public interface TestinEditor extends Disposable {
     void onToolBarFilterSelectionChanged();
 
     // UC-REPORT-001
-    default @NotNull Optional<TestRunDirectoryDto> shownTestRun() {
+    default @NotNull Optional<TestRunNode> shownTestRun() {
         return Optional.empty();
     }
 

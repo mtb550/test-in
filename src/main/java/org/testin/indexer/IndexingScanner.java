@@ -21,19 +21,19 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
@@ -58,14 +58,14 @@ import java.util.stream.Stream;
 
 final class IndexingScanner {
     private final @NotNull IndexerDataStore store;
-    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull NodeMapper directoryMapper;
     private final @NotNull Mapper mapper;
     private final @NotNull ReadProblems problems;
     private final @NotNull TestDataFiles testDataFiles;
 
     IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
         this.store = store;
-        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.directoryMapper = Services.getInstance(p, NodeMapper.class);
         this.mapper = Services.getInstance(p, Mapper.class);
         this.problems = new ReadProblems(p, store);
         this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
@@ -76,7 +76,7 @@ final class IndexingScanner {
     }
 
     // Rule-INTERNAL-091
-    private static @NotNull ScannedProject scannedNode(final @NotNull Path projectPath, final @NotNull TestProjectDirectoryDto tp) {
+    private static @NotNull ScannedProject scannedNode(final @NotNull Path projectPath, final @NotNull TestProjectNode tp) {
         final @NotNull ScannedProject scanned = new ScannedProject();
         scanned.getProjects().put(projectPath.toString(), tp);
 
@@ -84,16 +84,16 @@ final class IndexingScanner {
     }
 
     // Rule-INTERNAL-011
-    static @NotNull List<TestRunItems> inTestCaseOrder(final @NotNull List<TestRunItems> results, final @NotNull ScannedProject scanned) {
-        final @NotNull Map<UUID, TestRunItems> byId = new LinkedHashMap<>();
-        results.forEach(item -> byId.put(item.getId(), item));
+    static @NotNull List<RunItem> inTestCaseOrder(final @NotNull List<RunItem> runItems, final @NotNull ScannedProject scanned) {
+        final @NotNull Map<UUID, RunItem> byId = new LinkedHashMap<>();
+        runItems.forEach(runItem -> byId.put(runItem.getId(), runItem));
 
-        final @NotNull List<TestCaseDto> testCases = results.stream()
-                .map(item -> scanned.getTestCasesById().get(item.getId()))
+        final @NotNull List<TestCaseDto> testCases = runItems.stream()
+                .map(runItem -> scanned.getTestCasesById().get(runItem.getId()))
                 .filter(Objects::nonNull)
                 .toList();
 
-        final @NotNull List<TestRunItems> ordered = TestCaseOrder.ordered(testCases).stream()
+        final @NotNull List<RunItem> ordered = TestCaseOrder.ordered(testCases).stream()
                 .map(tc -> byId.remove(tc.getId()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -139,7 +139,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private @NotNull Optional<String> scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            final @NotNull TestProjectDirectoryDto tp = directoryMapper.getTestProjectNode(projectPath);
+            final @NotNull TestProjectNode tp = directoryMapper.getTestProjectNode(projectPath);
 
             // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = tp.getMarker().whyNotReadable();
@@ -170,16 +170,16 @@ final class IndexingScanner {
 
             final @NotNull List<Path> unread = new ArrayList<>();
 
-            final @NotNull TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
-            scanned.getTestCasesMainDirs().put(tcd.getPath().toString(), tcd);
-            scanTestSets(tcd.getPath(), tcd, indicator, unread, scanned);
+            final @NotNull TestCasesFolderNode testCasesFolder = tp.getTestCasesFolder();
+            scanned.getTestCasesFolders().put(testCasesFolder.getPath().toString(), testCasesFolder);
+            scanTestSets(testCasesFolder.getPath(), testCasesFolder, indicator, unread, scanned);
 
             indicator.setFraction(0.5);
             indicator.setText(Bundle.message("indexer.progress.test.runs", tp.getName()));
 
-            final @NotNull TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
-            scanned.getTestRunsMainDirs().put(trd.getPath().toString(), trd);
-            scanTestRunDirs(trd.getPath(), trd, indicator, unread, scanned);
+            final @NotNull TestRunsFolderNode testRunsFolder = tp.getTestRunsFolder();
+            scanned.getTestRunsFolders().put(testRunsFolder.getPath().toString(), testRunsFolder);
+            scanTestRunNodes(testRunsFolder.getPath(), testRunsFolder, indicator, unread, scanned);
 
             if (indicator.isCanceled()) {
                 Logger.info("Scan canceled, so the index was left as it was: " + projectPath.getFileName());
@@ -193,8 +193,8 @@ final class IndexingScanner {
 
             problems.unreadFolders(tp.getName(), unread);
             problems.damagedMarkers(tp.getName(), store.takeDamagedMarkers(projectPath));
-            problems.unreadableResults(tp.getName(), scanned.getUnreadableResults());
-            problems.handNamedResults(tp.getName(), scanned.getHandNamedResults());
+            problems.unreadableRunItems(tp.getName(), scanned.getUnreadableRunItems());
+            problems.handNamedRunItems(tp.getName(), scanned.getHandNamedRunItems());
             problems.clashingTestCases(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
             return Optional.empty();
         } catch (final Exception ex) {
@@ -204,7 +204,7 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
-    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+    private void scanTestSets(final @NotNull Path tcDir, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -221,19 +221,19 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
-    private void scanTestSetOrPackage(final @NotNull Path dirPath, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
-        store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
+    private void scanTestSetOrPackage(final @NotNull Path dirPath, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+        store.markedAs(dirPath, NodeType.UNDER_TEST_CASES).ifPresentOrElse(
                 marked -> {
-                    if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator, scanned);
+                    if (marked == NodeType.TS) scanTestSet(dirPath, parent, indicator, scanned);
                     else scanTestSetPackage(dirPath, parent, indicator, unread, scanned);
                 },
-                () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, unread));
+                () -> skipped(dirPath, NodeType.UNDER_TEST_CASES, unread));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
-    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+    private void scanTestSetPackage(final @NotNull Path path, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestSetPackageDirectoryDto tsp = directoryMapper.getTestSetPackageNode(path, parent);
+            final @NotNull TestSetPackageNode tsp = directoryMapper.getTestSetPackageNode(path, parent);
 
             scanned.getTestSetPackages().put(path.toString(), tsp);
 
@@ -248,9 +248,9 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
-    private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
+    private void scanTestSet(final @NotNull Path path, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(path, parent);
+            final @NotNull TestSetNode ts = directoryMapper.getTestSetNode(path, parent);
 
             scanned.getTestSets().put(path.toString(), ts);
 
@@ -298,7 +298,7 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
-    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+    private void scanTestRunNodes(final @NotNull Path trDir, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -315,19 +315,19 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
-    private void scanTestRunOrPackage(final @NotNull Path dirPath, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
-        store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
+    private void scanTestRunOrPackage(final @NotNull Path dirPath, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+        store.markedAs(dirPath, NodeType.UNDER_TEST_RUNS).ifPresentOrElse(
                 marked -> {
-                    if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator, scanned);
-                    else scanTestRunPackageDir(dirPath, parent, indicator, unread, scanned);
+                    if (marked == NodeType.TR) scanTestRun(dirPath, parent, indicator, scanned);
+                    else scanTestRunPackageNode(dirPath, parent, indicator, unread, scanned);
                 },
-                () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, unread));
+                () -> skipped(dirPath, NodeType.UNDER_TEST_RUNS, unread));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
-    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+    private void scanTestRunPackageNode(final @NotNull Path path, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestRunPackageDirectoryDto trp = directoryMapper.getTestRunPackageNode(path, parent);
+            final @NotNull TestRunPackageNode trp = directoryMapper.getTestRunPackageNode(path, parent);
 
             scanned.getTestRunPackages().put(path.toString(), trp);
 
@@ -342,8 +342,8 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-015
-    private void skipped(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family, final @NotNull List<Path> unread) {
-        Logger.warn("Skipping unmarked directory (missing " + DirectoryType.markerNames(family) + "): " + dirPath);
+    private void skipped(final @NotNull Path dirPath, final @NotNull List<NodeType> family, final @NotNull List<Path> unread) {
+        Logger.warn("Skipping unmarked directory (missing " + NodeType.markerNames(family) + "): " + dirPath);
 
         if (holdsTestCases(dirPath)) unread.add(dirPath);
     }
@@ -357,37 +357,37 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002
-    private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
-        final @NotNull TestRunDirectoryDto tr = directoryMapper.getTestRunNode(path, parent);
+    private void scanTestRun(final @NotNull Path path, final @NotNull Node parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
+        final @NotNull TestRunNode tr = directoryMapper.getTestRunNode(path, parent);
 
-        scanned.getTestRunDirs().put(path.toString(), tr);
+        scanned.getTestRunNodes().put(path.toString(), tr);
 
         // Rule-INTERNAL-011
-        scanned.getTestRuns().put(path.toString(), new TestRunDto().setResults(resultsIn(path, scanned)));
+        scanned.getRunItemsByPath().put(path.toString(), new RunItems().setAll(runItemsIn(path, scanned)));
 
         indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012
-    private @NotNull List<TestRunItems> resultsIn(final @NotNull Path testRunPath, final @NotNull ScannedProject scanned) {
-        final @NotNull List<TestRunItems> read = new ArrayList<>();
+    private @NotNull List<RunItem> runItemsIn(final @NotNull Path testRunPath, final @NotNull ScannedProject scanned) {
+        final @NotNull List<RunItem> read = new ArrayList<>();
 
-        for (final Path file : testDataFiles.resultsIn(testRunPath)) {
+        for (final Path file : testDataFiles.runItemsIn(testRunPath)) {
             // Rule-INTERNAL-094
             final @NotNull Optional<UUID> id = FileKind.RUN_ITEM.idIn(file);
             if (id.isEmpty()) {
-                scanned.getHandNamedResults().add(testRunPath.getFileName() + "/" + file.getFileName());
+                scanned.getHandNamedRunItems().add(testRunPath.getFileName() + "/" + file.getFileName());
                 continue;
             }
 
             try {
-                final @NotNull TestRunItems item = mapper.readValue(Files.readAllBytes(file), TestRunItems.class);
-                item.setId(id.orElseThrow());
-                read.add(item);
+                final @NotNull RunItem runItem = mapper.readValue(Files.readAllBytes(file), RunItem.class);
+                runItem.setId(id.orElseThrow());
+                read.add(runItem);
 
             } catch (final IOException | UncheckedIOException ex) {
-                Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + FailureText.of(ex));
-                scanned.getUnreadableResults().add(testRunPath.getFileName() + "/" + file.getFileName());
+                Logger.error("Failed to read the run item '" + file.toAbsolutePath() + "': " + FailureText.of(ex));
+                scanned.getUnreadableRunItems().add(testRunPath.getFileName() + "/" + file.getFileName());
             }
         }
 

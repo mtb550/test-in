@@ -30,10 +30,10 @@ import org.testin.Await;
 import org.testin.Gestures;
 import org.testin.clipboard.CutState;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 
 public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
-    private static @NotNull AnAction undoOn(final @NotNull TestCaseEditor editor) {
+    private static @NotNull AnAction undoOn(final @NotNull TestSetEditor editor) {
         final @NotNull KeyStroke controlZ = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Shortcuts.menuMask());
         return ActionUtil.getActions(editor.getList()).stream()
                 .filter(UndoAction.class::isInstance)
@@ -80,20 +80,20 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private @NotNull TestCaseEditor aTestSetOf(final @NotNull String... descriptions) {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+    private @NotNull TestSetEditor aTestSetOf(final @NotNull String... descriptions) {
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         for (int i = 0; i < descriptions.length; i++)
             EditorFixtures.testCase(getProject(), ts, descriptions[i], String.format("m%04d", i));
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
-    private @NotNull AnActionEvent eventOn(final @NotNull AnAction action, final @NotNull TestCaseEditor editor) {
+    private @NotNull AnActionEvent eventOn(final @NotNull AnAction action, final @NotNull TestSetEditor editor) {
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action, Gestures.dataOf(getProject(), editor.getList()));
         ActionUtil.updateAction(action, e);
         return e;
     }
 
-    private @NotNull List<String> askedToRemove(final @NotNull TestCaseEditor editor) {
+    private @NotNull List<String> askedToRemove(final @NotNull TestSetEditor editor) {
         final @NotNull AnAction remove = ActionManager.getInstance().getAction("Testin.RemoveTestCase");
         final @NotNull AnActionEvent e = eventOn(remove, editor);
         assertTrue("Remove is gray on the selected test cases", e.getPresentation().isEnabled());
@@ -113,7 +113,7 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-062
     public void testTheConfirmationNamesTheTestCaseOrCountsThemAndSaysWhichTestSet() {
-        final @NotNull TestCaseEditor editor = aTestSetOf("Log in", "Log out", "Reset the password");
+        final @NotNull TestSetEditor editor = aTestSetOf("Log in", "Log out", "Reset the password");
         editor.getList().setSelectedIndex(1);
 
         final @NotNull List<String> one = askedToRemove(editor);
@@ -129,7 +129,7 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-063
     public void testARemovalIsTakenBackWithControlZ() {
-        final @NotNull TestCaseEditor editor = aTestSetOf("Log in", "Log out");
+        final @NotNull TestSetEditor editor = aTestSetOf("Log in", "Log out");
         editor.getList().setSelectedIndex(0);
         final @NotNull TestCaseDto removed = editor.getList().getSelectedValue();
 
@@ -146,7 +146,7 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-064
     public void testNothingIsRenumberedAndTheNumbersOnScreenCloseUp() {
-        final @NotNull TestCaseEditor editor = aTestSetOf("Log in", "Log out", "Reset the password");
+        final @NotNull TestSetEditor editor = aTestSetOf("Log in", "Log out", "Reset the password");
         final @NotNull Path testSet = editor.getParent().getPath();
         final @NotNull TestCaseDto first = editor.getList().getModel().getElementAt(0);
         final @NotNull TestCaseDto last = editor.getList().getModel().getElementAt(2);
@@ -167,7 +167,7 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-065
     public void testATestCaseWaitingToBePastedIsAskedAboutAndItsRemovalCallsOffTheCut() {
-        final @NotNull TestCaseEditor editor = aTestSetOf("Log in", "Log out");
+        final @NotNull TestSetEditor editor = aTestSetOf("Log in", "Log out");
         editor.getList().setSelectedIndex(0);
         final @NotNull TestCaseDto waiting = editor.getList().getSelectedValue();
         final @NotNull CutState cutState = Services.getInstance(getProject(), CutState.class);

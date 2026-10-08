@@ -19,7 +19,7 @@ package org.testin.creator.dialogs;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.GitRefs;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.notifications.Refused;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -43,7 +43,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog {
         title = Bundle.message("dialog.create.project.title");
 
         final @NotNull ComponentDialogBase<TextInput> built = ComponentDialogBase.textField()
-                .icon(DirectoryType.TP.getIcon())
+                .icon(NodeType.TP.getIcon())
                 .placeholder(Bundle.message("dialog.create.project.placeholder"))
                 .build();
         nameInput = built.getComponent();
@@ -56,7 +56,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog {
 
     // UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-095, Rule-TREE-PANEL-107
     private static boolean isNameOrUrl(final @NotNull String typed) {
-        return GitRefs.isRepositoryUrl(typed) || DirectoryType.TP.canTakeName(typed);
+        return GitRefs.isRepositoryUrl(typed) || NodeType.TP.canTakeName(typed);
     }
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095

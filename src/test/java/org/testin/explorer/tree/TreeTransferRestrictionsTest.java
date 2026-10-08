@@ -17,14 +17,14 @@
 package org.testin.explorer.tree;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -34,21 +34,21 @@ import static org.testng.Assert.assertTrue;
 
 public class TreeTransferRestrictionsTest {
 
-    private static @NotNull DirectoryDto project(final String name) {
-        final TestProjectDirectoryDto dto = new TestProjectDirectoryDto();
+    private static @NotNull Node project(final String name) {
+        final TestProjectNode dto = new TestProjectNode();
         dto.setPath(Path.of("Testin", name));
         return dto;
     }
 
-    private static @NotNull DirectoryDto childPackage(final DirectoryDto parent, final String name) {
-        final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
+    private static @NotNull Node childPackage(final Node parent, final String name) {
+        final TestSetPackageNode dto = new TestSetPackageNode();
         dto.setPath(parent.getPath().resolve(name));
         dto.setParent(parent);
         return dto;
     }
 
-    private static @NotNull DirectoryDto node(final String... underRoot) {
-        final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
+    private static @NotNull Node node(final String... underRoot) {
+        final TestSetPackageNode dto = new TestSetPackageNode();
         dto.setPath(Path.of("root", underRoot));
         return dto;
     }
@@ -56,12 +56,12 @@ public class TreeTransferRestrictionsTest {
     // Rule-PRODUCT-006, Rule-TREE-PANEL-002
     @Test
     public void fixedNodesCannotBeMovedRenamedOrRemoved() {
-        final DirectoryDto[] fixed = {
-                new TestCasesMainDirectoryDto(),
-                new TestRunsMainDirectoryDto()
+        final Node[] fixed = {
+                new TestCasesFolderNode(),
+                new TestRunsFolderNode()
         };
 
-        for (final DirectoryDto node : fixed) {
+        for (final Node node : fixed) {
             assertFalse(node.isTransferable(), node.getClass().getSimpleName() + " must not be cut/copied/dragged");
             assertFalse(node.isRemovable(), node.getClass().getSimpleName() + " must not be removable");
             assertFalse(node.isRenamable(), node.getClass().getSimpleName() + " must not be renamable");
@@ -70,7 +70,7 @@ public class TreeTransferRestrictionsTest {
 
     @Test
     public void aTestProjectIsRemovableAndRenamableButNeverMoved() {
-        final DirectoryDto testProject = new TestProjectDirectoryDto();
+        final Node testProject = new TestProjectNode();
 
         assertTrue(testProject.isRemovable(), "a test project is removed by the tester who made it");
         assertFalse(testProject.isTransferable(), "a test project is not cut, copied or dragged");
@@ -79,14 +79,14 @@ public class TreeTransferRestrictionsTest {
 
     @Test
     public void regularNodesKeepTheirCapabilities() {
-        final DirectoryDto[] regular = {
-                new TestSetDirectoryDto(),
-                new TestSetPackageDirectoryDto(),
-                new TestRunDirectoryDto(),
-                new TestRunPackageDirectoryDto()
+        final Node[] regular = {
+                new TestSetNode(),
+                new TestSetPackageNode(),
+                new TestRunNode(),
+                new TestRunPackageNode()
         };
 
-        for (final DirectoryDto node : regular) {
+        for (final Node node : regular) {
             assertTrue(node.isTransferable(), node.getClass().getSimpleName() + " must stay transferable");
             assertTrue(node.isRemovable(), node.getClass().getSimpleName() + " must stay removable");
             assertTrue(node.isRenamable(), node.getClass().getSimpleName() + " must stay renamable");
@@ -96,18 +96,18 @@ public class TreeTransferRestrictionsTest {
     // Rule-PRODUCT-005, Rule-TREE-PANEL-003, Rule-TREE-PANEL-043
     @Test
     public void testRunNodesNeverEnterTheTestSetFamily() {
-        final DirectoryDto[] testSetFamilyTargets = {
-                new TestCasesMainDirectoryDto(),
-                new TestSetPackageDirectoryDto()
+        final Node[] testSetFamilyTargets = {
+                new TestCasesFolderNode(),
+                new TestSetPackageNode()
         };
-        final DirectoryDto[] testRunSources = {new TestRunDirectoryDto(), new TestRunPackageDirectoryDto()};
+        final Node[] testRunSources = {new TestRunNode(), new TestRunPackageNode()};
 
-        for (final DirectoryDto target : testSetFamilyTargets) {
-            for (final DirectoryDto source : testRunSources) {
+        for (final Node target : testSetFamilyTargets) {
+            for (final Node source : testRunSources) {
                 assertFalse(target.acceptsTransferred(source),
                         target.getClass().getSimpleName() + " must reject " + source.getClass().getSimpleName());
             }
-            assertTrue(target.acceptsTransferred(new TestSetDirectoryDto()),
+            assertTrue(target.acceptsTransferred(new TestSetNode()),
                     target.getClass().getSimpleName() + " must accept test-set nodes");
         }
     }
@@ -115,65 +115,65 @@ public class TreeTransferRestrictionsTest {
     // Rule-TREE-PANEL-044
     @Test
     public void testSetAcceptsNoDirectoryNodes() {
-        final DirectoryDto testSet = new TestSetDirectoryDto();
+        final Node testSet = new TestSetNode();
 
         assertFalse(testSet.isTransferTarget(), "a test set holds test cases only");
-        assertFalse(testSet.acceptsTransferred(new TestSetPackageDirectoryDto()), "no package into a test set");
-        assertFalse(testSet.acceptsTransferred(new TestSetDirectoryDto()), "no test set into a test set");
-        assertFalse(testSet.acceptsTransferred(new TestRunDirectoryDto()), "no test run node into a test set");
+        assertFalse(testSet.acceptsTransferred(new TestSetPackageNode()), "no package into a test set");
+        assertFalse(testSet.acceptsTransferred(new TestSetNode()), "no test set into a test set");
+        assertFalse(testSet.acceptsTransferred(new TestRunNode()), "no test run node into a test set");
     }
 
     // Rule-PRODUCT-005, Rule-TREE-PANEL-003, Rule-TREE-PANEL-043
     @Test
     public void testSetNodesNeverEnterTheTestRunFamily() {
-        final DirectoryDto[] testRunFamilyTargets = {
-                new TestRunsMainDirectoryDto(),
-                new TestRunPackageDirectoryDto(),
-                new TestRunDirectoryDto()
+        final Node[] testRunFamilyTargets = {
+                new TestRunsFolderNode(),
+                new TestRunPackageNode(),
+                new TestRunNode()
         };
-        final DirectoryDto[] testSetSources = {new TestSetDirectoryDto(), new TestSetPackageDirectoryDto()};
+        final Node[] testSetSources = {new TestSetNode(), new TestSetPackageNode()};
 
-        for (final DirectoryDto target : testRunFamilyTargets) {
-            for (final DirectoryDto source : testSetSources) {
+        for (final Node target : testRunFamilyTargets) {
+            for (final Node source : testSetSources) {
                 assertFalse(target.acceptsTransferred(source),
                         target.getClass().getSimpleName() + " must reject " + source.getClass().getSimpleName());
             }
         }
-        assertTrue(new TestRunsMainDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()),
+        assertTrue(new TestRunsFolderNode().acceptsTransferred(new TestRunPackageNode()),
                 "the test runs root must accept test run packages");
-        assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()),
+        assertTrue(new TestRunPackageNode().acceptsTransferred(new TestRunPackageNode()),
                 "test run packages must accept test run packages");
     }
 
     // Rule-PRODUCT-005, Rule-TREE-PANEL-044
     @Test
     public void testRunAcceptsNoRunStructure() {
-        final DirectoryDto testRun = new TestRunDirectoryDto();
+        final Node testRun = new TestRunNode();
 
-        assertFalse(testRun.acceptsTransferred(new TestRunDirectoryDto()),
+        assertFalse(testRun.acceptsTransferred(new TestRunNode()),
                 "no test run into a test run");
-        assertFalse(testRun.acceptsTransferred(new TestRunPackageDirectoryDto()),
+        assertFalse(testRun.acceptsTransferred(new TestRunPackageNode()),
                 "no test run package into a test run");
 
-        assertTrue(new TestRunsMainDirectoryDto().acceptsTransferred(new TestRunDirectoryDto()),
+        assertTrue(new TestRunsFolderNode().acceptsTransferred(new TestRunNode()),
                 "the test runs root must still accept test runs");
-        assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunDirectoryDto()),
+        assertTrue(new TestRunPackageNode().acceptsTransferred(new TestRunNode()),
                 "test run packages must still accept test runs");
     }
 
     @Test
     public void testProjectAcceptsNothing() {
-        final DirectoryDto testProject = new TestProjectDirectoryDto();
+        final Node testProject = new TestProjectNode();
 
         assertFalse(testProject.isTransferTarget());
-        assertFalse(testProject.acceptsTransferred(new TestSetDirectoryDto()));
-        assertFalse(testProject.acceptsTransferred(new TestRunDirectoryDto()));
+        assertFalse(testProject.acceptsTransferred(new TestSetNode()));
+        assertFalse(testProject.acceptsTransferred(new TestRunNode()));
     }
 
     // Rule-TREE-PANEL-045
     @Test
     public void destinationMustNotBeSelfSubtreeOrParent() {
-        final DirectoryDto source = node("test-cases", "pkg");
+        final Node source = node("test-cases", "pkg");
 
         assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg"), _ -> false),
                 "onto itself must be invalid");
@@ -189,8 +189,8 @@ public class TreeTransferRestrictionsTest {
     // Rule-TREE-PANEL-004
     @Test
     public void destinationMustNotAlreadyContainTheName() {
-        final DirectoryDto source = node("test-cases", "pkg");
-        final DirectoryDto target = node("test-cases", "other");
+        final Node source = node("test-cases", "pkg");
+        final Node target = node("test-cases", "other");
         final Path occupiedPath = Path.of("root", "test-cases", "other", "pkg");
 
         assertFalse(TreeTransferHandler.isValidDestination(source, target, occupiedPath::equals),
@@ -202,19 +202,19 @@ public class TreeTransferRestrictionsTest {
     // Rule-TREE-PANEL-013
     @Test
     public void transfersNeverCrossTestProjects() {
-        final DirectoryDto projectA = project("projectA");
-        final DirectoryDto packageInA = childPackage(projectA, "pkg");
-        final DirectoryDto testCasesDirInA = childPackage(projectA, "Test Cases");
+        final Node projectA = project("projectA");
+        final Node packageInA = childPackage(projectA, "pkg");
+        final Node testCasesDirInA = childPackage(projectA, "Test Cases");
 
-        final DirectoryDto projectB = project("projectB");
-        final DirectoryDto packageInB = childPackage(projectB, "pkg2");
+        final Node projectB = project("projectB");
+        final Node packageInB = childPackage(projectB, "pkg2");
 
         assertTrue(TreeTransferHandler.sameTestProject(packageInA, testCasesDirInA),
                 "within one project must stay allowed");
         assertFalse(TreeTransferHandler.sameTestProject(packageInA, packageInB),
                 "across projects must be rejected, whatever the node types");
 
-        final DirectoryDto orphan = new TestSetPackageDirectoryDto();
+        final Node orphan = new TestSetPackageNode();
         orphan.setPath(Path.of("somewhere", "pkg"));
         assertFalse(TreeTransferHandler.sameTestProject(orphan, packageInA),
                 "unresolvable ownership must reject");

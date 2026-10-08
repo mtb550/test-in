@@ -22,8 +22,8 @@ import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.TreeGesture;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoHistories;
@@ -34,14 +34,14 @@ import java.util.List;
 
 public class OrderNodeIdeTest extends AbstractTempRootIdeTest {
 
-    private TestSetDirectoryDto login;
+    private TestSetNode login;
 
     @Override
     protected void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        login = made.testSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        login = made.testSet(tp.getTestCasesFolder(), "Login");
         assertTrue(nodes().reorder(login, 3));
         undoHistories().forget(UndoScope.TREE);
     }

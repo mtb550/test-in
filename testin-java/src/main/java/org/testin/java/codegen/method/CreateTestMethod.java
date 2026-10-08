@@ -90,8 +90,8 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
     private static @NotNull String methodText(final @NotNull String methodName, final @NotNull TestCaseDto tc, final int position) {
         final @NotNull StringBuilder attributes = new StringBuilder();
 
-        if (!tc.getGroup().isEmpty()) {
-            final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
+        if (!tc.getGroups().isEmpty()) {
+            final @NotNull List<String> quoted = tc.getGroups().stream().map(JavaLiteral::of).toList();
 
             attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
         }

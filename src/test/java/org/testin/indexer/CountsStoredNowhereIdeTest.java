@@ -19,10 +19,10 @@ package org.testin.indexer;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,25 +31,25 @@ import java.util.stream.Collectors;
 
 public class CountsStoredNowhereIdeTest extends AbstractTempRootIdeTest {
 
-    private static @NotNull String markerOf(final @NotNull DirectoryDto node) {
+    private static @NotNull String markerOf(final @NotNull Node node) {
         final @NotNull Path marker = node.getPath().resolve(node.getType().getMarker());
         try {
-            return Files.readAllLines(marker).stream().filter(line -> !line.contains("\"modifiedAt\"")).collect(Collectors.joining("\n"));
+            return Files.readAllLines(marker).stream().filter(line -> !line.contains("\"updatedAt\"")).collect(Collectors.joining("\n"));
         } catch (final IOException ex) {
             throw new AssertionError("could not read " + marker, ex);
         }
     }
 
-    private long theTestCasesBeneath(final @NotNull DirectoryDto node) {
+    private long theTestCasesBeneath(final @NotNull Node node) {
         return NodeCounter.childCounts(getProject(), node).testCases();
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-046
     public void testACountIsWorkedOutWhenAskedForAndStoredNowhere() {
         final @NotNull NodesOnDisk onDisk = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto checkout = onDisk.testProject(root.resolve("Checkout"));
-        final @NotNull TestSetPackageDirectoryDto payments = onDisk.testSetPackage(checkout.getTestCasesDirectory(), "Payments");
-        final @NotNull TestSetDirectoryDto cards = onDisk.testSet(payments, "Cards");
+        final @NotNull TestProjectNode checkout = onDisk.testProject(root.resolve("Checkout"));
+        final @NotNull TestSetPackageNode payments = onDisk.testSetPackage(checkout.getTestCasesFolder(), "Payments");
+        final @NotNull TestSetNode cards = onDisk.testSet(payments, "Cards");
         onDisk.testCase(cards);
         onDisk.testCase(cards);
 

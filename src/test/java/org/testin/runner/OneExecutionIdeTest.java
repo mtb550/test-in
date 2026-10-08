@@ -38,7 +38,7 @@ import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -121,7 +121,7 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-097
     public void testAnExecutionAcrossModulesStartsNothingAndNamesThem() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull List<TestCaseDto> selected = theTestCases(List.of(createdTestCase(login, "Log in", "b"), createdTestCase(login, "Log out", "c")));
         selected.forEach(execution()::starting);
 
@@ -134,7 +134,7 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-031
     public void testWhateverIsSelectedIsOneExecution() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull List<TestCaseDto> selected = theTestCases(List.of(createdTestCase(login, "Log in", "b"), createdTestCase(login, "Log out", "c"), createdTestCase(createdTestSet("Payment"), "Pay", "b")));
         final @NotNull List<List<TestCaseDto>> handedOver = new ArrayList<>();
         ExtensionTestUtil.maskExtensions(TestRunner.EP, List.of((_, testCases) -> handedOver.add(testCases)), getTestRootDisposable());
@@ -148,7 +148,7 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
     // Rule-CODEGEN-031, Rule-CODEGEN-033
     public void testOneMessageCountsTheTestCasesThatStartedOnceTheirMethodsAreFound() {
         nothingIsReallyStarted();
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull List<TestCaseDto> selected = theTestCases(List.of(createdTestCase(login, "Log in", "b"), createdTestCase(login, "Log out", "c"), indexedTestCase(login, "Lock the account", "d")));
         settled();
 
@@ -165,7 +165,7 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
     // Rule-CODEGEN-035
     public void testTheMethodsRunInTheOrderOfTheTestCasesInTheirTestSet() {
         nothingIsReallyStarted();
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto third = indexedTestCase(login, "Lock the account", "d");
         final @NotNull TestCaseDto first = indexedTestCase(login, "Log in", "b");
         final @NotNull TestCaseDto second = indexedTestCase(login, "Log out", "c");
@@ -197,7 +197,7 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-074
     public void testATestCaseThatCannotRunIsReportedOnceByDescriptionAndSeveralByCount() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto alone = indexedTestCase(login, "Lock the account", "b");
         settled();
 

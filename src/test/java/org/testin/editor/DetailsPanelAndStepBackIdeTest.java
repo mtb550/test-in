@@ -27,11 +27,11 @@ import org.testin.Gestures;
 import org.testin.Said;
 import org.testin.actions.EscapeAction;
 import org.testin.clipboard.CutState;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.view.ViewDetailsAction;
 import org.testin.view.ViewOnScreen;
@@ -58,29 +58,29 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
         throw new AssertionError("no cell of the grid can be edited");
     }
 
-    private @NotNull TestCaseEditor openedTestSet() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+    private @NotNull TestSetEditor openedTestSet() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         createdTestCases = EditorFixtures.testCases(getProject(), ts, 3);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     private @NotNull CutState cutState() {
         return Services.getInstance(getProject(), CutState.class);
     }
 
-    private void pressEnterOn(final @NotNull TestCaseEditor editor) {
+    private void pressEnterOn(final @NotNull TestSetEditor editor) {
         Gestures.press(getProject(), editor.getList(), ViewDetailsAction.class);
     }
 
-    private void pressEscapeOn(final @NotNull TestCaseEditor editor) {
+    private void pressEscapeOn(final @NotNull TestSetEditor editor) {
         Gestures.press(getProject(), editor.getList(), EscapeAction.class);
     }
 
     // Rule-EDITOR-PANEL-112
     public void testOpeningTheDetailsPanelSaysNothing() {
         final @NotNull ViewOnScreen window = ViewOnScreen.closed(getProject(), getTestRootDisposable());
-        final @NotNull TestCaseEditor editor = openedTestSet();
+        final @NotNull TestSetEditor editor = openedTestSet();
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         final @NotNull List<Notification> notifications = Said.listening(getProject(), getTestRootDisposable()).notifications();
         try {
@@ -101,7 +101,7 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-113
     public void testOnceThePanelIsOpenMovingTheSelectionFillsItAgain() {
         final @NotNull ViewOnScreen window = ViewOnScreen.closed(getProject(), getTestRootDisposable());
-        final @NotNull TestCaseEditor editor = openedTestSet();
+        final @NotNull TestSetEditor editor = openedTestSet();
         try {
             editor.getList().setSelectedIndex(0);
             pressEnterOn(editor);
@@ -119,7 +119,7 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-114
     public void testEachPressTakesOneStepInTheSameOrder() {
         final @NotNull ViewOnScreen window = ViewOnScreen.closed(getProject(), getTestRootDisposable());
-        final @NotNull TestCaseEditor editor = openedTestSet();
+        final @NotNull TestSetEditor editor = openedTestSet();
         try {
             editor.getList().setSelectedIndex(1);
             pressEnterOn(editor);
@@ -149,7 +149,7 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-115
     public void testInTheGridAnOpenCellTakesThePressFirstAndOnlyCancelsTheEdit() {
         final @NotNull ViewOnScreen window = ViewOnScreen.closed(getProject(), getTestRootDisposable());
-        final @NotNull TestCaseEditor editor = openedTestSet();
+        final @NotNull TestSetEditor editor = openedTestSet();
         try {
             editor.getList().setSelectedIndex(0);
             pressEnterOn(editor);
@@ -179,7 +179,7 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-116
     public void testInTheSearchBoxThePressReturnsTheKeyboardToTheListAndLeavesTheText() {
-        final @NotNull TestCaseEditor editor = openedTestSet();
+        final @NotNull TestSetEditor editor = openedTestSet();
         final @NotNull JFrame frame = new JFrame();
         try {
             frame.add(editor.getComponent());

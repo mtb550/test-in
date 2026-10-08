@@ -17,7 +17,7 @@
 package org.testin.bug;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
@@ -32,11 +32,11 @@ import static org.testng.Assert.assertTrue;
 
 public class BugReportsTest {
 
-    private static final RunItem ITEM = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
-    private static final RunItem SAME_TEST_CASE_OTHER_RUN = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
+    private static final RunItemPath RUN_ITEM_PATH = new RunItemPath(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
+    private static final RunItemPath SAME_TEST_CASE_OTHER_RUN = new RunItemPath(Path.of("NAFATH", "Test Runs", "Sprint 8"), RUN_ITEM_PATH.id());
 
-    private static @NotNull TestRunItems failed() {
-        return TestRunItems.builder().id(ITEM.id()).status(RunItemStatus.FAILED).build();
+    private static @NotNull RunItem failed() {
+        return RunItem.builder().id(RUN_ITEM_PATH.id()).status(RunItemStatus.FAILED).build();
     }
 
     // Rule-VIEW-PANEL-072
@@ -44,30 +44,30 @@ public class BugReportsTest {
     public void reportBugSaysWhereItsOwnReportIs() {
         final BugReports reports = new BugReports();
 
-        reports.begin(ITEM);
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.preparing")));
+        reports.begin(RUN_ITEM_PATH);
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.of(Bundle.message("bug.preparing")));
 
-        reports.moveTo(ITEM, Stage.OPEN);
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.open")));
+        reports.moveTo(RUN_ITEM_PATH, Stage.OPEN);
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.of(Bundle.message("bug.open")));
 
-        reports.moveTo(ITEM, Stage.SENDING);
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.sending")),
+        reports.moveTo(RUN_ITEM_PATH, Stage.SENDING);
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.of(Bundle.message("bug.sending")),
                 "while sending the run item has no link yet, so the stage is what keeps it off");
 
-        assertFalse(reports.end(ITEM, Stage.OPEN), "a dialog closing on Send does not end the send");
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.sending")));
+        assertFalse(reports.end(RUN_ITEM_PATH, Stage.OPEN), "a dialog closing on Send does not end the send");
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.of(Bundle.message("bug.sending")));
 
-        assertTrue(reports.end(ITEM, Stage.SENDING));
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty());
+        assertTrue(reports.end(RUN_ITEM_PATH, Stage.SENDING));
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.empty());
     }
 
     // Rule-VIEW-PANEL-072
     @Test
     public void aReportedBugKeepsReportBugOff() {
         final BugReports reports = new BugReports();
-        final TestRunItems reported = TestRunItems.builder().id(ITEM.id()).status(RunItemStatus.FAILED).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
+        final RunItem reported = RunItem.builder().id(RUN_ITEM_PATH.id()).status(RunItemStatus.FAILED).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
 
-        assertEquals(reports.whyReportBugIsOff(ITEM, reported), Optional.of(Bundle.message("bug.already.reported")));
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, reported), Optional.of(Bundle.message("bug.already.reported")));
     }
 
     // Rule-VIEW-PANEL-072
@@ -76,11 +76,11 @@ public class BugReportsTest {
         final BugReports reports = new BugReports();
         reports.begin(SAME_TEST_CASE_OTHER_RUN);
 
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty(), "one being prepared, even for the same test case in another test run, does not hold the others");
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.empty(), "one being prepared, even for the same test case in another test run, does not hold the others");
 
         reports.moveTo(SAME_TEST_CASE_OTHER_RUN, Stage.OPEN);
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.finish.open.report")));
-        assertTrue(reports.anotherIsOpen(ITEM));
+        assertEquals(reports.whyReportBugIsOff(RUN_ITEM_PATH, failed()), Optional.of(Bundle.message("bug.finish.open.report")));
+        assertTrue(reports.anotherIsOpen(RUN_ITEM_PATH));
         assertFalse(reports.anotherIsOpen(SAME_TEST_CASE_OTHER_RUN), "its own dialog is not another one");
     }
 
@@ -89,10 +89,10 @@ public class BugReportsTest {
         final BugReports reports = new BugReports();
         final Edits edits = new Edits("Log in fails", "body");
 
-        reports.keep(ITEM, edits);
-        assertEquals(reports.unsent(ITEM), Optional.of(edits), "a failed send reopens with them");
+        reports.keep(RUN_ITEM_PATH, edits);
+        assertEquals(reports.unsent(RUN_ITEM_PATH), Optional.of(edits), "a failed send reopens with them");
 
-        reports.discard(ITEM);
-        assertEquals(reports.unsent(ITEM), Optional.empty());
+        reports.discard(RUN_ITEM_PATH);
+        assertEquals(reports.unsent(RUN_ITEM_PATH), Optional.empty());
     }
 }

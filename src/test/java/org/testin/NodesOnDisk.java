@@ -19,15 +19,15 @@ package org.testin;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
@@ -35,47 +35,47 @@ import java.util.UUID;
 
 public record NodesOnDisk(@NotNull Project p) {
 
-    private @NotNull DirectoryMapper mapper() {
-        return Services.getInstance(p, DirectoryMapper.class);
+    private @NotNull NodeMapper mapper() {
+        return Services.getInstance(p, NodeMapper.class);
     }
 
     private @NotNull Nodes nodes() {
         return Services.getInstance(p, Nodes.class);
     }
 
-    public @NotNull TestProjectDirectoryDto testProject(final @NotNull Path path) {
+    public @NotNull TestProjectNode testProject(final @NotNull Path path) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestProjectDirectoryDto tp = mapper().setTestProjectNode(path);
+            final @NotNull TestProjectNode tp = mapper().setTestProjectNode(path);
             nodes().addTestProject(tp);
             return tp;
         });
     }
 
-    public @NotNull TestSetPackageDirectoryDto testSetPackage(final @NotNull DirectoryDto parent, final @NotNull String name) {
+    public @NotNull TestSetPackageNode testSetPackage(final @NotNull Node parent, final @NotNull String name) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetPackageDirectoryDto tsp = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
+            final @NotNull TestSetPackageNode tsp = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
             nodes().addTestSetPackage(tsp);
             return tsp;
         });
     }
 
-    public @NotNull TestSetDirectoryDto testSet(final @NotNull DirectoryDto parent, final @NotNull String name) {
+    public @NotNull TestSetNode testSet(final @NotNull Node parent, final @NotNull String name) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetDirectoryDto ts = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
+            final @NotNull TestSetNode ts = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
             nodes().addTestSet(ts);
             return ts;
         });
     }
 
-    public @NotNull TestRunDirectoryDto testRun(final @NotNull DirectoryDto parent, final @NotNull String name) {
+    public @NotNull TestRunNode testRun(final @NotNull Node parent, final @NotNull String name) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestRunDirectoryDto tr = mapper().setTestRunNode(parent.getPath().resolve(name), parent);
-            nodes().addTestRunDir(tr);
+            final @NotNull TestRunNode tr = mapper().setTestRunNode(parent.getPath().resolve(name), parent);
+            nodes().addTestRunNode(tr);
             return tr;
         });
     }
 
-    public @NotNull TestCaseDto testCase(final @NotNull TestSetDirectoryDto ts) {
+    public @NotNull TestCaseDto testCase(final @NotNull TestSetNode ts) {
         final @NotNull TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
                 .description("Log in with a valid user")

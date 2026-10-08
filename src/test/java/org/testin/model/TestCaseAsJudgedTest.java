@@ -17,8 +17,8 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Mapper;
 import org.testin.util.RealMapper;
@@ -39,106 +39,106 @@ public class TestCaseAsJudgedTest {
         return TestCaseDto.builder().id(id).description(description).build();
     }
 
-    private static @NotNull TestRunItems passed(final UUID id) {
-        final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
-        return item;
+    private static @NotNull RunItem passed(final UUID id) {
+        final RunItem runItem = RunItem.builder().id(id).build();
+        runItem.recordRunItemStatus(RunItemStatus.PASSED, "tester");
+        return runItem;
     }
 
     // Rule-EDITOR-PANEL-239
     @Test
     public void aRunItemOfATestRunNotCommittedShowsEveryEdit() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
+        final RunItem runItem = passed(id);
 
-        item.showing(Optional.of(testCaseReading(id, "after")), Optional.empty(), Optional.empty(), false);
+        runItem.showing(Optional.of(testCaseReading(id, "after")), Optional.empty(), Optional.empty(), false);
 
-        assertEquals(item.shownTestCase().getDescription(), "after", "a test run not committed shows the test case as it is now");
+        assertEquals(runItem.shownTestCase().getDescription(), "after", "a test run not committed shows the test case as it is now");
     }
 
     // Rule-EDITOR-PANEL-239
     @Test
     public void aRunItemOfACommittedTestRunShowsTheTestCaseFromItsCommit() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
+        final RunItem runItem = passed(id);
 
-        item.showing(Optional.of(testCaseReading(id, "after")), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
+        runItem.showing(Optional.of(testCaseReading(id, "after")), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
-        assertEquals(item.shownTestCase().getDescription(), "before", "the run item shows what its commit holds");
-        assertEquals(item.liveTestCase().getDescription(), "after", "actions still reach the test case as it is now");
+        assertEquals(runItem.shownTestCase().getDescription(), "before", "the run item shows what its commit holds");
+        assertEquals(runItem.liveTestCase().getDescription(), "after", "actions still reach the test case as it is now");
     }
 
     // Rule-EDITOR-PANEL-240
     @Test
     public void aCorrectionChangesOnlyTheRunItemStatusWhoAndWhen() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
-        item.showing(Optional.of(testCaseReading(id, "now")), Optional.empty(), Optional.empty(), false);
+        final RunItem runItem = passed(id);
+        runItem.showing(Optional.of(testCaseReading(id, "now")), Optional.empty(), Optional.empty(), false);
 
-        item.recordRunItemStatus(RunItemStatus.FAILED, "other tester");
+        runItem.recordRunItemStatus(RunItemStatus.FAILED, "other tester");
 
-        assertEquals(item.getStatus(), RunItemStatus.FAILED);
-        assertEquals(item.getExecutedBy(), "other tester");
-        assertEquals(item.shownTestCase().getDescription(), "now");
+        assertEquals(runItem.getStatus(), RunItemStatus.FAILED);
+        assertEquals(runItem.getExecutedBy(), "other tester");
+        assertEquals(runItem.shownTestCase().getDescription(), "now");
     }
 
     // Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
     @Test
     public void aTestCaseDeletedFromATestRunNotCommittedReadsRemovedWithItsLastTextInGit() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
+        final RunItem runItem = passed(id);
 
-        item.showing(Optional.empty(), Optional.empty(), Optional.of(testCaseReading(id, "as Git last held it")), false);
+        runItem.showing(Optional.empty(), Optional.empty(), Optional.of(testCaseReading(id, "as Git last held it")), false);
 
-        assertTrue(item.isRemoved(), "nothing may act on the run item of a test case that no longer exists");
-        assertEquals(item.shownStatus(), RunItemStatus.REMOVED, "a deleted test case reads Removed while its test run is not Committed");
-        assertEquals(item.getStatus(), RunItemStatus.PASSED, "the file keeps the run item status it was given");
-        assertEquals(item.shownTestCase().getDescription(), "as Git last held it");
+        assertTrue(runItem.isRemoved(), "nothing may act on the run item of a test case that no longer exists");
+        assertEquals(runItem.shownStatus(), RunItemStatus.REMOVED, "a deleted test case reads Removed while its test run is not Committed");
+        assertEquals(runItem.getStatus(), RunItemStatus.PASSED, "the file keeps the run item status it was given");
+        assertEquals(runItem.shownTestCase().getDescription(), "as Git last held it");
     }
 
     // Rule-EDITOR-PANEL-126
     @Test
     public void aTestCaseDeletedBeforeGitEverHeldItShowsThePlaceholder() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
+        final RunItem runItem = passed(id);
 
-        item.showing(Optional.empty(), Optional.empty(), Optional.empty(), false);
+        runItem.showing(Optional.empty(), Optional.empty(), Optional.empty(), false);
 
-        assertEquals(item.shownTestCase().getDescription(), TestCaseDto.deleted(id).getDescription());
+        assertEquals(runItem.shownTestCase().getDescription(), TestCaseDto.deleted(id).getDescription());
     }
 
     // Rule-EDITOR-PANEL-239
     @Test
     public void aTestCaseDeletedFromACommittedTestRunKeepsTheTextOfItsCommit() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
+        final RunItem runItem = passed(id);
 
-        item.showing(Optional.empty(), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
+        runItem.showing(Optional.empty(), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
-        assertFalse(item.isRemoved(), "a committed test run keeps every run item it recorded");
-        assertEquals(item.shownStatus(), RunItemStatus.PASSED);
-        assertEquals(item.shownTestCase().getDescription(), "before");
+        assertFalse(runItem.isRemoved(), "a committed test run keeps every run item it recorded");
+        assertEquals(runItem.shownStatus(), RunItemStatus.PASSED);
+        assertEquals(runItem.shownTestCase().getDescription(), "before");
     }
 
     @Test
     public void theCommittedTestCaseTakesItsTestSetFromTheLiveTestCase() {
         final UUID id = UUID.randomUUID();
-        final TestSetDirectoryDto set = new TestSetDirectoryDto();
-        final TestRunItems item = passed(id);
+        final TestSetNode set = new TestSetNode();
+        final RunItem runItem = passed(id);
 
-        item.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
+        runItem.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
-        assertSame(item.shownTestCase().getParent(), set, "where the test case sits is the live test case's, so navigation still works");
+        assertSame(runItem.shownTestCase().getParent(), set, "where the test case sits is the live test case's, so navigation still works");
     }
 
     // Rule-EDITOR-PANEL-238
     @Test
     public void aRunItemIsWrittenWithoutATestCase() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = passed(id);
-        item.showing(Optional.of(testCaseReading(id, "now")), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
+        final RunItem runItem = passed(id);
+        runItem.showing(Optional.of(testCaseReading(id, "now")), Optional.of(testCaseReading(id, "before")), Optional.empty(), false);
 
-        final String written = MAPPER.writeValueAsString(item);
+        final String written = MAPPER.writeValueAsString(runItem);
 
         assertFalse(written.contains("testCase"), "a run item keeps no copy of its test case: " + written);
     }
@@ -147,7 +147,7 @@ public class TestCaseAsJudgedTest {
     @Test
     public void aRunItemWrittenWithACopyIsReadWithoutIt() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems read = MAPPER.readValue("{\"id\":\"" + id + "\",\"status\":\"PASSED\",\"testCase\":{\"id\":\"" + id + "\",\"description\":\"old copy\"}}", TestRunItems.class);
+        final RunItem read = MAPPER.readValue("{\"id\":\"" + id + "\",\"status\":\"PASSED\",\"testCase\":{\"id\":\"" + id + "\",\"description\":\"old copy\"}}", RunItem.class);
 
         read.showing(Optional.of(testCaseReading(id, "live")), Optional.empty(), Optional.empty(), false);
 

@@ -38,7 +38,7 @@ public class NodeKindTablesTest {
 
     private static @NotNull Set<String> kindsWithAnAcceptsRow() {
         try {
-            final @NotNull Field declared = DirectoryType.class.getDeclaredField("ACCEPTS");
+            final @NotNull Field declared = NodeType.class.getDeclaredField("ACCEPTS");
             declared.setAccessible(true);
 
             return ((Map<?, ?>) declared.get(null)).keySet().stream()
@@ -46,7 +46,7 @@ public class NodeKindTablesTest {
                     .collect(Collectors.toSet());
 
         } catch (final ReflectiveOperationException ex) {
-            fail("DirectoryType.ACCEPTS is gone, so nothing checks that every kind has a row");
+            fail("NodeType.ACCEPTS is gone, so nothing checks that every kind has a row");
             return Set.of();
         }
     }
@@ -65,16 +65,16 @@ public class NodeKindTablesTest {
 
     @Test
     public void everyMarkerFileNameNamesOneKind() {
-        for (final DirectoryType kind : DirectoryType.values()) {
-            assertEquals(DirectoryType.byMarker(kind.getMarker()).orElseThrow(), kind, kind.getMarker());
+        for (final NodeType kind : NodeType.values()) {
+            assertEquals(NodeType.byMarker(kind.getMarker()).orElseThrow(), kind, kind.getMarker());
         }
 
         for (final String record : List.of(FileKind.TEST_CASE.fileName(A_TEST_CASE), FileKind.RUN_ITEM.fileName(A_TEST_CASE), "a1b2c.png")) {
-            assertTrue(DirectoryType.byMarker(record).isEmpty(), record + " is a record, not a marker, so it belongs to no kind");
+            assertTrue(NodeType.byMarker(record).isEmpty(), record + " is a record, not a marker, so it belongs to no kind");
         }
 
-        assertEquals(DirectoryType.values().length,
-                Arrays.stream(DirectoryType.values()).map(DirectoryType::getMarkerClass).distinct().count(),
+        assertEquals(NodeType.values().length,
+                Arrays.stream(NodeType.values()).map(NodeType::getMarkerClass).distinct().count(),
                 "no two kinds share a marker class");
     }
 
@@ -90,28 +90,28 @@ public class NodeKindTablesTest {
     @Test
     public void everyKindOfNodeSaysWhatItAccepts() {
         assertEquals(kindsWithAnAcceptsRow(),
-                Arrays.stream(DirectoryType.values()).map(Enum::name).collect(Collectors.toSet()),
-                "DirectoryType.ACCEPTS does not have a row per kind, and a kind with no row accepts nothing");
+                Arrays.stream(NodeType.values()).map(Enum::name).collect(Collectors.toSet()),
+                "NodeType.ACCEPTS does not have a row per kind, and a kind with no row accepts nothing");
     }
 
     // Rule-TREE-PANEL-003, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044
     @Test
     public void theTwoFamiliesNeverMix() {
-        assertTrue(DirectoryType.TCD.accepts(DirectoryType.TS), "a test set belongs under Test Cases");
-        assertTrue(DirectoryType.TSP.accepts(DirectoryType.TSP), "a package belongs in a package");
-        assertTrue(DirectoryType.TRD.accepts(DirectoryType.TR), "a test run belongs under Test Runs");
-        assertTrue(DirectoryType.TRP.accepts(DirectoryType.TR), "a test run belongs in a test run package");
+        assertTrue(NodeType.TCF.accepts(NodeType.TS), "a test set belongs under Test Cases");
+        assertTrue(NodeType.TSP.accepts(NodeType.TSP), "a package belongs in a package");
+        assertTrue(NodeType.TRF.accepts(NodeType.TR), "a test run belongs under Test Runs");
+        assertTrue(NodeType.TRP.accepts(NodeType.TR), "a test run belongs in a test run package");
 
-        assertFalse(DirectoryType.TCD.accepts(DirectoryType.TR), "a test run does not belong under Test Cases");
-        assertFalse(DirectoryType.TRD.accepts(DirectoryType.TS), "a test set does not belong under Test Runs");
-        assertFalse(DirectoryType.TSP.accepts(DirectoryType.TRP), "a test run package does not belong in a set package");
+        assertFalse(NodeType.TCF.accepts(NodeType.TR), "a test run does not belong under Test Cases");
+        assertFalse(NodeType.TRF.accepts(NodeType.TS), "a test set does not belong under Test Runs");
+        assertFalse(NodeType.TSP.accepts(NodeType.TRP), "a test run package does not belong in a set package");
 
-        for (final DirectoryType source : DirectoryType.values()) {
-            assertFalse(DirectoryType.TR.accepts(source), "a test run holds run items, so " + source + " cannot be dropped into it");
-            assertFalse(DirectoryType.TS.accepts(source), "a test set holds test cases, so " + source + " cannot be dropped into it");
-            assertFalse(DirectoryType.TP.accepts(source), "a test project holds its two containers, so " + source + " cannot be dropped into it");
+        for (final NodeType source : NodeType.values()) {
+            assertFalse(NodeType.TR.accepts(source), "a test run holds run items, so " + source + " cannot be dropped into it");
+            assertFalse(NodeType.TS.accepts(source), "a test set holds test cases, so " + source + " cannot be dropped into it");
+            assertFalse(NodeType.TP.accepts(source), "a test project holds its two containers, so " + source + " cannot be dropped into it");
         }
 
-        assertFalse(DirectoryType.TR.acceptsAnything(), "a test run takes nothing, so the tree must not draw a drop highlight over one");
+        assertFalse(NodeType.TR.acceptsAnything(), "a test run takes nothing, so the tree must not draw a drop highlight over one");
     }
 }

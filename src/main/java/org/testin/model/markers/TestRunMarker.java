@@ -25,9 +25,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunExecution;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.model.testrun.TestRunExecution;
 import org.testin.model.status.TestRunStatus;
 
 import java.time.ZoneId;
@@ -51,7 +51,7 @@ public class TestRunMarker extends AbstractMarker {
 
     @NonNull
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Map<ResultAnalysis, String> resultAnalysis = new EnumMap<>(ResultAnalysis.class);
+    private Map<TestRunResultAnalysis, String> resultAnalysis = new EnumMap<>(TestRunResultAnalysis.class);
 
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
@@ -83,7 +83,7 @@ public class TestRunMarker extends AbstractMarker {
     }
 
     // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191, Rule-INTERNAL-117
-    public void recordAnalysis(final @NotNull Map<ResultAnalysis, String> written) {
+    public void recordAnalysis(final @NotNull Map<TestRunResultAnalysis, String> written) {
         resultAnalysis = written;
     }
 

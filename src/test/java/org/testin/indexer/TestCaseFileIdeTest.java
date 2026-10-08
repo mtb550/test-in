@@ -20,8 +20,8 @@ import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
 
-    private static @NotNull TestCaseDto aTestCaseIn(final TestSetDirectoryDto ts) {
+    private static @NotNull TestCaseDto aTestCaseIn(final TestSetNode ts) {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
         return tc;
@@ -43,25 +43,25 @@ public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestProjectDirectoryDto aTestProject(final String name) {
+    private @NotNull TestProjectNode aTestProject(final String name) {
         return WriteAction.computeAndWait(() -> {
-            final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve(name));
+            final TestProjectNode tp = Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(root.resolve(name));
             nodes().addTestProject(tp);
             return tp;
         });
     }
 
-    private @NotNull TestSetDirectoryDto aTestSetIn(final TestProjectDirectoryDto tp) {
+    private @NotNull TestSetNode aTestSetIn(final TestProjectNode tp) {
         return WriteAction.computeAndWait(() -> {
-            final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
-                    .getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetNode ts = Services.getInstance(getProject(), NodeMapper.class)
+                    .getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Login"), tp.getTestCasesFolder());
             nodes().addTestSet(ts);
             return ts;
         });
     }
 
     public void testATestCaseIsFoundInsideTheTestProjectThatHoldsIt() {
-        final TestProjectDirectoryDto tp = aTestProject("NAFATH");
+        final TestProjectNode tp = aTestProject("NAFATH");
         aTestProject("NAFATH2");
         final TestCaseDto tc = aTestCaseIn(aTestSetIn(tp));
 
@@ -69,7 +69,7 @@ public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
 
         assertEquals("the test case was placed in the wrong test project", tp.getPath(), file.testProject());
         assertEquals("the test case's file is not where the store writes it",
-                Path.of(tp.getTestCasesDirectory().getPath().getFileName().toString(), "Login", tc.getId() + ".tc"), file.inProject());
+                Path.of(tp.getTestCasesFolder().getPath().getFileName().toString(), "Login", tc.getId() + ".tc"), file.inProject());
     }
 
     public void testATestCaseNoIndexedTestProjectHoldsHasNoFile() {

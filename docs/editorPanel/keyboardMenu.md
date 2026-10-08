@@ -74,7 +74,7 @@ The `Context Menu` key.
 
 ## The screen
 
-This is the menu in a test case editor.
+This is the menu in a test set editor.
 
 ```
 ┌──────────────────────────────────┐
@@ -115,7 +115,7 @@ In the grid the menu opens on the selected cell instead.
 
 ## What the menu holds
 
-In a test case editor, in this order: **Create Test Case**, **View Test Case
+In a test set editor, in this order: **Create Test Case**, **View Test Case
 Details**, **Update Test Case**, **Actions**, **Automate Test Case**, **Run Test
 Method**, **Navigate to Test Method**.
 

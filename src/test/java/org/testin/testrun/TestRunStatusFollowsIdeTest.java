@@ -24,12 +24,12 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
 
@@ -38,7 +38,7 @@ import java.util.List;
 
 public class TestRunStatusFollowsIdeTest extends AbstractOpenEditorsIdeTest {
 
-    private TestRunDirectoryDto testRun;
+    private TestRunNode testRun;
 
     private static @NotNull TestRunStatus inTheEditor(final @NotNull TestRunEditor editor) {
         return editor.shownTestRun().orElseThrow(() -> new AssertionError("the editor shows no test run")).getMarker().getStatus();
@@ -48,10 +48,10 @@ public class TestRunStatusFollowsIdeTest extends AbstractOpenEditorsIdeTest {
     public void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        final @NotNull TestSetDirectoryDto login = made.testSet(tp.getTestCasesDirectory(), "Login");
-        testRun = made.testRun(tp.getTestRunsDirectory(), "Cycle-1");
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(testRun.getPath(), new TestRunDto().setResults(new ArrayList<>(List.of(new TestRunItems().setId(made.testCase(login).getId())))));
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestSetNode login = made.testSet(tp.getTestCasesFolder(), "Login");
+        testRun = made.testRun(tp.getTestRunsFolder(), "Cycle-1");
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(testRun.getPath(), new RunItems().setAll(new ArrayList<>(List.of(new RunItem().setId(made.testCase(login).getId())))));
     }
 
     private @NotNull TestRunEditor theEditor() {
@@ -61,15 +61,15 @@ public class TestRunStatusFollowsIdeTest extends AbstractOpenEditorsIdeTest {
     }
 
     private @NotNull TestRunStatus inTheTree() {
-        final @NotNull DirectoryDto row = Services.getInstance(getProject(), Nodes.class).find(testRun.getPath()).orElseThrow(() -> new AssertionError("the test run is not in the tree"));
-        return ((TestRunDirectoryDto) row).getMarker().getStatus();
+        final @NotNull Node row = Services.getInstance(getProject(), Nodes.class).find(testRun.getPath()).orElseThrow(() -> new AssertionError("the test run is not in the tree"));
+        return ((TestRunNode) row).getMarker().getStatus();
     }
 
     // Rule-TREE-PANEL-091
     public void testAStatusSetFromTheTreeOrTheEditorIsFollowedByBoth() {
         opened(testRun);
         final @NotNull TestRunEditor editor = theEditor();
-        final @NotNull TestRunDirectoryDto treeRow = (TestRunDirectoryDto) Services.getInstance(getProject(), Nodes.class).find(testRun.getPath()).orElseThrow();
+        final @NotNull TestRunNode treeRow = (TestRunNode) Services.getInstance(getProject(), Nodes.class).find(testRun.getPath()).orElseThrow();
 
         Services.getInstance(getProject(), TestRunStatusChange.class).apply(treeRow, TestRunStatus.IN_PROGRESS);
 

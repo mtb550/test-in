@@ -21,9 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
@@ -42,20 +42,20 @@ public class BugHistoryIdeTest extends AbstractGitRemoteIdeTest {
     private static final @NotNull UUID ID = UUID.fromString("77777777-7777-4777-8777-777777777397");
     private static final @NotNull String RUN_ITEM = ID + ".ri";
 
-    private static @NotNull TestRunItems runItem(final @NotNull RunItemStatus status, final @NotNull BugSeverity severity) {
-        return TestRunItems.builder().id(ID).status(status).bugSeverity(severity).actualResult("The basket was emptied").executedBy("Sara").build();
+    private static @NotNull RunItem runItem(final @NotNull RunItemStatus status, final @NotNull BugSeverity severity) {
+        return RunItem.builder().id(ID).status(status).bugSeverity(severity).actualResult("The basket was emptied").executedBy("Sara").build();
     }
 
     private static @NotNull List<String> told(final @NotNull List<BugCard> bugs) {
         return bugs.stream().map(bug -> (bug.isCommitted() ? "" : "not committed ") + bug.event().kind() + " in " + bug.event().testRunName()).toList();
     }
 
-    private void save(final @NotNull String testRun, final @NotNull TestRunItems item) {
-        write(work, "Test Runs/" + testRun + "/" + RUN_ITEM, Services.getInstance(getProject(), Mapper.class).writeValueAsString(item));
+    private void save(final @NotNull String testRun, final @NotNull RunItem runItem) {
+        write(work, "Test Runs/" + testRun + "/" + RUN_ITEM, Services.getInstance(getProject(), Mapper.class).writeValueAsString(runItem));
     }
 
-    private void holdsNow(final @NotNull Path testProject, final @NotNull String testRun, final @NotNull TestRunItems item) {
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(testProject.resolve("Test Runs").resolve(testRun), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
+    private void holdsNow(final @NotNull Path testProject, final @NotNull String testRun, final @NotNull RunItem runItem) {
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(testProject.resolve("Test Runs").resolve(testRun), RunItems.builder().all(new ArrayList<>(List.of(runItem))).build());
     }
 
     private @NotNull List<BugCard> bugsOf(final @NotNull Path testProject) {
@@ -74,7 +74,7 @@ public class BugHistoryIdeTest extends AbstractGitRemoteIdeTest {
         save("Cycle 5", runItem(RunItemStatus.PASSED, BugSeverity.MINOR));
         commitAll(work, "Cycle 3 results");
         save("Cycle 3", runItem(RunItemStatus.FAILED, BugSeverity.MAJOR));
-        save("Cycle 5", TestRunItems.builder().id(ID).status(RunItemStatus.PASSED).executedBy("Muteb").build());
+        save("Cycle 5", RunItem.builder().id(ID).status(RunItemStatus.PASSED).executedBy("Muteb").build());
         commitAll(work, "Severity");
         save("Cycle 3", runItem(RunItemStatus.PASSED, BugSeverity.MAJOR));
         mustGit(work, "rm", "-q", "Test Runs/Cycle 4/" + RUN_ITEM);
@@ -86,7 +86,7 @@ public class BugHistoryIdeTest extends AbstractGitRemoteIdeTest {
         mustGit(work, "checkout", "-q", MAIN);
 
         holdsNow(work, "Cycle 3", runItem(RunItemStatus.FAILED, BugSeverity.MAJOR));
-        holdsNow(work, "Cycle 5", TestRunItems.builder().id(ID).status(RunItemStatus.PASSED).executedBy("Muteb").build());
+        holdsNow(work, "Cycle 5", RunItem.builder().id(ID).status(RunItemStatus.PASSED).executedBy("Muteb").build());
 
         final @NotNull List<BugCard> bugs = bugsOf(work);
 

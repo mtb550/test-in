@@ -39,12 +39,12 @@ import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.testrun.failure.FailureDetailDialog;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.MultiLineField;
@@ -148,7 +148,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialog.close(getProject(), FailedResultDialog.class);
+        ShownDialog.close(getProject(), FailureDetailDialog.class);
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
         super.tearDown();
     }
@@ -193,14 +193,14 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             awaitWrites();
 
-            final @NotNull TestRunItems failed = fixture.resultOf(fixture.testCases().getFirst());
+            final @NotNull RunItem failed = fixture.runItemOf(fixture.testCases().getFirst());
             assertEquals(RunItemStatus.FAILED, failed.getStatus());
             assertEquals("the screenshots were not kept", 2, failed.getScreenshots().size());
             final @NotNull List<byte[]> kept = Services.getInstance(getProject(), TestRuns.class).screenshots(fixture.testRun().getPath(), failed);
             assertEquals("the first picture pasted is not the first kept", Color.RED.getRGB(), firstPixelOf(kept.get(0)));
             assertEquals("the second picture pasted is not the second kept", Color.BLUE.getRGB(), firstPixelOf(kept.get(1)));
             for (final String name : failed.getScreenshots()) {
-                assertTrue("a screenshot is not a picture file beside the test run: " + name, Files.isRegularFile(TestRunDirectoryDto.screenshotFile(fixture.testRun().getPath(), name)));
+                assertTrue("a screenshot is not a picture file beside the test run: " + name, Files.isRegularFile(TestRunNode.screenshotFile(fixture.testRun().getPath(), name)));
             }
 
             final @NotNull List<String> pastedNames = List.copyOf(failed.getScreenshots());
@@ -212,7 +212,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             OnScreen.pressKey(again, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-            final @NotNull TestRunItems edited = fixture.resultOf(fixture.testCases().getFirst());
+            final @NotNull RunItem edited = fixture.runItemOf(fixture.testCases().getFirst());
             assertEquals("taking a picture out did not take it out of the test run", List.of(pastedNames.get(1)), edited.getScreenshots());
         } finally {
             Disposer.dispose(editor);
@@ -230,13 +230,13 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             actualResultBox(dialog).setText("The dashboard stayed blank");
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final @NotNull TestCaseDto walked = fixture.testCases().getFirst();
-            Services.getInstance(getProject(), TestRuns.class).changeTestRun(fixture.testRun().getPath(), testRun -> testRun.getResults().removeIf(item -> item.getId().equals(walked.getId())));
+            Services.getInstance(getProject(), TestRuns.class).changeRunItems(fixture.testRun().getPath(), testRun -> testRun.getAll().removeIf(runItem -> runItem.getId().equals(walked.getId())));
 
             OnScreen.pressKey(dialog, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
             assertTrue("Failed was recorded on a test run that no longer covers the test case",
-                    Services.getInstance(getProject(), TestRuns.class).getTestRunByPath(fixture.testRun().getPath()).resultOf(walked.getId()).isEmpty());
+                    Services.getInstance(getProject(), TestRuns.class).getRunItems(fixture.testRun().getPath()).runItemOf(walked.getId()).isEmpty());
             assertTrue("no message said why nothing was recorded: " + balloons, balloons.contains(Bundle.message("run.item.status.test.case.not.covered")));
             assertFalse("Failed was announced though nothing was recorded", balloons.contains(RunItemStatus.FAILED.getLabel()));
         } finally {
@@ -257,7 +257,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             awaitWrites();
             Services.getInstance(getProject(), Nodes.class).removeTestRun(fixture.testRun().getPath(), _ -> {
             });
-            Await.until("the test run was never taken out of the index", () -> Services.getInstance(getProject(), TestRuns.class).findTestRun(fixture.testRun().getPath()).isEmpty());
+            Await.until("the test run was never taken out of the index", () -> Services.getInstance(getProject(), TestRuns.class).findRunItems(fixture.testRun().getPath()).isEmpty());
 
             OnScreen.pressKey(dialog, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -274,7 +274,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
         final @NotNull TestRunEditor editor = walking(fixture);
         try {
-            final @NotNull FailedResultDialog built = new FailedResultDialog(getProject(), fixture.testRun().getPath(), fixture.resultOf(fixture.testCases().getFirst()), _ -> {
+            final @NotNull FailureDetailDialog built = new FailureDetailDialog(getProject(), fixture.testRun().getPath(), fixture.runItemOf(fixture.testCases().getFirst()), _ -> {
             });
             assertTrue("what happened is not typed into the box the test case form uses",
                     ShownDialog.componentsOf(built).stream().map(ComponentDialogBase::getComponent).anyMatch(MultiLineField.class::isInstance));
@@ -321,7 +321,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             Gestures.press(getProject(), actionFor(box, Shortcuts.Enter.getKey()), box);
 
             assertEquals("Enter in the box did not record the failure", RunItemStatus.FAILED, fixture.statusOf(fixture.testCases().getFirst()));
-            assertTrue(fixture.resultOf(fixture.testCases().getFirst()).getActualResult().startsWith("The dashboard stayed blank"));
+            assertTrue(fixture.runItemOf(fixture.testCases().getFirst()).getActualResult().startsWith("The dashboard stayed blank"));
         } finally {
             Disposer.dispose(editor);
         }
@@ -330,11 +330,11 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-167
     public void testEditingTheDetailLeavesTheRunItemStatusAndWritesOnlyTheFourFields() {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 2);
-        final @NotNull TestRunItems failed = EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.FAILED).setExecutedBy("Sara").setActualResult("It froze");
+        final @NotNull RunItem failed = EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.FAILED).setExecutedBy("Sara").setActualResult("It froze");
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(failed, EditorFixtures.pending(testCases.get(1))), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         try {
-            final @NotNull TestRunItems before = fixture.resultOf(testCases.getFirst());
+            final @NotNull RunItem before = fixture.runItemOf(testCases.getFirst());
             final @NotNull String executedBy = before.getExecutedBy();
             editor.getList().setSelectedIndex(0);
 
@@ -346,7 +346,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             OnScreen.pressKey(dialog, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-            final @NotNull TestRunItems after = fixture.resultOf(testCases.getFirst());
+            final @NotNull RunItem after = fixture.runItemOf(testCases.getFirst());
             assertEquals("editing the detail changed the run item status", RunItemStatus.FAILED, after.getStatus());
             assertEquals("editing the detail changed who recorded it", executedBy, after.getExecutedBy());
             assertEquals("It froze on the second login", after.getActualResult());
@@ -391,7 +391,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<String> heldWhenSaid = new ArrayList<>();
         Services.getInstance(getProject(), Notifier.class).watchBalloons(getTestRootDisposable(), html -> {
             if (html.contains(Bundle.message("run.item.updated")))
-                heldWhenSaid.add(fixture.resultOf(testCases.getFirst()).getActualResult());
+                heldWhenSaid.add(fixture.runItemOf(testCases.getFirst()).getActualResult());
         });
         try {
             editor.getList().setSelectedIndex(0);
@@ -409,7 +409,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             final @NotNull JComponent dropped = fixture.openFailureDialog();
             actualResultBox(dropped).setText("Never kept");
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            Services.getInstance(getProject(), TestRuns.class).changeTestRun(fixture.testRun().getPath(), testRun -> testRun.getResults().removeIf(item -> item.getId().equals(testCases.get(1).getId())));
+            Services.getInstance(getProject(), TestRuns.class).changeRunItems(fixture.testRun().getPath(), testRun -> testRun.getAll().removeIf(runItem -> runItem.getId().equals(testCases.get(1).getId())));
             OnScreen.pressKey(dropped, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 

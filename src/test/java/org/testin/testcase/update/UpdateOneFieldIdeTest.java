@@ -23,10 +23,10 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testcase.UpdateTestCaseAction;
@@ -50,7 +50,7 @@ import java.util.stream.Stream;
 public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull List<TestCaseDto> saved = new ArrayList<>();
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private static @NotNull TestCaseDto with(final @NotNull TestCaseDto tc, final @NotNull String description, final @NotNull String expectedResult) {
         return tc.edit().description(description).expectedResult(expectedResult).build();
@@ -90,8 +90,8 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
         ShownDialog.press(getProject(), UpdateTestCaseDialog.class, Shortcuts.Enter.getKey());
     }
 
-    private @NotNull TestCaseEditor anEditorSelecting(final @NotNull TestCaseDto tc) {
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+    private @NotNull TestSetEditor anEditorSelecting(final @NotNull TestCaseDto tc) {
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         for (int i = 0; i < editor.getList().getModel().getSize(); i++)
             if (editor.getList().getModel().getElementAt(i).getId().equals(tc.getId()))
                 editor.getList().setSelectedIndex(i);
@@ -147,7 +147,7 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
     public void testASaveThatLeftEveryFieldAsItWasWritesNothingAndSaysNothing() {
         final @NotNull TestCaseDto tc = aTestCase("Log in", "Dashboard opens");
         final @NotNull String before = fileOf(tc);
-        final @NotNull TestCaseEditor editor = anEditorSelecting(tc);
+        final @NotNull TestSetEditor editor = anEditorSelecting(tc);
         final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         final @NotNull UndoScope scope = UndoScope.of(testSet.getPath());
 
@@ -170,7 +170,7 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
             final @NotNull TestCaseDto tc = aTestCase("Log in", "Dashboard opens");
             final @NotNull Mapper mapper = Services.getInstance(getProject(), Mapper.class);
             final @NotNull String original = mapper.writeValueAsString(tc.copy());
-            final @NotNull TestCaseEditor editor = anEditorSelecting(tc);
+            final @NotNull TestSetEditor editor = anEditorSelecting(tc);
             final @NotNull UndoScope scope = UndoScope.of(testSet.getPath());
 
             ShownDialog.open(getProject(), UpdateTestCaseDialog.class, () -> UpdateTestCaseAction.openField(getProject(), editor, UpdateTestCaseFields.EXPECTED_RESULT));

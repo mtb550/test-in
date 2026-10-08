@@ -23,8 +23,8 @@ import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestRunNode;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 
@@ -40,21 +40,21 @@ record ReCreateTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotN
 
     void reCreateAt(final @NotNull TreePath path) {
         TreeValues.directoryAt(path)
-                .filter(TestRunDirectoryDto.class::isInstance)
-                .map(TestRunDirectoryDto.class::cast)
+                .filter(TestRunNode.class::isInstance)
+                .map(TestRunNode.class::cast)
                 .ifPresent(source -> TreeValues.directoryAt(path.getParentPath())
                         .ifPresent(parent -> reCreate(source, parent)));
     }
 
-    private void reCreate(final @NotNull TestRunDirectoryDto source, final @NotNull DirectoryDto parent) {
-        final @NotNull Set<UUID> testCases = testRuns.getTestRunByPath(source.getPath()).coveredIds();
+    private void reCreate(final @NotNull TestRunNode source, final @NotNull Node parent) {
+        final @NotNull Set<UUID> testCases = testRuns.getRunItems(source.getPath()).coveredIds();
 
         final @NotNull Set<String> taken = nodes.getChildren(parent.getPath()).stream()
-                .map(DirectoryDto::getName)
+                .map(Node::getName)
                 .collect(Collectors.toSet());
 
         boundTestProject.get().ifPresentOrElse(
-                tp -> new CreateTestRun(p).configureTestRun(tp.getTestCasesDirectory(), NextTestRunName.after(source.getName(), taken), parent, testCases, source.getMarker().getConfiguration()),
+                tp -> new CreateTestRun(p).configureTestRun(tp.getTestCasesFolder(), NextTestRunName.after(source.getName(), taken), parent, testCases, source.getMarker().getConfiguration()),
                 () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
     }
 }

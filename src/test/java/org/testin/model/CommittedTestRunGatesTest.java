@@ -18,7 +18,7 @@ package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunNode;
 import org.testin.model.status.TestRunStatus;
 import org.testng.annotations.Test;
 
@@ -29,8 +29,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class CommittedTestRunGatesTest {
-    private static @NotNull TestRunDirectoryDto testRunIn(final @NotNull TestRunStatus status) {
-        final @NotNull TestRunDirectoryDto testRun = new TestRunDirectoryDto();
+    private static @NotNull TestRunNode testRunIn(final @NotNull TestRunStatus status) {
+        final @NotNull TestRunNode testRun = new TestRunNode();
         testRun.getMarker().changeStatus(status);
         return testRun;
     }
@@ -62,7 +62,7 @@ public class CommittedTestRunGatesTest {
     // Rule-TREE-PANEL-009, Rule-TREE-PANEL-135, Rule-PRODUCT-011
     @Test
     public void aCommittedTestRunTakesNoRunItemStatusAndSaysWhy() {
-        final @NotNull TestRunDirectoryDto committed = testRunIn(TestRunStatus.COMMITTED);
+        final @NotNull TestRunNode committed = testRunIn(TestRunStatus.COMMITTED);
 
         assertFalse(committed.takesRunItemStatuses());
         assertTrue(committed.whySignedOff().orElseThrow().contains(TestRunStatus.COMMITTED.getLabel()), "the refusal does not name the status");
@@ -71,7 +71,7 @@ public class CommittedTestRunGatesTest {
     // Rule-TREE-PANEL-009, Rule-TREE-PANEL-135
     @Test
     public void aCommittedTestRunCannotBeEditedRenamedMovedOrReordered() {
-        final @NotNull TestRunDirectoryDto committed = testRunIn(TestRunStatus.COMMITTED);
+        final @NotNull TestRunNode committed = testRunIn(TestRunStatus.COMMITTED);
 
         assertFalse(committed.isOpen(), "Edit Test Run, Start and Light Mode would accept it");
         assertFalse(committed.isRenamable());
@@ -89,7 +89,7 @@ public class CommittedTestRunGatesTest {
     @Test
     public void aCompletedOrClosedTestRunTakesRunItemStatusesButNoEdits() {
         for (final TestRunStatus status : new TestRunStatus[]{TestRunStatus.COMPLETED, TestRunStatus.CLOSED}) {
-            final @NotNull TestRunDirectoryDto testRun = testRunIn(status);
+            final @NotNull TestRunNode testRun = testRunIn(status);
 
             assertTrue(testRun.takesRunItemStatuses(), "a " + status + " test run refused a run item status");
             assertTrue(testRun.whySignedOff().isEmpty(), "a " + status + " test run gave a reason to refuse");
@@ -101,7 +101,7 @@ public class CommittedTestRunGatesTest {
     @Test
     public void anOpenTestRunTakesEverything() {
         for (final TestRunStatus status : new TestRunStatus[]{TestRunStatus.CREATED, TestRunStatus.ASSIGNED, TestRunStatus.IN_PROGRESS}) {
-            final @NotNull TestRunDirectoryDto testRun = testRunIn(status);
+            final @NotNull TestRunNode testRun = testRunIn(status);
 
             assertTrue(testRun.isOpen(), "a " + status + " test run cannot be edited");
             assertTrue(testRun.takesRunItemStatuses(), "a " + status + " test run refused a run item status");

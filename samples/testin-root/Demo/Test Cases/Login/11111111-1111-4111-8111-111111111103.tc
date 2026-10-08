@@ -10,7 +10,7 @@
   ],
   "priority" : "MEDIUM",
   "reference" : "",
-  "group" : [
+  "groups" : [
     "SECURITY"
   ],
   "createdBy" : "Testin Sample",

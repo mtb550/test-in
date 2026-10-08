@@ -22,11 +22,11 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -44,7 +44,7 @@ public class TestProjectOnDiskIdeTest extends AbstractTempRootIdeTest {
 
     private Path chosen;
 
-    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+    private @NotNull TestProjectNode testProject = new TestProjectNode();
 
     private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);
@@ -83,11 +83,11 @@ public class TestProjectOnDiskIdeTest extends AbstractTempRootIdeTest {
     private @NotNull TestCaseDto aTestProjectWithEverythingInIt() {
         final @NotNull NodesOnDisk onDisk = new NodesOnDisk(getProject());
         testProject = onDisk.testProject(chosen.resolve("NAFATH"));
-        final @NotNull TestSetDirectoryDto login = onDisk.testSet(onDisk.testSetPackage(testProject.getTestCasesDirectory(), "Accounts"), "Login");
+        final @NotNull TestSetNode login = onDisk.testSet(onDisk.testSetPackage(testProject.getTestCasesFolder(), "Accounts"), "Login");
         final @NotNull TestCaseDto tc = onDisk.testCase(login);
-        final @NotNull TestRunDirectoryDto testRun = onDisk.testRun(testProject.getTestRunsDirectory(), "Cycle-1");
+        final @NotNull TestRunNode testRun = onDisk.testRun(testProject.getTestRunsFolder(), "Cycle-1");
         final @NotNull TestRuns testRuns = Services.getInstance(getProject(), TestRuns.class);
-        testRuns.putTestRun(testRun.getPath(), new TestRunDto().setResults(new ArrayList<>(List.of(new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.PASSED)))));
+        testRuns.putRunItems(testRun.getPath(), new RunItems().setAll(new ArrayList<>(List.of(new RunItem().setId(tc.getId()).setStatus(RunItemStatus.PASSED)))));
         testRuns.awaitWrites();
         return tc;
     }

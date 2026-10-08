@@ -19,14 +19,14 @@ package org.testin.rename;
 import com.intellij.testFramework.DumbModeTestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 
 public class RenameRefusedIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-080
     public void testARenameToAPackageTheCodeAlreadyHasIsRefusedBeforeAnythingMoves() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
         createdTestSet("Login", checkout);
         createdTestSet("Visa", indexedPackage("payment methods", theTestCasesDirectory()));
 
@@ -37,7 +37,7 @@ public class RenameRefusedIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-081
     public void testARenameThatMovesCodeIsRefusedWhileTheIdeIndexes() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
 
         assertFalse("a rename was refused while the IDE was not indexing", NodeRename.refused(getProject(), login, "Sign in"));
         assertTrue("a rename that moves code was let through while the IDE indexes", DumbModeTestUtils.computeInDumbModeSynchronously(getProject(), () -> NodeRename.refused(getProject(), login, "Sign in")));

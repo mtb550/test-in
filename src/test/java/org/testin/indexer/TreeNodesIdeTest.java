@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.creator.NodeCreators;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.TestCaseDto;
 import org.testin.model.markers.TestSetMarker;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.status.PackageStatus;
 import org.testin.model.status.TestSetStatus;
 import org.testin.remove.Removals;
@@ -89,14 +89,14 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private @NotNull TestProjectDirectoryDto aTestProject() {
+    private @NotNull TestProjectNode aTestProject() {
         return made().testProject(root.resolve("NAFATH"));
     }
 
     // Rule-TREE-PANEL-062, Rule-TREE-PANEL-008
     public void testRetiringAPackageDeletesNothingInIt() {
-        final @NotNull TestSetPackageDirectoryDto payments = made().testSetPackage(aTestProject().getTestCasesDirectory(), "Payments");
-        final @NotNull TestSetDirectoryDto refunds = made().testSet(payments, "Refunds");
+        final @NotNull TestSetPackageNode payments = made().testSetPackage(aTestProject().getTestCasesFolder(), "Payments");
+        final @NotNull TestSetNode refunds = made().testSet(payments, "Refunds");
         final @NotNull TestCaseDto tc = made().testCase(refunds);
         final @NotNull Map<Path, String> before = filesUnder(refunds.getPath(), "");
 
@@ -110,32 +110,32 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-066
     public void testBringingATestSetBackChangesNothingButItsStatus() {
-        final @NotNull TestSetDirectoryDto login = made().testSet(aTestProject().getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = made().testSet(aTestProject().getTestCasesFolder(), "Login");
         made().testCase(login);
         made().testCase(login);
         assertTrue(nodes().reorder(login, 2));
-        final @NotNull Map<Path, String> left = filesUnder(login.getPath(), DirectoryType.TS.getMarker());
+        final @NotNull Map<Path, String> left = filesUnder(login.getPath(), NodeType.TS.getMarker());
 
         assertTrue("the test set was not deprecated", nodes().mark(login, TestSetStatus.DEPRECATED, TESTER));
         assertTrue("the test set was not brought back", nodes().mark(login, TestSetStatus.ACTIVE, TESTER));
 
         assertEquals(TestSetStatus.ACTIVE, login.getMarker().getStatus());
         assertEquals("bringing the test set back lost its order number", 2, login.getOrder());
-        assertEquals("bringing the test set back changed what it holds", left, filesUnder(login.getPath(), DirectoryType.TS.getMarker()));
+        assertEquals("bringing the test set back changed what it holds", left, filesUnder(login.getPath(), NodeType.TS.getMarker()));
     }
 
     // Rule-TREE-PANEL-077
     public void testRunningFromAParentSkipsRetiredBranchesButARetiredTestSetStillRuns() {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
-        final @NotNull DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
+        final @NotNull TestProjectNode tp = aTestProject();
+        final @NotNull Node testCasesRoot = tp.getTestCasesFolder();
 
         final @NotNull TestCaseDto live = made().testCase(made().testSet(testCasesRoot, "Login"));
 
-        final @NotNull TestSetDirectoryDto deprecated = made().testSet(testCasesRoot, "Legacy Login");
+        final @NotNull TestSetNode deprecated = made().testSet(testCasesRoot, "Legacy Login");
         final @NotNull TestCaseDto inTheDeprecatedSet = made().testCase(deprecated);
         assertTrue(nodes().mark(deprecated, TestSetStatus.DEPRECATED, TESTER));
 
-        final @NotNull TestSetPackageDirectoryDto archived = made().testSetPackage(testCasesRoot, "Old Payments");
+        final @NotNull TestSetPackageNode archived = made().testSetPackage(testCasesRoot, "Old Payments");
         made().testCase(made().testSet(archived, "Refunds"));
         assertTrue(nodes().mark(archived, PackageStatus.ARCHIVED, TESTER));
 
@@ -164,9 +164,9 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-042
     public void testTheTwoContainersAreNeverRemoved() {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
+        final @NotNull TestProjectNode tp = aTestProject();
 
-        for (final DirectoryDto container : List.of(tp.getTestCasesDirectory(), tp.getTestRunsDirectory())) {
+        for (final Node container : List.of(tp.getTestCasesFolder(), tp.getTestRunsFolder())) {
             final @NotNull AtomicBoolean removed = new AtomicBoolean(true);
             Removals.of(container.getType()).remove(getProject(), container, removed::set);
 
@@ -180,35 +180,35 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
         final @NotNull String wasNamed = settings().testerName;
         try {
             settings().testerName = TESTER;
-            final @NotNull TestSetDirectoryDto login = made().testSet(aTestProject().getTestCasesDirectory(), "Login");
+            final @NotNull TestSetNode login = made().testSet(aTestProject().getTestCasesFolder(), "Login");
             final @NotNull ZonedDateTime yesterday = ZonedDateTime.now(ZoneId.systemDefault()).minusDays(1);
-            login.getMarker().setModifiedAt(yesterday);
+            login.getMarker().setUpdatedAt(yesterday);
 
             settings().testerName = "Muteb";
             final @NotNull TestCaseDto added = made().testCase(login);
-            assertEquals("adding a test case did not name who did it", "Muteb", markerOnDisk(login).getModifiedBy());
-            assertTrue("adding a test case did not move the Updated row", markerOnDisk(login).getModifiedAt().isAfter(yesterday));
+            assertEquals("adding a test case did not name who did it", "Muteb", markerOnDisk(login).getUpdatedBy());
+            assertTrue("adding a test case did not move the Updated row", markerOnDisk(login).getUpdatedAt().isAfter(yesterday));
 
             settings().testerName = "Hind";
             assertTrue(indexedTestCases().removeTestCase(login.getPath(), added.getId()));
-            assertEquals("removing a test case did not name who did it", "Hind", markerOnDisk(login).getModifiedBy());
+            assertEquals("removing a test case did not name who did it", "Hind", markerOnDisk(login).getUpdatedBy());
 
         } finally {
             settings().testerName = wasNamed;
         }
     }
 
-    private @NotNull TestSetMarker markerOnDisk(final @NotNull TestSetDirectoryDto testSet) {
-        return nodes().readMarker(testSet.getPath(), DirectoryType.TS, TestSetMarker.class);
+    private @NotNull TestSetMarker markerOnDisk(final @NotNull TestSetNode testSet) {
+        return nodes().readMarker(testSet.getPath(), NodeType.TS, TestSetMarker.class);
     }
 
     // Rule-TREE-PANEL-027
     public void testATestSetPackageIsCreatedEmptyAndOpensNothing() {
-        @NotNull DirectoryDto parent = aTestProject().getTestCasesDirectory();
+        @NotNull Node parent = aTestProject().getTestCasesFolder();
 
         for (final String name : List.of("Payments", "Refunds", "Partial")) {
             final @NotNull Path wanted = parent.getPath().resolve(name);
-            final @NotNull Optional<DirectoryDto> created = NodeCreators.of(getProject(), DirectoryType.TSP).execute(name, parent, wanted);
+            final @NotNull Optional<Node> created = NodeCreators.of(getProject(), NodeType.TSP).execute(name, parent, wanted);
 
             assertTrue("a test set package was not created under " + parent.getName(), created.isPresent());
             assertTrue(nodes().nodeExists(wanted));
@@ -220,11 +220,11 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-033
     public void testATestRunPackageIsCreatedEmptyAndOpensNothing() {
-        @NotNull DirectoryDto parent = aTestProject().getTestRunsDirectory();
+        @NotNull Node parent = aTestProject().getTestRunsFolder();
 
         for (final String name : List.of("Release 4", "Sprint 12", "Smoke")) {
             final @NotNull Path wanted = parent.getPath().resolve(name);
-            final @NotNull Optional<DirectoryDto> created = NodeCreators.of(getProject(), DirectoryType.TRP).execute(name, parent, wanted);
+            final @NotNull Optional<Node> created = NodeCreators.of(getProject(), NodeType.TRP).execute(name, parent, wanted);
 
             assertTrue("a test run package was not created under " + parent.getName(), created.isPresent());
             assertTrue(nodes().nodeExists(wanted));

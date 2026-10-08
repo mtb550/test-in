@@ -27,10 +27,10 @@ import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
@@ -43,19 +43,19 @@ import java.util.Optional;
 
 public class RenameWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
-    private TestSetPackageDirectoryDto payments;
-    private TestSetDirectoryDto card;
-    private TestSetDirectoryDto login;
+    private TestSetPackageNode payments;
+    private TestSetNode card;
+    private TestSetNode login;
 
     @Override
     public void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        payments = made.testSetPackage(tp.getTestCasesDirectory(), "Payments");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        payments = made.testSetPackage(tp.getTestCasesFolder(), "Payments");
         card = made.testSet(payments, "Card");
         made.testCase(card);
-        login = made.testSet(tp.getTestCasesDirectory(), "Login");
+        login = made.testSet(tp.getTestCasesFolder(), "Login");
     }
 
     @Override
@@ -64,11 +64,11 @@ public class RenameWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
         super.tearDown();
     }
 
-    private @NotNull TestinEditor editorOn(final @NotNull TestSetDirectoryDto testSet) {
+    private @NotNull TestinEditor editorOn(final @NotNull TestSetNode testSet) {
         return Services.getInstance(getProject(), TestinEditors.class).editorFor(testSet).orElseThrow(() -> new AssertionError(testSet.getName() + " has no editor open"));
     }
 
-    private void aCellIsBeingEditedIn(final @NotNull TestSetDirectoryDto testSet) {
+    private void aCellIsBeingEditedIn(final @NotNull TestSetNode testSet) {
         final @NotNull TestinEditor editor = editorOn(testSet);
         Await.until("the editor never loaded", () -> !editor.isLoading());
         ((AbstractTestinEditor<?, ?>) editor).onToolBarSwitchedToGridView();
@@ -97,7 +97,7 @@ public class RenameWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
         opened(card);
         aCellIsBeingEditedIn(card);
 
-        for (final DirectoryDto node : List.of(card, payments)) {
+        for (final Node node : List.of(card, payments)) {
             final @NotNull Presentation shown = TreeGesture.updated(getProject(), new RenameAction(), List.of(node));
 
             assertFalse("Rename is not gray on " + node.getName() + " while a cell under it is being edited", shown.isEnabled());

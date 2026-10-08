@@ -28,8 +28,8 @@ import org.testin.indexer.TestRuns;
 import org.testin.indexer.WatchedPath;
 import org.testin.logger.Logger;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.TestRunStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -57,7 +57,7 @@ public final class TestRunStatusChange {
     }
 
     // UC-TREE-PANEL-020, Rule-EDITOR-PANEL-008, Rule-TREE-PANEL-091
-    public void apply(final @NotNull TestRunDirectoryDto testRun, final @NotNull TestRunStatus newStatus) {
+    public void apply(final @NotNull TestRunNode testRun, final @NotNull TestRunStatus newStatus) {
         final @NotNull Optional<TestRunEditor> open = editors.testRunEditorFor(testRun);
 
         Logger.trace("Test run status changed: " + testRun.getName() + " = " + newStatus.getLabel());
@@ -74,7 +74,7 @@ public final class TestRunStatusChange {
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-136
-    private void offerTheCommit(final @NotNull TestRunDirectoryDto testRun) {
+    private void offerTheCommit(final @NotNull TestRunNode testRun) {
         WatchedPath.testProjectOf(testRun.getPath(), Services.getInstance(p, TestinRoot.class).absolutePath())
                 .filter(testProject -> !new GitRepositoryService(p).isNotRepository(testProject))
                 .ifPresentOrElse(testProject ->
@@ -83,7 +83,7 @@ public final class TestRunStatusChange {
                         () -> notifier.softShow(p, TestRunStatus.COMPLETED.getLabel()));
     }
 
-    private void persist(final @NotNull TestRunDirectoryDto testRun, final @NotNull Optional<TestRunEditor> open) {
+    private void persist(final @NotNull TestRunNode testRun, final @NotNull Optional<TestRunEditor> open) {
         final @NotNull TestRunStatus status = testRun.getMarker().getStatus();
         final @NotNull String tester = settings.testerName;
 
@@ -94,14 +94,14 @@ public final class TestRunStatusChange {
             marker.touch(tester);
         });
 
-        if (open.isPresent()) testRuns.saveTestRun(testRun.getPath());
+        if (open.isPresent()) testRuns.saveRunItems(testRun.getPath());
     }
 
     private void finish(final @NotNull Path testRunPath) {
-        testRuns.changeTestRun(testRunPath, testRun -> {
+        testRuns.changeRunItems(testRunPath, testRun -> {
             int closed = 0;
-            for (final TestRunItems item : testRun.getResults()) {
-                if (item.markUntestedIfPending()) closed++;
+            for (final RunItem runItem : testRun.getAll()) {
+                if (runItem.markUntestedIfPending()) closed++;
             }
 
             if (closed > 0)

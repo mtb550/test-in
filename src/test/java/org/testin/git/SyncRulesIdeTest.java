@@ -27,8 +27,8 @@ import org.testin.git.review.PendingCommitsDialog;
 import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
@@ -111,8 +111,8 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
 
     // UC-SHARE-016, Rule-SHARE-073
     public void testAfterTheSyncTestinReadsTheWorkingFolderAgain() {
-        final @NotNull TestProjectDirectoryDto demo = new NodesOnDisk(getProject()).testProject(work);
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(demo.getTestCasesDirectory(), "Login");
+        final @NotNull TestProjectNode demo = new NodesOnDisk(getProject()).testProject(work);
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(demo.getTestCasesFolder(), "Login");
         new NodesOnDisk(getProject()).testCase(login);
         commitAll(work, "the Login test set");
         mustGit(work, "push", "origin", MAIN);

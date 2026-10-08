@@ -18,7 +18,7 @@ package org.testin.view.details;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
@@ -49,11 +49,11 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         return TestCaseDto.builder().id(ID).description("Log in with a valid user").expectedResult("The dashboard opens").module("Accounts").build();
     }
 
-    private static @NotNull TestRunItems failed() {
-        return TestRunItems.builder().id(ID).status(RunItemStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
+    private static @NotNull RunItem failed() {
+        return RunItem.builder().id(ID).status(RunItemStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
     }
 
-    private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
+    private @NotNull List<String> shown(final @NotNull Optional<RunItem> runItem) {
         return Drawn.words(Drawn.detailsTab(getProject(), aTestCase(), runItem, List.of("Demo", "Test Cases", LAST_STEP)));
     }
 

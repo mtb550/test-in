@@ -26,13 +26,13 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Gestures;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -83,28 +83,28 @@ public class ContextMenuKeyIdeTest extends AbstractTempRootIdeTest {
         return tree;
     }
 
-    private @NotNull TestSetDirectoryDto aTestSet() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+    private @NotNull TestSetNode aTestSet() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         testCases = EditorFixtures.testCases(getProject(), ts, 3);
         return ts;
     }
 
     private @NotNull TestRunEditor aTestRunEditor() {
         aTestSet();
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-123
     public void testTheMenuOpensOnWhateverIsSelectedInBothViewsAndBothEditors() {
-        final @NotNull TestCaseEditor testSetEditor = EditorFixtures.openTestCaseEditor(getProject(), aTestSet(), getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), aTestSet(), getTestRootDisposable());
         final @NotNull TestRunEditor testRunEditor = aTestRunEditor();
         try {
-            assertOpensOnTheSelectedCard("test case editor", testSetEditor);
+            assertOpensOnTheSelectedCard("test set editor", testSetEditor);
             assertOpensOnTheSelectedCard("test run editor", testRunEditor);
-            assertOpensOnTheSelectedCell("test case editor", testSetEditor);
+            assertOpensOnTheSelectedCell("test set editor", testSetEditor);
             assertOpensOnTheSelectedCell("test run editor", testRunEditor);
         } finally {
             Disposer.dispose(testSetEditor);
@@ -125,7 +125,7 @@ public class ContextMenuKeyIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-124
     public void testWithNothingSelectedNothingOpens() {
-        final @NotNull TestCaseEditor testSetEditor = EditorFixtures.openTestCaseEditor(getProject(), aTestSet(), getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), aTestSet(), getTestRootDisposable());
         final @NotNull TestRunEditor testRunEditor = aTestRunEditor();
         final @NotNull SimpleTree tree = aTree();
         try {

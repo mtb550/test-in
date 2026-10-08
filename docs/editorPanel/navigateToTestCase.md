@@ -6,7 +6,7 @@
 row in its own test set, **so that** I can read it or fix it where it lives.
 I do not have to hunt for it in the tree.
 
-The test case's own test set opens in the test case editor with the test case
+The test case's own test set opens in the test set editor with the test case
 selected, as clicking its identity in the view panel does. The test run editor
 stays open behind it.
 
@@ -39,7 +39,7 @@ No key. The card's last button, or the right-click menu.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-233** — Navigate to Test Case opens the test case's own
-  test set in the test case editor and selects it there, as clicking its
+  test set in the test set editor and selects it there, as clicking its
   identity in the view panel does. The tree does not move.
 - **Rule-EDITOR-PANEL-234** — It is on a test run's cards and in the right-click
   menu of the test run editor. It is not offered in a test set, on a card or in
@@ -99,7 +99,7 @@ in the menu.
    last one reading **tc**.
 3. The tester clicks it, or right-clicks the row and chooses **Navigate to Test
    Case**.
-4. The test case's own test set opens in the test case editor, or comes forward
+4. The test case's own test set opens in the test set editor, or comes forward
    if it is already open, with the test case selected.
 5. The tree stays where it was. The test run editor stays open behind.
 

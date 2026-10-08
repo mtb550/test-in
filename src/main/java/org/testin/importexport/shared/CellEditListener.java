@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -30,7 +30,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CellEditListener implements TableModelListener {
-    private final @NotNull List<TestCaseEditorAttributes> importAttributes;
+    private final @NotNull List<TestSetEditorAttributes> importAttributes;
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> testCases;
     private boolean isUpdating = false;
@@ -49,11 +49,11 @@ public class CellEditListener implements TableModelListener {
                 try {
                     final @NotNull DefaultTableModel model = (DefaultTableModel) e.getSource();
                     final @NotNull String updatedValue = String.valueOf(model.getValueAt(row, col));
-                    final @NotNull TestCaseEditorAttributes currentAttr = importAttributes.get(col - 2);
+                    final @NotNull TestSetEditorAttributes currentAttr = importAttributes.get(col - 2);
                     final @NotNull Optional<TestCaseDto> took = currentAttr.getImportSetter().execute(p, testCases.get(row), updatedValue);
 
                     // Rule-SHARE-106
-                    took.ifPresentOrElse(tc -> testCases.set(row, tc), () -> TestCaseEditorAttributes.sayWhatWasRefused(p, 1));
+                    took.ifPresentOrElse(tc -> testCases.set(row, tc), () -> TestSetEditorAttributes.sayWhatWasRefused(p, 1));
 
                     final @NotNull String formattedValue = currentAttr.gridValue(testCases.get(row));
                     model.setValueAt(formattedValue, row, col);

@@ -28,18 +28,18 @@ import org.testin.OnScreen;
 import org.testin.Said;
 import org.testin.editor.grid.GridKeys;
 import org.testin.editor.open.UnifiedVirtualFile;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.GridViewBtn;
-import org.testin.editor.toolbar.TestCaseDetailsPopupBtn;
+import org.testin.editor.toolbar.TestSetDetailsPopupBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -53,7 +53,7 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
 
     private static final @NotNull String TYPED_PAGE_SIZE = "7";
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private static void typedPageSize(final @NotNull TestinEditor editor) {
         editor.getStatusBar().getPageSizeField().setText(TYPED_PAGE_SIZE);
@@ -62,14 +62,14 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull List<TestCaseDto> aTestSetOfThree() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         testSet = EditorFixtures.testSet(getProject(), tp, "Checkout");
         return EditorFixtures.testCases(getProject(), testSet, 3);
     }
 
     private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestCaseDto> covered) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
@@ -80,8 +80,8 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-222
     public void testThePageSizeLastTypedIsWhereEveryEditorOpenedAfterwardStarts() {
         final @NotNull List<TestCaseDto> testCases = aTestSetOfThree();
-        final @NotNull TestCaseEditor alreadyOpen = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
-        final @NotNull TestCaseEditor typedIn = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor alreadyOpen = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor typedIn = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         try {
             typedPageSize(typedIn);
 
@@ -89,9 +89,9 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
             assertEquals("an editor already open did not keep its own page size", TestinEditor.DEFAULT_PAGE_SIZE, alreadyOpen.getPageSize());
             assertEquals("the page size was not remembered past a restart", TYPED_PAGE_SIZE, PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY));
 
-            final @NotNull TestCaseEditor openedAfter = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+            final @NotNull TestSetEditor openedAfter = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
             final @NotNull TestRunEditor testRunAfter = aTestRunEditorOver(testCases);
-            assertEquals("a test case editor opened afterward did not start with it", 7, openedAfter.getPageSize());
+            assertEquals("a test set editor opened afterward did not start with it", 7, openedAfter.getPageSize());
             assertEquals("a test run editor opened afterward did not start with it", 7, testRunAfter.getPageSize());
             assertEquals(TYPED_PAGE_SIZE, openedAfter.getStatusBar().getPageSizeField().getText());
         } finally {
@@ -104,15 +104,15 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-226
     public void testACutOrAPasteOverCellsIsOneChangeOneMessageAndOneUndo() {
         final @NotNull List<TestCaseDto> testCases = aTestSetOfThree();
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
-            final @NotNull Set<TestCaseEditorAttributes> fields = editor.getToolBar().getToolbarItem(TestCaseDetailsPopupBtn.class).getSelectedDetails();
-            fields.add(TestCaseEditorAttributes.MODULE);
+            final @NotNull Set<TestSetEditorAttributes> fields = editor.getToolBar().getToolbarItem(TestSetDetailsPopupBtn.class).getSelectedDetails();
+            fields.add(TestSetEditorAttributes.MODULE);
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final @NotNull JBTable grid = (JBTable) editor.getPreferredFocusedComponent();
-            final int module = grid.convertColumnIndexToView(TestCaseEditorAttributes.MODULE.column());
+            final int module = grid.convertColumnIndexToView(TestSetEditorAttributes.MODULE.column());
 
             CopyPasteManager.getInstance().setContents(new StringSelection("""
                     Login
@@ -159,14 +159,14 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-229
     public void testAGridThatCannotBeBuiltShowsTheCardsHoldingThePageAndSaysWhy() {
         aTestSetOfThree();
-        final @NotNull TestCaseEditor editor = new TestCaseEditor(getProject(), new UnifiedVirtualFile(testSet)) {
+        final @NotNull TestSetEditor editor = new TestSetEditor(getProject(), new UnifiedVirtualFile(testSet)) {
             @Override
-            protected @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<TestCaseEditorAttributes> attributes) {
+            protected @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<TestSetEditorAttributes> attributes) {
                 throw new IllegalStateException("the grid broke");
             }
         };
         Disposer.register(getTestRootDisposable(), editor);
-        Await.until("the test case editor never loaded", () -> !editor.isLoading());
+        Await.until("the test set editor never loaded", () -> !editor.isLoading());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();

@@ -18,7 +18,7 @@ package org.testin.testrun;
 
 import com.google.errorprone.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 
 @FunctionalInterface
 @Immutable
@@ -26,5 +26,5 @@ public interface RunItemValueSetter {
     @NotNull RunItemValueSetter NONE = (_, _) -> {
     };
 
-    void execute(final @NotNull TestRunItems item, final @NotNull String typed);
+    void execute(final @NotNull RunItem runItem, final @NotNull String typed);
 }

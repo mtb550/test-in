@@ -19,11 +19,11 @@ package org.testin.filter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestCaseStatus;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testng.annotations.Test;
 
 import java.time.ZoneOffset;
@@ -45,7 +45,7 @@ public class TestCaseFilterTest {
                 .description("Login succeeds")
                 .expectedResult("Dashboard")
                 .priority(Priority.HIGH)
-                .group(List.of("Regression"))
+                .groups(List.of("Regression"))
                 .module("accounts")
                 .build();
         final TestCaseDto other = TestCaseDto.builder()
@@ -65,13 +65,13 @@ public class TestCaseFilterTest {
     public void filtersRunItemStatusOnlyWhenRunItemExists() {
         final TestCaseDto passed = TestCaseDto.builder().description("passed").build();
         final TestCaseDto missing = TestCaseDto.builder().description("missing").build();
-        final TestRunItems item = TestRunItems.builder()
+        final RunItem runItem = RunItem.builder()
                 .id(passed.getId())
                 .status(RunItemStatus.PASSED)
                 .build()
                 .showing(Optional.of(passed), Optional.empty(), Optional.empty(), false);
 
-        final Map<UUID, TestRunItems> recorded = Map.of(passed.getId(), item);
+        final Map<UUID, RunItem> recorded = Map.of(passed.getId(), runItem);
 
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(passed, missing),
@@ -89,7 +89,7 @@ public class TestCaseFilterTest {
                 .testData("admin@example.com")
                 .preConditions("The account exists")
                 .reference("JIRA-123")
-                .group(List.of("Regression"))
+                .groups(List.of("Regression"))
                 .build();
 
         for (final String wanted : List.of("accounts", "admin@example.com", "The account exists", "JIRA-123", "Regression")) {
@@ -119,7 +119,7 @@ public class TestCaseFilterTest {
     // Rule-EDITOR-PANEL-091
     @Test
     public void theSearchReadsEveryFieldTheFieldsPopupLists() {
-        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        final @NotNull TestSetNode set = new TestSetNode();
         set.setPath2(new ArrayList<>(List.of("Shop", "Checkout")));
         final @NotNull TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
@@ -130,7 +130,7 @@ public class TestCaseFilterTest {
                 .reference("JIRA-77")
                 .testData("card=4111")
                 .preConditions("A basket holds one item")
-                .group(List.of("Regression"))
+                .groups(List.of("Regression"))
                 .module("payments")
                 .status(TestCaseStatus.REVIEWED)
                 .createdBy("Sara")
@@ -141,7 +141,7 @@ public class TestCaseFilterTest {
         tc.setParent(set);
 
         final @NotNull List<String> notFound = new ArrayList<>();
-        for (final TestCaseEditorAttributes field : TestCaseEditorAttributes.values()) {
+        for (final TestSetEditorAttributes field : TestSetEditorAttributes.values()) {
             final @NotNull String value = field.gridValue(tc);
             if (value.isBlank()) continue;
 
@@ -155,7 +155,7 @@ public class TestCaseFilterTest {
     // Rule-EDITOR-PANEL-096
     @Test
     public void choosingNothingInAFilterMatchesEveryTestCase() {
-        final @NotNull TestCaseDto high = TestCaseDto.builder().description("one").priority(Priority.HIGH).group(List.of("Smoke")).module("accounts").status(TestCaseStatus.REVIEWED).build();
+        final @NotNull TestCaseDto high = TestCaseDto.builder().description("one").priority(Priority.HIGH).groups(List.of("Smoke")).module("accounts").status(TestCaseStatus.REVIEWED).build();
         final @NotNull TestCaseDto low = TestCaseDto.builder().description("two").priority(Priority.LOW).module("payments").status(TestCaseStatus.DISABLED).build();
         final @NotNull TestCaseDto bare = TestCaseDto.builder().description("three").build();
 

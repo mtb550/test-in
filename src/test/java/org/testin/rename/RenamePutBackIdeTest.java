@@ -19,7 +19,7 @@ package org.testin.rename;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.util.NameSanitizer;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class RenamePutBackIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-133
     public void testARenameWhoseFolderCannotBeRenamedPutsTheCodeBack() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull String renamedClass = "nafath." + NameSanitizer.className("Sign in");
         deleteFolder(login.getPath());
 

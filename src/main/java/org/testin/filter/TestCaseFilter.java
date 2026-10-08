@@ -21,9 +21,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Groups;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public final class TestCaseFilter {
     }
 
     // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020
-    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {
         if (source.isEmpty()) {
             return Collections.emptyList();
         }
@@ -54,14 +54,14 @@ public final class TestCaseFilter {
     }
 
     // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239, Rule-EDITOR-PANEL-261
-    private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
-        final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(TestRunItems::shownTestCase).orElse(testCase);
+    private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {
+        final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(RunItem::shownTestCase).orElse(testCase);
 
-        final boolean matchesSearch = query.isEmpty() || TestCaseEditorAttributes.anyContains(shown, query);
+        final boolean matchesSearch = query.isEmpty() || TestSetEditorAttributes.anyContains(shown, query);
         final boolean matchesPriority = wanted.priorities().isEmpty() || wanted.priorities().contains(shown.getPriority());
         final boolean matchesGroup = wanted.groups().isEmpty()
-                || (wanted.groups().contains(Groups.NONE) && shown.getGroup().isEmpty())
-                || shown.getGroup().stream().anyMatch(wanted.groups()::contains);
+                || (wanted.groups().contains(Groups.NONE) && shown.getGroups().isEmpty())
+                || shown.getGroups().stream().anyMatch(wanted.groups()::contains);
         final boolean matchesModule = wanted.modules().isEmpty() || wanted.modules().contains(shown.getModule());
         final boolean matchesTestCaseStatus = wanted.testCaseStatuses().isEmpty() || wanted.testCaseStatuses().contains(shown.getStatus());
         final boolean matchesRunItemStatus = wanted.runItemStatuses().isEmpty()
@@ -70,9 +70,9 @@ public final class TestCaseFilter {
         return matchesSearch && matchesPriority && matchesGroup && matchesModule && matchesTestCaseStatus && matchesRunItemStatus;
     }
 
-    private static boolean matchesStatus(final @NotNull UUID id, final @NotNull Set<RunItemStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+    private static boolean matchesStatus(final @NotNull UUID id, final @NotNull Set<RunItemStatus> statuses, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {
         return runItemProvider.apply(id)
-                .map(TestRunItems::shownStatus)
+                .map(RunItem::shownStatus)
                 .filter(statuses::contains)
                 .isPresent();
     }

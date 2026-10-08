@@ -22,7 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
@@ -46,7 +46,7 @@ public final class TestCaseMerge {
     public static boolean isTestCase(final @NotNull String relativePath) {
         final @NotNull String slashed = relativePath.replace('\\', '/');
 
-        return FileKind.of(Path.of(relativePath)) == FileKind.TEST_CASE && slashed.contains(DirectoryType.TCD.getFolderName() + "/");
+        return FileKind.of(Path.of(relativePath)) == FileKind.TEST_CASE && slashed.contains(NodeType.TCF.getFolderName() + "/");
     }
 
     // UC-SHARE-018, Rule-SHARE-080

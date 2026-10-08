@@ -126,7 +126,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-003
-    public void applyListLayout(final @NotNull JList<?> list) {
+    public void applyCardViewLayout(final @NotNull JList<?> list) {
         titleArea.setFont(Fonts.title());
 
         for (final JBLabel lbl : attributeLabels.values()) {

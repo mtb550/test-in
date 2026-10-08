@@ -21,14 +21,14 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.NodeFigures;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestSetStatus;
 import org.testin.services.Services;
@@ -39,33 +39,33 @@ import java.util.UUID;
 
 public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull DirectoryMapper mapper() {
-        return Services.getInstance(getProject(), DirectoryMapper.class);
+    private @NotNull NodeMapper mapper() {
+        return Services.getInstance(getProject(), NodeMapper.class);
     }
 
     private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestProjectDirectoryDto aTestProject() {
+    private @NotNull TestProjectNode aTestProject() {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestProjectDirectoryDto tp = mapper().setTestProjectNode(root.resolve("Checkout"));
+            final @NotNull TestProjectNode tp = mapper().setTestProjectNode(root.resolve("Checkout"));
             nodes().addTestProject(tp);
             return tp;
         });
     }
 
-    private @NotNull TestSetPackageDirectoryDto aTestSetPackage(final @NotNull DirectoryDto parent, final @NotNull String name) {
+    private @NotNull TestSetPackageNode aTestSetPackage(final @NotNull Node parent, final @NotNull String name) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetPackageDirectoryDto tsp = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
+            final @NotNull TestSetPackageNode tsp = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
             nodes().addTestSetPackage(tsp);
             return tsp;
         });
     }
 
-    private @NotNull List<UUID> aTestSet(final @NotNull DirectoryDto parent, final @NotNull String name, final int testCases, final @NotNull TestSetStatus status) {
-        final @NotNull TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetDirectoryDto created = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
+    private @NotNull List<UUID> aTestSet(final @NotNull Node parent, final @NotNull String name, final int testCases, final @NotNull TestSetStatus status) {
+        final @NotNull TestSetNode ts = WriteAction.computeAndWait(() -> {
+            final @NotNull TestSetNode created = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
             created.getMarker().setStatus(status);
             nodes().addTestSet(created);
             return created;
@@ -82,23 +82,23 @@ public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
         return ids;
     }
 
-    private @NotNull TestRunDirectoryDto aTestRun(final @NotNull TestProjectDirectoryDto tp) {
+    private @NotNull TestRunNode aTestRun(final @NotNull TestProjectNode tp) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestRunDirectoryDto tr = mapper().setTestRunNode(tp.getTestRunsDirectory().getPath().resolve("Cycle 1"), tp.getTestRunsDirectory());
-            nodes().addTestRunDir(tr);
+            final @NotNull TestRunNode tr = mapper().setTestRunNode(tp.getTestRunsFolder().getPath().resolve("Cycle 1"), tp.getTestRunsFolder());
+            nodes().addTestRunNode(tr);
             return tr;
         });
     }
 
-    private @NotNull NodeFigures counted(final @NotNull DirectoryDto node) {
+    private @NotNull NodeFigures counted(final @NotNull Node node) {
         return NodeCounter.childCounts(getProject(), node);
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-047
     public void testAContainerIsTheSumOfEverythingBeneathItAtAnyDepth() {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
-        final @NotNull TestSetPackageDirectoryDto auth = aTestSetPackage(tp.getTestCasesDirectory(), "Auth");
-        final @NotNull TestSetPackageDirectoryDto admin = aTestSetPackage(auth, "Admin");
+        final @NotNull TestProjectNode tp = aTestProject();
+        final @NotNull TestSetPackageNode auth = aTestSetPackage(tp.getTestCasesFolder(), "Auth");
+        final @NotNull TestSetPackageNode admin = aTestSetPackage(auth, "Admin");
         aTestSet(auth, "Login", 2, TestSetStatus.ACTIVE);
         aTestSet(admin, "Roles", 3, TestSetStatus.ACTIVE);
 
@@ -111,11 +111,11 @@ public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-006, Rule-INTERNAL-050
     public void testARetiredTestSetIsStillCounted() {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
-        aTestSet(tp.getTestCasesDirectory(), "Login", 2, TestSetStatus.ACTIVE);
-        aTestSet(tp.getTestCasesDirectory(), "Old login", 3, TestSetStatus.DEPRECATED);
+        final @NotNull TestProjectNode tp = aTestProject();
+        aTestSet(tp.getTestCasesFolder(), "Login", 2, TestSetStatus.ACTIVE);
+        aTestSet(tp.getTestCasesFolder(), "Old login", 3, TestSetStatus.DEPRECATED);
 
-        final @NotNull NodeFigures figures = counted(tp.getTestCasesDirectory());
+        final @NotNull NodeFigures figures = counted(tp.getTestCasesFolder());
 
         assertEquals("a deprecated test set was left out of the count", 2, figures.testSets());
         assertEquals("the test cases of a deprecated test set were left out of the count", 5, figures.testCases());
@@ -123,12 +123,12 @@ public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-006, Rule-INTERNAL-048
     public void testATestRunIsCountedFromTheRunItemStatusesItRecorded() {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
-        final @NotNull List<UUID> testCases = aTestSet(tp.getTestCasesDirectory(), "Login", 4, TestSetStatus.ACTIVE);
-        final @NotNull TestRunDirectoryDto tr = aTestRun(tp);
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(tr.getPath(), new TestRunDto().setResults(new ArrayList<>(List.of(
-                new TestRunItems().setId(testCases.get(0)).setStatus(RunItemStatus.PASSED),
-                new TestRunItems().setId(testCases.get(1)).setStatus(RunItemStatus.FAILED)))));
+        final @NotNull TestProjectNode tp = aTestProject();
+        final @NotNull List<UUID> testCases = aTestSet(tp.getTestCasesFolder(), "Login", 4, TestSetStatus.ACTIVE);
+        final @NotNull TestRunNode tr = aTestRun(tp);
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(tr.getPath(), new RunItems().setAll(new ArrayList<>(List.of(
+                new RunItem().setId(testCases.get(0)).setStatus(RunItemStatus.PASSED),
+                new RunItem().setId(testCases.get(1)).setStatus(RunItemStatus.FAILED)))));
 
         final @NotNull TestRunSummary counted = NodeCounter.testRunFigures(getProject(), tr).testRun();
 
@@ -139,7 +139,7 @@ public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-006, Rule-INTERNAL-051
     public void testATestRunThatCouldNotBeReadCountsAsNothing() {
-        final @NotNull TestRunDirectoryDto tr = aTestRun(aTestProject());
+        final @NotNull TestRunNode tr = aTestRun(aTestProject());
 
         assertEquals("a test run the index could not read was not counted as nothing", NodeFigures.NONE, NodeCounter.testRunFigures(getProject(), tr));
     }

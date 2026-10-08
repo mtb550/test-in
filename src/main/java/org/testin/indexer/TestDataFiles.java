@@ -24,7 +24,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -101,7 +101,7 @@ final class TestDataFiles {
     }
 
     // Rule-INTERNAL-011
-    @NotNull List<Path> resultsIn(final @NotNull Path testRunPath) {
+    @NotNull List<Path> runItemsIn(final @NotNull Path testRunPath) {
         try (Stream<Path> inside = Files.list(testRunPath)) {
             return inside.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
         } catch (final IOException ex) {
@@ -112,7 +112,7 @@ final class TestDataFiles {
 
     @NotNull List<Path> screenshotsIn(final @NotNull Path testRunPath) {
         try (Stream<Path> inside = Files.list(testRunPath)) {
-            return inside.filter(file -> FileKind.of(file, DirectoryType.TR) == FileKind.SCREENSHOT).toList();
+            return inside.filter(file -> FileKind.of(file, NodeType.TR) == FileKind.SCREENSHOT).toList();
         } catch (final IOException ex) {
             Logger.warn("Could not list the screenshots in " + testRunPath + ": " + FailureText.of(ex));
             return List.of();

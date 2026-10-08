@@ -28,7 +28,7 @@ import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.ImportedRow;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.FailureText;
 
 import java.io.File;
@@ -88,7 +88,7 @@ public class ImportExcel {
         }
 
         // Rule-SHARE-106
-        TestCaseEditorAttributes.sayWhatWasRefused(p, refused);
+        TestSetEditorAttributes.sayWhatWasRefused(p, refused);
     }
 
     private @NotNull Parsed parseSheet(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull DataFormatter dataFormatter) {
@@ -101,7 +101,7 @@ public class ImportExcel {
         final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
         for (final Cell cell : headerRow) {
             final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();
-            for (final TestCaseEditorAttributes reqCol : TestCaseEditorAttributes.all(Can.IMPORT)) {
+            for (final TestSetEditorAttributes reqCol : TestSetEditorAttributes.all(Can.IMPORT)) {
                 if (reqCol.isColumn(headerName)) {
                     headerIndexMap.put(reqCol.getName().toLowerCase(Locale.ROOT), cell.getColumnIndex());
                 }
@@ -115,7 +115,7 @@ public class ImportExcel {
         for (final Row row : sheet) {
             if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
 
-            final @NotNull ImportedRow imported = TestCaseEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase(Locale.ROOT)))
+            final @NotNull ImportedRow imported = TestSetEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase(Locale.ROOT)))
                     .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
                     .orElse(""));
 

@@ -69,7 +69,7 @@ public class TestDataKeepsLfTest {
         final @NotNull Map<String, String> declared = declarations();
         final @NotNull List<String> missing = new ArrayList<>();
 
-        for (final DirectoryType kind : DirectoryType.values()) {
+        for (final NodeType kind : NodeType.values()) {
             if (!declared.containsKey(kind.getMarker())) missing.add(kind.getMarker());
         }
 
@@ -89,7 +89,7 @@ public class TestDataKeepsLfTest {
         final @NotNull Map<String, String> declared = declarations();
         final @NotNull List<String> wrong = new ArrayList<>();
 
-        for (final DirectoryType kind : DirectoryType.values()) {
+        for (final NodeType kind : NodeType.values()) {
             if (!declared.getOrDefault(kind.getMarker(), "").contains(KEEPS_LF))
                 note(wrong, kind.getMarker(), KEEPS_LF, declared);
         }

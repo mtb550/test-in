@@ -29,7 +29,7 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,7 +47,7 @@ public class SheetCodeUndoIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-018
     public void testAWholeSheetIsWrittenInStepsOf200AndCtrlZTakesItAllBack() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull List<TestCaseDto> sheet = IntStream.range(0, SHEET)
                 .mapToObj(i -> indexedTestCase(login, "Log in as user " + i, String.format(Locale.ROOT, "b%04d", i)))
                 .toList();

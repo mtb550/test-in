@@ -20,8 +20,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.testrun.RunItem;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 
 import java.util.List;
@@ -36,19 +36,19 @@ public final class GridRows {
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
     public static @NotNull List<String[]> ofTestCases(final @NotNull List<TestCaseDto> testCases, final @NotNull ToIntFunction<TestCaseDto> position) {
-        return rows(testCases, TestCaseEditorAttributes.COLUMNS, TestCaseEditorAttributes.ORDER, position, tc -> attribute -> attribute.gridValue(tc));
+        return rows(testCases, TestSetEditorAttributes.COLUMNS, TestSetEditorAttributes.ORDER, position, tc -> attribute -> attribute.gridValue(tc));
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
-    public static @NotNull List<String[]> ofRunItems(final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, TestRunItems> runItems, final @NotNull ToIntFunction<TestCaseDto> position) {
+    public static @NotNull List<String[]> ofRunItems(final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, RunItem> runItems, final @NotNull ToIntFunction<TestCaseDto> position) {
         return rows(testCases, TestRunEditorAttributes.COLUMNS, TestRunEditorAttributes.ORDER, position, tc -> {
-            final @NotNull TestRunItems runItem = runItemOf(tc, runItems);
+            final @NotNull RunItem runItem = runItemOf(tc, runItems);
             return attribute -> attribute.gridValue(runItem);
         });
     }
 
-    private static @NotNull TestRunItems runItemOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, TestRunItems> runItems) {
-        return Optional.ofNullable(runItems.get(tc.getId())).orElseGet(() -> TestRunItems.pendingFor(tc));
+    private static @NotNull RunItem runItemOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, RunItem> runItems) {
+        return Optional.ofNullable(runItems.get(tc.getId())).orElseGet(() -> RunItem.pendingFor(tc));
     }
 
     private static <A> @NotNull List<String[]> rows(final @NotNull List<TestCaseDto> testCases, final @NotNull List<A> columns, final @NotNull A order, final @NotNull ToIntFunction<TestCaseDto> position, final @NotNull Function<TestCaseDto, Function<A, String>> valuesOf) {

@@ -21,11 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.FilesUnder;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.NodeCount;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 import org.testin.view.marker.MarkerDetailsViewDialog;
@@ -42,16 +42,16 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
         return words.get(caption - 1);
     }
 
-    private @NotNull List<String> wordsOfTheDialogOpenedBy(final @NotNull TestCaseEditor editor) {
+    private @NotNull List<String> wordsOfTheDialogOpenedBy(final @NotNull TestSetEditor editor) {
         return ShownDialog.wordsOf(new MarkerDetailsViewDialog(getProject(), editor.getEditedNode()));
     }
 
     // Rule-EDITOR-PANEL-121
     public void testTheDialogIsAboutTheNodeTheEditorShowsNotTheSelectedTestCase() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         try {
             editor.getList().setSelectedIndex(1);
 
@@ -68,10 +68,10 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-122
     public void testTheCountsAreWorkedOutAsTheDialogOpensAndStoredNowhere() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         try {
             final @NotNull Map<String, String> before = FilesUnder.snapshot(root);
             assertEquals("2", countedTestCases(wordsOfTheDialogOpenedBy(editor)));

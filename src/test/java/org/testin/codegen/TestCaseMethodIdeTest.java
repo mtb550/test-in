@@ -25,7 +25,7 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.config.TestinYml;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -37,7 +37,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-002
     public void testATestCaseCreatedWithNoDescriptionGetsNoMethod() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
 
         createdTestCase(login, "", "b");
 
@@ -68,7 +68,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-014
     public void testPriorityIsThePositionInTheTestSetCountingFromOne() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto first = createdTestCase(login, "Open the login page", "b");
         final @NotNull TestCaseDto second = createdTestCase(login, "Log in with a valid user", "c");
         final @NotNull TestCaseDto third = createdTestCase(login, "Log out", "d");
@@ -80,7 +80,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-014
     public void testTheTestCasesOwnPriorityWritesNothingIntoTheCode() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto tc = indexedTestCase(login, "Log in with a valid user", "b");
         tc.setPriority(Priority.HIGH);
 

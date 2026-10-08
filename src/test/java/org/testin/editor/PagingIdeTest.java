@@ -24,12 +24,12 @@ import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.statusbar.PageStep;
 import org.testin.editor.statusbar.StatusBar;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,7 +48,7 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull String pageSizeBefore = "";
 
-    private static void searchForNumber1(final @NotNull TestCaseEditor editor) {
+    private static void searchForNumber1(final @NotNull TestSetEditor editor) {
         editor.getToolBar().getSearchTxt().setText(SEARCHED);
         Await.until("the search for '" + SEARCHED + "' never narrowed the list to " + NARROWED_TO, () -> editor.getCurrentTestCases().size() == NARROWED_TO);
     }
@@ -102,19 +102,19 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
         super.tearDown();
     }
 
-    private @NotNull TestSetDirectoryDto aLongTestSet() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+    private @NotNull TestSetNode aLongTestSet() {
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), ts, LONG_TEST_SET);
         return ts;
     }
 
-    private @NotNull TestCaseEditor opened(final @NotNull TestSetDirectoryDto ts) {
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    private @NotNull TestSetEditor opened(final @NotNull TestSetNode ts) {
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-101
     public void testTheTestSetIsPagedAfterTheSearchHasNarrowedIt() {
-        final @NotNull TestCaseEditor editor = opened(aLongTestSet());
+        final @NotNull TestSetEditor editor = opened(aLongTestSet());
         assertEquals("the whole test set is not three pages", 3, editor.getTotalPageCount());
 
         searchForNumber1(editor);
@@ -127,7 +127,7 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-102
     public void testAnArrowWithNowhereToGoIsGray() {
-        final @NotNull TestCaseEditor editor = opened(aLongTestSet());
+        final @NotNull TestSetEditor editor = opened(aLongTestSet());
         final @NotNull StatusBar bar = editor.getStatusBar();
 
         assertFalse("First is not gray on the first page", bar.button(PageStep.FIRST).isEnabled());
@@ -146,8 +146,8 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-103, Rule-EDITOR-PANEL-009
     public void testPagingAndSearchingSayNothingAndChangeNothing() {
-        final @NotNull TestSetDirectoryDto ts = aLongTestSet();
-        final @NotNull TestCaseEditor editor = opened(ts);
+        final @NotNull TestSetNode ts = aLongTestSet();
+        final @NotNull TestSetEditor editor = opened(ts);
         final @NotNull List<String> before = everyFileIn(ts.getPath());
         final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
@@ -163,7 +163,7 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-092
     public void testSearchingGoesBackToTheFirstPage() {
-        final @NotNull TestCaseEditor editor = opened(aLongTestSet());
+        final @NotNull TestSetEditor editor = opened(aLongTestSet());
         onPage(editor, 2);
 
         editor.getToolBar().getSearchTxt().setText("Test case");
@@ -172,24 +172,24 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-104
     public void testReloadingATestSetLandsOnThePageThatHoldsTheSelectedTestCase() {
-        final @NotNull TestCaseEditor editor = opened(aLongTestSet());
+        final @NotNull TestSetEditor editor = opened(aLongTestSet());
 
         reloadsOntoTheSelectedPage(editor, () -> !editor.isLoading() && editor.getList().getModel().getSize() > 0);
     }
 
     // Rule-EDITOR-PANEL-104
     public void testReloadingATestRunLandsOnThePageThatHoldsTheSelectedTestCase() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, EditorFixtures.testCases(getProject(), ts, LONG_TEST_SET).stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, EditorFixtures.testCases(getProject(), ts, LONG_TEST_SET).stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
 
-        reloadsOntoTheSelectedPage(editor, () -> editor.run().isPresent() && editor.getList().getModel().getSize() > 0);
+        reloadsOntoTheSelectedPage(editor, () -> editor.loadedRunItems().isPresent() && editor.getList().getModel().getSize() > 0);
     }
 
     // Rule-EDITOR-PANEL-107
     public void testChangingThePageSizeGoesBackToTheFirstPageAndToTheList() {
-        final @NotNull TestCaseEditor editor = opened(aLongTestSet());
+        final @NotNull TestSetEditor editor = opened(aLongTestSet());
         onPage(editor, 2);
 
         editor.getStatusBar().getPageSizeField().setText("10");

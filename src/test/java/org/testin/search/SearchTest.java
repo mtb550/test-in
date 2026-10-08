@@ -18,13 +18,13 @@ package org.testin.search;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -40,8 +40,8 @@ import static org.testng.Assert.assertTrue;
 
 public class SearchTest {
 
-    private static @NotNull TestSetDirectoryDto testSet(final String name, final String... chain) {
-        final TestSetDirectoryDto set = TestSetDirectoryDto.builder().build();
+    private static @NotNull TestSetNode testSet(final String name, final String... chain) {
+        final TestSetNode set = TestSetNode.builder().build();
         set.setName(name);
         set.setPath(Path.of("C:", "Testin", "test-01", "Test Cases", name));
         set.setPath2(new ArrayList<>(List.of(chain)));
@@ -49,7 +49,7 @@ public class SearchTest {
         return set;
     }
 
-    private static @NotNull TestCaseDto testCase(final String description, final TestSetDirectoryDto in) {
+    private static @NotNull TestCaseDto testCase(final String description, final TestSetNode in) {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).build();
         tc.setParent(in);
 
@@ -58,7 +58,7 @@ public class SearchTest {
 
     @Test
     public void aTestCasePointsAtTheTestSetThatHoldsIt() {
-        final TestSetDirectoryDto login = testSet("Login", "test-01", "Test Cases", "Login");
+        final TestSetNode login = testSet("Login", "test-01", "Test Cases", "Login");
         final TestCaseDto tc = testCase("Sign in with a valid user", login);
 
         final Hit hit = Hit.of(tc);
@@ -70,7 +70,7 @@ public class SearchTest {
 
     @Test
     public void aNodeCarriesItselfAndNoTestCase() {
-        final TestSetDirectoryDto login = testSet("Login", "test-01", "Test Cases", "Login");
+        final TestSetNode login = testSet("Login", "test-01", "Test Cases", "Login");
 
         final Hit hit = Hit.of(login);
 
@@ -81,7 +81,7 @@ public class SearchTest {
 
     @Test
     public void everyHitSaysWhereItLives() {
-        final TestSetDirectoryDto login = testSet("Login", "test-01", "Test Cases", "Auth", "Login");
+        final TestSetNode login = testSet("Login", "test-01", "Test Cases", "Auth", "Login");
 
         assertEquals(Hit.of(login).where(), "test-01 > Test Cases > Auth > Login");
         assertEquals(Hit.of(testCase("Sign in", login)).where(), "test-01 > Test Cases > Auth > Login",
@@ -105,7 +105,7 @@ public class SearchTest {
 
     @Test
     public void testCasesThatMatchOnTheirDescriptionComeFirst() {
-        final TestSetDirectoryDto set = testSet("Login", "test-01");
+        final TestSetNode set = testSet("Login", "test-01");
         final TestCaseDto onADescription = testCase("Login with a valid user", set);
         final TestCaseDto onSomethingUnseen = testCase("Check the balance", set);
 
@@ -118,7 +118,7 @@ public class SearchTest {
 
     @Test
     public void testCasesMatchingEquallyWellAreAlphabetical() {
-        final TestSetDirectoryDto set = testSet("Login", "test-01");
+        final TestSetNode set = testSet("Login", "test-01");
         final TestCaseDto second = testCase("Login with a valid user", set);
         final TestCaseDto first = testCase("Login fails on a bad password", set);
 
@@ -130,8 +130,8 @@ public class SearchTest {
 
     @Test
     public void theNodeWhoseNameIsTheQueryOutranksOneThatMerelyContainsIt() {
-        final TestSetDirectoryDto exact = testSet("Login", "test-01");
-        final TestSetDirectoryDto longer = testSet("Login and logout journeys", "test-01");
+        final TestSetNode exact = testSet("Login", "test-01");
+        final TestSetNode longer = testSet("Login and logout journeys", "test-01");
 
         assertTrue(Hits.byClosestName(exact, longer) < 0,
                 "typing a set's name should put that set at the top, not a sentence containing it");
@@ -150,7 +150,7 @@ public class SearchTest {
 
     @Test
     public void aPackageIsNot() {
-        final TestSetPackageDirectoryDto pkg = TestSetPackageDirectoryDto.builder().build();
+        final TestSetPackageNode pkg = TestSetPackageNode.builder().build();
         pkg.setName("Auth");
 
         assertFalse(pkg.isOpenableInEditor(), "there is no editor to open, so Enter on it would do nothing");
@@ -158,8 +158,8 @@ public class SearchTest {
 
     @Test
     public void theEmptyQueryListReadsAsTheTreeDoes() {
-        final TestSetDirectoryDto underAuth = testSet("Login", "test-01", "Test Cases", "Auth", "Login");
-        final TestSetDirectoryDto underBilling = testSet("Invoices", "test-01", "Test Cases", "Billing", "Invoices");
+        final TestSetNode underAuth = testSet("Login", "test-01", "Test Cases", "Auth", "Login");
+        final TestSetNode underBilling = testSet("Invoices", "test-01", "Test Cases", "Billing", "Invoices");
 
         assertTrue(Hits.inTreeOrder(underAuth, underBilling) < 0,
                 "Auth before Billing, so a project's sets stay together instead of interleaving alphabetically");
@@ -167,8 +167,8 @@ public class SearchTest {
 
     @Test
     public void twoNodesInOnePlaceAreAlphabetical() {
-        final TestSetDirectoryDto second = testSet("Beta", "test-01", "Test Cases");
-        final TestSetDirectoryDto first = testSet("Alpha", "test-01", "Test Cases");
+        final TestSetNode second = testSet("Beta", "test-01", "Test Cases");
+        final TestSetNode first = testSet("Alpha", "test-01", "Test Cases");
 
         assertTrue(Hits.inTreeOrder(first, second) < 0);
     }
@@ -176,20 +176,20 @@ public class SearchTest {
     // Rule-INTERNAL-002
     @Test
     public void onlyTestSetsAndTestRunsHaveAnEditorToOpen() {
-        assertTrue(testSet("Login", "test-01").isOpenableInEditor(), "a test set opens the test case editor");
-        assertTrue(TestRunDirectoryDto.builder().build().isOpenableInEditor(), "a test run opens the test run editor");
+        assertTrue(testSet("Login", "test-01").isOpenableInEditor(), "a test set opens the test set editor");
+        assertTrue(TestRunNode.builder().build().isOpenableInEditor(), "a test run opens the test run editor");
     }
 
     // Rule-INTERNAL-002
     @Test
     public void aFolderOfNodesHasNoEditorAndIsNotOpened() {
-        assertFalse(TestSetPackageDirectoryDto.builder().build().isOpenableInEditor());
-        assertFalse(TestRunPackageDirectoryDto.builder().build().isOpenableInEditor());
-        assertFalse(TestCasesMainDirectoryDto.builder().build().isOpenableInEditor(),
+        assertFalse(TestSetPackageNode.builder().build().isOpenableInEditor());
+        assertFalse(TestRunPackageNode.builder().build().isOpenableInEditor());
+        assertFalse(TestCasesFolderNode.builder().build().isOpenableInEditor(),
                 "the Test Cases folder is somewhere to look through, not somewhere to open");
-        assertFalse(TestRunsMainDirectoryDto.builder().build().isOpenableInEditor(),
+        assertFalse(TestRunsFolderNode.builder().build().isOpenableInEditor(),
                 "and the Test Runs folder is the one that crashed");
-        assertFalse(new TestProjectDirectoryDto().isOpenableInEditor(),
+        assertFalse(new TestProjectNode().isOpenableInEditor(),
                 "a project is where the two folders live, and neither it nor they open");
     }
 }

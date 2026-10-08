@@ -19,7 +19,7 @@ package org.testin.git.change;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
@@ -41,8 +41,8 @@ public class RunItemChangeComparatorTest {
     private static final ZonedDateTime EXECUTED_AT =
             ZonedDateTime.of(2026, 9, 20, 11, 30, 0, 0, ZoneId.of("Asia/Riyadh"));
 
-    private static @NotNull TestRunItems base() {
-        return TestRunItems.builder()
+    private static @NotNull RunItem base() {
+        return RunItem.builder()
                 .id(JUDGED_TEST_CASE)
                 .status(RunItemStatus.FAILED)
                 .actualResult("The dashboard never opened")
@@ -56,15 +56,15 @@ public class RunItemChangeComparatorTest {
                 .build();
     }
 
-    private static @NotNull FieldChange onlyChange(final TestRunItems after) {
+    private static @NotNull FieldChange onlyChange(final RunItem after) {
         final List<FieldChange> changes = RunItemChangeComparator.compare(base(), after);
         assertEquals(changes.size(), 1, "expected exactly one changed field, got " + changes);
         return changes.getFirst();
     }
 
     @Test
-    public void comparesEverythingAResultRecords() {
-        final List<FieldChange> changes = RunItemChangeComparator.compare(new TestRunItems().setId(JUDGED_TEST_CASE), base());
+    public void comparesEverythingARunItemRecords() {
+        final List<FieldChange> changes = RunItemChangeComparator.compare(new RunItem().setId(JUDGED_TEST_CASE), base());
 
         assertEquals(changes.size(), 9, "a field a tester filled in and the review does not list cannot be read"
                 + " before committing it: " + changes);
@@ -82,7 +82,7 @@ public class RunItemChangeComparatorTest {
     }
 
     @Test
-    public void aResultThatChangedNothingThisReadsStillGetsASelectableRow() {
+    public void aRunItemThatChangedNothingThisReadsStillGetsASelectableRow() {
         final FieldChange change = onlyChange(base().setDuration(Duration.ofSeconds(12)));
 
         assertEquals(change.changeType(), ChangeType.CHANGE_RUN_ITEM);

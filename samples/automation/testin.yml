@@ -5,6 +5,6 @@
 location: local
 
 # location: remote             shared through Git:
-# RepoUrl: https://github.com/you/test-01.git
+# repoUrl: https://github.com/you/test-01.git
 # testinProject: test-01       which test project, local or shared
 testinProject: Demo

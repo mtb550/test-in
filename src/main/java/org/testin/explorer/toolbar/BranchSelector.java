@@ -29,7 +29,7 @@ import org.testin.git.GitRepositoryService;
 import org.testin.git.review.ViewPendingCommitsAction;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
@@ -65,7 +65,7 @@ public class BranchSelector {
 
     private boolean showingPlaceholder = false;
 
-    public BranchSelector(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
+    public BranchSelector(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull Optional<TestProjectNode> testProjectNode) {
         this.p = p;
         this.tp = tp;
         this.git = new GitRepositoryService(p);
@@ -82,12 +82,12 @@ public class BranchSelector {
 
         comboBox.addActionListener(_ -> onSelection());
 
-        updateProject(testProjectDirectory);
+        updateProject(testProjectNode);
     }
 
     // UC-TREE-PANEL-026, Rule-TREE-PANEL-108
-    public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
-        final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
+    public void updateProject(final @NotNull Optional<TestProjectNode> testProjectNode) {
+        final @NotNull Path path = testProjectNode.map(TestProjectNode::getPath).orElse(Path.of(""));
 
         final boolean projectChanged = !path.equals(projectPath);
         this.projectPath = path;

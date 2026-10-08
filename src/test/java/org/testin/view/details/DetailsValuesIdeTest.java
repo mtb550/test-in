@@ -26,12 +26,12 @@ import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.Picture;
 import org.testin.ui.framework.ShownDialog;
@@ -60,7 +60,7 @@ import java.util.Set;
 
 public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
-    private static final @NotNull String ORDER = TestCaseEditorAttributes.ORDER.getName().toUpperCase(Locale.ROOT);
+    private static final @NotNull String ORDER = TestSetEditorAttributes.ORDER.getName().toUpperCase(Locale.ROOT);
 
     private static @NotNull TestCaseDto everyFieldFilled(final @NotNull TestCaseDto tc) {
         tc.setExpectedResult("The dashboard opens");
@@ -72,8 +72,8 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
         return tc;
     }
 
-    private static @NotNull TestRunItems failedWith(final @NotNull TestCaseDto tc, final @NotNull List<String> screenshots) {
-        return TestRunItems.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb")
+    private static @NotNull RunItem failedWith(final @NotNull TestCaseDto tc, final @NotNull List<String> screenshots) {
+        return RunItem.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb")
                 .bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).stacktrace("java.lang.AssertionError: expected [true]").screenshots(screenshots).build();
     }
 
@@ -93,7 +93,7 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
         return Optional.ofNullable(icon).map(Icon::getIconWidth).orElse(0);
     }
 
-    private @NotNull JBPanel<?> drawnWithEveryBandOpen(final @NotNull TestCaseDto tc, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> path) {
+    private @NotNull JBPanel<?> drawnWithEveryBandOpen(final @NotNull TestCaseDto tc, final @NotNull Optional<RunItem> runItem, final @NotNull List<String> path) {
         final boolean wasOpen = PropertiesComponent.getInstance().getBoolean(DetailsTab.TEST_CASE_OPEN, false);
         PropertiesComponent.getInstance().setValue(DetailsTab.TEST_CASE_OPEN, true, false);
         try {
@@ -111,10 +111,10 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-028
     public void testNoValueCanBeTypedIntoOrTakesTheKeyboard() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
+        final @NotNull TestSetNode ts = aTestSet("Login");
         final @NotNull TestCaseDto tc = everyFieldFilled(aTestCase(ts, "Log in with a valid user", "a"));
-        final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(failedWith(tc, List.of())));
-        final @NotNull JBPanel<?> tab = drawnWithEveryBandOpen(tc, Services.getInstance(getProject(), TestRuns.class).findTestRun(tr.getPath()).flatMap(run -> run.resultOf(tc.getId())), tr.getPath2());
+        final @NotNull TestRunNode tr = aTestRun(List.of(failedWith(tc, List.of())));
+        final @NotNull JBPanel<?> tab = drawnWithEveryBandOpen(tc, Services.getInstance(getProject(), TestRuns.class).findRunItems(tr.getPath()).flatMap(run -> run.runItemOf(tc.getId())), tr.getPath2());
 
         final @NotNull List<Component> drawn = Drawn.components(tab);
         assertTrue("the test case's own band was not drawn open: " + Drawn.words(tab), Drawn.holds(Drawn.words(tab), "The dashboard opens"));
@@ -150,7 +150,7 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-062
     public void testOrderIsWhereTheTestCaseSitsInItsTestSet() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
+        final @NotNull TestSetNode ts = aTestSet("Login");
         aTestCase(ts, "Log in with a valid user", "a");
         final @NotNull TestCaseDto middle = aTestCase(ts, "Log in with a locked user", "m");
         aTestCase(ts, "Log in with no password", "z");
@@ -163,9 +163,9 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-081
     public void testTheStacktraceLinkComesFirstThenOneThumbnailForEachScreenshot() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
+        final @NotNull TestSetNode ts = aTestSet("Login");
         final @NotNull TestCaseDto tc = aTestCase(ts, "Log in with a valid user", "a");
-        final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
+        final @NotNull TestRunNode tr = aTestRun(List.of(RunItem.builder().id(tc.getId()).build()));
         final @NotNull TestRuns testRuns = Services.getInstance(getProject(), TestRuns.class);
         final @NotNull List<String> names = testRuns.storeScreenshots(tr.getPath(), List.of(aScreenshot(320, 200), aScreenshot(640, 400)));
         assertEquals(2, names.size());
@@ -200,9 +200,9 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-103, Rule-VIEW-PANEL-081
     public void testTheStacktraceAndScreenshotsAreDrawnWhenFieldsHidesTheStacktrace() {
-        final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
+        final @NotNull TestSetNode ts = aTestSet("Login");
         final @NotNull TestCaseDto tc = aTestCase(ts, "Log in with a valid user", "a");
-        final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
+        final @NotNull TestRunNode tr = aTestRun(List.of(RunItem.builder().id(tc.getId()).build()));
         final @NotNull List<String> names = Services.getInstance(getProject(), TestRuns.class).storeScreenshots(tr.getPath(), List.of(aScreenshot(320, 200)));
         final @NotNull Set<TestRunEditorAttributes> was = ShownFields.read(ShownFields.IN_TEST_RUNS, TestRunEditorAttributes.class);
         final @NotNull Set<TestRunEditorAttributes> chosen = EnumSet.allOf(TestRunEditorAttributes.class);

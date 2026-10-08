@@ -30,8 +30,8 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Said;
 import org.testin.codegen.event.Moved;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +81,7 @@ public class QuietCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-050
     public void testRemovingATestCaseThatHasNoMethodSaysNothing() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto kept = createdTestCase(login, "Log in with a valid user", "b");
         final @NotNull TestCaseDto neverWritten = indexedTestCase(login, "Log out", "c");
         settled();
@@ -95,8 +95,8 @@ public class QuietCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-054
     public void testATestSetDroppedWhereItAlreadyIsRewritesNothing() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
-        final @NotNull TestSetDirectoryDto payment = createdTestSet("Payment", checkout);
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetNode payment = createdTestSet("Payment", checkout);
         createdTestCase(payment, "Pay with a saved card", "b");
         settled();
         final @NotNull String before = stampOf("nafath/checkout/PaymentTest.java");
@@ -112,9 +112,9 @@ public class QuietCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-058
     public void testAPackageDroppedIntoItselfRewritesNothing() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
         createdTestCase(createdTestSet("Payment", checkout), "Pay with a saved card", "b");
-        final @NotNull TestSetPackageDirectoryDto cards = indexedPackage("Cards", checkout);
+        final @NotNull TestSetPackageNode cards = indexedPackage("Cards", checkout);
         createdTestCase(createdTestSet("Visa", cards), "Pay with a Visa card", "b");
         settled();
         final @NotNull String payment = stampOf("nafath/checkout/PaymentTest.java");
@@ -132,8 +132,8 @@ public class QuietCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-060
     public void testARemovalThatFindsNoCodeSaysNothing() {
-        final @NotNull TestSetDirectoryDto neverWritten = indexedTestSet("Payment", theTestCasesDirectory());
-        final @NotNull TestSetPackageDirectoryDto noFolder = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetNode neverWritten = indexedTestSet("Payment", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode noFolder = indexedPackage("Checkout", theTestCasesDirectory());
         settled();
 
         GenType.REMOVE_TEST_SET.execute(getProject(), neverWritten);

@@ -19,11 +19,11 @@ package org.testin.view.marker;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.NodeCounter;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.NodeFigures;
 import org.testin.model.markers.Marker;
-import org.testin.model.node.DirectoryDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.node.Node;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -34,11 +34,11 @@ import org.testin.util.Shortcuts;
 import java.util.List;
 
 public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog {
-    public MarkerDetailsViewDialog(final @NotNull Project p, final @NotNull DirectoryDto dto) {
+    public MarkerDetailsViewDialog(final @NotNull Project p, final @NotNull Node dto) {
         super(p);
 
         final @NotNull Marker marker = dto.getMarker();
-        final @NotNull DirectoryType type = dto.getType();
+        final @NotNull NodeType type = dto.getType();
         final @NotNull NodeFigures figures = NodeCounter.figures(p, dto);
 
         title = Bundle.message("dialog.details.title");
@@ -46,11 +46,11 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog {
         final @NotNull ComponentDialogBase.DetailsBuilder details = ComponentDialogBase.details()
                 .row(Bundle.message("caption.name"), dto.getName())
                 .row(Bundle.message("caption.path"), dto.getPath().toString())
-                .row(TestCaseEditorAttributes.CREATED_BY.getName(), marker.getCreatedBy())
-                .row(TestCaseEditorAttributes.CREATED_AT.getName(), Display.formatDate(marker.getCreatedAt()))
-                .row(TestCaseEditorAttributes.UPDATED_BY.getName(), marker.getModifiedBy())
-                .row(TestCaseEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getModifiedAt()))
-                .row(TestCaseEditorAttributes.STATUS.getName(), marker.getStatusLabel());
+                .row(TestSetEditorAttributes.CREATED_BY.getName(), marker.getCreatedBy())
+                .row(TestSetEditorAttributes.CREATED_AT.getName(), Display.formatDate(marker.getCreatedAt()))
+                .row(TestSetEditorAttributes.UPDATED_BY.getName(), marker.getUpdatedBy())
+                .row(TestSetEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getUpdatedAt()))
+                .row(TestSetEditorAttributes.STATUS.getName(), marker.getStatusLabel());
 
         marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));
 

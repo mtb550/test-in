@@ -38,8 +38,8 @@ final class TestRunMarkerMerge {
     private static final @NotNull String ENDED = "executionEndedAt";
     private static final @NotNull String STATUS = "status";
     private static final @NotNull String COMMIT = "commit";
-    private static final @NotNull String MODIFIED_AT = "modifiedAt";
-    private static final @NotNull String MODIFIED_BY = "modifiedBy";
+    private static final @NotNull String MODIFIED_AT = "updatedAt";
+    private static final @NotNull String MODIFIED_BY = "updatedBy";
 
     private static final @NotNull List<String> WRITTEN_INTO = List.of("configuration", "resultAnalysis");
 

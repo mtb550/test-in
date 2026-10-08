@@ -23,7 +23,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.view.details.DetailsTab;
 
 import javax.swing.AbstractButton;
@@ -41,7 +41,7 @@ import java.util.function.Predicate;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Drawn {
 
-    public static @NotNull JBPanel<?> detailsTab(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
+    public static @NotNull JBPanel<?> detailsTab(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull Optional<RunItem> runItem, final @NotNull List<String> currentPath) {
         final @NotNull JBPanel<?> tab = new JBPanel<>();
         new DetailsTab().load(p, tab, Optional.of(tc), runItem, currentPath);
         return tab;

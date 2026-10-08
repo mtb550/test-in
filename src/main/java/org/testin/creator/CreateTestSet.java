@@ -18,28 +18,28 @@ package org.testin.creator;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
 public class CreateTestSet implements NodeCreator {
-    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull NodeMapper directoryMapper;
     private final @NotNull Nodes nodes;
 
     public CreateTestSet(final @NotNull Project p) {
-        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.directoryMapper = Services.getInstance(p, NodeMapper.class);
         this.nodes = Services.getInstance(p, Nodes.class);
     }
 
     // UC-TREE-PANEL-007
     @Override
-    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(newDirPath, parentDir);
+    public @NotNull Optional<Node> execute(final @NotNull String name, final @NotNull Node parentNode, final @NotNull Path newDirPath) {
+        final @NotNull TestSetNode ts = directoryMapper.getTestSetNode(newDirPath, parentNode);
 
         return nodes.addTestSet(ts) ? Optional.of(ts) : Optional.empty();
     }

@@ -18,8 +18,8 @@ package org.testin.codegen.event;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
 // UC-CODEGEN-002, Rule-CODEGEN-077
-public record MovedTestCase(@NotNull TestCaseDto tc, @NotNull DirectoryDto from) {
+public record MovedTestCase(@NotNull TestCaseDto tc, @NotNull Node from) {
 }

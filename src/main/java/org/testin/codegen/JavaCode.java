@@ -22,14 +22,14 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.event.Moved;
 import org.testin.codegen.event.Renamed;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JavaCode {
     // UC-CODEGEN-004, Rule-CODEGEN-023
-    private final @NotNull GenAction<DirectoryDto> created;
+    private final @NotNull GenAction<Node> created;
 
     // UC-CODEGEN-015, UC-CODEGEN-017, Rule-CODEGEN-051
     private final @NotNull GenAction<Renamed> renamed;
@@ -38,9 +38,9 @@ public final class JavaCode {
     private final @NotNull GenAction<Moved> moved;
 
     // UC-CODEGEN-018, Rule-CODEGEN-096
-    private final @NotNull GenAction<DirectoryDto> removed;
+    private final @NotNull GenAction<Node> removed;
 
-    public static @NotNull JavaCode of(final @NotNull DirectoryType type) {
+    public static @NotNull JavaCode of(final @NotNull NodeType type) {
         final @NotNull String nodeType = type.getDescription();
         return switch (type) {
             case TP -> new JavaCode(
@@ -50,7 +50,7 @@ public final class JavaCode {
                     GenType.REMOVE_TEST_PROJECT::execute
             );
 
-            case TCD, TRD, TRP, TR -> new JavaCode(
+            case TCF, TRF, TRP, TR -> new JavaCode(
                     new NoJavaCode<>(nodeType),
                     new NoJavaCode<>(nodeType),
                     new NoJavaCode<>(nodeType),

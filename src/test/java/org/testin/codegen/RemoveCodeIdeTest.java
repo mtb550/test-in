@@ -20,8 +20,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 
 public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
 
@@ -33,7 +33,7 @@ public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-049
     public void testRemovingATestCaseDeletesItsMethodAndKeepsTheClass() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto removed = createdTestCase(login, "Log in with a valid user", "b");
         final @NotNull TestCaseDto kept = createdTestCase(login, "Log out", "c");
 
@@ -47,7 +47,7 @@ public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-059
     public void testRemovingATestSetDeletesItsClassFile() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         assertNotNull("the test set's class was never written", theTestSourceRoot().findFileByRelativePath("nafath/LoginTest.java"));
 
         GenType.REMOVE_TEST_SET.execute(getProject(), login);
@@ -57,7 +57,7 @@ public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-059
     public void testRemovingAPackageDeletesItsFolderAndEverythingUnderIt() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
         createdTestSet("Payment", checkout);
         createdTestSet("Visa", indexedPackage("Cards", checkout));
         assertNotNull("the nested class was never written", theTestSourceRoot().findFileByRelativePath("nafath/checkout/cards/VisaTest.java"));

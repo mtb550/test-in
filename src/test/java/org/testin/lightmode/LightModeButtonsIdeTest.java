@@ -33,9 +33,9 @@ import org.testin.editor.EditorFixtures;
 import org.testin.editor.card.ShownTestCaseAction;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.model.status.RunItemStatus;
 import org.testin.runner.CapturedRunner;
@@ -128,15 +128,15 @@ public class LightModeButtonsIdeTest extends AbstractCodegenIdeTest {
     }
 
     private @NotNull List<TestCaseDto> automatedTestCases() {
-        final @NotNull TestSetDirectoryDto ts = createdTestSet("Checkout");
+        final @NotNull TestSetNode ts = createdTestSet("Checkout");
         final @NotNull List<TestCaseDto> made = List.of(createdTestCase(ts, "Log in with a valid user", "m0001"), createdTestCase(ts, "Log in with a wrong password", "m0002"));
         settled();
         return made;
     }
 
     private @NotNull TestRunEditor walkingThrough(final @NotNull List<TestCaseDto> testCases) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
         editor.onStartExecutionClicked();
         Await.until("the walk never started", () -> editor.getWalk().getCurrentlyExecutingIndex() == 0);

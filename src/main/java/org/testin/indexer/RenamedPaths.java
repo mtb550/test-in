@@ -17,7 +17,7 @@
 package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -42,7 +42,7 @@ record RenamedPaths(@NotNull Path from, @NotNull Path to) {
         });
     }
 
-    <V extends DirectoryDto> void moveNodesUnder(final @NotNull Map<String, V> map) {
+    <V extends Node> void moveNodesUnder(final @NotNull Map<String, V> map) {
         final @NotNull List<Map.Entry<String, V>> under = map.entrySet().stream().filter(entry -> isUnder(entry.getValue().getPath())).toList();
         for (final Map.Entry<String, V> entry : under) {
             final @NotNull V node = entry.getValue();

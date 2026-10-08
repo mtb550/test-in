@@ -23,23 +23,23 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.util.Bundle;
 
 import java.util.List;
 
 // UC-TREE-PANEL-012
 public class RemoveAction extends AbstractAnyProjectAction {
-    private static @NotNull List<DirectoryDto> removableNodes(final @NotNull AnActionEvent e) {
+    private static @NotNull List<Node> removableNodes(final @NotNull AnActionEvent e) {
         return TestinData.selectedNodes(e).stream()
-                .filter(DirectoryDto::isRemovable)
+                .filter(Node::isRemovable)
                 .toList();
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        final @NotNull List<DirectoryDto> nodesToRemove = removableNodes(e);
+        final @NotNull List<Node> nodesToRemove = removableNodes(e);
         if (nodesToRemove.isEmpty()) return;
 
         new RemoveWork(p).confirm(nodesToRemove);

@@ -17,7 +17,7 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 
@@ -38,7 +38,7 @@ public class HistoryCardsTest {
     }
 
     private static @NotNull BugCard bug(final @NotNull String hash, final int day) {
-        return new BugCard(hash, "Sara", on(day), new BugEvent(BugEventKind.RECORDED, Path.of("Cycle 3"), TestRunItems.builder().build(), List.of()));
+        return new BugCard(hash, "Sara", on(day), new BugEvent(BugEventKind.RECORDED, Path.of("Cycle 3"), RunItem.builder().build(), List.of()));
     }
 
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-107

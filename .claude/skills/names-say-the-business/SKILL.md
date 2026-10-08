@@ -32,9 +32,56 @@ name should match our correct names in business."*
 | `RunEditor`, `runPath`      | `TestRunEditor`, `testRunPath`         | Run alone is a verb. The thing is a test run                                 |
 | `TestStatus`, `verdict`     | `RunItemStatus`, `runItemStatus`       | Passed, Failed, Blocked is what a test run records for a run item            |
 | `RunStatus`, `RunRegistry`  | `ExecutionStatus`, `ExecutionRegistry` | Executing TestNG methods is an execution, not a test run                     |
-| `TestEditor`, `TestToolbar` | `TestCaseEditor`, `TestCaseToolbar`    | The editor of a test set's test cases                                        |
+| `TestEditor`, `TestToolbar` | `TestSetEditor`, `TestSetToolbar`      | The editor of a test set's test cases                                        |
 
 It holds for the documentation and for issues as well: *test case id*, never *case id*; *run item*, never *item*.
+
+## Name the container, and name the thing
+
+> *"test set has many test case, test run has many run items, so we can not say
+> TestCaseEditor and TestRunEditor, we must say TestSetEditor and TestRunEditor.
+> if you dont be specific in names of method and classes you will be confused and
+> may you implement somthing wrong, contributer may confused. business may will
+> not clear."* - Muteb, 9 October 2026
+
+Two halves, and a pair of names must sit on the same half:
+
+- **What opens a container is named for the container.** An editor, its
+  toolbar, its context menu, its grid listener and its package: `TestSetEditor`
+  beside `TestRunEditor`, `TestSetToolbar` beside `TestRunToolbar`,
+  `editor/testset` beside `editor/testrun`.
+- **What shows one thing is named for that thing.** A card and its renderer:
+  `TestCaseCard` beside `RunItemCard`, never `TestRunCard`.
+- **A view is named for what it draws.** `CardView` beside `GridView`; the
+  button a tester presses says **Card View**.
+- **One thing is singular, a list is plural.** `RunItem` for one run item, never
+  `TestRunItems`; `groups` for a test case's list of groups, never `group`.
+- **A run item is never a result.** `getRunItems()`, `runItemOf(id)`,
+  `RunItemsInTestCaseOrderTest`, and the words a tester reads: Record Run Item,
+  Run items not read. "Result" stays only where the business says it: Actual
+  Result, Expected Result, Result Analysis.
+- **Where a thing lives is its path**, as `getPath()`, `testRunPath` and
+  `testSetPath` already say. Which run item, by test run and test case, is a
+  `RunItemPath` - not an address, a key or a reference.
+
+| Not this                               | This                                         |
+|----------------------------------------|----------------------------------------------|
+| `TestCaseEditor`, `TestCaseToolbar`    | `TestSetEditor`, `TestSetToolbar`            |
+| `TestRunCard`, `TestRunListRenderer`   | `RunItemCard`, `RunItemCardRenderer`         |
+| `ListView`, `ListViewBtn`, `LIST_VIEW` | `CardView`, `CardViewBtn`, `CARD_VIEW`       |
+| `TestRunItems`, `getResults()`         | `RunItem`, `getRunItems()`                   |
+| `bug.RunItem` (a test run and an id)   | `RunItemPath`                                |
+| `FailedResultDialog`                   | `FailureDetailDialog`                        |
+| `EditorKind.TEST`, `EditorKind.RUN`    | `EditorKind.TEST_SET`, `EditorKind.TEST_RUN` |
+
+**The stored keys say the same word as the code and the screen.** A marker's
+`modifiedBy` became `updatedBy`, as a test case and every screen say; a test
+case's `group` became `groups`; `testin.yml`'s `RepoUrl` became `repoUrl`. A
+stored key is renamed on purpose, never by a sweep: it moves the format number
+on (Rule-INTERNAL-091), it gets no `@JsonAlias`, and old data is wiped rather
+than converted. A key that is persisted but not seen as a word - a settings key
+such as `testin.selectedDetails.test.v4` - keeps its string when the constant
+around it is renamed.
 
 ## The two short names, and there are only two
 
@@ -66,8 +113,9 @@ verified it, and no string, bundle key or stored value changed.
 
 Renaming is a three-step check, not a find-and-replace. CLAUDE.md states it:
 
-1. **Never touch a string.** A bundle key, a marker file name, a stored JSON
-   field and a `@State` name all read like code and are none of it.
+1. **Never touch a string by accident.** A bundle key, a marker file name, a stored JSON
+   field and a `@State` name all read like code and are none of it. Rename one
+   only on purpose, as the section above says, and diff every literal before and after.
 2. **Check the new name is free in that file.** `cases` renamed to `testCases`
    where a `testCases` already exists is two variables with one name.
 3. **Compile and run the tests.** A rename that compiles and passes is done; a

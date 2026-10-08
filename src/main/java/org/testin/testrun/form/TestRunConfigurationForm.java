@@ -19,7 +19,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.testrun.TestRunConfiguration;
 import org.testin.ui.dialogs.CollapsiblePanel;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogComponent;

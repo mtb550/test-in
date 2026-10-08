@@ -37,7 +37,7 @@ import org.testin.git.history.TestCaseHistory;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseFields;
@@ -167,7 +167,7 @@ public class HistoryTab {
     // Rule-VIEW-PANEL-105
     private static @NotNull JComponent bugCard(final @NotNull Project p, final @NotNull BugCard bug, final @NotNull TestCaseDto tc) {
         final @NotNull BugEvent event = bug.event();
-        final @NotNull Color bar = event.kind().barOf(event.item());
+        final @NotNull Color bar = event.kind().barOf(event.runItem());
 
         final @NotNull JBPanel<?> box = new JBPanel<>();
         box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
@@ -198,7 +198,7 @@ public class HistoryTab {
 
     // Rule-VIEW-PANEL-109
     private static @NotNull JComponent testRun(final @NotNull Project p, final @NotNull BugEvent event, final @NotNull TestCaseDto tc) {
-        return Services.getInstance(p, TestRuns.class).findTestRunDir(event.testRun())
+        return Services.getInstance(p, TestRuns.class).findTestRunNode(event.testRun())
                 .map(dir -> {
                     final @NotNull JComponent link = AbstractDetails.link(event.testRunName(), _ -> Services.getInstance(p, TestinEditors.class).openAndSelect(dir, tc));
                     link.setFont(Fonts.strong());
@@ -214,21 +214,21 @@ public class HistoryTab {
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-108
     private static @NotNull List<JComponent> bugRows(final @NotNull Project p, final @NotNull BugEvent event) {
         return switch (event.kind()) {
-            case RECORDED -> bugAttributes(p, event.item());
+            case RECORDED -> bugAttributes(p, event.runItem());
             case CHANGED -> event.changes().stream().map(change -> field(change.fieldName(), change(change))).toList();
             case CLEARED ->
-                    List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.cleared.why", event.item().getStatus().getLabel()))));
+                    List.of(field(Bundle.message("view.history.bug.because"), plain(Bundle.message("view.history.bug.cleared.why", event.runItem().getStatus().getLabel()))));
             case REMOVED -> List.of();
         };
     }
 
-    private static @NotNull List<JComponent> bugAttributes(final @NotNull Project p, final @NotNull TestRunItems item) {
+    private static @NotNull List<JComponent> bugAttributes(final @NotNull Project p, final @NotNull RunItem runItem) {
         final @NotNull List<JComponent> rows = new ArrayList<>();
-        if (item.isFailed()) {
-            rows.add(field(TestRunEditorAttributes.BUG_SEVERITY.getName(), text(item.getBugSeverity().getLabel(), Fonts.body(), item.getBugSeverity().getColor())));
-            rows.add(field(TestRunEditorAttributes.BUG_PRIORITY.getName(), plain(item.getBugPriority().getLabel())));
+        if (runItem.isFailed()) {
+            rows.add(field(TestRunEditorAttributes.BUG_SEVERITY.getName(), text(runItem.getBugSeverity().getLabel(), Fonts.body(), runItem.getBugSeverity().getColor())));
+            rows.add(field(TestRunEditorAttributes.BUG_PRIORITY.getName(), plain(runItem.getBugPriority().getLabel())));
         }
-        item.bugIssue().ifPresent(url -> rows.add(field(TestRunEditorAttributes.BUG_ISSUE.getName(), BugIssueLink.of(p, url))));
+        runItem.bugIssue().ifPresent(url -> rows.add(field(TestRunEditorAttributes.BUG_ISSUE.getName(), BugIssueLink.of(p, url))));
         return rows;
     }
 

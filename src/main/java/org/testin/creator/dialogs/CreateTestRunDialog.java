@@ -18,7 +18,7 @@ package org.testin.creator.dialogs;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.notifications.Refused;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -30,22 +30,22 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public final class CreateTestRunDialog extends AbstractFrameworkDialog {
-    private final @NotNull TextFieldWithSelections<DirectoryType> nameAndType;
+    private final @NotNull TextFieldWithSelections<NodeType> nameAndType;
 
-    private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
+    private final @NotNull BiConsumer<@NotNull String, @NotNull NodeType> onCreate;
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-032
-    public CreateTestRunDialog(final @NotNull Project p, final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate) {
+    public CreateTestRunDialog(final @NotNull Project p, final @NotNull BiConsumer<@NotNull String, @NotNull NodeType> onCreate) {
         super(p);
         this.onCreate = onCreate;
 
         title = Bundle.message("dialog.create.test.run.title");
 
-        final @NotNull ComponentDialogBase<TextFieldWithSelections<DirectoryType>> built = ComponentDialogBase.<DirectoryType>textFieldWithSelections()
-                .icon(DirectoryType.TR.getIcon())
+        final @NotNull ComponentDialogBase<TextFieldWithSelections<NodeType>> built = ComponentDialogBase.<NodeType>textFieldWithSelections()
+                .icon(NodeType.TR.getIcon())
                 .placeholder(Bundle.message("dialog.create.test.run.placeholder"))
-                .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDescription(), Bundle.message("dialog.create.test.run.hint.tr"), DirectoryType.TR)
-                .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDescription(), Bundle.message("dialog.create.test.run.hint.trp"), DirectoryType.TRP)
+                .selection(NodeType.TR.getIcon(), NodeType.TR.getDescription(), Bundle.message("dialog.create.test.run.hint.tr"), NodeType.TR)
+                .selection(NodeType.TRP.getIcon(), NodeType.TRP.getDescription(), Bundle.message("dialog.create.test.run.hint.trp"), NodeType.TRP)
                 .build();
         nameAndType = built.getComponent();
         components = List.of(built);
@@ -59,7 +59,7 @@ public final class CreateTestRunDialog extends AbstractFrameworkDialog {
     // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull DirectoryType type = nameAndType.getSelectedValue();
+        final @NotNull NodeType type = nameAndType.getSelectedValue();
 
         final @NotNull String name = accepted(nameAndType, value -> Refused.ofName(type, value));
         if (name.isEmpty()) return;

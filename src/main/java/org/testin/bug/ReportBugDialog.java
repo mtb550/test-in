@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 final class ReportBugDialog extends AbstractFrameworkDialog {
-    private final @NotNull RunItem item;
+    private final @NotNull RunItemPath runItemPath;
     private final @NotNull PreparedBug bug;
     private final @NotNull Runnable redraw;
     private final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
@@ -46,13 +46,13 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
 
     private boolean sent;
 
-    ReportBugDialog(final @NotNull Project p, final @NotNull RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
+    ReportBugDialog(final @NotNull Project p, final @NotNull RunItemPath runItemPath, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
         super(p);
-        this.item = item;
+        this.runItemPath = runItemPath;
         this.bug = bug;
         this.redraw = redraw;
 
-        final @NotNull Edits opening = reports.unsent(item)
+        final @NotNull Edits opening = reports.unsent(runItemPath)
                 .orElse(new Edits(bug.facts().title(), bug.body()));
 
         titleField = ComponentDialogBase.textField()
@@ -84,17 +84,17 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
 
     void open() {
         if (!show()) {
-            reports.discard(item);
-            if (reports.end(item, Stage.OPEN)) redraw.run();
+            reports.discard(runItemPath);
+            if (reports.end(runItemPath, Stage.OPEN)) redraw.run();
             return;
         }
 
         getPopup().addListener(new JBPopupListener() {
             @Override
             public void onClosed(final @NotNull LightweightWindowEvent event) {
-                if (!event.isOk()) reports.discard(item);
+                if (!event.isOk()) reports.discard(runItemPath);
 
-                if (reports.end(item, Stage.OPEN)) redraw.run();
+                if (reports.end(runItemPath, Stage.OPEN)) redraw.run();
             }
         });
     }
@@ -110,7 +110,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
     }
 
     private @NotNull Optional<String> noLongerFailed() {
-        return item.stillFailed(testRuns).isPresent()
+        return runItemPath.stillFailed(testRuns).isPresent()
                 ? Optional.empty()
                 : Optional.of(Bundle.message("bug.no.longer.failed"));
     }
@@ -126,7 +126,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
 
         sent = true;
         final @NotNull Edits edits = new Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
-        BugFiling.send(p, item, bug.repository().orElseThrow(), edits, bug.facts().screenshots(), redraw);
+        BugFiling.send(p, runItemPath, bug.repository().orElseThrow(), edits, bug.facts().screenshots(), redraw);
         closeOk();
     }
 }

@@ -23,8 +23,8 @@ import org.testin.FilesUnder;
 import org.testin.editor.EditorFixtures;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 
@@ -53,8 +53,8 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-223
     public void testATestSetWithUnplacedTestCasesIsPlacedOnceSoATypedPositionMeansSomething() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Imported");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Imported");
         final @NotNull List<TestCaseDto> unplaced = new ArrayList<>();
         for (final String description : List.of("Log in", "Log out", "Pay by card", "Check out"))
             unplaced.add(EditorFixtures.testCase(getProject(), ts, description, ""));

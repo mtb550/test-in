@@ -25,10 +25,10 @@ import org.testin.git.GitRepositoryService;
 import org.testin.indexer.TestRuns;
 import org.testin.indexer.WatchedPath;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.util.FailureText;
@@ -57,11 +57,11 @@ public final class TestRunFromGit {
                 .filter(testProject -> !git.isNotRepository(testProject))
                 .ifPresent(testProject -> {
                     final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-                    testRuns.findTestRun(testRunPath).ifPresent(testRun -> {
+                    testRuns.findRunItems(testRunPath).ifPresent(testRun -> {
                         final @NotNull String revision = recordedRevision(git, testProject, testRunPath, testRuns.commitOf(testRunPath));
                         testRuns.rememberRecordedAt(testRunPath, revision);
                         readTheCommit(p, git, testProject, revision, testRun.coveredIds());
-                        readTheDeleted(p, git, testProject, testRun.getResults().stream().filter(TestRunItems::isRemoved).map(TestRunItems::getId).toList());
+                        readTheDeleted(p, git, testProject, testRun.getAll().stream().filter(RunItem::isRemoved).map(RunItem::getId).toList());
                     });
                 });
     }
@@ -70,7 +70,7 @@ public final class TestRunFromGit {
     static @NotNull String recordedRevision(final @NotNull GitRepositoryService git, final @NotNull Path testProject, final @NotNull Path testRunPath, final @NotNull String commit) {
         if (commit.isEmpty() || isInTheBranch(git, testProject, commit)) return commit;
 
-        final @NotNull String marker = testProject.relativize(testRunPath.resolve(DirectoryType.TR.getMarker())).toString().replace('\\', '/');
+        final @NotNull String marker = testProject.relativize(testRunPath.resolve(NodeType.TR.getMarker())).toString().replace('\\', '/');
         try {
             final @NotNull String record = git.log(testProject, "-1", "--format=%H", "-G\"commit\"", "--", marker).strip();
             return record.isEmpty() ? commit : record + "^";
@@ -90,7 +90,7 @@ public final class TestRunFromGit {
 
     // Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
     public static void readAll(final @NotNull Project p) {
-        Services.getInstance(p, TestRuns.class).getAllTestRuns().keySet().forEach(testRunPath -> read(p, testRunPath));
+        Services.getInstance(p, TestRuns.class).getAllRunItems().keySet().forEach(testRunPath -> read(p, testRunPath));
     }
 
     // Rule-EDITOR-PANEL-239
@@ -103,7 +103,7 @@ public final class TestRunFromGit {
 
         final @NotNull Map<String, UUID> wanted = unread.stream().collect(Collectors.toMap(FileKind.TEST_CASE::fileName, Function.identity()));
         try {
-            final @NotNull List<String> listed = git.files(testProject, commit, DirectoryType.TCD.getFolderName()).stream()
+            final @NotNull List<String> listed = git.files(testProject, commit, NodeType.TCF.getFolderName()).stream()
                     .filter(path -> wanted.containsKey(fileName(path)))
                     .toList();
             final @NotNull Map<String, String> files = git.contents(testProject, commit, listed);
@@ -125,7 +125,7 @@ public final class TestRunFromGit {
         final @NotNull Map<String, UUID> wanted = deleted.stream().collect(Collectors.toMap(FileKind.TEST_CASE::fileName, Function.identity()));
         try {
             final @NotNull Map<String, UUID> lastVersions = lastVersions(git.log(testProject, Stream.concat(Stream.of(FORMAT, "--name-status", "--"),
-                    deleted.stream().map(id -> BugHistory.pathspec(DirectoryType.TCD, FileKind.TEST_CASE, id))).toArray(String[]::new)), wanted);
+                    deleted.stream().map(id -> BugHistory.pathspec(NodeType.TCF, FileKind.TEST_CASE, id))).toArray(String[]::new)), wanted);
             if (lastVersions.isEmpty()) return;
 
             final @NotNull Map<UUID, TestCaseDto> testCases = new HashMap<>();

@@ -19,7 +19,7 @@ package org.testin.notifications;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -107,8 +107,8 @@ public enum Refused {
     private final @NotNull String sentence;
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-095
-    public static @NotNull Optional<Refused> ofName(final @NotNull DirectoryType type, final @NotNull String name) {
-        if (!DirectoryType.isOneFolderName(name)) return Optional.of(NOT_ONE_FOLDER);
+    public static @NotNull Optional<Refused> ofName(final @NotNull NodeType type, final @NotNull String name) {
+        if (!NodeType.isOneFolderName(name)) return Optional.of(NOT_ONE_FOLDER);
         if (!type.canTakeName(name)) return Optional.of(NOT_A_JAVA_NAME);
 
         return Optional.empty();

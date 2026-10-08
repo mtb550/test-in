@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.Said;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
 import org.testin.indexer.TestCases;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
@@ -38,12 +38,12 @@ public class CommittedTestRunF2IdeTest extends AbstractReadTheRootIdeTest {
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-110
     public void testF2OnARunItemOfACommittedTestRunChangesNothingAndSaysWhere() {
         final @NotNull Path testProject = aTestProjectAt(root.resolve("Shop"));
-        final @NotNull Path testSet = marked(theTestCasesOf(testProject).resolve("Login"), DirectoryType.TS);
+        final @NotNull Path testSet = marked(theTestCasesOf(testProject).resolve("Login"), NodeType.TS);
         final @NotNull UUID id = aTestCaseIn(testSet);
         final @NotNull Path testRun = theTestRunsOf(testProject).resolve("Cycle 4");
         try {
             Files.createDirectories(testRun);
-            Files.writeString(testRun.resolve(DirectoryType.TR.getMarker()), """
+            Files.writeString(testRun.resolve(NodeType.TR.getMarker()), """
                     {
                       "createdBy" : "Sara",
                       "createdAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
@@ -65,7 +65,7 @@ public class CommittedTestRunF2IdeTest extends AbstractReadTheRootIdeTest {
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-110
     public void testF2OnADeletedTestCaseChangesNothingAndSaysWhy() {
         final @NotNull Path testProject = aTestProjectAt(root.resolve("Shop"));
-        final @NotNull Path login = marked(theTestCasesOf(testProject).resolve("Login"), DirectoryType.TS);
+        final @NotNull Path login = marked(theTestCasesOf(testProject).resolve("Login"), NodeType.TS);
         final @NotNull UUID id = aTestCaseIn(login);
         try {
             Files.delete(login.resolve(FileKind.TEST_CASE.fileName(id)));

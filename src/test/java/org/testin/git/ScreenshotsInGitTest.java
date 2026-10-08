@@ -17,7 +17,7 @@
 package org.testin.git;
 
 import org.testin.git.change.GitDiffProcessor;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -42,7 +42,7 @@ public class ScreenshotsInGitTest {
         try {
             final Path at = root.resolve("runs/cycle38");
             Files.createDirectories(at);
-            Files.writeString(at.resolve(DirectoryType.TR.getMarker()), "{}");
+            Files.writeString(at.resolve(NodeType.TR.getMarker()), "{}");
         } catch (final Exception e) {
             throw new AssertionError("could not write the test run's marker", e);
         }

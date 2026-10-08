@@ -20,9 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
@@ -47,26 +47,26 @@ public class SignedOffTestRunIdeTest extends AbstractTempRootIdeTest {
     protected void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        failed = made.testCase(made.testSet(tp.getTestCasesDirectory(), "Payments")).getId();
-        cycle = made.testRun(tp.getTestRunsDirectory(), "Cycle-1").getPath();
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        failed = made.testCase(made.testSet(tp.getTestCasesFolder(), "Payments")).getId();
+        cycle = made.testRun(tp.getTestRunsFolder(), "Cycle-1").getPath();
     }
 
     private @NotNull Path aTestRunWithOneFailure() {
-        indexedTestRuns().putTestRun(cycle, new TestRunDto().setResults(List.of(
-                new TestRunItems().setId(failed).setStatus(RunItemStatus.FAILED).setActualResult(RECORDED))));
+        indexedTestRuns().putRunItems(cycle, new RunItems().setAll(List.of(
+                new RunItem().setId(failed).setStatus(RunItemStatus.FAILED).setActualResult(RECORDED))));
         return cycle;
     }
 
     private boolean saveAFailureOnto(final @NotNull Path testRunPath) {
-        final @NotNull TestRunItems row = new TestRunItems().setId(failed).setStatus(RunItemStatus.FAILED).setActualResult("Typed after the sign-off");
+        final @NotNull RunItem row = new RunItem().setId(failed).setStatus(RunItemStatus.FAILED).setActualResult("Typed after the sign-off");
         return new FailureForm(getProject(), testRunPath, row, 1f, () -> {
         }, () -> {
         }).save();
     }
 
     private @NotNull String recordedOn(final @NotNull Path testRunPath) {
-        return indexedTestRuns().getTestRunByPath(testRunPath).resultOf(failed).map(TestRunItems::getActualResult).orElse("");
+        return indexedTestRuns().getRunItems(testRunPath).runItemOf(failed).map(RunItem::getActualResult).orElse("");
     }
 
     // Rule-TREE-PANEL-135, Rule-PRODUCT-011

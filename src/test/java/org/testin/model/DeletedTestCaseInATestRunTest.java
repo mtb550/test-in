@@ -18,8 +18,9 @@ package org.testin.model;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
+import org.testin.model.testrun.RunItems;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -33,8 +34,8 @@ import static org.testng.Assert.assertTrue;
 
 public class DeletedTestCaseInATestRunTest {
 
-    private static @NotNull TestRunItems removedItem(final UUID id) {
-        return TestRunItems.builder()
+    private static @NotNull RunItem removedItem(final UUID id) {
+        return RunItem.builder()
                 .id(id)
                 .status(RunItemStatus.REMOVED)
                 .executedAt(Config.NOT_EXECUTED)
@@ -57,9 +58,9 @@ public class DeletedTestCaseInATestRunTest {
     @Test
     public void theRowStillShowsAndStillNamesItsTestCase() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = removedItem(id);
+        final RunItem runItem = removedItem(id);
 
-        final TestCaseDto shown = item.shownTestCase();
+        final TestCaseDto shown = runItem.shownTestCase();
 
         assertEquals(shown.getId(), id, "the id is the only identity a deleted test case has left");
         assertTrue(shown.getDescription().contains(id.toString()),
@@ -69,29 +70,29 @@ public class DeletedTestCaseInATestRunTest {
     // Rule-EDITOR-PANEL-126
     @Test
     public void aRowNeverJudgedOfADeletedTestCaseIsShownRemoved() {
-        final TestRunItems item = TestRunItems.builder()
+        final RunItem runItem = RunItem.builder()
                 .id(UUID.randomUUID())
                 .status(RunItemStatus.PENDING)
                 .removed(true)
                 .build();
 
-        assertEquals(item.shownStatus(), RunItemStatus.REMOVED, "nothing was executed, and now nothing can be");
+        assertEquals(runItem.shownStatus(), RunItemStatus.REMOVED, "nothing was executed, and now nothing can be");
     }
 
     // Rule-EDITOR-PANEL-126
     @Test
     public void aJudgedRunItemOfADeletedTestCaseShowsRemovedAndKeepsItsRunItemStatusInTheFile() {
-        final TestRunItems item = TestRunItems.builder()
+        final RunItem runItem = RunItem.builder()
                 .id(UUID.randomUUID())
                 .status(RunItemStatus.PASSED)
                 .removed(true)
                 .build();
 
-        assertTrue(item.isRemoved(), "the run item status path, the details editor and the walker refuse it");
-        assertEquals(item.shownStatus(), RunItemStatus.REMOVED, "a deleted test case reads Removed while its test run is not Committed");
+        assertTrue(runItem.isRemoved(), "the run item status path, the details editor and the walker refuse it");
+        assertEquals(runItem.shownStatus(), RunItemStatus.REMOVED, "a deleted test case reads Removed while its test run is not Committed");
 
         try {
-            final String written = new String(RealMapper.build().writeValueAsBytes(TestRunDto.builder().results(List.of(item)).build()), StandardCharsets.UTF_8);
+            final String written = new String(RealMapper.build().writeValueAsBytes(RunItems.builder().all(List.of(runItem)).build()), StandardCharsets.UTF_8);
 
             assertTrue(written.contains("\"PASSED\""), "the file keeps the run item status: " + written);
             assertFalse(written.contains("removed"), "the mark is never written: " + written);

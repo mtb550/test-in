@@ -19,11 +19,11 @@ package org.testin.explorer.tree;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.tree.LeafState;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.status.ProjectStatus;
 
 import java.nio.file.Path;
@@ -35,30 +35,30 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
 
     private static final Path SET = Path.of("project", "Test Cases", "Login");
 
-    private static @NotNull DirectoryDto at(final DirectoryDto directory, final Path path) {
+    private static @NotNull Node at(final Node directory, final Path path) {
         directory.setPath(path);
         return directory;
     }
 
     public void testARescanReadsTheSameFolderIntoAnEqualNode() {
-        final TreePanelNode before = new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET));
-        final TreePanelNode after = new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET));
+        final TreePanelNode before = new TreePanelNode(getProject(), at(new TestSetNode(), SET));
+        final TreePanelNode after = new TreePanelNode(getProject(), at(new TestSetNode(), SET));
 
         assertEquals("a rescan builds a new DTO for the same folder, and the tree must see the same node", before, after);
         assertEquals(before.hashCode(), after.hashCode());
     }
 
     public void testTwoFoldersAreTwoNodes() {
-        final TreePanelNode login = new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET));
-        final TreePanelNode checkout = new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET.resolveSibling("Checkout")));
+        final TreePanelNode login = new TreePanelNode(getProject(), at(new TestSetNode(), SET));
+        final TreePanelNode checkout = new TreePanelNode(getProject(), at(new TestSetNode(), SET.resolveSibling("Checkout")));
 
         assertNotEquals(login, checkout);
     }
 
     // Rule-TREE-PANEL-127
     public void testATestSetAndATestRunHaveNothingToOpen() {
-        assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET)).getLeafState());
-        assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestRunDirectoryDto(), Path.of("project", "Test Runs", "Cycle 1"))).getLeafState());
+        assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestSetNode(), SET)).getLeafState());
+        assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestRunNode(), Path.of("project", "Test Runs", "Cycle 1"))).getLeafState());
     }
 
     public void testAFolderCanBeFoundByItsPathAlone() {
@@ -66,19 +66,19 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
         final TreePanelNode probe = TreePanelNode.standingFor(getProject(), root, SET);
 
         assertEquals("the model finds a changed folder by comparing a probe with the node it holds",
-                new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET)), probe);
-        assertEquals(new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), Objects.requireNonNull(SET.getParent(), "the test set has no folder"))), probe.getParent());
+                new TreePanelNode(getProject(), at(new TestSetNode(), SET)), probe);
+        assertEquals(new TreePanelNode(getProject(), at(new TestSetPackageNode(), Objects.requireNonNull(SET.getParent(), "the test set has no folder"))), probe.getParent());
         assertEquals("the probe's parents lead to the root the structure answers with",
-                new TreePanelNode(getProject(), at(new TestProjectDirectoryDto(), root)), probe.getParent().getParent());
+                new TreePanelNode(getProject(), at(new TestProjectNode(), root)), probe.getParent().getParent());
     }
 
     public void testAPackageIsAskedForItsChildren() {
-        assertEquals(LeafState.ASYNC, new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), Objects.requireNonNull(SET.getParent(), "the test set has no folder"))).getLeafState());
+        assertEquals(LeafState.ASYNC, new TreePanelNode(getProject(), at(new TestSetPackageNode(), Objects.requireNonNull(SET.getParent(), "the test set has no folder"))).getLeafState());
     }
 
     // Rule-TREE-PANEL-063
     public void testATestProjectThatIsNotActiveShowsNothingUnderIt() {
-        final @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+        final @NotNull TestProjectNode testProject = new TestProjectNode();
         testProject.setPath(Path.of("project"));
 
         assertEquals("an active test project does not show its two containers", 2, new TreePanelNode(getProject(), testProject).getChildren().size());

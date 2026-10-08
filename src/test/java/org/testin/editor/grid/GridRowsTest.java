@@ -18,7 +18,7 @@ package org.testin.editor.grid;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
@@ -42,9 +42,9 @@ public class GridRowsTest {
         final @NotNull List<String[]> rows = GridRows.ofTestCases(List.of(LOGIN, LOGOUT), GridRowsTest::position);
 
         assertEquals(rows.size(), 2, "the test cases are not one row each");
-        assertEquals(rows.getFirst().length, TestCaseEditorAttributes.values().length, "a row does not hold one cell per column");
-        assertEquals(rows.getFirst()[TestCaseEditorAttributes.ORDER.column()], "7", "the order column does not show the test case's place");
-        assertEquals(rows.get(1)[TestCaseEditorAttributes.DESCRIPTION.column()], "Log out", "the description column does not show the description");
+        assertEquals(rows.getFirst().length, TestSetEditorAttributes.values().length, "a row does not hold one cell per column");
+        assertEquals(rows.getFirst()[TestSetEditorAttributes.ORDER.column()], "7", "the order column does not show the test case's place");
+        assertEquals(rows.get(1)[TestSetEditorAttributes.DESCRIPTION.column()], "Log out", "the description column does not show the description");
     }
 
     // Rule-EDITOR-PANEL-020

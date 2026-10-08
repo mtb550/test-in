@@ -68,7 +68,7 @@ public final class Badges {
         final @NotNull List<Badge> badges = new ArrayList<>();
         addPriorityBadge(badges, tc);
 
-        for (final String group : tc.getGroup()) {
+        for (final String group : tc.getGroups()) {
             badges.add(createGroupBadge(group));
         }
 

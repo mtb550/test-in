@@ -22,12 +22,12 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.list.CardMouseListener;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.cardview.CardMouseListener;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.node.TestSetNode;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.view.Drawn;
 
 import java.awt.Rectangle;
@@ -55,15 +55,15 @@ public class RightClickIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
-    private @NotNull TestCaseEditor fourTestCases() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+    private @NotNull TestSetEditor fourTestCases() {
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), ts, 4);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-110
     public void testRightClickingAGridRowOutsideTheSelectionMovesTheSelectionThereFirst() {
-        final @NotNull TestCaseEditor editor = fourTestCases();
+        final @NotNull TestSetEditor editor = fourTestCases();
         editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         final @NotNull JBTable table = Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst().orElseThrow();
@@ -71,7 +71,7 @@ public class RightClickIdeTest extends AbstractTempRootIdeTest {
         table.setRowSelectionInterval(0, 1);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-        final @NotNull Rectangle row = table.getCellRect(3, table.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.column()), true);
+        final @NotNull Rectangle row = table.getCellRect(3, table.convertColumnIndexToView(TestSetEditorAttributes.DESCRIPTION.column()), true);
         final @NotNull MouseEvent press = new MouseEvent(table, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), InputEvent.BUTTON3_DOWN_MASK, (int) row.getCenterX(), (int) row.getCenterY(), 1, true, MouseEvent.BUTTON3);
         final @NotNull BooleanSupplier moved = () -> Arrays.equals(new int[]{3}, table.getSelectedRows());
 
@@ -86,7 +86,7 @@ public class RightClickIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-110
     public void testRightClickingACardOutsideTheSelectionMovesTheSelectionThereFirst() {
-        final @NotNull TestCaseEditor editor = fourTestCases();
+        final @NotNull TestSetEditor editor = fourTestCases();
         final @NotNull JBList<TestCaseDto> list = editor.getList();
         list.setSize(900, 2000);
         list.setSelectionInterval(0, 1);

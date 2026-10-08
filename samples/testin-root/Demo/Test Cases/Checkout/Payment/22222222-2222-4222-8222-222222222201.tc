@@ -12,7 +12,7 @@
   ],
   "priority" : "HIGH",
   "reference" : "",
-  "group" : [
+  "groups" : [
     "SMOKE",
     "FUNCTIONAL"
   ],

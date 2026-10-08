@@ -20,19 +20,19 @@ import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 
 import java.util.List;
 
 public class BulkDescriptionIdeTest extends AbstractCodegenIdeTest {
 
-    private static @NotNull TestCaseDto described(final @NotNull TestSetDirectoryDto ts, final @NotNull String description) {
+    private static @NotNull TestCaseDto described(final @NotNull TestSetNode ts, final @NotNull String description) {
         return TestCaseDto.builder().parent(ts).description(description).build();
     }
 
     // Rule-CODEGEN-019
     public void testFillingInTheDescriptionOfSeveralTestCasesWritesEachMethod() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto first = described(login, "Logs in");
         final @NotNull TestCaseDto second = described(login, "Logs out");
 
@@ -45,7 +45,7 @@ public class BulkDescriptionIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-019, Rule-CODEGEN-020
     public void testAMethodAlreadyThereIsRenamedNotWrittenAgain() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto hasOne = described(login, "Logs in");
         GenType.CREATE_TEST_CASE.executeAllNow(getProject(), List.of(hasOne));
 

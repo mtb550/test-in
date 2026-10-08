@@ -30,8 +30,8 @@ import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -68,8 +68,8 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
     }
 
     private void filed(final @NotNull String testRun, final @NotNull String bugIssueUrl) {
-        final @NotNull TestRunItems failed = TestRunItems.builder().id(TEST_CASE_ID).status(RunItemStatus.FAILED).bugIssueUrl(bugIssueUrl).build();
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(root.resolve("NAFATH").resolve("Test Runs").resolve(testRun), TestRunDto.builder().results(new ArrayList<>(List.of(failed))).build());
+        final @NotNull RunItem failed = RunItem.builder().id(TEST_CASE_ID).status(RunItemStatus.FAILED).bugIssueUrl(bugIssueUrl).build();
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(root.resolve("NAFATH").resolve("Test Runs").resolve(testRun), RunItems.builder().all(new ArrayList<>(List.of(failed))).build());
     }
 
     private void ghAnswers(final @NotNull String withBoards) {
@@ -188,7 +188,7 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         readAndWait();
         assertEquals(1, hintsFor(SetupStep.BUG_STATES).size());
 
-        Services.getInstance(getProject(), TestRuns.class).getAllTestRuns().keySet().forEach(testRun -> Services.getInstance(getProject(), TestRuns.class).putTestRun(testRun, TestRunDto.builder().results(new ArrayList<>()).build()));
+        Services.getInstance(getProject(), TestRuns.class).getAllRunItems().keySet().forEach(testRun -> Services.getInstance(getProject(), TestRuns.class).putRunItems(testRun, RunItems.builder().all(new ArrayList<>()).build()));
         readAndWait();
 
         assertEquals("the hint waited on bug links nobody has any more", List.of(), hintsFor(SetupStep.BUG_STATES));

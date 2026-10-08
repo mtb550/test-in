@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
@@ -47,18 +47,18 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestProjectDirectoryDto aTestProject(final String name) {
+    private @NotNull TestProjectNode aTestProject(final String name) {
         return WriteAction.computeAndWait(() -> {
-            final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve(name));
+            final TestProjectNode tp = Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(root.resolve(name));
             nodes().addTestProject(tp);
             return tp;
         });
     }
 
-    private @NotNull TestSetDirectoryDto aTestSetIn(final TestProjectDirectoryDto tp) {
+    private @NotNull TestSetNode aTestSetIn(final TestProjectNode tp) {
         return WriteAction.computeAndWait(() -> {
-            final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
-                    .getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetNode ts = Services.getInstance(getProject(), NodeMapper.class)
+                    .getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Login"), tp.getTestCasesFolder());
             nodes().addTestSet(ts);
             return ts;
         });
@@ -85,7 +85,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
     }
 
     public void testAnInactiveProjectsContainersFollowIt() {
-        final TestProjectDirectoryDto tp = aTestProject("Checkout");
+        final TestProjectNode tp = aTestProject("Checkout");
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
             nodes().persistMarker(tp);
@@ -95,15 +95,15 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
         final Path to = root.resolve("Checkout_App");
         rename(tp.getPath(), to);
 
-        final TestProjectDirectoryDto renamed = Optional.ofNullable(nodes().getTestProjectsByPath().get(to.toString()))
+        final TestProjectNode renamed = Optional.ofNullable(nodes().getTestProjectsByPath().get(to.toString()))
                 .orElseThrow(() -> new AssertionError("the inactive project is not held under its new name"));
-        assertEquals("its test cases folder kept the old path", to.resolve("Test Cases"), renamed.getTestCasesDirectory().getPath());
-        assertEquals("its test runs folder kept the old path", to.resolve("Test Runs"), renamed.getTestRunsDirectory().getPath());
+        assertEquals("its test cases folder kept the old path", to.resolve("Test Cases"), renamed.getTestCasesFolder().getPath());
+        assertEquals("its test runs folder kept the old path", to.resolve("Test Runs"), renamed.getTestRunsFolder().getPath());
     }
 
     public void testAHandNamedTestCaseKeepsItsFile() {
-        final TestProjectDirectoryDto tp = aTestProject("NAFATH");
-        final TestSetDirectoryDto ts = aTestSetIn(tp);
+        final TestProjectNode tp = aTestProject("NAFATH");
+        final TestSetNode ts = aTestSetIn(tp);
         final UUID id = UUID.randomUUID();
 
         try {

@@ -17,8 +17,8 @@
 package org.testin.explorer.tree;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
 import org.testng.annotations.Test;
 
 import javax.swing.TransferHandler;
@@ -32,7 +32,7 @@ import static org.testng.Assert.assertFalse;
 public class NodesTransferableTest {
 
     private static @NotNull NodesTransferable aDraggedTestSet() {
-        final @NotNull DirectoryDto testSet = new TestSetDirectoryDto();
+        final @NotNull Node testSet = new TestSetNode();
         testSet.setPath(Path.of("root", "NAFATH", "Test Cases", "Login"));
 
         return new NodesTransferable(new TreeTransferPayload(List.of(testSet), TransferHandler.MOVE));

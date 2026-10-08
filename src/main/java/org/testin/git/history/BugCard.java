@@ -26,6 +26,6 @@ public record BugCard(@NotNull String hash, @NotNull String who, @NotNull ZonedD
     static @NotNull BugCard notCommitted(final @NotNull BugEvent event) {
         if (event.kind() == BugEventKind.REMOVED) return new BugCard("", "", Config.NOT_EXECUTED, event);
 
-        return new BugCard("", event.item().getExecutedBy(), event.item().getExecutedAt(), event);
+        return new BugCard("", event.runItem().getExecutedBy(), event.runItem().getExecutedAt(), event);
     }
 }

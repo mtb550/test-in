@@ -28,7 +28,7 @@ import org.testin.editor.card.HoverButton;
 import org.testin.editor.card.Offered;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
@@ -43,7 +43,7 @@ public final class ActionIcons {
     private static final int STRUT_WIDTH = 8;
 
     // UC-VIEW-PANEL-009, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057, Rule-VIEW-PANEL-063, Rule-EDITOR-PANEL-237
-    public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Optional<DirectoryDto> shownIn) {
+    public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Optional<Node> shownIn) {
         final @NotNull Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, shownIn, dto);
         final @NotNull Offered testRun = CardHoverAction.RUN_TEST_METHOD.offer(p, shownIn, dto);
         final @NotNull Offered testCase = CardHoverAction.NAVIGATE_TO_TEST_CASE.offer(p, shownIn, dto);

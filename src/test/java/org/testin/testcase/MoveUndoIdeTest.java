@@ -27,11 +27,11 @@ import org.testin.Gestures;
 import org.testin.Said;
 import org.testin.clipboard.CutState;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
@@ -48,8 +48,8 @@ import java.util.stream.Stream;
 
 public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull TestSetDirectoryDto from = new TestSetDirectoryDto();
-    private @NotNull TestSetDirectoryDto to = new TestSetDirectoryDto();
+    private @NotNull TestSetNode from = new TestSetNode();
+    private @NotNull TestSetNode to = new TestSetNode();
 
     private static boolean onDisk(final @NotNull Path testSet, final @NotNull UUID id) {
         try (final Stream<Path> files = Files.list(testSet)) {
@@ -74,11 +74,11 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), UndoHistories.class);
     }
 
-    private @NotNull List<UUID> idsIn(final @NotNull TestSetDirectoryDto ts) {
+    private @NotNull List<UUID> idsIn(final @NotNull TestSetNode ts) {
         return theTestCases().getTestCasesForTestSet(ts.getPath()).stream().map(TestCaseDto::getId).toList();
     }
 
-    private @NotNull TestCaseDto movedFromTheFirstSetToTheSecond(final @NotNull TestCaseEditor source, final @NotNull TestCaseEditor target, final @NotNull List<String> balloons) {
+    private @NotNull TestCaseDto movedFromTheFirstSetToTheSecond(final @NotNull TestSetEditor source, final @NotNull TestSetEditor target, final @NotNull List<String> balloons) {
         final @NotNull TestCaseDto moving = source.getAllTestCases().getFirst();
         source.getList().setSelectedIndex(0);
         Gestures.press(getProject(), ActionManager.getInstance().getAction("Testin.CutTestCaseNode"), source.getList());
@@ -91,7 +91,7 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
     }
 
     private void twoTestSets() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         from = EditorFixtures.testSet(getProject(), tp, "Login");
         to = EditorFixtures.testSet(getProject(), tp, "Payments");
         EditorFixtures.testCase(getProject(), from, "Log in with a valid user", "m0001");
@@ -102,8 +102,8 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-215
     public void testUndoingAMovePutsTheTestCasesBackWhereTheyCameFromAndNowhereElse() {
         twoTestSets();
-        final @NotNull TestCaseEditor source = EditorFixtures.openTestCaseEditor(getProject(), from, getTestRootDisposable());
-        final @NotNull TestCaseEditor target = EditorFixtures.openTestCaseEditor(getProject(), to, getTestRootDisposable());
+        final @NotNull TestSetEditor source = EditorFixtures.openTestSetEditor(getProject(), from, getTestRootDisposable());
+        final @NotNull TestSetEditor target = EditorFixtures.openTestSetEditor(getProject(), to, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull TestCaseDto moved = movedFromTheFirstSetToTheSecond(source, target, balloons);
@@ -125,8 +125,8 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-228
     public void testAMoveTakenBackComesBackWithRedoAndOnlyARealChangeIsRefused() {
         twoTestSets();
-        final @NotNull TestCaseEditor source = EditorFixtures.openTestCaseEditor(getProject(), from, getTestRootDisposable());
-        final @NotNull TestCaseEditor target = EditorFixtures.openTestCaseEditor(getProject(), to, getTestRootDisposable());
+        final @NotNull TestSetEditor source = EditorFixtures.openTestSetEditor(getProject(), from, getTestRootDisposable());
+        final @NotNull TestSetEditor target = EditorFixtures.openTestSetEditor(getProject(), to, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull TestCaseDto moved = movedFromTheFirstSetToTheSecond(source, target, balloons);

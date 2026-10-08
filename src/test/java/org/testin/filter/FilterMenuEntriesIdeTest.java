@@ -32,14 +32,14 @@ import org.testin.Gestures;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.TestCaseStatus;
 import org.testin.services.Services;
 import org.testin.testrun.form.TestRunFormFilter;
@@ -55,7 +55,7 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String GENERATED_CLASS = "nafath.CheckoutTest";
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private @NotNull List<TestCaseDto> testCases = List.of();
 
@@ -97,8 +97,8 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
     }
 
     private @NotNull TestRunEditor aTestRunEditorOver(final @NotNull List<TestCaseDto> covered) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
@@ -118,11 +118,11 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-198
     public void testTheAutomationFilterOffersTheThreeStatesInBothEditors() {
         threeStatesOfAutomation();
-        final @NotNull TestCaseEditor testCaseEditor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull TestRunEditor testRunEditor = aTestRunEditorOver(testCases);
         try {
             final @NotNull List<String> threeStates = Automated.FILTERABLE.stream().map(Automated::getLabel).toList();
-            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testCaseEditor, testRunEditor)) {
+            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testSetEditor, testRunEditor)) {
                 awaitTheAnswers(editor);
                 assertEquals("the Automation filter does not offer the three states", threeStates, namesUnder(filterOf(editor), Bundle.message("filter.automation")));
                 assertEquals("choosing no state did not show everything", 3, shown(editor).size());
@@ -137,7 +137,7 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
                 assertEquals("clearing the Automation filter did not show everything", 3, shown(editor).size());
             }
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }
@@ -145,17 +145,17 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-260
     public void testTestSetIsOnTheFilterMenuOfEveryEditorGrayAndSaysWhy() {
         threeStatesOfAutomation();
-        final @NotNull TestCaseEditor testCaseEditor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull TestRunEditor testRunEditor = aTestRunEditorOver(testCases);
         try {
-            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testCaseEditor, testRunEditor)) {
+            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testSetEditor, testRunEditor)) {
                 final @NotNull AnAction testSetEntry = entry(filterOf(editor), Bundle.message("filter.test.set.one"));
                 final @NotNull Presentation shown = Gestures.updated(getProject(), testSetEntry, editor.getList());
                 assertFalse("Test Set works in " + editor.getClass().getSimpleName(), shown.isEnabled());
                 assertEquals("Test Set (only Create Test Run picks across test sets)", shown.getText());
             }
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }
@@ -166,19 +166,19 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestCaseDto reviewed = testCases.get(1).edit().status(TestCaseStatus.REVIEWED).build();
         reviewed.setParent(testSet);
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(testSet.getPath(), reviewed);
-        final @NotNull TestCaseEditor testCaseEditor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull TestRunEditor testRunEditor = aTestRunEditorOver(testCases);
         try {
             final @NotNull List<String> fourStatuses = Arrays.stream(TestCaseStatus.values()).map(TestCaseStatus::getLabel).toList();
-            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testCaseEditor, testRunEditor)) {
+            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testSetEditor, testRunEditor)) {
                 assertEquals("Status does not offer the test case's own four", fourStatuses, namesUnder(filterOf(editor), Bundle.message("filter.test.case.status")));
                 choose(editor, Bundle.message("filter.test.case.status"), TestCaseStatus.REVIEWED.getLabel());
                 assertEquals("Status did not filter on the test case's own status in " + editor.getClass().getSimpleName(), List.of(reviewed.getDescription()), shown(editor));
                 filterOf(editor).resetToolBarFilter();
             }
 
-            final boolean inTheTestCaseEditor = childrenOf(filterOf(testCaseEditor).menu()).stream().anyMatch(action -> nameOf(action).equals(Bundle.message("filter.run.item.status")));
-            assertFalse("Run Item Status is offered in a test case editor", inTheTestCaseEditor);
+            final boolean inTheTestSetEditor = childrenOf(filterOf(testSetEditor).menu()).stream().anyMatch(action -> nameOf(action).equals(Bundle.message("filter.run.item.status")));
+            assertFalse("Run Item Status is offered in a test set editor", inTheTestSetEditor);
             assertNotNull("Run Item Status is not offered in a test run editor", entry(filterOf(testRunEditor), Bundle.message("filter.run.item.status")));
 
             final @NotNull CheckedTreeNode tree = new CheckedTreeNode("all");
@@ -193,7 +193,7 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
             final @NotNull TreeModel offered = Drawn.components(form.getSelection().getPanel()).stream().filter(Tree.class::isInstance).map(Tree.class::cast).findFirst().orElseThrow().getModel();
             assertEquals("Status did not filter the Create Test Run dialog", 1, offered.getChildCount(offered.getChild(offered.getRoot(), 0)));
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }

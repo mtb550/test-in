@@ -41,7 +41,7 @@ import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.card.Offered;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.view.Drawn;
@@ -101,7 +101,7 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
     public void testWithoutTheJavaCodeGeneratorsTestManagementGoesOnAndNoCodeIsWritten() {
         ExtensionTestUtil.maskExtensions(CodeGenerators.EP, List.of(), getTestRootDisposable());
 
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto tc = createdTestCase(login, "Log in with a valid user", "b");
         tc.setDescription("Sign in with a valid user");
         GenType.UPDATE_TEST_CASE_DESCRIPTION.execute(getProject(), tc);
@@ -124,7 +124,7 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
                 throw new AssertionError("could not put a file where the package folder goes: " + ex.getMessage(), ex);
             }
         });
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         createdTestCase(login, "Log in with a valid user", "b");
         settled();
 

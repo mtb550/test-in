@@ -25,10 +25,10 @@ import org.testin.FilesUnder;
 import org.testin.config.TestinYml;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.statusbar.StatusBar;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
@@ -42,7 +42,7 @@ public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String GENERATED_CLASS = "nafath.CheckoutTest";
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private static @NotNull JComponent automatedCount(final @NotNull StatusBar bar) {
         return (JComponent) ((Container) bar.getComponent(2)).getComponent(3);
@@ -115,7 +115,7 @@ public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-210
     public void testTheStatusBarSaysHowManyHaveAGeneratedMethodBehindThem() {
         threeStatesOfAutomation();
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         try {
             final @NotNull String counted = Bundle.message("statusbar.automated.count", Automated.WRITTEN.getLabel(), "1", "3");
             Await.until("the status bar never counted the automated test cases: " + Drawn.text(automatedCount(editor.getStatusBar())), () -> {
@@ -138,7 +138,7 @@ public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
 
         threeStatesOfAutomation();
         assertTrue(TestinYml.save(getProject(), TestinYml.lines("SOMETHING_ELSE")));
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         try {
             editor.refreshView();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();

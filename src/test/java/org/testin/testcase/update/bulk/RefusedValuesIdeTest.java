@@ -26,17 +26,17 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;
@@ -45,15 +45,15 @@ import java.util.UUID;
 
 public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
-    private static @NotNull JBTable theGridOf(final @NotNull TestCaseEditor editor) {
+    private static @NotNull JBTable theGridOf(final @NotNull TestSetEditor editor) {
         editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         return (JBTable) editor.getPreferredFocusedComponent();
     }
 
-    private static void typed(final @NotNull JBTable grid, final int row, final @NotNull TestCaseEditorAttributes attribute, final @NotNull String value) {
+    private static void typed(final @NotNull JBTable grid, final int row, final @NotNull TestSetEditorAttributes attribute, final @NotNull String value) {
         grid.getModel().setValueAt(value, row, attribute.column());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
@@ -71,12 +71,12 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull List<TestCaseDto> aTestSetHolding(final @NotNull String... descriptions) {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         testSet = EditorFixtures.testSet(getProject(), tp, "Checkout");
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
         for (int i = 0; i < descriptions.length; i++) {
             final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(descriptions[i]).order(String.format("m%04d", i))
-                    .priority(Priority.MEDIUM).group(new ArrayList<>(List.of("Smoke"))).build();
+                    .priority(Priority.MEDIUM).groups(new ArrayList<>(List.of("Smoke"))).build();
             tc.setParent(testSet);
             Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(testSet.getPath(), tc);
             made.add(tc);
@@ -91,16 +91,16 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-206
     public void testAValueTestinCannotReadIsRefusedAndTheTesterToldOnceForACell() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out");
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
 
-            typed(grid, 0, TestCaseEditorAttributes.PRIORITY, "Urgent");
+            typed(grid, 0, TestSetEditorAttributes.PRIORITY, "Urgent");
 
-            assertEquals("the cell kept a value Testin could not read", Priority.MEDIUM.getLabel(), grid.getModel().getValueAt(0, TestCaseEditorAttributes.PRIORITY.column()));
+            assertEquals("the cell kept a value Testin could not read", Priority.MEDIUM.getLabel(), grid.getModel().getValueAt(0, TestSetEditorAttributes.PRIORITY.column()));
             assertEquals("what the test case had did not stay", Priority.MEDIUM, stored(testCases.getFirst()).getPriority());
-            assertEquals("the tester was not told once", List.of(unreadable(Bundle.message("grid.refused.as", "Urgent", TestCaseEditorAttributes.PRIORITY.getName()))), balloons);
+            assertEquals("the tester was not told once", List.of(unreadable(Bundle.message("grid.refused.as", "Urgent", TestSetEditorAttributes.PRIORITY.getName()))), balloons);
         } finally {
             Disposer.dispose(editor);
         }
@@ -123,15 +123,15 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-206
     public void testBlankIsNotUnreadableItClearsTheGroupsAndABulkEditGivesTheDefaultPriority() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out");
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
 
-            typed(grid, 0, TestCaseEditorAttributes.PRIORITY, "");
-            typed(grid, 1, TestCaseEditorAttributes.GROUP, "");
+            typed(grid, 0, TestSetEditorAttributes.PRIORITY, "");
+            typed(grid, 1, TestSetEditorAttributes.GROUP, "");
 
-            Await.until("a blank group was not written", () -> stored(testCases.get(1)).getGroup().isEmpty());
+            Await.until("a blank group was not written", () -> stored(testCases.get(1)).getGroups().isEmpty());
             assertEquals("a blank priority in a cell changed the priority", Priority.MEDIUM, stored(testCases.get(0)).getPriority());
             assertTrue("a blank value was called unreadable: " + balloons, balloons.stream().noneMatch(said -> said.startsWith(unreadable("").substring(0, 14))));
 
@@ -176,11 +176,11 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-206
     public void testARefusedTestCaseIsNotCountedInTheUpdatedMessage() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out");
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
-            typed(grid, 0, TestCaseEditorAttributes.PRIORITY, "Urgent");
+            typed(grid, 0, TestSetEditorAttributes.PRIORITY, "Urgent");
             assertFalse("a refused cell said it updated something: " + balloons, balloons.contains(Done.UPDATED.getOutcome()));
             assertEquals(Priority.MEDIUM, stored(testCases.getFirst()).getPriority());
         } finally {

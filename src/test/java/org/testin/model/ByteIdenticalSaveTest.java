@@ -50,7 +50,7 @@ public class ByteIdenticalSaveTest {
         tc.setStatus(TestCaseStatus.TO_BE_UPDATED);
         tc.setPriority(Priority.HIGH);
         tc.setReference("JIRA-1");
-        tc.setGroup(List.of("smoke", "régression"));
+        tc.setGroups(List.of("smoke", "régression"));
         tc.setCreatedBy("Muteb");
         tc.setUpdatedBy("");
         tc.setCreatedAt(ZonedDateTime.of(2026, 9, 2, 23, 29, 28, 0, ZoneId.of("Asia/Riyadh")));

@@ -27,12 +27,12 @@ import org.testin.git.review.PendingCommitsDialog;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
@@ -89,8 +89,8 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
                 {
                   "createdBy" : "Sara",
                   "createdAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
-                  "modifiedBy" : "Sara",
-                  "modifiedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
+                  "updatedBy" : "Sara",
+                  "updatedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
                   "status" : "%s"
                 }""".formatted(status.name());
     }
@@ -99,7 +99,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     protected void setUp() {
         super.setUp();
         testProject = aTestProjectAt(root.resolve("Shop"));
-        testSet = marked(theTestCasesOf(testProject).resolve("Login"), DirectoryType.TS);
+        testSet = marked(theTestCasesOf(testProject).resolve("Login"), NodeType.TS);
         id = aTestCaseIn(testSet);
     }
 
@@ -111,7 +111,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
     private @NotNull Path aTestRun(final @NotNull String name, final @NotNull TestRunStatus status) {
         final @NotNull Path testRun = theTestRunsOf(testProject).resolve(name);
-        write(testRun.resolve(DirectoryType.TR.getMarker()), aTestRunMarker(status));
+        write(testRun.resolve(NodeType.TR.getMarker()), aTestRunMarker(status));
         resultIn(testRun, FileKind.RUN_ITEM.fileName(id), id);
         return testRun;
     }
@@ -141,22 +141,22 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private @NotNull TestRunDirectoryDto theTestRunAt(final @NotNull Path testRun) {
-        return indexedTestRuns().findTestRunDir(testRun).orElseThrow(() -> new AssertionError(testRun.getFileName() + " is not indexed"));
+    private @NotNull TestRunNode theTestRunAt(final @NotNull Path testRun) {
+        return indexedTestRuns().findTestRunNode(testRun).orElseThrow(() -> new AssertionError(testRun.getFileName() + " is not indexed"));
     }
 
-    private @NotNull TestRunItems theRunItemOf(final @NotNull Path testRun) {
+    private @NotNull RunItem theRunItemOf(final @NotNull Path testRun) {
         return theRunItemOf(testRun, id);
     }
 
-    private @NotNull TestRunItems theRunItemOf(final @NotNull Path testRun, final @NotNull UUID testCaseId) {
+    private @NotNull RunItem theRunItemOf(final @NotNull Path testRun, final @NotNull UUID testCaseId) {
         try {
             ApplicationManager.getApplication().executeOnPooledThread(() -> TestRunFromGit.read(getProject(), testRun)).get();
         } catch (final InterruptedException | ExecutionException ex) {
             throw new AssertionError("the commit of " + testRun.getFileName() + " was never read", ex);
         }
-        final @NotNull TestRunDto held = indexedTestRuns().getTestRunByPath(testRun);
-        return held.resultOf(testCaseId).orElseThrow(() -> new AssertionError(testRun.getFileName() + " does not cover the test case"));
+        final @NotNull RunItems held = indexedTestRuns().getRunItems(testRun);
+        return held.runItemOf(testCaseId).orElseThrow(() -> new AssertionError(testRun.getFileName() + " does not cover the test case"));
     }
 
     private void reviewed(final @NotNull String message, final @NotNull Consumer<JComponent> button) {
@@ -206,7 +206,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         assertEquals(MESSAGE, subject("HEAD^"));
         assertEquals(TestRunStatus.COMMITTED, theTestRunAt(completed).getMarker().getStatus());
         assertEquals(testersCommit, theTestRunAt(completed).getMarker().getCommit());
-        assertTrue("the commit id was not written into the .tr", read(completed.resolve(DirectoryType.TR.getMarker())).contains(testersCommit));
+        assertTrue("the commit id was not written into the .tr", read(completed.resolve(NodeType.TR.getMarker())).contains(testersCommit));
         assertEquals("the .tr was left out of Testin's commit", "", mustGit(testProject, "status", "--porcelain").trim());
         assertEquals("a test run that was not Completed changed", TestRunStatus.IN_PROGRESS, theTestRunAt(inProgress).getMarker().getStatus());
         assertEquals("", theTestRunAt(inProgress).getMarker().getCommit());
@@ -222,11 +222,11 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         theTestCaseReads("Press Pay now");
         readEverything();
 
-        final @NotNull TestRunItems committed = theRunItemOf(completed);
+        final @NotNull RunItem committed = theRunItemOf(completed);
         assertEquals("Press Pay", committed.shownTestCase().getDescription());
         assertTrue("the change since the commit is not said", ChangedSinceCommit.of(committed));
 
-        final @NotNull TestRunItems open = theRunItemOf(inProgress);
+        final @NotNull RunItem open = theRunItemOf(inProgress);
         assertEquals("Press Pay now", open.shownTestCase().getDescription());
         assertFalse(ChangedSinceCommit.of(open));
     }
@@ -244,7 +244,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         }
         readEverything();
 
-        final @NotNull TestRunItems committed = theRunItemOf(completed);
+        final @NotNull RunItem committed = theRunItemOf(completed);
         assertFalse("a committed test run lost a run item", committed.isRemoved());
         assertEquals("a Committed test run changed the run item status its commit recorded", RunItemStatus.PASSED, committed.shownStatus());
         assertEquals("Press Pay", committed.shownTestCase().getDescription());
@@ -276,10 +276,10 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         committedAsItIs();
         theTestCaseIsDeleted();
 
-        final @NotNull TestRunItems runItem = theRunItemOf(inProgress);
+        final @NotNull RunItem runItem = theRunItemOf(inProgress);
         assertEquals("a deleted test case was not Removed", RunItemStatus.REMOVED, runItem.shownStatus());
         assertEquals("the run item did not show the last text Git holds", DESCRIPTION, runItem.shownTestCase().getDescription());
-        assertTrue("a deleted test case took a run item status", Services.getInstance(getProject(), RunItemStatusService.class).heldTestRun(inProgress).flatMap(testRun -> testRun.resultOf(id)).filter(TestRunItems::isRemoved).isPresent());
+        assertTrue("a deleted test case took a run item status", Services.getInstance(getProject(), RunItemStatusService.class).heldTestRun(inProgress).flatMap(testRun -> testRun.runItemOf(id)).filter(RunItem::isRemoved).isPresent());
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-113
@@ -372,7 +372,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         committedAsItIs();
         committedWithTheReview();
 
-        final @NotNull Path checkout = marked(theTestCasesOf(testProject).resolve("Checkout"), DirectoryType.TS);
+        final @NotNull Path checkout = marked(theTestCasesOf(testProject).resolve("Checkout"), NodeType.TS);
         final @NotNull Path moved = checkout.resolve(FileKind.TEST_CASE.fileName(id));
         try {
             Files.move(testSet.resolve(FileKind.TEST_CASE.fileName(id)), moved);
@@ -382,7 +382,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         write(moved, read(moved).replace("Press Pay", "Press Pay now"));
         readEverything();
 
-        final @NotNull TestRunItems committed = theRunItemOf(completed);
+        final @NotNull RunItem committed = theRunItemOf(completed);
         assertEquals("Press Pay", committed.shownTestCase().getDescription());
         assertTrue(ChangedSinceCommit.of(committed));
     }
@@ -402,7 +402,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
     private @NotNull Path aCommittedTestRunFrom(final @NotNull String commit) {
         final @NotNull Path testRun = aTestRun(COMPLETED, TestRunStatus.COMMITTED);
-        final @NotNull Path marker = testRun.resolve(DirectoryType.TR.getMarker());
+        final @NotNull Path marker = testRun.resolve(NodeType.TR.getMarker());
         write(marker, read(marker).replace("\"status\" : \"COMMITTED\"", "\"status\" : \"COMMITTED\",\n  \"commit\" : \"" + commit + "\""));
         return testRun;
     }
@@ -414,7 +414,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         theTestCaseReads("Press Pay");
         readEverything();
 
-        final @NotNull TestRunItems runItem = theRunItemOf(committed);
+        final @NotNull RunItem runItem = theRunItemOf(committed);
         assertEquals("Press Pay", runItem.shownTestCase().getDescription());
         assertFalse(ChangedSinceCommit.of(runItem));
         assertTrue("a Committed test run took a run item status", Services.getInstance(getProject(), RunItemStatusService.class).heldTestRun(committed).isEmpty());
@@ -434,7 +434,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         final @NotNull Path first = aTestRun(COMPLETED, TestRunStatus.COMPLETED);
         final @NotNull UUID other = aTestCaseIn(testSet);
         final @NotNull Path second = theTestRunsOf(testProject).resolve("Cycle 5");
-        write(second.resolve(DirectoryType.TR.getMarker()), aTestRunMarker(TestRunStatus.COMPLETED));
+        write(second.resolve(NodeType.TR.getMarker()), aTestRunMarker(TestRunStatus.COMPLETED));
         resultIn(second, FileKind.RUN_ITEM.fileName(other), other);
         committedAsItIs();
         committedWithTheReview();
@@ -500,7 +500,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
         committedAsItIs();
         theTestCaseIsDeleted();
 
-        final @NotNull TestRunItems runItem = indexedTestRuns().getTestRunByPath(committed).resultOf(id).orElseThrow();
+        final @NotNull RunItem runItem = indexedTestRuns().getRunItems(committed).runItemOf(id).orElseThrow();
         assertFalse("a Committed test run reads Removed for a test case it has not read from its commit yet", runItem.isRemoved());
         assertEquals(RunItemStatus.PASSED, runItem.shownStatus());
     }
@@ -552,7 +552,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
 
         readEverything();
 
-        Await.until("the record was not read once the index was", () -> indexedTestRuns().getTestRunByPath(committed).resultOf(id)
+        Await.until("the record was not read once the index was", () -> indexedTestRuns().getRunItems(committed).runItemOf(id)
                 .map(runItem -> runItem.shownTestCase().getDescription().equals(DESCRIPTION)).orElse(false));
     }
 
@@ -560,7 +560,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     public void testEveryMarkerStaysTickedInTheReview() {
         final @NotNull Path testRun = aTestRun("Cycle 4", TestRunStatus.IN_PROGRESS);
         committedAsItIs();
-        write(testRun.resolve(DirectoryType.TR.getMarker()), aTestRunMarker(TestRunStatus.ASSIGNED));
+        write(testRun.resolve(NodeType.TR.getMarker()), aTestRunMarker(TestRunStatus.ASSIGNED));
         theTestCaseReads("Press Pay");
         readEverything();
 
@@ -575,7 +575,7 @@ public class CommittedTestRunIdeTest extends AbstractReadTheRootIdeTest {
     public void testACompletedTestRunWithAChangeLeftOutOfTheCommitStaysCompleted() {
         final @NotNull Path completed = aTestRun(COMPLETED, TestRunStatus.COMPLETED);
         committedAsItIs();
-        write(completed.resolve(DirectoryType.TR.getMarker()), aTestRunMarker(TestRunStatus.COMPLETED).replace("\"modifiedBy\" : \"Sara\"", "\"modifiedBy\" : \"Omar\""));
+        write(completed.resolve(NodeType.TR.getMarker()), aTestRunMarker(TestRunStatus.COMPLETED).replace("\"updatedBy\" : \"Sara\"", "\"updatedBy\" : \"Omar\""));
         theTestCaseReads("Press Pay");
         readEverything();
 

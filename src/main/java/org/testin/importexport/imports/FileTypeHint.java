@@ -21,7 +21,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.testcase.Can;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Fonts;
 import org.testin.util.Html;
 
@@ -29,8 +29,8 @@ import javax.swing.JComponent;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record FileTypeHint(@NotNull JBLabel label, @NotNull List<TestCaseEditorAttributes> attributes) {
-    public static @NotNull FileTypeHint of(final @NotNull List<TestCaseEditorAttributes> attributes) {
+public record FileTypeHint(@NotNull JBLabel label, @NotNull List<TestSetEditorAttributes> attributes) {
+    public static @NotNull FileTypeHint of(final @NotNull List<TestSetEditorAttributes> attributes) {
         final @NotNull JBLabel label = new JBLabel();
         // Rule-INTERNAL-095
         label.setFont(Fonts.hint());
@@ -54,7 +54,7 @@ public record FileTypeHint(@NotNull JBLabel label, @NotNull List<TestCaseEditorA
     public void showFor(final @NotNull FileTypes format) {
         final @NotNull String columns = attributes.stream()
                 .filter(attribute -> attribute.can(Can.IMPORT))
-                .map(TestCaseEditorAttributes::getName)
+                .map(TestSetEditorAttributes::getName)
                 .collect(Collectors.joining(", "));
 
         final @NotNull String hint = format.hintFor(columns);

@@ -10,7 +10,7 @@
   ],
   "priority" : "LOW",
   "reference" : "",
-  "group" : [
+  "groups" : [
     "REGRESSION"
   ],
   "createdBy" : "Testin Sample",

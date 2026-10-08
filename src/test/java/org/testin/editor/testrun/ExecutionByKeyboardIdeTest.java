@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
@@ -48,8 +48,8 @@ public class ExecutionByKeyboardIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-PRODUCT-024
     public void testEveryStepOfExecutingATestRunHasAKey() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto login = EditorFixtures.testSet(getProject(), tp, "Login");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode login = EditorFixtures.testSet(getProject(), tp, "Login");
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), login, 2);
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList()), getTestRootDisposable());
         final @NotNull JBList<?> list = Drawn.components(editor.getComponent()).stream()

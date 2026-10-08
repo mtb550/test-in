@@ -31,17 +31,17 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testcase.Can;
 import org.testin.testcase.Rank;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
@@ -90,26 +90,26 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
         return name.isEmpty() ? Bundle.message("import.sheet.no.name") : name;
     }
 
-    void openImportDialog(final @NotNull DirectoryDto dirDto) {
-        new ImportDialog(p, TestCaseEditorAttributes.all(Can.IMPORT),
+    void openImportDialog(final @NotNull Node node) {
+        new ImportDialog(p, TestSetEditorAttributes.all(Can.IMPORT),
                 (file, format) -> format.importToFile(p, file),
-                selectedTestCasesBySheet -> executeImportWriteAction(dirDto, selectedTestCasesBySheet))
+                selectedTestCasesBySheet -> executeImportWriteAction(node, selectedTestCasesBySheet))
                 .show();
     }
 
     // UC-SHARE-005, UC-SHARE-006
-    private void executeImportWriteAction(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Node selectedNode, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet) {
         final boolean generateCode = CodeOn.isOnOrHinted(p);
 
         final int total = selectedTestCasesBySheet.values().stream().mapToInt(List::size).sum();
 
-        BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedDirDto.getName()),
-                Bundle.message("import.failed.title"), indicator -> importInBackground(selectedDirDto, selectedTestCasesBySheet, generateCode, total, indicator));
+        BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedNode.getName()),
+                Bundle.message("import.failed.title"), indicator -> importInBackground(selectedNode, selectedTestCasesBySheet, generateCode, total, indicator));
     }
 
     // UC-SHARE-005, UC-SHARE-006
-    void importInBackground(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet, final boolean generateCode, final int total, final @NotNull ProgressIndicator indicator) {
-        final @NotNull Path targetPath = selectedDirDto.getPath();
+    void importInBackground(final @NotNull Node selectedNode, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet, final boolean generateCode, final int total, final @NotNull ProgressIndicator indicator) {
+        final @NotNull Path targetPath = selectedNode.getPath();
 
         indicator.setIndeterminate(false);
         final long startedAt = System.currentTimeMillis();
@@ -125,12 +125,12 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
         final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
 
         try {
-            final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
-                    targetSets(selectedDirDto, targetPath, selectedTestCasesBySheet);
+            final @NotNull Map<TestSetNode, List<TestCaseDto>> targets =
+                    targetSets(selectedNode, targetPath, selectedTestCasesBySheet);
             targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
 
-            for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
-                final @NotNull TestSetDirectoryDto into = set.getKey();
+            for (final Map.Entry<TestSetNode, List<TestCaseDto>> set : targets.entrySet()) {
+                final @NotNull TestSetNode into = set.getKey();
                 final @NotNull List<TestCaseDto> testCases = set.getValue();
                 final @NotNull Path setPath = into.getPath();
 
@@ -155,8 +155,8 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
             return;
         }
 
-        if (selectedDirDto.holdsTestCases()) {
-            onEdt(() -> editors.closeThenOpen(selectedDirDto));
+        if (selectedNode.holdsTestCases()) {
+            onEdt(() -> editors.closeThenOpen(selectedNode));
         }
 
         notifier.softShowCounted(p, Done.IMPORTED, imported);
@@ -189,26 +189,26 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
     }
 
     // UC-SHARE-006, Rule-SHARE-031
-    private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> testCasesBySheet) {
-        if (selectedDirDto instanceof TestSetDirectoryDto ts) {
+    private @NotNull Map<TestSetNode, List<TestCaseDto>> targetSets(final @NotNull Node selectedNode, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> testCasesBySheet) {
+        if (selectedNode instanceof TestSetNode ts) {
             final @NotNull List<TestCaseDto> everything = new ArrayList<>();
             testCasesBySheet.values().forEach(everything::addAll);
 
             return Map.of(ts, everything);
         }
 
-        final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> sets = new LinkedHashMap<>();
+        final @NotNull Map<TestSetNode, List<TestCaseDto>> sets = new LinkedHashMap<>();
         testCasesBySheet.forEach((sheetName, testCases) -> {
             final @NotNull String name = testSetNameOf(sheetName);
             final @NotNull Path path = targetPath.resolve(name);
 
             sets.put(onEdtCompute(() -> {
-                final @NotNull TestSetDirectoryDto made = (TestSetDirectoryDto) new CreateTestSet(p)
-                        .execute(name, selectedDirDto, path)
+                final @NotNull TestSetNode made = (TestSetNode) new CreateTestSet(p)
+                        .execute(name, selectedNode, path)
                         .orElseThrow(() -> new IllegalStateException(Bundle.message("import.set.not.made", name)));
 
                 try {
-                    JavaCode.of(DirectoryType.TS).getCreated().execute(p, made);
+                    JavaCode.of(NodeType.TS).getCreated().execute(p, made);
                 } catch (final Exception ex) {
                     Logger.error("Failed to create Java class: " + FailureText.of(ex));
                 }
@@ -240,7 +240,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
     }
 
     // UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037
-    private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull TestSetDirectoryDto into, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
+    private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull TestSetNode into, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
         String rank = tailRank;
 
         final @NotNull List<TestCaseDto> placed = new ArrayList<>(testCases.size());

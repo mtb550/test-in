@@ -20,12 +20,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.Node;
+import org.testin.model.testrun.RunItem;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -108,15 +108,15 @@ final class PendingChangeFactory {
 
         final @NotNull String name = tc.map(TestCaseDto::getDescription).filter(description -> !description.isBlank())
                 .orElseGet(() -> String.valueOf(relativePath.getFileName()));
-        final @NotNull String testSet = tc.map(TestCaseDto::getParent).map(DirectoryDto::getName).orElse("");
+        final @NotNull String testSet = tc.map(TestCaseDto::getParent).map(Node::getName).orElse("");
 
         final @NotNull List<FieldChange> changes = switch (type) {
             case ADDED -> List.of(new FieldChange(parentName(relativePath), "",
-                    RunItemChangeComparator.summary(read(mapper, afterJson, TestRunItems.class)), ChangeSubject.RUN_ITEM.getCreated()));
+                    RunItemChangeComparator.summary(read(mapper, afterJson, RunItem.class)), ChangeSubject.RUN_ITEM.getCreated()));
             case DELETED -> List.of(new FieldChange(parentName(relativePath),
-                    RunItemChangeComparator.summary(read(mapper, beforeJson, TestRunItems.class)), "", ChangeSubject.RUN_ITEM.getRemoved()));
+                    RunItemChangeComparator.summary(read(mapper, beforeJson, RunItem.class)), "", ChangeSubject.RUN_ITEM.getRemoved()));
             case MODIFIED -> RunItemChangeComparator.compare(
-                    read(mapper, beforeJson, TestRunItems.class), read(mapper, afterJson, TestRunItems.class));
+                    read(mapper, beforeJson, RunItem.class), read(mapper, afterJson, RunItem.class));
         };
 
         return new PendingChange(ChangeSubject.RUN_ITEM, name, testSet, testCaseId.map(UUID::toString).orElse(""),
@@ -131,7 +131,7 @@ final class PendingChangeFactory {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         changes.add(new FieldChange(relativePath.getFileName().toString(), before, after, ChangeSubject.MARKER.changeFor(type)));
 
-        if (type == DiffType.MODIFIED && DirectoryType.TR.isMarkerOf(relativePath.getFileName().toString())) {
+        if (type == DiffType.MODIFIED && NodeType.TR.isMarkerOf(relativePath.getFileName().toString())) {
             changes.addAll(TestRunChangeComparator.compareFacts(
                     read(mapper, beforeJson, TestRunMarker.class), read(mapper, afterJson, TestRunMarker.class)));
         }

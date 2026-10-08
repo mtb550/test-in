@@ -25,10 +25,10 @@ import org.testin.git.GitRepositoryService;
 import org.testin.git.change.TestCaseChangeComparator;
 import org.testin.indexer.TestCaseFile;
 import org.testin.model.Config;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.FailureText;
@@ -55,11 +55,11 @@ public final class TestCaseHistory {
     public static @NotNull Optional<TestCaseFile> deletedFile(final @NotNull Project p, final @NotNull UUID testCaseId) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         return Services.getInstance(p, BoundTestProject.class).get()
-                .map(DirectoryDto::getPath)
+                .map(Node::getPath)
                 .filter(testProject -> !git.isNotRepository(testProject))
                 .flatMap(testProject -> {
                     try {
-                        return git.log(testProject, "-1", "--format=", "--name-only", "--", BugHistory.pathspec(DirectoryType.TCD, FileKind.TEST_CASE, testCaseId)).lines()
+                        return git.log(testProject, "-1", "--format=", "--name-only", "--", BugHistory.pathspec(NodeType.TCF, FileKind.TEST_CASE, testCaseId)).lines()
                                 .filter(line -> !line.isBlank())
                                 .findFirst()
                                 .map(path -> new TestCaseFile(testProject, Path.of(path.strip())));

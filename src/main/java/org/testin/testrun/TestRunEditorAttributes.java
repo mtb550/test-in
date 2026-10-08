@@ -24,8 +24,8 @@ import org.testin.model.Groups;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.ToolBarDefault;
 import org.testin.model.bug.BugIssueUrl;
-import org.testin.model.result.TestRunItems;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.testrun.RunItem;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.util.Bundle;
@@ -39,85 +39,85 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum TestRunEditorAttributes implements ToolBarAttribute {
     ORDER(
-            TestCaseEditorAttributes.ORDER.getName(),
+            TestSetEditorAttributes.ORDER.getName(),
             ToolBarDefault.LOCKED_CHECKED,
             _ -> ""
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
     },
 
     DESCRIPTION(
-            TestCaseEditorAttributes.DESCRIPTION.getName(),
+            TestSetEditorAttributes.DESCRIPTION.getName(),
             ToolBarDefault.ON,
-            item -> item.shownTestCase().getDescription()
+            runItem -> runItem.shownTestCase().getDescription()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
 
         // Rule-EDITOR-PANEL-263
         @Override
-        public @NotNull String gridValue(final @NotNull TestRunItems runItem) {
+        public @NotNull String gridValue(final @NotNull RunItem runItem) {
             final @NotNull String description = super.gridValue(runItem);
             return ChangedSinceCommit.of(runItem) ? description + " " + Bundle.message("test.run.changed.since.short") : description;
         }
     },
 
     EXPECTED_RESULT(
-            TestCaseEditorAttributes.EXPECTED_RESULT.getName(),
+            TestSetEditorAttributes.EXPECTED_RESULT.getName(),
             ToolBarDefault.ON,
-            item -> item.shownTestCase().getExpectedResult()
+            runItem -> runItem.shownTestCase().getExpectedResult()
     ),
 
     STEPS(
-            TestCaseEditorAttributes.STEPS.getName(),
+            TestSetEditorAttributes.STEPS.getName(),
             ToolBarDefault.OFF,
-            item -> String.join(", ", item.shownTestCase().getSteps())
+            runItem -> String.join(", ", runItem.shownTestCase().getSteps())
     ),
 
     PRIORITY(
-            TestCaseEditorAttributes.PRIORITY.getName(),
+            TestSetEditorAttributes.PRIORITY.getName(),
             ToolBarDefault.OFF,
-            item -> item.shownTestCase().getPriority().getLabel()
+            runItem -> runItem.shownTestCase().getPriority().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
     },
 
     GROUP(
-            TestCaseEditorAttributes.GROUP.getName(),
+            TestSetEditorAttributes.GROUP.getName(),
             ToolBarDefault.OFF,
-            item -> Groups.text(item.shownTestCase().getGroup())
+            runItem -> Groups.text(runItem.shownTestCase().getGroups())
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            runItem.shownTestCase().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+            runItem.shownTestCase().getGroups().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
 
     ACTUAL_RESULT(
             Bundle.message("attribute.run.item.actual.result"),
             ToolBarDefault.ON,
-            TestRunItems::getActualResult,
-            TestRunItems::recordActualResult
+            RunItem::getActualResult,
+            RunItem::recordActualResult
     ),
 
     STACKTRACE(
             Bundle.message("attribute.run.item.stacktrace"),
             ToolBarDefault.OFF,
-            TestRunItems::getStacktrace
+            RunItem::getStacktrace
     ),
 
     BUG_SEVERITY(
             Bundle.message("attribute.run.item.bug.severity"),
             ToolBarDefault.ON,
-            item -> item.isFailed() ? item.getBugSeverity().getLabel() : ""
+            runItem -> runItem.isFailed() ? runItem.getBugSeverity().getLabel() : ""
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addBugBadge(badges, getRunItemValueExtractor().apply(runItem), runItem.getBugSeverity().getColor());
         }
     },
@@ -125,10 +125,10 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
     BUG_PRIORITY(
             Bundle.message("attribute.run.item.bug.priority"),
             ToolBarDefault.ON,
-            item -> item.isFailed() ? item.getBugPriority().getLabel() : ""
+            runItem -> runItem.isFailed() ? runItem.getBugPriority().getLabel() : ""
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addBugBadge(badges, getRunItemValueExtractor().apply(runItem), runItem.getBugPriority().getColor());
         }
     },
@@ -136,23 +136,23 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
     BUG_ISSUE(
             Bundle.message("attribute.run.item.bug.issue"),
             ToolBarDefault.OFF,
-            item -> BugIssueUrl.reference(item.getBugIssueUrl())
+            runItem -> BugIssueUrl.reference(runItem.getBugIssueUrl())
     ),
 
     RUN_STATUS(
             Bundle.message("attribute.run.item.status"),
             ToolBarDefault.ON,
-            item -> item.shownStatus().getLabel()
+            runItem -> runItem.shownStatus().getLabel()
     ),
 
     DURATION(
             Bundle.message("attribute.run.item.duration"),
             ToolBarDefault.ON,
-            item -> Display.formatDuration(item.getDuration())
+            runItem -> Display.formatDuration(runItem.getDuration())
     ) {
         // Rule-EDITOR-PANEL-270
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addDurationBadge(badges, gridValue(runItem));
         }
     },
@@ -160,25 +160,25 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
     EXECUTED_BY(
             Bundle.message("attribute.run.item.executed.by"),
             ToolBarDefault.OFF,
-            TestRunItems::getExecutedBy
+            RunItem::getExecutedBy
     ),
 
     EXECUTED_AT(
             Bundle.message("attribute.run.item.executed.at"),
             ToolBarDefault.OFF,
-            item -> Display.formatDate(item.getExecutedAt())
+            runItem -> Display.formatDate(runItem.getExecutedAt())
     ),
 
     PATH(
-            TestCaseEditorAttributes.PATH.getName(),
+            TestSetEditorAttributes.PATH.getName(),
             ToolBarDefault.OFF,
-            item -> String.join(" > ", item.liveTestCase().getParent().getPath2())
+            runItem -> String.join(" > ", runItem.liveTestCase().getParent().getPath2())
     ),
 
     FQCN(
-            TestCaseEditorAttributes.FQCN.getName(),
+            TestSetEditorAttributes.FQCN.getName(),
             ToolBarDefault.LOCKED_UNCHECKED,
-            item -> String.join(" > ", Fqcn.ofMethod(item.liveTestCase()))
+            runItem -> String.join(" > ", Fqcn.ofMethod(runItem.liveTestCase()))
     );
 
     // Rule-EDITOR-PANEL-020
@@ -186,11 +186,11 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
 
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
-    private final @NotNull Function<TestRunItems, String> runItemValueExtractor;
+    private final @NotNull Function<RunItem, String> runItemValueExtractor;
 
     private final @NotNull RunItemValueSetter runItemValueSetter;
 
-    TestRunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestRunItems, String> runItemValueExtractor) {
+    TestRunEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<RunItem, String> runItemValueExtractor) {
         this(name, toolBarDefault, runItemValueExtractor, RunItemValueSetter.NONE);
     }
 
@@ -208,12 +208,12 @@ public enum TestRunEditorAttributes implements ToolBarAttribute {
         return !runItemValueSetter.equals(RunItemValueSetter.NONE);
     }
 
-    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+    public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, runItemValueExtractor.apply(runItem));
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
-    public @NotNull String gridValue(final @NotNull TestRunItems runItem) {
+    public @NotNull String gridValue(final @NotNull RunItem runItem) {
         return runItemValueExtractor.apply(runItem);
     }
 }

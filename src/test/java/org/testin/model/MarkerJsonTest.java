@@ -19,7 +19,7 @@ package org.testin.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.testin.model.markers.Marker;
-import org.testin.model.markers.TestCasesMainDirectoryMarker;
+import org.testin.model.markers.TestCasesFolderMarker;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestSetMarker;
 import org.testng.annotations.Test;
@@ -65,7 +65,7 @@ public class MarkerJsonTest {
             final String json = mapper.writeValueAsString(marker);
 
             assertTrue(json.contains("\"createdBy\":\"mtb\""), json);
-            assertTrue(json.contains("\"modifiedBy\""), json);
+            assertTrue(json.contains("\"updatedBy\""), json);
             assertTrue(json.contains("\"status\":\"ACTIVE\""), json);
             assertFalse(json.contains("statusLabel"), json);
         } catch (final Exception ex) {
@@ -105,10 +105,10 @@ public class MarkerJsonTest {
         try {
             final String old = "{\"createdBy\":\"a\",\"updatedBy\":\"b\",\"updatedAt\":\"" + onDisk + "\",\"status\":\"ACTIVE\"}";
 
-            assertEquals(mapper.readValue(old, TestProjectMarker.class).getModifiedBy(), "b");
-            assertEquals(mapper.readValue(old, TestProjectMarker.class).getModifiedAt().toInstant(), when.toInstant());
-            assertEquals(mapper.readValue(old, TestSetMarker.class).getModifiedBy(), "b");
-            assertEquals(mapper.readValue(old, TestSetMarker.class).getModifiedAt().toInstant(), when.toInstant());
+            assertEquals(mapper.readValue(old, TestProjectMarker.class).getUpdatedBy(), "b");
+            assertEquals(mapper.readValue(old, TestProjectMarker.class).getUpdatedAt().toInstant(), when.toInstant());
+            assertEquals(mapper.readValue(old, TestSetMarker.class).getUpdatedBy(), "b");
+            assertEquals(mapper.readValue(old, TestSetMarker.class).getUpdatedAt().toInstant(), when.toInstant());
         } catch (final Exception ex) {
             throw new AssertionError(ex);
         }
@@ -119,7 +119,7 @@ public class MarkerJsonTest {
         try {
             final String withStatus = "{\"createdBy\":\"a\",\"status\":\"ACTIVE\",\"whatever\":1}";
 
-            assertEquals(mapper.readValue(withStatus, TestCasesMainDirectoryMarker.class).getCreatedBy(), "a");
+            assertEquals(mapper.readValue(withStatus, TestCasesFolderMarker.class).getCreatedBy(), "a");
         } catch (final Exception ex) {
             throw new AssertionError(ex);
         }
@@ -130,10 +130,10 @@ public class MarkerJsonTest {
         try {
             final String onlyCreated = "{\"createdBy\":\"mtb\",\"createdAt\":\"" + onDisk + "\"}";
 
-            final TestCasesMainDirectoryMarker marker = mapper.readValue(onlyCreated, TestCasesMainDirectoryMarker.class);
+            final TestCasesFolderMarker marker = mapper.readValue(onlyCreated, TestCasesFolderMarker.class);
 
-            assertEquals(marker.getModifiedBy(), "mtb", "nobody has modified it, so it stands as its creator made it");
-            assertEquals(marker.getModifiedAt().toInstant(), when.toInstant(), "and at the time they made it");
+            assertEquals(marker.getUpdatedBy(), "mtb", "nobody has modified it, so it stands as its creator made it");
+            assertEquals(marker.getUpdatedAt().toInstant(), when.toInstant(), "and at the time they made it");
         } catch (final Exception ex) {
             throw new AssertionError(ex);
         }
@@ -144,14 +144,14 @@ public class MarkerJsonTest {
         try {
             final TestSetMarker marker = new TestSetMarker();
             marker.setCreatedAt(when);
-            marker.setModifiedAt(when);
+            marker.setUpdatedAt(when);
 
             final String json = mapper.writeValueAsString(marker);
             assertTrue(json.contains(onDisk), json);
 
             final TestSetMarker read = mapper.readValue(json, TestSetMarker.class);
             assertEquals(read.getCreatedAt().toInstant(), when.toInstant());
-            assertEquals(read.getModifiedAt().toInstant(), when.toInstant());
+            assertEquals(read.getUpdatedAt().toInstant(), when.toInstant());
         } catch (final Exception ex) {
             throw new AssertionError(ex);
         }

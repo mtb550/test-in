@@ -118,7 +118,7 @@ public final class TestCaseValues implements Disposable {
                 addTo(newExpectedResults, tc.getExpectedResult());
                 addTo(newModules, tc.getModule());
                 tc.getSteps().forEach(s -> addTo(newSteps, s));
-                tc.getGroup().forEach(g -> addTo(newGroups, g));
+                tc.getGroups().forEach(g -> addTo(newGroups, g));
             }
 
             replace(descriptions, newDescriptions);
@@ -139,7 +139,7 @@ public final class TestCaseValues implements Disposable {
         addExpectedResult(tc.getExpectedResult());
         addModule(tc.getModule());
         tc.getSteps().forEach(this::addStep);
-        tc.getGroup().forEach(this::addGroup);
+        tc.getGroups().forEach(this::addGroup);
     }
 
     @Override

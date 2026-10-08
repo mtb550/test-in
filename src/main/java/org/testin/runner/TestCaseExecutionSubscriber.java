@@ -26,7 +26,7 @@ import org.testin.codegen.TestName;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.Failure;
+import org.testin.model.testrun.Failure;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.services.Services;
 

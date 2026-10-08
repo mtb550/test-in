@@ -19,9 +19,9 @@ package org.testin.git.conflict;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.testcase.TestSetEditorAttributes;
 
 import java.util.Locale;
 
@@ -38,7 +38,7 @@ final class FieldName {
     private static @NotNull String ofTestCaseField(final @NotNull String jsonField) {
         final @NotNull String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
 
-        for (final TestCaseEditorAttributes attribute : TestCaseEditorAttributes.values()) {
+        for (final TestSetEditorAttributes attribute : TestSetEditorAttributes.values()) {
             if (attribute.name().equals(constant)) return attribute.getName();
         }
 
@@ -49,7 +49,7 @@ final class FieldName {
         for (final TestRunConfiguration question : TestRunConfiguration.values()) {
             if (question.name().equals(key)) return question.getDisplayName();
         }
-        for (final ResultAnalysis heading : ResultAnalysis.values()) {
+        for (final TestRunResultAnalysis heading : TestRunResultAnalysis.values()) {
             if (heading.name().equals(key)) return heading.getLabel();
         }
 

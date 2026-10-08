@@ -23,8 +23,8 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
@@ -49,14 +49,14 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                 return;
             }
 
-            final @NotNull Optional<DirectoryDto> shown = TreeValues.directoryOf(value);
+            final @NotNull Optional<Node> shown = TreeValues.directoryOf(value);
             if (shown.isEmpty()) {
                 append(Objects.toString(value, ""), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 return;
             }
 
-            final @NotNull DirectoryDto dir = shown.get();
-            final @NotNull DirectoryType type = dir.getType();
+            final @NotNull Node dir = shown.get();
+            final @NotNull NodeType type = dir.getType();
 
             setIcon(dir.iconShownInTree());
             final boolean grayed = selectedNodes.contains(dir.getPath()) || dir.isRetired();

@@ -21,7 +21,7 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogSize;
@@ -75,7 +75,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     protected abstract @NotNull String getJsonFieldName();
 
     // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-039
-    protected abstract @NotNull TestCaseEditorAttributes attribute();
+    protected abstract @NotNull TestSetEditorAttributes attribute();
 
     // Rule-EDITOR-PANEL-005
     protected @NotNull String getOriginalValue(final @NotNull TestCaseDto tc) {
@@ -123,7 +123,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
             written.add(took.orElseThrow());
         }
 
-        TestCaseEditorAttributes.sayWhatWasRefused(p, refused);
+        TestSetEditorAttributes.sayWhatWasRefused(p, refused);
 
         return written;
     }

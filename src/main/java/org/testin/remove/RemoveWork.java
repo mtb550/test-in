@@ -27,7 +27,7 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
@@ -54,7 +54,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
-    void confirm(final @NotNull List<DirectoryDto> nodesToRemove) {
+    void confirm(final @NotNull List<Node> nodesToRemove) {
         final @NotNull String holds = nodesToRemove.size() == 1
                 ? NodeCounter.childCounts(p, nodesToRemove.getFirst()).describe()
                 : "";
@@ -69,7 +69,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-041
-    private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
+    private void removeNodes(final @NotNull List<Node> nodesToRemove) {
         if (nodesToRemove.isEmpty()) return;
 
         // Rule-CODEGEN-096
@@ -80,7 +80,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
 
         // Rule-TREE-PANEL-102
         final boolean copied = BackgroundWork.synchronously(p, Bundle.message("remove.progress"), true, () -> {
-            for (final DirectoryDto node : nodesToRemove) {
+            for (final Node node : nodesToRemove) {
                 ProgressManager.checkCanceled();
                 nodes.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
             }
@@ -92,7 +92,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
         }
 
         // Rule-TREE-PANEL-116
-        for (final DirectoryDto node : nodesToRemove) {
+        for (final Node node : nodesToRemove) {
             editors.close(node);
         }
 
@@ -118,11 +118,11 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
-    private void removeEach(final @NotNull List<DirectoryDto> nodes, final @NotNull Consumer<@NotNull List<DirectoryDto>> whenAllGone) {
+    private void removeEach(final @NotNull List<Node> nodes, final @NotNull Consumer<@NotNull List<Node>> whenAllGone) {
         final @NotNull AtomicInteger pending = new AtomicInteger(nodes.size());
-        final @NotNull List<DirectoryDto> went = new CopyOnWriteArrayList<>();
+        final @NotNull List<Node> went = new CopyOnWriteArrayList<>();
 
-        for (final DirectoryDto node : nodes) {
+        for (final Node node : nodes) {
             Removals.of(node.getType()).remove(p, node, wasRemoved -> {
                 if (wasRemoved) went.add(node);
                 if (pending.decrementAndGet() != 0) return;
@@ -133,7 +133,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-040
-    private void recordRemoval(final @NotNull List<DirectoryDto> asked, final @NotNull List<Kept> kept) {
+    private void recordRemoval(final @NotNull List<Node> asked, final @NotNull List<Kept> kept) {
         final @NotNull String what = asked.size() == 1
                 ? Bundle.message("remove.undo.one", asked.getFirst().getName())
                 : Bundle.message("remove.undo.many", String.valueOf(asked.size()));

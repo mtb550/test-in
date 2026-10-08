@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.ui.Tooltip;
@@ -50,7 +50,7 @@ public final class StacktraceLine extends AbstractDetails {
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;
 
-    private final @NotNull TestRunItems runItem;
+    private final @NotNull RunItem runItem;
 
     private final @NotNull List<String> currentPath;
 

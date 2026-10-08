@@ -27,7 +27,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.open.LastOpenEditors;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.BackgroundWork;
@@ -67,13 +67,13 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
     @Getter(AccessLevel.PACKAGE)
-    private final @NotNull TestRunWriter testRunWriter;
+    private final @NotNull RunItemWriter runItemWriter;
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull NodeFiles nodeFiles;
     private final @NotNull TestinRoot testinRoot;
     private final @NotNull Rescan rescan;
     private final @NotNull BoundTestProject boundTestProject;
-    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull NodeMapper directoryMapper;
     private final @NotNull LastOpenEditors lastOpenEditors;
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
@@ -82,12 +82,12 @@ public final class ProjectIndexer {
         this.testinRoot = Services.getInstance(p, TestinRoot.class);
         this.rescan = Services.getInstance(Rescan.class);
         this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
-        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.directoryMapper = Services.getInstance(p, NodeMapper.class);
         this.lastOpenEditors = Services.getInstance(p, LastOpenEditors.class);
         this.store = new IndexerDataStore(p);
         this.problems = new ReadProblems(p, store);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
-        this.testRunWriter = new TestRunWriter(p, store);
+        this.runItemWriter = new RunItemWriter(p, store);
         this.nodeFiles = new NodeFiles(p, this, store);
     }
 
@@ -337,21 +337,21 @@ public final class ProjectIndexer {
     private boolean isListedTestProject(final @NotNull Path folder) {
         final boolean marked = isTestProjectFolder(folder);
         if (!marked)
-            Logger.warn("Skipping directory without a " + DirectoryType.TP.getMarker() + " marker (not a test project): " + folder);
+            Logger.warn("Skipping directory without a " + NodeType.TP.getMarker() + " marker (not a test project): " + folder);
         return marked;
     }
 
     private boolean isTestProjectFolder(final @NotNull Path folder) {
-        return store.hasMarker(folder, DirectoryType.TP);
+        return store.hasMarker(folder, NodeType.TP);
     }
 
     private void logSummary() {
         Logger.info("Indexing complete: " +
                 store.getTestCasesById().size() + " test cases, " +
-                store.getTestRunsByPath().size() + " test runs, " +
+                store.getRunItemsByPath().size() + " test runs, " +
                 store.getTestProjectsByPath().size() + " projects, " +
-                store.getTestSetsDirByPath().size() + " test sets, " +
-                store.getTestRunsDirByPath().size() + " test run dirs, " +
+                store.getTestSetNodesByPath().size() + " test sets, " +
+                store.getTestRunNodesByPath().size() + " test run dirs, " +
                 store.getTestSetPackagesByPath().size() + " test set packages, " +
                 store.getTestRunPackagesByPath().size() + " test run packages");
     }

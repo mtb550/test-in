@@ -127,7 +127,7 @@ public class PendingChangeFactoryTest {
     }
 
     @Test
-    public void aResultIsItsOwnKindOfChange() {
+    public void aRunItemIsItsOwnKindOfChange() {
         final UUID testCaseId = UUID.randomUUID();
         final String before = """
                 {"id":"%s","status":"PENDING"}""".formatted(testCaseId);

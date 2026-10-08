@@ -19,7 +19,7 @@ package org.testin.testrun.failure;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestRuns;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.Screenshots;
@@ -37,7 +37,7 @@ public final class ScreenshotsSection implements FailureSection {
     private final @NotNull IdentityHashMap<byte[], String> named = new IdentityHashMap<>();
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    public ScreenshotsSection(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull TestRunItems runItem) {
+    public ScreenshotsSection(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull RunItem runItem) {
         final @NotNull List<byte[]> stored = Services.getInstance(p, TestRuns.class).screenshots(testRunPath, runItem);
         IntStream.range(0, stored.size()).forEach(index -> named.put(stored.get(index), runItem.getScreenshots().get(index)));
 

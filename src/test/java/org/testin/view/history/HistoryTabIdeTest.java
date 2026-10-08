@@ -29,13 +29,13 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -50,8 +50,8 @@ public class HistoryTabIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull JBPanel<?> tab = new JBPanel<>(new BorderLayout());
 
-    private static @NotNull TestRunItems failed(final @NotNull TestCaseDto tc) {
-        return TestRunItems.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The basket was emptied").bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
+    private static @NotNull RunItem failed(final @NotNull TestCaseDto tc) {
+        return RunItem.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The basket was emptied").bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
     }
 
     private @NotNull TestCaseDto aTestCase() {
@@ -60,11 +60,11 @@ public class HistoryTabIdeTest extends AbstractTempRootIdeTest {
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-100, Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-109
     public void testABugIsACardOfItsOwnWithItsAttributesAndItsTestRunOpensTheRunItem() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Login");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Login");
         final @NotNull TestCaseDto tc = EditorFixtures.testCase(getProject(), ts, "Log in with a valid user", "a");
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, List.of(failed(tc)));
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(tp.getTestRunsDirectory().getPath().resolve("Cycle-0"), TestRunDto.builder().results(new ArrayList<>(List.of(failed(tc)))).build());
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, List.of(failed(tc)));
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(tp.getTestRunsFolder().getPath().resolve("Cycle-0"), RunItems.builder().all(new ArrayList<>(List.of(failed(tc)))).build());
 
         new HistoryTab().load(getProject(), tab, Optional.of(tc));
         Await.until("the bug cards were never drawn: " + Drawn.words(tab), () -> Drawn.holds(Drawn.words(tab), Bundle.message("view.history.not.under.git")));

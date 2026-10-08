@@ -21,11 +21,11 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
@@ -38,10 +38,10 @@ public class RemoveConfirmsOnceIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-PRODUCT-014
     public void testRemovingSeveralTestCasesConfirmsOnceInThePastTenseWithACount() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto login = EditorFixtures.testSet(getProject(), tp, "Login");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode login = EditorFixtures.testSet(getProject(), tp, "Login");
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), login, 4);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), login, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), login, getTestRootDisposable());
         final @NotNull List<TestCaseDto> chosen = testCases.subList(0, 3);
         final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         new RemoveTestCaseWork(getProject(), editor, login, chosen).remove();

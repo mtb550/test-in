@@ -34,8 +34,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.list.ListPanelBuilder;
-import org.testin.editor.list.ListView;
+import org.testin.editor.cardview.CardPanelBuilder;
+import org.testin.editor.cardview.CardView;
 import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
@@ -46,7 +46,7 @@ import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
 import org.testin.model.ToolBarAttribute;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.ProjectLifetime;
@@ -66,7 +66,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute, N extends DirectoryDto> implements Disposable, Toolbar, TestinEditor {
+public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute, N extends Node> implements Disposable, Toolbar, TestinEditor {
     @Getter
     protected final @NotNull Project p;
     @Getter
@@ -87,7 +87,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull JBList<TestCaseDto> list;
     protected final @NotNull CollectionListModel<TestCaseDto> model;
     protected final @NotNull JBScrollPane scrollPane;
-    protected final @NotNull ListView listView;
+    protected final @NotNull CardView cardView;
     protected final @NotNull AbstractEditorContextMenu contextMenu;
     @Getter
     protected final @NotNull StatusBar statusBar = new StatusBar();
@@ -129,10 +129,10 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         this.mainPanel.setBackground(UIUtil.getPanelBackground());
         this.mainPanel.setOpaque(true);
 
-        this.listView = ListPanelBuilder.build(p, projectDisposable, this);
-        this.model = listView.model();
-        this.list = listView.list();
-        this.scrollPane = listView.scrollPane();
+        this.cardView = CardPanelBuilder.build(p, projectDisposable, this);
+        this.model = cardView.model();
+        this.list = cardView.list();
+        this.scrollPane = cardView.scrollPane();
 
         this.contextMenu = buildContextMenu();
     }
@@ -177,7 +177,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     @Override
-    public @NotNull DirectoryDto getEditedNode() {
+    public @NotNull Node getEditedNode() {
         return parent;
     }
 
@@ -282,7 +282,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018
     @Override
-    public void onToolBarSwitchedToListView() {
+    public void onToolBarSwitchedToCardView() {
         Logger.debug("[switch] -> LIST view, currentView=" + getToolBar().getCurrentView());
         center.set(scrollPane);
 
@@ -427,7 +427,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         Declared.bindTo("Testin.CopyTestCase", list);
         Declared.bindTo("Testin.RemoveTestCase", list);
 
-        ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
+        CardPanelBuilder.wireCommonListeners(p, this, cardView, parent, contextMenu,
                 grid::table,
                 () -> getToolBar().getCurrentView() == ViewMode.GRID_VIEW);
     }
@@ -455,9 +455,9 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         replaceModel(pageItems);
 
         selectedId.ifPresent(id -> {
-            for (final TestCaseDto item : pageItems) {
-                if (id.equals(item.getId())) {
-                    list.setSelectedValue(item, true);
+            for (final TestCaseDto testCase : pageItems) {
+                if (id.equals(testCase.getId())) {
+                    list.setSelectedValue(testCase, true);
                     break;
                 }
             }

@@ -41,7 +41,7 @@ import org.testin.help.Guides;
 import org.testin.indexer.IndexChanged;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
@@ -153,7 +153,7 @@ public final class TreePanel implements Disposable {
                 return;
             }
 
-            final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
+            final @NotNull Optional<TestProjectNode> boundProject = bound();
             final @NotNull PanelState state = state(listing, boundProject);
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -167,7 +167,7 @@ public final class TreePanel implements Disposable {
         return treeView.isVisible();
     }
 
-    private void draw(final @NotNull PanelState state, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
+    private void draw(final @NotNull PanelState state, final @NotNull Optional<TestProjectNode> boundProject) {
         ThreadingAssertions.assertEventDispatchThread();
         treeView.setVisible(boundProject.isPresent());
         aimTheTitleBar();
@@ -197,7 +197,7 @@ public final class TreePanel implements Disposable {
         reindex();
     }
 
-    private @NotNull Optional<TestProjectDirectoryDto> bound() {
+    private @NotNull Optional<TestProjectNode> bound() {
         return boundTestProject.get();
     }
 
@@ -212,7 +212,7 @@ public final class TreePanel implements Disposable {
         return true;
     }
 
-    private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
+    private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing, final @NotNull Optional<TestProjectNode> boundProject) {
         underRoot = listing;
 
         return PanelState.of(
@@ -225,7 +225,7 @@ public final class TreePanel implements Disposable {
     }
 
     // UC-TREE-PANEL-001
-    private void showTree(final @NotNull TestProjectDirectoryDto tp) {
+    private void showTree(final @NotNull TestProjectNode tp) {
         Logger.info("TreePanel.refresh(): showing '" + tp.getName() + "'");
 
         projectTree.refresh();

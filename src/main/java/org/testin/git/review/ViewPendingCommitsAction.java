@@ -25,7 +25,7 @@ import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.help.Guide;
 import org.testin.help.Guides;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 
@@ -50,7 +50,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
         // Rule-SHARE-105
         if (OptionalPlugin.GIT.grayedWithReason(this, e.getPresentation())) return;
 
-        e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectDirectoryDto.class).isPresent());
+        e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectNode.class).isPresent());
     }
 
     @Override

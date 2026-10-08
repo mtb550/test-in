@@ -18,9 +18,9 @@ package org.testin.report.generators;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
 import org.testin.report.ReportTile;
 import org.testng.annotations.Test;
@@ -70,22 +70,22 @@ public class ReportSectionTest {
     public void aRunItemStatusHasOneColorInEveryPartOfAReport() {
         assertEquals(ReportSection.FAILED.getHexColor(), RunItemStatus.FAILED.getReportHex(), "the failed table heading");
         assertEquals(ReportTile.FAILED.getHex(), RunItemStatus.FAILED.getReportHex(), "the failed count tile");
-        assertEquals(ResultAnalysis.FAILED.getHexColor(), RunItemStatus.FAILED.getReportHex(), "the failed result analysis line");
+        assertEquals(TestRunResultAnalysis.FAILED.getHexColor(), RunItemStatus.FAILED.getReportHex(), "the failed result analysis line");
 
         assertEquals(ReportSection.PASSED.getHexColor(), RunItemStatus.PASSED.getReportHex(), "the passed table heading");
         assertEquals(ReportTile.PASSED.getHex(), RunItemStatus.PASSED.getReportHex(), "the passed count tile");
-        assertEquals(ResultAnalysis.PASSED.getHexColor(), RunItemStatus.PASSED.getReportHex(), "the passed result analysis line");
+        assertEquals(TestRunResultAnalysis.PASSED.getHexColor(), RunItemStatus.PASSED.getReportHex(), "the passed result analysis line");
 
         assertEquals(ReportSection.BLOCKED.getHexColor(), RunItemStatus.BLOCKED.getReportHex(), "the blocked table heading");
         assertEquals(ReportTile.BLOCKED.getHex(), RunItemStatus.BLOCKED.getReportHex(), "the blocked count tile");
-        assertEquals(ResultAnalysis.BLOCKED.getHexColor(), RunItemStatus.BLOCKED.getReportHex(), "the blocked result analysis line");
+        assertEquals(TestRunResultAnalysis.BLOCKED.getHexColor(), RunItemStatus.BLOCKED.getReportHex(), "the blocked result analysis line");
     }
 
     @Test
     public void everyStatusBelongsToExactlyOneSection() {
         for (final RunItemStatus status : RunItemStatus.values()) {
             final List<ReportSection> claiming = Arrays.stream(ReportSection.values())
-                    .filter(section -> section.matches(item(status)))
+                    .filter(section -> section.matches(runItem(status)))
                     .toList();
 
             assertEquals(claiming.size(), 1,
@@ -95,27 +95,27 @@ public class ReportSectionTest {
 
     @Test
     public void everySectionCountMatchesTheRowsItWillPrint() {
-        final List<TestRunItems> results = new ArrayList<>();
+        final List<RunItem> runItems = new ArrayList<>();
         for (final RunItemStatus status : RunItemStatus.values()) {
-            results.add(item(status));
-            results.add(item(status));
+            runItems.add(runItem(status));
+            runItems.add(runItem(status));
         }
 
-        final TestRunSummary summary = TestRunSummary.of(results);
+        final TestRunSummary summary = TestRunSummary.of(runItems);
 
         for (final ReportSection section : ReportSection.values()) {
-            final long rows = results.stream().filter(section::matches).count();
+            final long rows = runItems.stream().filter(section::matches).count();
             assertEquals(section.count(summary), rows, section + " heading and rows disagree");
         }
     }
 
     @Test
     public void theSectionsAccountForEveryTestCaseInTheTestRun() {
-        final List<TestRunItems> results = List.of(
-                item(RunItemStatus.PASSED), item(RunItemStatus.PASSED), item(RunItemStatus.FAILED),
-                item(RunItemStatus.BLOCKED), item(RunItemStatus.PENDING), item(RunItemStatus.UNTESTED));
+        final List<RunItem> runItems = List.of(
+                runItem(RunItemStatus.PASSED), runItem(RunItemStatus.PASSED), runItem(RunItemStatus.FAILED),
+                runItem(RunItemStatus.BLOCKED), runItem(RunItemStatus.PENDING), runItem(RunItemStatus.UNTESTED));
 
-        final TestRunSummary summary = TestRunSummary.of(results);
+        final TestRunSummary summary = TestRunSummary.of(runItems);
         final long printed = Arrays.stream(ReportSection.values())
                 .mapToLong(section -> section.count(summary))
                 .sum();
@@ -142,10 +142,10 @@ public class ReportSectionTest {
         assertTrue(description.contains("<b>7</b>"), description);
     }
 
-    private @NotNull TestRunItems item(final RunItemStatus status) {
-        final TestRunItems item = new TestRunItems();
-        item.setId(UUID.randomUUID());
-        item.setStatus(status);
-        return item;
+    private @NotNull RunItem runItem(final RunItemStatus status) {
+        final RunItem runItem = new RunItem();
+        runItem.setId(UUID.randomUUID());
+        runItem.setStatus(status);
+        return runItem;
     }
 }

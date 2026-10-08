@@ -29,11 +29,11 @@ import org.testin.editor.EditorFixtures;
 import org.testin.explorer.TreePanel;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.imports.SourceSection;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.dialogs.DestinationForm;
@@ -102,9 +102,9 @@ public class TestinFolderIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull TestProjectDirectoryDto aTestProjectIn(final @NotNull Path folder, final @NotNull String name) {
+    private @NotNull TestProjectNode aTestProjectIn(final @NotNull Path folder, final @NotNull String name) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(folder.resolve(name));
+            final @NotNull TestProjectNode tp = Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(folder.resolve(name));
             Services.getInstance(getProject(), Nodes.class).addTestProject(tp);
             return tp;
         });
@@ -126,8 +126,8 @@ public class TestinFolderIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Path first = folder("first");
         final @NotNull Path second = folder("second");
         settings().rootTestinPath = first.toString();
-        final @NotNull TestProjectDirectoryDto moved = aTestProjectIn(second, "NAFATH");
-        final @NotNull TestSetDirectoryDto login = EditorFixtures.testSet(getProject(), moved, "Login");
+        final @NotNull TestProjectNode moved = aTestProjectIn(second, "NAFATH");
+        final @NotNull TestSetNode login = EditorFixtures.testSet(getProject(), moved, "Login");
         Services.getInstance(getProject(), TreePanel.class);
         indexer().resetForReindex();
         assertTrue("the second folder's test set is known before the folder changed, so this proves nothing", Services.getInstance(getProject(), Nodes.class).find(login.getPath()).isEmpty());

@@ -24,7 +24,7 @@ import org.testin.codegen.SubtreeCode;
 import org.testin.codegen.event.Moved;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -56,18 +56,18 @@ final class NodeTransfer {
         this.undoHistories = Services.getInstance(p, UndoHistories.class);
     }
 
-    static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {
+    static @NotNull String describe(final @NotNull List<Node> sources) {
         return sources.size() == 1
                 ? "'" + sources.getFirst().getName() + "'"
                 : Bundle.message("transfer.items", String.valueOf(sources.size()));
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-006
-    void carryOut(final int action, final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
+    void carryOut(final int action, final @NotNull List<Node> sources, final @NotNull Node target) {
         if (action == TransferHandler.MOVE) {
             moveNodes(sources, target);
         } else {
-            final @NotNull List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
+            final @NotNull List<Path> sourcePaths = sources.stream().map(Node::getPath).toList();
             nodes.copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
 
@@ -85,8 +85,8 @@ final class NodeTransfer {
     }
 
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-047
-    private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        final @NotNull List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
+    private void moveNodes(final @NotNull List<Node> sources, final @NotNull Node target) {
+        final @NotNull List<Path> oldPaths = sources.stream().map(Node::getPath).toList();
         final @NotNull List<Path> newPaths = sources.stream()
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
@@ -131,8 +131,8 @@ final class NodeTransfer {
     }
 
     // Rule-CODEGEN-082
-    private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        for (final DirectoryDto source : sources) {
+    private void generateForCopies(final @NotNull List<Node> sources, final @NotNull Node target) {
+        for (final Node source : sources) {
             nodes.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
         }
     }

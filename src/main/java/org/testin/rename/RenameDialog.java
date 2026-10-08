@@ -19,8 +19,8 @@ package org.testin.rename;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -40,10 +40,10 @@ final class RenameDialog extends AbstractFrameworkDialog {
 
     private final @NotNull Consumer<@NotNull String> onSubmit;
 
-    private final @NotNull DirectoryType type;
+    private final @NotNull NodeType type;
 
     // UC-TREE-PANEL-011, Rule-INTERNAL-099, Rule-INTERNAL-105, Rule-INTERNAL-108, Rule-TREE-PANEL-123
-    RenameDialog(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<@NotNull String> onSubmit) {
+    RenameDialog(final @NotNull Project p, final @NotNull Node dir, final @NotNull Consumer<@NotNull String> onSubmit) {
         super(p);
         this.onSubmit = onSubmit;
         this.type = dir.getType();

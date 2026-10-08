@@ -25,9 +25,9 @@ import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
@@ -46,17 +46,17 @@ import java.util.HashSet;
 
 public class PasteNodeAsksFirstIdeTest extends AbstractTempRootIdeTest {
 
-    private TestSetDirectoryDto login;
-    private TestSetPackageDirectoryDto payments;
+    private TestSetNode login;
+    private TestSetPackageNode payments;
     private TreeTransferHandler handler;
 
     @Override
     protected void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        login = made.testSet(tp.getTestCasesDirectory(), "Login");
-        payments = made.testSetPackage(tp.getTestCasesDirectory(), "Payments");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        login = made.testSet(tp.getTestCasesFolder(), "Login");
+        payments = made.testSetPackage(tp.getTestCasesFolder(), "Payments");
         final @NotNull DefaultMutableTreeNode selected = new DefaultMutableTreeNode(login);
         final @NotNull DefaultMutableTreeNode top = new DefaultMutableTreeNode(tp);
         top.add(selected);

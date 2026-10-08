@@ -23,8 +23,8 @@ import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.creator.dialogs.CreateTestRunDialog;
 import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -41,17 +41,17 @@ record CreateTreeNodeWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull Not
     }
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-008, UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-004
-    void createUnder(final @NotNull DirectoryDto pDir) {
-        final @NotNull BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
+    void createUnder(final @NotNull Node parentNode) {
+        final @NotNull BiConsumer<String, NodeType> onCreate = (s, dt) -> {
             if (s.isEmpty()) return;
-            final @NotNull Path newDirPath = pDir.getPath().resolve(s);
+            final @NotNull Path newDirPath = parentNode.getPath().resolve(s);
 
             if (nodes.nodeExists(newDirPath)) {
                 notifier.softRefuse(p, Refused.ALREADY_EXISTS, s);
                 return;
             }
 
-            final @NotNull Optional<DirectoryDto> created = NodeCreators.of(p, dt).execute(s, pDir, newDirPath);
+            final @NotNull Optional<Node> created = NodeCreators.of(p, dt).execute(s, parentNode, newDirPath);
 
             created.ifPresent(dir -> {
                 notifier.softShow(p, Done.CREATED);
@@ -64,8 +64,8 @@ record CreateTreeNodeWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull Not
 
         };
 
-        final @NotNull List<DirectoryType> kinds = pDir.childKinds();
-        if (kinds.equals(DirectoryType.UNDER_TEST_CASES)) new CreateTestDialog(p, onCreate).show();
-        else if (kinds.equals(DirectoryType.UNDER_TEST_RUNS)) new CreateTestRunDialog(p, onCreate).show();
+        final @NotNull List<NodeType> kinds = parentNode.childKinds();
+        if (kinds.equals(NodeType.UNDER_TEST_CASES)) new CreateTestDialog(p, onCreate).show();
+        else if (kinds.equals(NodeType.UNDER_TEST_RUNS)) new CreateTestRunDialog(p, onCreate).show();
     }
 }

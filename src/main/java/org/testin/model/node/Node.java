@@ -1,0 +1,172 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.model.node;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.testin.model.NodeType;
+import org.testin.model.markers.Marker;
+
+import javax.swing.Icon;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
+@ToString
+public abstract class Node {
+    @NonNull
+    @Builder.Default
+    private String name = "";
+
+    @NonNull
+    @Builder.Default
+    private Path path = Path.of("");
+
+    @NonNull
+    @Builder.Default
+    private List<String> path2 = List.of();
+
+    @ToString.Exclude
+    private @Nullable Node parent;
+
+    public static @NotNull List<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
+        final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
+        path.add(name);
+
+        return path;
+    }
+
+    public @NotNull List<Node> selfAndAncestors() {
+        final @NotNull List<Node> chain = new ArrayList<>();
+        for (Node current = this; current != null; current = current.getParent()) {
+            chain.add(current);
+        }
+        return chain;
+    }
+
+    @NonNull
+    public abstract Marker getMarker();
+
+    // Rule-INTERNAL-116
+    @Override
+    public final boolean equals(final @Nullable Object other) {
+        return other instanceof Node dir && dir.getClass() == getClass() && dir.path.equals(path);
+    }
+
+    @Override
+    public final int hashCode() {
+        return path.hashCode();
+    }
+
+    public int getOrder() {
+        return getMarker().getOrder();
+    }
+
+    public boolean isOrderable() {
+        return false;
+    }
+
+    @NonNull
+    public String getMarkerFileName() {
+        return getType().getMarker();
+    }
+
+    // UC-TREE-PANEL-007, UC-TREE-PANEL-009
+    public @NotNull List<NodeType> childKinds() {
+        return List.of();
+    }
+
+    public boolean canCreateChildren() {
+        return !childKinds().isEmpty();
+    }
+
+    public boolean isRenamable() {
+        return true;
+    }
+
+    // Rule-TREE-PANEL-100
+    public @NotNull List<Node> fixedChildren() {
+        return List.of();
+    }
+
+    public boolean isTestCaseContainer() {
+        return false;
+    }
+
+    // Rule-TREE-PANEL-009, Rule-PRODUCT-011
+    public @NotNull Optional<String> whySignedOff() {
+        return Optional.empty();
+    }
+
+    public boolean isOpenableInEditor() {
+        return false;
+    }
+
+    public boolean isTransferable() {
+        return true;
+    }
+
+    public boolean isRemovable() {
+        return true;
+    }
+
+    public boolean isTransferTarget() {
+        return getType().acceptsAnything();
+    }
+
+    public boolean acceptsTransferred(final @NotNull Node source) {
+        return getType().accepts(source.getType());
+    }
+
+    public boolean isRetired() {
+        return false;
+    }
+
+    // UC-TREE-PANEL-001, Rule-INTERNAL-072
+    public @NotNull Icon iconShownInTree() {
+        return getType().getIcon();
+    }
+
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
+    public @NotNull String statusShownInTree() {
+        return getMarker().status().isActive() ? "" : getMarker().getStatusLabel();
+    }
+
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-127
+    public boolean mayHaveChildren() {
+        return !fixedChildren().isEmpty() || getType().acceptsAnything();
+    }
+
+    public boolean holdsTestCases() {
+        return false;
+    }
+
+    @NotNull
+    public abstract NodeType getType();
+}

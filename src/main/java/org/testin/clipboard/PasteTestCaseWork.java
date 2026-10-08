@@ -23,12 +23,12 @@ import org.testin.codegen.GenType;
 import org.testin.codegen.event.CopiedTestCase;
 import org.testin.codegen.event.MovedTestCase;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
 import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -61,14 +61,14 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
         if (pastedTestCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (editor instanceof TestCaseEditor destUI) pasteInto(destUI, pastedTestCases);
+            if (editor instanceof TestSetEditor destUI) pasteInto(destUI, pastedTestCases);
         });
     }
 
-    private void pasteInto(final @NotNull TestCaseEditor destUI, final @NotNull List<TestCaseDto> pastedTestCases) {
+    private void pasteInto(final @NotNull TestSetEditor destUI, final @NotNull List<TestCaseDto> pastedTestCases) {
         final boolean isCut = cutState.isCutOf(pastedTestCases);
 
-        final @NotNull Optional<DirectoryDto> cutFromSet =
+        final @NotNull Optional<Node> cutFromSet =
                 isCut ? cutState.source().map(TestinEditor::getParent) : Optional.empty();
 
         if (!isCut) cutState.clear();
@@ -119,7 +119,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
         if (isCut) cutState.clear();
     }
 
-    private @NotNull List<TestCaseDto> clonesInto(final @NotNull TestCaseEditor destUI, final @NotNull List<TestCaseDto> pastedTestCases, final boolean isCut, final @NotNull List<String> ranks) {
+    private @NotNull List<TestCaseDto> clonesInto(final @NotNull TestSetEditor destUI, final @NotNull List<TestCaseDto> pastedTestCases, final boolean isCut, final @NotNull List<String> ranks) {
         final @NotNull List<TestCaseDto> clones = new ArrayList<>(pastedTestCases.size());
         for (int i = 0; i < pastedTestCases.size(); i++) {
             final @NotNull TestCaseDto clonedTc = cloneForPasting(pastedTestCases.get(i), isCut, destUI.getParent(), ranks.get(i));
@@ -143,7 +143,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
     }
 
     // UC-EDITOR-PANEL-017, Rule-INTERNAL-035
-    private void moveCut(final @NotNull TestinEditor sourceUI, final @NotNull TestCaseEditor destUI, final @NotNull List<TestCaseDto> cutItems, final @NotNull List<TestCaseDto> pastedHere) {
+    private void moveCut(final @NotNull TestinEditor sourceUI, final @NotNull TestSetEditor destUI, final @NotNull List<TestCaseDto> cutItems, final @NotNull List<TestCaseDto> pastedHere) {
         final @NotNull Path from = sourceUI.getParent().getPath();
         final @NotNull Path to = destUI.getParent().getPath();
 
@@ -165,7 +165,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
     }
 
     // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-083
-    private @NotNull List<String> ranksUnderTheSelection(final @NotNull TestCaseEditor destUI, final @NotNull Set<UUID> leaving, final int count) {
+    private @NotNull List<String> ranksUnderTheSelection(final @NotNull TestSetEditor destUI, final @NotNull Set<UUID> leaving, final int count) {
         final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(destUI.getAllTestCases().stream().filter(tc -> !leaving.contains(tc.getId())).toList());
         final @NotNull Optional<TestCaseDto> anchor = destUI.getSelectedTestCases().stream()
                 .filter(selected -> !selected.getOrder().isEmpty())
@@ -186,7 +186,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
     }
 
     // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-081, Rule-EDITOR-PANEL-082
-    private @NotNull TestCaseDto cloneForPasting(final @NotNull TestCaseDto original, final boolean isCut, final @NotNull TestSetDirectoryDto parent, final @NotNull String rank) {
+    private @NotNull TestCaseDto cloneForPasting(final @NotNull TestCaseDto original, final boolean isCut, final @NotNull TestSetNode parent, final @NotNull String rank) {
         final @NotNull TestCaseDtoBuilder draft = original.edit().parent(parent).order(rank);
 
         if (isCut) {

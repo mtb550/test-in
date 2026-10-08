@@ -44,12 +44,12 @@ public class JsonMarkerNamesTest {
 
     @Test
     public void everyMarkerIsReadAsJsonAndNothingElse() {
-        final @NotNull Set<String> markers = Arrays.stream(DirectoryType.values()).map(DirectoryType::getMarker).collect(Collectors.toCollection(TreeSet::new));
+        final @NotNull Set<String> markers = Arrays.stream(NodeType.values()).map(NodeType::getMarker).collect(Collectors.toCollection(TreeSet::new));
 
         final @NotNull Matcher declared = Pattern.compile("fileNames=\"([^\"]*)\"").matcher(read(Path.of("src", "main", "resources", "META-INF", "testin-json.xml")));
         assertTrue(declared.find(), "testin-json.xml maps no file names to JSON");
 
         assertEquals(new TreeSet<>(Arrays.asList(declared.group(1).split(";"))), markers,
-                "testin-json.xml reads these names as JSON, and DirectoryType names its markers - a marker left out is read as another language, one extra claims a file Testin does not write");
+                "testin-json.xml reads these names as JSON, and NodeType names its markers - a marker left out is read as another language, one extra claims a file Testin does not write");
     }
 }

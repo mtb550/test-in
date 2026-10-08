@@ -40,12 +40,12 @@ import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.model.Automated;
 import org.testin.model.StatusBarItem;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.RunItemStatusService;
 import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Prose;
@@ -164,7 +164,7 @@ final class LightModeWindow {
         return label;
     }
 
-    boolean shows(final @NotNull TestRunDirectoryDto other) {
+    boolean shows(final @NotNull TestRunNode other) {
         return editor.getParent().getPath().equals(other.getPath());
     }
 
@@ -220,8 +220,8 @@ final class LightModeWindow {
         if (arrived) testCaseView.captureLeaving();
 
         set.setText(tc.getParent().getName());
-        description.setText(TestCaseEditorAttributes.DESCRIPTION.displayValue(tc));
-        expected.setText(TestCaseEditorAttributes.EXPECTED_RESULT.displayValue(tc));
+        description.setText(TestSetEditorAttributes.DESCRIPTION.displayValue(tc));
+        expected.setText(TestSetEditorAttributes.EXPECTED_RESULT.displayValue(tc));
 
         details.show(tc);
 
@@ -340,8 +340,8 @@ final class LightModeWindow {
     }
 
     private void openCapture() {
-        executingItem().ifPresent(item -> {
-            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom.getLevel(), this::fitHeight, this::saveCapture));
+        executingItem().ifPresent(runItem -> {
+            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), runItem, zoom.getLevel(), this::fitHeight, this::saveCapture));
 
             showCapture();
             fitHeight();
@@ -443,10 +443,10 @@ final class LightModeWindow {
         return index >= 0 && index < testCases.size() ? Optional.of(testCases.get(index)) : Optional.empty();
     }
 
-    private @NotNull Optional<TestRunItems> executingItem() {
+    private @NotNull Optional<RunItem> executingItem() {
         return executingTestCase()
                 .flatMap(tc -> editor.runItem(tc.getId()))
-                .filter(item -> !item.isRemoved());
+                .filter(runItem -> !runItem.isRemoved());
     }
 
     private @NotNull JComponent content() {

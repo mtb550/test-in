@@ -31,9 +31,9 @@ public class UpdateMenuHoldsEveryEditableFieldIdeTest extends BasePlatformTestCa
                 .map(UpdateTestCaseFields::getName)
                 .collect(Collectors.toSet());
 
-        final List<String> missing = Arrays.stream(TestCaseEditorAttributes.values())
+        final List<String> missing = Arrays.stream(TestSetEditorAttributes.values())
                 .filter(attribute -> attribute.can(Can.EDIT))
-                .map(TestCaseEditorAttributes::getName)
+                .map(TestSetEditorAttributes::getName)
                 .filter(name -> !onTheMenu.contains(name))
                 .toList();
 

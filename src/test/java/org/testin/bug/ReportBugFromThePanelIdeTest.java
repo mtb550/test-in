@@ -31,9 +31,9 @@ import org.testin.editor.EditorFixtures;
 import org.testin.model.TestCaseDto;
 import org.testin.model.bug.BugPriority;
 import org.testin.model.bug.BugSeverity;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.services.BackgroundWork;
@@ -81,9 +81,9 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
     private final @NotNull List<ProcessOutput> answers = new CopyOnWriteArrayList<>();
 
     private TestCaseDto tc;
-    private TestRunDirectoryDto tr;
-    private TestRunItems failed;
-    private RunItem item;
+    private TestRunNode tr;
+    private RunItem failed;
+    private RunItemPath runItemPath;
     private Optional<String> ymlBefore = Optional.empty();
     private Function<ProgressIndicator, GitHubCli> ghBefore;
 
@@ -138,11 +138,11 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         ghBefore = BugFiling.ghOnThisMachine;
         BugFiling.ghOnThisMachine = _ -> new GitHubCli(this::answer);
 
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         tc = EditorFixtures.testCase(getProject(), EditorFixtures.testSet(getProject(), tp, "Login"), "Log in with a valid user", "a");
-        failed = TestRunItems.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The session was dropped").bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).build();
+        failed = RunItem.builder().id(tc.getId()).status(RunItemStatus.FAILED).actualResult("The session was dropped").bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).build();
         tr = EditorFixtures.testRun(getProject(), tp, List.of(failed));
-        item = new RunItem(tr.getPath(), tc.getId());
+        runItemPath = new RunItemPath(tr.getPath(), tc.getId());
     }
 
     @Override
@@ -185,15 +185,15 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull JComponent opened(final @NotNull PreparedBug bug) {
         final @NotNull BugReports reports = Services.getInstance(getProject(), BugReports.class);
-        reports.begin(item);
-        reports.moveTo(item, Stage.OPEN);
-        new ReportBugDialog(getProject(), item, bug, () -> {
+        reports.begin(runItemPath);
+        reports.moveTo(runItemPath, Stage.OPEN);
+        new ReportBugDialog(getProject(), runItemPath, bug, () -> {
         }).open();
         return ShownDialog.content(getProject(), ReportBugDialog.class);
     }
 
     private void sentAndSettled() {
-        Await.until("the send never finished", () -> Services.getInstance(getProject(), BugReports.class).whyReportBugIsOff(item, failed).filter(Bundle.message("bug.sending")::equals).isEmpty() && !issuesCreated().isEmpty());
+        Await.until("the send never finished", () -> Services.getInstance(getProject(), BugReports.class).whyReportBugIsOff(runItemPath, failed).filter(Bundle.message("bug.sending")::equals).isEmpty() && !issuesCreated().isEmpty());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
@@ -245,7 +245,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         ReportBug.start(getProject(), tr, tc.getId(), tc, () -> {
         });
 
-        Await.until("the stopped preparation never finished", () -> Services.getInstance(getProject(), BugReports.class).whyReportBugIsOff(item, failed).isEmpty());
+        Await.until("the stopped preparation never finished", () -> Services.getInstance(getProject(), BugReports.class).whyReportBugIsOff(runItemPath, failed).isEmpty());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         assertFalse("stopping the progress bar still opened the bug", ShownDialog.isOpen(getProject(), ReportBugDialog.class));
     }
@@ -359,7 +359,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         final @NotNull BrowserOpened browser = BrowserOpened.recording(getTestRootDisposable());
         final @NotNull List<Notification> shown = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
-        BugFiling.record(getProject(), item, new IssueCreation(Optional.of(ISSUE), 0, ""));
+        BugFiling.record(getProject(), runItemPath, new IssueCreation(Optional.of(ISSUE), 0, ""));
 
         final @NotNull Notification reported = shown.stream().filter(notification -> notification.getTitle().equals(Done.REPORTED.getOutcome())).findFirst().orElseThrow(() -> new AssertionError("no message said the bug was reported"));
         final @NotNull AnAction open = reported.getActions().stream().filter(action -> Bundle.message("bug.open.issue").equals(action.getTemplateText())).findFirst()

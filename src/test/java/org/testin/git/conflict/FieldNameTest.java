@@ -16,9 +16,9 @@
 
 package org.testin.git.conflict;
 
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -27,7 +27,7 @@ public class FieldNameTest {
 
     @Test
     public void aTestCaseFieldIsNamedByTheEditorsOwnEnum() {
-        assertEquals(FieldName.of("updatedAt"), TestCaseEditorAttributes.UPDATED_AT.getName(),
+        assertEquals(FieldName.of("updatedAt"), TestSetEditorAttributes.UPDATED_AT.getName(),
                 "a camelCase JSON field is the enum constant with the underscore");
     }
 
@@ -41,7 +41,7 @@ public class FieldNameTest {
 
     @Test
     public void aResultAnalysisKeyIsNamedByItsHeading() {
-        final ResultAnalysis heading = ResultAnalysis.PASSED;
+        final TestRunResultAnalysis heading = TestRunResultAnalysis.PASSED;
 
         assertEquals(FieldName.of("resultAnalysis." + heading.name()), heading.getLabel(),
                 "the key is named as the analysis dialog heads it");

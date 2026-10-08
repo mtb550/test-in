@@ -17,7 +17,7 @@
 package org.testin.creator;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -25,5 +25,5 @@ import java.util.Optional;
 @FunctionalInterface
 public interface NodeCreator {
     @NotNull
-    Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath);
+    Optional<Node> execute(final @NotNull String name, final @NotNull Node parentNode, final @NotNull Path newDirPath);
 }

@@ -20,12 +20,12 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
@@ -45,14 +45,14 @@ public class TestCaseSnapshotIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestSetDirectoryDto checkoutSet() {
+    private @NotNull TestSetNode checkoutSet() {
         return WriteAction.computeAndWait(() -> {
-            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+            final NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
 
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
+            final TestProjectNode tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
-            final TestSetDirectoryDto ts = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Checkout"), tp.getTestCasesDirectory());
+            final TestSetNode ts = mapper.getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Checkout"), tp.getTestCasesFolder());
             nodes().addTestSet(ts);
             return ts;
         });
@@ -60,7 +60,7 @@ public class TestCaseSnapshotIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-255
     public void testUndoingAPasteWhoseSourceSetIsGoneLeavesTheTestCasesInTheDestination() {
-        final TestSetDirectoryDto destination = checkoutSet();
+        final TestSetNode destination = checkoutSet();
 
         final Path source = destination.getPath().resolveSibling("Login");
 
@@ -90,7 +90,7 @@ public class TestCaseSnapshotIdeTest extends AbstractTempRootIdeTest {
     }
 
     public void testUndoingARemovalPutsTheTestCaseBack() {
-        final TestSetDirectoryDto ts = checkoutSet();
+        final TestSetNode ts = checkoutSet();
         final TestCaseDto removed = TestCaseDto.builder()
                 .id(UUID.randomUUID())
                 .description("Pay with a saved card")

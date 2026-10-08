@@ -81,7 +81,7 @@ public class ReviewKindByNameTest {
 
     // UC-SHARE-010, Rule-SHARE-047
     @Test
-    public void aTestCaseOrResultTheReviewCannotParseStillGetsItsKindOfRow() {
+    public void aTestCaseOrRunItemTheReviewCannotParseStillGetsItsKindOfRow() {
         final @NotNull String testCase = "Test Cases/Login/" + UUID.randomUUID() + ".tc";
         final @NotNull String result = "Test Runs/Sprint 1/" + UUID.randomUUID() + ".ri";
         onDisk(testCase, "{ this is not a test case");

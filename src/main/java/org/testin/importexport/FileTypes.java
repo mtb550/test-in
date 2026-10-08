@@ -28,8 +28,8 @@ import org.testin.importexport.imports.ImportCsv;
 import org.testin.importexport.imports.ImportExcel;
 import org.testin.importexport.imports.ImportJson;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
 import org.testin.report.generators.TestRunExcelGenerator;
 import org.testin.report.generators.TestRunHtmlGenerator;
 import org.testin.report.generators.TestRunPdfGenerator;
@@ -63,7 +63,7 @@ public enum FileTypes {
             columns -> Bundle.message("import.hint.xlsx", columns),
             (_, destFile, sheets) -> new ExportExcel().exportToFile(destFile, sheets),
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
-            (p, trDir, tr) -> new TestRunExcelGenerator().generate(p, trDir, tr)
+            (p, testRunNode, runItems) -> new TestRunExcelGenerator().generate(p, testRunNode, runItems)
     ),
 
     JSON(
@@ -90,7 +90,7 @@ public enum FileTypes {
             _ -> "",
             (_, destFile, sheets) -> new ExportHtml().exportToFile(destFile, sheets),
             ImportHandler.UNSUPPORTED,
-            (p, trDir, tr) -> new TestRunHtmlGenerator().generate(p, trDir, tr).getBytes(StandardCharsets.UTF_8)
+            (p, testRunNode, runItems) -> new TestRunHtmlGenerator().generate(p, testRunNode, runItems).getBytes(StandardCharsets.UTF_8)
     ),
 
     PDF(
@@ -99,7 +99,7 @@ public enum FileTypes {
             _ -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
-            (p, trDir, tr) -> new TestRunPdfGenerator().generate(p, trDir, tr)
+            (p, testRunNode, runItems) -> new TestRunPdfGenerator().generate(p, testRunNode, runItems)
     ),
 
     WORD(
@@ -108,7 +108,7 @@ public enum FileTypes {
             _ -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
-            (p, trDir, tr) -> new TestRunWordGenerator().generate(p, trDir, tr)
+            (p, testRunNode, runItems) -> new TestRunWordGenerator().generate(p, testRunNode, runItems)
     );
 
     private final @NotNull String label;
@@ -165,8 +165,8 @@ public enum FileTypes {
         return importHandler.execute(p, importFile);
     }
 
-    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
+    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunNode testRunNode, final @NotNull RunItems runItems) {
         if (!isReportable()) throw new IllegalStateException(label + " has no report generator");
-        return reportHandler.execute(p, trDir, tr);
+        return reportHandler.execute(p, testRunNode, runItems);
     }
 }

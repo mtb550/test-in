@@ -20,8 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.TestSetMarker;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunExecution;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.model.testrun.TestRunExecution;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;

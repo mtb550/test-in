@@ -26,7 +26,7 @@ import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -41,7 +41,7 @@ import java.util.UUID;
 // UC-EDITOR-PANEL-005
 public class CreateTestCaseAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-008, Rule-EDITOR-PANEL-030
-    public static void openCreateDialog(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir) {
+    public static void openCreateDialog(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetNode dir) {
         new CreateTestCaseDialog(p, dir, tc -> {
             final @NotNull List<TestCaseDto> affectedNodes = List.of(tc);
 
@@ -65,7 +65,7 @@ public class CreateTestCaseAction extends AbstractAnyProjectAction {
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.editor(e)
                 .filter(editor -> editor.getParent().isTestCaseContainer())
-                .ifPresent(editor -> openCreateDialog(p, editor, (TestSetDirectoryDto) editor.getParent()));
+                .ifPresent(editor -> openCreateDialog(p, editor, (TestSetNode) editor.getParent()));
     }
 
     // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-214

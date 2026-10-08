@@ -10,8 +10,8 @@ A class is written by its simple name, and the import says where it comes from:
 ```java
 // no
 void pending(final org.testin.model.status.RunItemStatus passed) {
-    final TestRunItems item = TestRunItems.builder().build().showing(java.util.Optional.of(passed));
-    assertEquals(item.getStatus(), org.testin.model.status.RunItemStatus.PENDING);
+    final RunItem runItem = RunItem.builder().build().showing(java.util.Optional.of(passed));
+    assertEquals(runItem.getStatus(), org.testin.model.status.RunItemStatus.PENDING);
 }
 ```
 
@@ -21,8 +21,8 @@ import java.util.Optional;
 import org.testin.model.status.RunItemStatus;
 
 void pending(final RunItemStatus passed) {
-    final TestRunItems item = TestRunItems.builder().build().showing(Optional.of(passed));
-    assertEquals(item.getStatus(), RunItemStatus.PENDING);
+    final RunItem runItem = RunItem.builder().build().showing(Optional.of(passed));
+    assertEquals(runItem.getStatus(), RunItemStatus.PENDING);
 }
 ```
 

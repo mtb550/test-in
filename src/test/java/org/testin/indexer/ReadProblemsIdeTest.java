@@ -19,9 +19,9 @@ package org.testin.indexer;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.TempTree;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -40,7 +40,7 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
     // UC-INTERNAL-002, Rule-INTERNAL-124
     public void testAReadThatFailsPartWayIsSaidIsNotCountedAndIsReadAgainNextTime() {
         final @NotNull Path testRuns = theTestRunsOf(project());
-        final @NotNull UUID testCase = aTestCaseIn(marked(theTestCasesOf(project()).resolve("Login"), DirectoryType.TS));
+        final @NotNull UUID testCase = aTestCaseIn(marked(theTestCasesOf(project()).resolve("Login"), NodeType.TS));
         TempTree.delete(testRuns);
         SyntheticTree.write(testRuns, "a file where the test runs folder should be");
 
@@ -49,10 +49,10 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
         Await.until("a read that failed part-way said nothing", () -> !said(Bundle.message("indexer.failed.title", PROJECT)).isEmpty());
 
         assertFalse("a read that failed part-way was counted as read", indexer().isIndexed());
-        assertTrue("the failure did not say which folder could not be read: " + said(Bundle.message("indexer.failed.title", PROJECT)), names(said(Bundle.message("indexer.failed.title", PROJECT)), DirectoryType.TRD.getFolderName()));
+        assertTrue("the failure did not say which folder could not be read: " + said(Bundle.message("indexer.failed.title", PROJECT)), names(said(Bundle.message("indexer.failed.title", PROJECT)), NodeType.TRF.getFolderName()));
 
         TempTree.delete(testRuns);
-        marked(testRuns, DirectoryType.TRD);
+        marked(testRuns, NodeType.TRF);
         Await.until("the test project was not read again on the next request", () -> {
             indexer().indexWithProgress();
             return indexer().isIndexed();
@@ -62,7 +62,7 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public void testOneTestCaseThatCannotBeReadDoesNotStopTheRest() {
-        final @NotNull Path testSet = marked(theTestCasesOf(project()).resolve("Login"), DirectoryType.TS);
+        final @NotNull Path testSet = marked(theTestCasesOf(project()).resolve("Login"), NodeType.TS);
         final @NotNull UUID first = aTestCaseIn(testSet);
         final @NotNull UUID second = aTestCaseIn(testSet);
         SyntheticTree.write(testSet.resolve(FileKind.TEST_CASE.fileName(UUID.randomUUID())), "{ this is not a test case");
@@ -77,7 +77,7 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public void testANodeWhoseMarkerWillNotParseIsDrawnAndNamedByItsPlace() {
         final @NotNull Path testSet = theTestCasesOf(project()).resolve("Login");
-        SyntheticTree.write(testSet.resolve(DirectoryType.TS.getMarker()), "{ this is not a marker");
+        SyntheticTree.write(testSet.resolve(NodeType.TS.getMarker()), "{ this is not a marker");
         final @NotNull UUID testCase = aTestCaseIn(testSet);
 
         readEverything();
@@ -104,8 +104,8 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-082
     public void testTwoTestCaseFilesClaimingOneIdentityAreReported() {
-        final @NotNull Path login = marked(theTestCasesOf(project()).resolve("Login"), DirectoryType.TS);
-        final @NotNull Path signUp = marked(theTestCasesOf(project()).resolve("Sign up"), DirectoryType.TS);
+        final @NotNull Path login = marked(theTestCasesOf(project()).resolve("Login"), NodeType.TS);
+        final @NotNull Path signUp = marked(theTestCasesOf(project()).resolve("Sign up"), NodeType.TS);
         final @NotNull UUID shared = aTestCaseIn(login);
         SyntheticTree.write(signUp.resolve(FileKind.TEST_CASE.fileName(shared)), SyntheticTree.testCase(shared, "m"));
 
@@ -117,8 +117,8 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-094
-    public void testAResultNotNamedByATestCaseIdIsNotReadAndIsNamed() {
-        final @NotNull Path testRun = marked(theTestRunsOf(project()).resolve("Cycle 1"), DirectoryType.TR);
+    public void testARunItemNotNamedByATestCaseIdIsNotReadAndIsNamed() {
+        final @NotNull Path testRun = marked(theTestRunsOf(project()).resolve("Cycle 1"), NodeType.TR);
         final @NotNull UUID named = UUID.randomUUID();
         final @NotNull UUID handNamed = UUID.randomUUID();
         resultIn(testRun, FileKind.RUN_ITEM.fileName(named), named);
@@ -126,12 +126,12 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
         readEverything();
 
-        final @NotNull List<UUID> read = Services.getInstance(getProject(), TestRuns.class).getTestRunByPath(testRun).getResults().stream()
-                .map(TestRunItems::getId)
+        final @NotNull List<UUID> read = Services.getInstance(getProject(), TestRuns.class).getRunItems(testRun).getAll().stream()
+                .map(RunItem::getId)
                 .toList();
         assertEquals("the results read are not exactly the one named by its test case id", List.of(named), read);
 
-        final @NotNull List<String> warned = said(Bundle.message("indexer.results.unnamed.title", PROJECT));
+        final @NotNull List<String> warned = said(Bundle.message("indexer.run.items.unnamed.title", PROJECT));
         assertTrue("the result file not named by a test case id was not named in a warning: " + warned, names(warned, "by hand.ri"));
     }
 }

@@ -19,7 +19,7 @@ package org.testin.codegen;
 import com.intellij.testFramework.DumbModeTestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -36,8 +36,8 @@ public class RemoveWaitsForIndexingIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-096
     public void testOnlyANodeThatHasCodeWaitsForIndexing() {
-        final @NotNull Set<DirectoryType> withCode = Arrays.stream(DirectoryType.values()).filter(type -> JavaCode.of(type).getRemoved().generates()).collect(Collectors.toCollection(() -> EnumSet.noneOf(DirectoryType.class)));
+        final @NotNull Set<NodeType> withCode = Arrays.stream(NodeType.values()).filter(type -> JavaCode.of(type).getRemoved().generates()).collect(Collectors.toCollection(() -> EnumSet.noneOf(NodeType.class)));
 
-        assertEquals("a test run would wait for indexing, or a test set would not", EnumSet.of(DirectoryType.TP, DirectoryType.TSP, DirectoryType.TS), withCode);
+        assertEquals("a test run would wait for indexing, or a test set would not", EnumSet.of(NodeType.TP, NodeType.TSP, NodeType.TS), withCode);
     }
 }

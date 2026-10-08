@@ -18,7 +18,7 @@ package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogComponent;
 
@@ -36,7 +36,7 @@ public final class FailureFields {
     private final @NotNull List<FailureSection> sections;
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
-    public FailureFields(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull TestRunItems runItem) {
+    public FailureFields(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull RunItem runItem) {
         actualResult = new ActualResultSection(p, runItem);
         bugSeverity = BugSeveritySection.of(runItem);
         bugPriority = BugPrioritySection.of(runItem);
@@ -52,7 +52,7 @@ public final class FailureFields {
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
-    public void applyTo(final @NotNull TestRunItems runItem) {
+    public void applyTo(final @NotNull RunItem runItem) {
         runItem.recordFailure(actualResult.typed(), bugSeverity.selected(), bugPriority.selected(), stacktrace.typed(), screenshots.names());
     }
 

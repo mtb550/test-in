@@ -30,10 +30,10 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseAction;
@@ -58,7 +58,7 @@ import java.util.stream.Stream;
 public class BulkEditIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull String MODULE = "\"module\": \"";
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private static int startOfValue(final @NotNull Document document, final int index) {
         int at = -1;
@@ -110,7 +110,7 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
     }
 
     private void bulkEditTheModules() {
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         editor.getList().setSelectionInterval(0, editor.getList().getModel().getSize() - 1);
 
         UpdateTestCaseAction.openField(getProject(), editor, UpdateTestCaseFields.MODULE);

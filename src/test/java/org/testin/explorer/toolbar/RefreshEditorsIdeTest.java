@@ -30,8 +30,8 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testproject.BoundTestProject;
@@ -46,9 +46,9 @@ import java.util.UUID;
 public class RefreshEditorsIdeTest extends AbstractOpenEditorsIdeTest {
 
     private @NotNull String rootWas = "";
-    private TestSetDirectoryDto login;
-    private TestSetDirectoryDto checkout;
-    private TestSetDirectoryDto card;
+    private TestSetNode login;
+    private TestSetNode checkout;
+    private TestSetNode card;
     private TestCaseDto inCheckout;
     private TestCaseDto inCard;
     private TreePanel panel;
@@ -57,7 +57,7 @@ public class RefreshEditorsIdeTest extends AbstractOpenEditorsIdeTest {
         return Services.getInstance(AppSettingsState.class);
     }
 
-    private static void aSecondTestCaseWrittenBesides(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto first) {
+    private static void aSecondTestCaseWrittenBesides(final @NotNull TestSetNode testSet, final @NotNull TestCaseDto first) {
         final @NotNull Path written = testSet.getPath().resolve(FileKind.TEST_CASE.fileName(first.getId()));
         final @NotNull UUID second = UUID.randomUUID();
         try {
@@ -82,10 +82,10 @@ public class RefreshEditorsIdeTest extends AbstractOpenEditorsIdeTest {
         settings().rootTestinPath = root.toString();
 
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        login = made.testSet(tp.getTestCasesDirectory(), "Login");
-        checkout = made.testSet(tp.getTestCasesDirectory(), "Checkout");
-        card = made.testSet(tp.getTestCasesDirectory(), "Card");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        login = made.testSet(tp.getTestCasesFolder(), "Login");
+        checkout = made.testSet(tp.getTestCasesFolder(), "Checkout");
+        card = made.testSet(tp.getTestCasesFolder(), "Card");
         inCheckout = made.testCase(checkout);
         inCard = made.testCase(card);
         Services.getInstance(getProject(), BoundTestProject.class).choose("NAFATH");
@@ -101,7 +101,7 @@ public class RefreshEditorsIdeTest extends AbstractOpenEditorsIdeTest {
         super.tearDown();
     }
 
-    private @NotNull TestinEditor editorOn(final @NotNull TestSetDirectoryDto testSet) {
+    private @NotNull TestinEditor editorOn(final @NotNull TestSetNode testSet) {
         final @NotNull TestinEditor editor = Services.getInstance(getProject(), TestinEditors.class).editorFor(testSet).orElseThrow(() -> new AssertionError(testSet.getName() + " has no editor open"));
         Await.until("the editor on " + testSet.getName() + " never loaded", () -> !editor.isLoading());
         return editor;

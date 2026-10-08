@@ -31,16 +31,16 @@ import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.card.HoverButton;
 import org.testin.editor.card.Offered;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.list.ListPanelBuilder;
-import org.testin.editor.list.ListView;
+import org.testin.editor.cardview.CardPanelBuilder;
+import org.testin.editor.cardview.CardView;
 import org.testin.editor.statusbar.PageStep;
 import org.testin.editor.statusbar.StatusBar;
-import org.testin.editor.testrun.TestRunCard;
+import org.testin.editor.testrun.RunItemCard;
 import org.testin.explorer.tree.TreePanelTree;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.testrun.form.TestRunTreeCellRenderer;
 import org.testin.ui.dialogs.DialogStyle;
@@ -112,10 +112,10 @@ public class ScreenReaderNamesIdeTest extends BasePlatformTestCase {
     // Rule-INTERNAL-122
     public void testACardSaysItsTitleThenTheRunItemStatusItShows() {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
-        final @NotNull TestRunItems runItem = new TestRunItems().setId(tc.getId()).setStatus(RunItemStatus.FAILED).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
-        final @NotNull TestRunCard card = new TestRunCard(getProject());
+        final @NotNull RunItem runItem = new RunItem().setId(tc.getId()).setStatus(RunItemStatus.FAILED).showing(Optional.of(tc), Optional.empty(), Optional.empty(), false);
+        final @NotNull RunItemCard card = new RunItemCard(getProject());
 
-        final @NotNull ListView view = ListPanelBuilder.build(getProject(), getTestRootDisposable(), StandIn.of(TestinEditor.class));
+        final @NotNull CardView view = CardPanelBuilder.build(getProject(), getTestRootDisposable(), StandIn.of(TestinEditor.class));
         view.model().add(tc);
         final @NotNull JBList<TestCaseDto> list = view.list();
         list.setCellRenderer((_, shown, index, _, _) -> {
@@ -133,11 +133,11 @@ public class ScreenReaderNamesIdeTest extends BasePlatformTestCase {
 
     // Rule-INTERNAL-122
     public void testAGridCellSaysTheValueItShows() {
-        final String @NotNull [] row = new String[TestCaseEditorAttributes.values().length];
+        final String @NotNull [] row = new String[TestSetEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.column()] = "Log in with a valid user";
+        row[TestSetEditorAttributes.DESCRIPTION.column()] = "Log in with a valid user";
 
-        final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(List.<String[]>of(row), Set.of(TestCaseEditorAttributes.DESCRIPTION));
+        final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(List.<String[]>of(row), Set.of(TestSetEditorAttributes.DESCRIPTION));
 
         assertEveryStopIsNamed("the grid", table);
         assertEquals("Log in with a valid user", spoken(table.getAccessibleContext().getAccessibleTable().getAccessibleAt(0, 0).getAccessibleContext()));

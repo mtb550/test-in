@@ -113,7 +113,7 @@ public class UpdateTestBase {
 
     // UC-CODEGEN-002, UC-CODEGEN-012, Rule-CODEGEN-046
     protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
+        final @NotNull List<String> quoted = tc.getGroups().stream().map(JavaLiteral::of).toList();
 
         if (quoted.isEmpty()) removeTestAnnotationAttribute(pm, "groups");
         else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", quoted) + "}");

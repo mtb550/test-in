@@ -26,16 +26,16 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.OnScreen;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.editor.toolbar.SearchTxt;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.ui.framework.RowStripe;
 
@@ -79,9 +79,9 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static @NotNull String[] rowReading(final @NotNull String description) {
-        final String @NotNull [] row = new String[TestCaseEditorAttributes.values().length];
+        final String @NotNull [] row = new String[TestSetEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
+        row[TestSetEditorAttributes.DESCRIPTION.column()] = description;
         return row;
     }
 
@@ -89,30 +89,30 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
         return table.prepareRenderer(table.getCellRenderer(row, table.convertColumnIndexToView(column)), row, table.convertColumnIndexToView(column)).getBackground();
     }
 
-    private @NotNull TestCaseEditor aTestCaseEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
+    private @NotNull TestSetEditor aTestSetEditor() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Checkout");
         EditorFixtures.testCases(getProject(), ts, 3);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     private @NotNull TestRunEditor aTestRunEditor() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), tp, "Payments");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), tp, "Payments");
         final @NotNull List<TestCaseDto> covered = EditorFixtures.testCases(getProject(), ts, 2);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, covered.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-212
     public void testTheSearchFieldIsTheLastThingOnTheToolbarInBothEditors() {
-        final @NotNull TestCaseEditor testCaseEditor = aTestCaseEditor();
+        final @NotNull TestSetEditor testSetEditor = aTestSetEditor();
         final @NotNull TestRunEditor testRunEditor = aTestRunEditor();
         try {
-            assertTheSearchFieldIsLastAndTakesWhatIsLeft("test case editor", testCaseEditor.getToolBar());
+            assertTheSearchFieldIsLastAndTakesWhatIsLeft("test set editor", testSetEditor.getToolBar());
             assertTheSearchFieldIsLastAndTakesWhatIsLeft("test run editor", testRunEditor.getToolBar());
         } finally {
-            Disposer.dispose(testCaseEditor);
+            Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);
         }
     }
@@ -133,13 +133,13 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-249
     public void testAGridThatHeldTheKeyboardWhenItWasRebuiltHoldsItAgain() {
-        final @NotNull TestCaseEditor editor = aTestCaseEditor();
+        final @NotNull TestSetEditor editor = aTestSetEditor();
         final @NotNull JFrame frame = OnScreen.shown(editor.getComponent(), getTestRootDisposable());
         try {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             final @NotNull JBTable grid = (JBTable) editor.getPreferredFocusedComponent();
-            final int description = TestCaseEditorAttributes.DESCRIPTION.column();
+            final int description = TestSetEditorAttributes.DESCRIPTION.column();
             grid.changeSelection(0, description, false, false);
             assertTrue(grid.editCellAt(0, description));
             grid.getEditorComponent().requestFocus();
@@ -156,8 +156,8 @@ public class EditorSurfacesIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-250
     public void testAGridRowIsDrawnInItsStripeOrTheSelectionColorAndNothingElse() {
         final @NotNull List<String[]> rows = List.of(rowReading("Log in"), rowReading("Pay by card"), rowReading("Log out"));
-        final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(rows, Set.of(TestCaseEditorAttributes.DESCRIPTION));
-        final int column = TestCaseEditorAttributes.DESCRIPTION.column();
+        final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(rows, Set.of(TestSetEditorAttributes.DESCRIPTION));
+        final int column = TestSetEditorAttributes.DESCRIPTION.column();
         final @NotNull JFrame frame = OnScreen.shown(new JBScrollPane(table), getTestRootDisposable());
 
         for (int row = 0; row < rows.size(); row++) {

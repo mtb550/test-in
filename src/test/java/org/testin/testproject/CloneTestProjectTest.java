@@ -16,7 +16,7 @@
 
 package org.testin.testproject;
 
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -44,9 +44,9 @@ public class CloneTestProjectTest {
     // Rule-TREE-PANEL-107
     @Test
     public void aNameJavaRefusesIsMadeIntoOneItAccepts() {
-        assertTrue(DirectoryType.TP.canTakeName(CloneTestProject.repositoryName("https://github.com/acme/new.git")),
+        assertTrue(NodeType.TP.canTakeName(CloneTestProject.repositoryName("https://github.com/acme/new.git")),
                 "new is a word Java keeps for itself");
-        assertTrue(DirectoryType.TP.canTakeName(CloneTestProject.repositoryName("https://github.com/acme/nafath-test-cases.git")),
+        assertTrue(NodeType.TP.canTakeName(CloneTestProject.repositoryName("https://github.com/acme/nafath-test-cases.git")),
                 "and a name it already accepts is kept as it is");
     }
 }

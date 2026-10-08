@@ -19,13 +19,13 @@ package org.testin.testrun;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 
@@ -42,33 +42,33 @@ public class RunItemStatusPerTestRunIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private @NotNull Path aTestRunOver(final @NotNull TestProjectDirectoryDto tp, final @NotNull String named) {
+    private @NotNull Path aTestRunOver(final @NotNull TestProjectNode tp, final @NotNull String named) {
         final @NotNull Path testRunPath = WriteAction.computeAndWait(() -> {
-            final @NotNull TestRunDirectoryDto testRun = Services.getInstance(getProject(), DirectoryMapper.class).setTestRunNode(tp.getTestRunsDirectory().getPath().resolve(named), tp.getTestRunsDirectory());
-            Services.getInstance(getProject(), Nodes.class).addTestRunDir(testRun);
+            final @NotNull TestRunNode testRun = Services.getInstance(getProject(), NodeMapper.class).setTestRunNode(tp.getTestRunsFolder().getPath().resolve(named), tp.getTestRunsFolder());
+            Services.getInstance(getProject(), Nodes.class).addTestRunNode(testRun);
             return testRun.getPath();
         });
 
-        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(new ArrayList<>(List.of(new TestRunItems().setId(testCaseId)))));
+        indexedTestRuns().putRunItems(testRunPath, new RunItems().setAll(new ArrayList<>(List.of(new RunItem().setId(testCaseId)))));
         return testRunPath;
     }
 
     private @NotNull RunItemStatus statusIn(final @NotNull Path testRunPath) {
-        return indexedTestRuns().getTestRunByPath(testRunPath).resultOf(testCaseId).orElseThrow().getStatus();
+        return indexedTestRuns().getRunItems(testRunPath).runItemOf(testCaseId).orElseThrow().getStatus();
     }
 
     // Rule-PRODUCT-009
     public void testATestCaseCarriesItsOwnRunItemStatusInEachTestRun() {
-        final @NotNull TestProjectDirectoryDto tp = WriteAction.computeAndWait(() -> {
-            final @NotNull TestProjectDirectoryDto project = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve("NAFATH"));
+        final @NotNull TestProjectNode tp = WriteAction.computeAndWait(() -> {
+            final @NotNull TestProjectNode project = Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(root.resolve("NAFATH"));
             Services.getInstance(getProject(), Nodes.class).addTestProject(project);
             return project;
         });
         final @NotNull Path cycle1 = aTestRunOver(tp, "Cycle-1");
         final @NotNull Path cycle2 = aTestRunOver(tp, "Cycle-2");
 
-        indexedTestRuns().changeResult(cycle1, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.FAILED, "Sara"));
-        indexedTestRuns().changeResult(cycle2, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.PASSED, "Omar"));
+        indexedTestRuns().changeRunItem(cycle1, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.FAILED, "Sara"));
+        indexedTestRuns().changeRunItem(cycle2, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.PASSED, "Omar"));
 
         assertEquals(RunItemStatus.FAILED, statusIn(cycle1));
         assertEquals("passing the test case in one test run changed what another recorded", RunItemStatus.PASSED, statusIn(cycle2));

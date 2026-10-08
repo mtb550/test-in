@@ -26,7 +26,7 @@ import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.help.Guide;
 import org.testin.help.Guides;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
@@ -49,8 +49,8 @@ public class SyncActionAction extends AbstractAnyProjectAction {
 
     private static @NotNull Optional<Path> projectOn(final @NotNull TreePath selectionPath) {
         for (final Object component : selectionPath.getPath()) {
-            final @NotNull Optional<Path> project = TreeValues.valueOf(component, TestProjectDirectoryDto.class)
-                    .map(TestProjectDirectoryDto::getPath);
+            final @NotNull Optional<Path> project = TreeValues.valueOf(component, TestProjectNode.class)
+                    .map(TestProjectNode::getPath);
             if (project.isPresent()) return project;
         }
 
@@ -72,7 +72,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
         // Rule-SHARE-105
         if (OptionalPlugin.GIT.grayedWithReason(this, e.getPresentation())) return;
 
-        e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectDirectoryDto.class).isPresent());
+        e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectNode.class).isPresent());
     }
 
     @Override

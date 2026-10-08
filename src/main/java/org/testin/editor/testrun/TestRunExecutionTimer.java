@@ -18,7 +18,7 @@ package org.testin.editor.testrun;
 
 import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 
 import javax.swing.Timer;
 import java.time.Duration;
@@ -32,7 +32,7 @@ final class TestRunExecutionTimer implements Disposable {
 
     private long startedAt;
 
-    private @NotNull Optional<TestRunItems> counting = Optional.empty();
+    private @NotNull Optional<RunItem> counting = Optional.empty();
 
     private @NotNull Duration alreadyCounted = Duration.ZERO;
 
@@ -43,15 +43,15 @@ final class TestRunExecutionTimer implements Disposable {
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
     boolean isOn(final @NotNull UUID testCaseId) {
-        return counting.filter(item -> item.getId().equals(testCaseId)).isPresent();
+        return counting.filter(runItem -> runItem.getId().equals(testCaseId)).isPresent();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
-    void start(final @NotNull TestRunItems item, final @NotNull Runnable repaint) {
+    void start(final @NotNull RunItem runItem, final @NotNull Runnable repaint) {
         stop();
 
-        alreadyCounted = item.getDuration();
-        counting = Optional.of(item);
+        alreadyCounted = runItem.getDuration();
+        counting = Optional.of(runItem);
         startedAt = System.currentTimeMillis();
 
         timer = new Timer(REDRAW_MS, _ -> {
@@ -75,12 +75,12 @@ final class TestRunExecutionTimer implements Disposable {
         timer.stop();
         timer = notTicking();
 
-        counting.ifPresent(item -> item.recordClock(alreadyCounted));
+        counting.ifPresent(runItem -> runItem.recordClock(alreadyCounted));
         counting = Optional.empty();
     }
 
     private void elapse() {
-        counting.ifPresent(item -> item.recordClock(alreadyCounted.plusMillis(System.currentTimeMillis() - startedAt)));
+        counting.ifPresent(runItem -> runItem.recordClock(alreadyCounted.plusMillis(System.currentTimeMillis() - startedAt)));
     }
 
     @Override

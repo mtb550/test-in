@@ -25,13 +25,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.ReportColor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.bug.BugIssueUrl;
 import org.testin.model.markers.DetailRow;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -50,19 +50,19 @@ public final class TestRunExcelGenerator {
     }
 
     // Rule-REPORT-020
-    private static void writeOverview(final @NotNull Worksheet ws, final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunSummary summary) {
+    private static void writeOverview(final @NotNull Worksheet ws, final @NotNull String projectName, final @NotNull TestRunNode testRunNode, final @NotNull TestRunSummary summary) {
         ws.value(0, 0, Bundle.message("report.title"));
         ws.style(0, 0).bold().fontSize(14).set();
 
         int row = heading(ws, 2, Bundle.message("report.heading.overview"));
-        for (final DetailRow overview : ReportOverview.rowsFor(projectName, trDir, summary)) {
+        for (final DetailRow overview : ReportOverview.rowsFor(projectName, testRunNode, summary)) {
             ws.value(row, 0, overview.caption());
             ws.style(row, 0).bold().set();
             ws.value(row++, 1, overview.value());
         }
 
         row = heading(ws, row + 1, Bundle.message("report.heading.execution"));
-        ws.value(row++, 0, Bundle.message("report.summary.named", trDir.getName(),
+        ws.value(row++, 0, Bundle.message("report.summary.named", testRunNode.getName(),
                 String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"));
         for (final ReportTile figure : ReportTile.shownFor(summary)) {
             caption(ws, row, figure.getLabel(), figure.getHex());
@@ -71,11 +71,11 @@ public final class TestRunExcelGenerator {
             row++;
         }
 
-        if (ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis())) {
+        if (TestRunResultAnalysis.anyWrittenIn(testRunNode.getMarker().getResultAnalysis())) {
             row = heading(ws, row + 1, Bundle.message("report.heading.analysis"));
 
-            for (final ResultAnalysis section : ResultAnalysis.values()) {
-                final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
+            for (final TestRunResultAnalysis section : TestRunResultAnalysis.values()) {
+                final @NotNull String written = section.writtenIn(testRunNode.getMarker().getResultAnalysis());
                 if (written.isEmpty()) continue;
 
                 caption(ws, row, section.heading(summary), section.getHexColor());
@@ -101,7 +101,7 @@ public final class TestRunExcelGenerator {
     }
 
     // Rule-REPORT-019, Rule-REPORT-020
-    private static void writeTestCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr) {
+    private static void writeTestCases(final @NotNull Worksheet ws, final @NotNull RunItems runItems) {
         ws.value(0, 0, Bundle.message("report.excel.caption.id"));
         ws.value(0, 1, Bundle.message("caption.test.case"));
         ws.value(0, 2, TestRunEditorAttributes.RUN_STATUS.getName());
@@ -114,25 +114,25 @@ public final class TestRunExcelGenerator {
         ws.range(0, 0, 0, 8).style().bold().fillColor(ReportColor.PANEL.hex()).set();
 
         int row = 1;
-        for (final TestRunItems result : tr.getResults()) {
+        for (final RunItem runItem : runItems.getAll()) {
             ProgressManager.checkCanceled();
-            final @NotNull UUID id = result.getId();
-            final @NotNull TestCaseDto details = result.shownTestCase();
+            final @NotNull UUID id = runItem.getId();
+            final @NotNull TestCaseDto details = runItem.shownTestCase();
 
             ws.value(row, 0, id.toString());
             ws.value(row, 1, orNotAvailable(details.getDescription()));
-            ws.value(row, 2, result.shownStatus().getLabel());
-            ws.value(row, 3, result.getActualResult());
-            ws.value(row, 4, TestRunEditorAttributes.BUG_SEVERITY.getRunItemValueExtractor().apply(result));
-            ws.value(row, 5, TestRunEditorAttributes.BUG_PRIORITY.getRunItemValueExtractor().apply(result));
-            ws.value(row, 6, Display.formatDuration(result.getDuration()));
+            ws.value(row, 2, runItem.shownStatus().getLabel());
+            ws.value(row, 3, runItem.getActualResult());
+            ws.value(row, 4, TestRunEditorAttributes.BUG_SEVERITY.getRunItemValueExtractor().apply(runItem));
+            ws.value(row, 5, TestRunEditorAttributes.BUG_PRIORITY.getRunItemValueExtractor().apply(runItem));
+            ws.value(row, 6, Display.formatDuration(runItem.getDuration()));
             ws.value(row, 7, orNotAvailable(details.getExpectedResult()));
 
-            final @NotNull ReportSection runItemStatus = ReportSection.of(result);
+            final @NotNull ReportSection runItemStatus = ReportSection.of(runItem);
             ws.range(row, 0, row, 8).style().fillColor(runItemStatus.getHexColor()).fontColor(runItemStatus.textHex()).wrapText(true).set();
 
             final int line = row;
-            result.bugIssue().ifPresent(url -> {
+            runItem.bugIssue().ifPresent(url -> {
                 ws.hyperlink(line, 8, HyperLink.external(url, BugIssueUrl.shortReference(url)));
                 ws.style(line, 8).fillColor(runItemStatus.getHexColor()).fontColor(runItemStatus.textHex()).underlined().set();
             });
@@ -152,13 +152,13 @@ public final class TestRunExcelGenerator {
     }
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunNode testRunNode, final @NotNull RunItems runItems) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
-            final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
+            final @NotNull TestRunSummary summary = TestRunSummary.of(runItems.getAll());
 
-            writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, summary);
-            writeTestCases(wb.newWorksheet(Bundle.message("report.excel.sheet.test.cases")), tr);
+            writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), testRunNode, summary);
+            writeTestCases(wb.newWorksheet(Bundle.message("report.excel.sheet.test.cases")), runItems);
 
             wb.finish();
 

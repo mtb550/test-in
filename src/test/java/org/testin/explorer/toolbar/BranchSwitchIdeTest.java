@@ -22,8 +22,8 @@ import org.testin.AbstractOpenEditorsIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.explorer.TreePanel;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testproject.BoundTestProject;
@@ -45,9 +45,9 @@ import java.util.Optional;
 public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
 
     private @NotNull String rootWas = "";
-    private TestProjectDirectoryDto tp;
-    private TestSetDirectoryDto login;
-    private TestSetDirectoryDto checkout;
+    private TestProjectNode tp;
+    private TestSetNode login;
+    private TestSetNode checkout;
     private TreePanel panel;
 
     private static @NotNull AppSettingsState settings() {
@@ -99,8 +99,8 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
 
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
         tp = made.testProject(root.resolve("NAFATH"));
-        login = made.testSet(tp.getTestCasesDirectory(), "Login");
-        checkout = made.testSet(tp.getTestCasesDirectory(), "Checkout");
+        login = made.testSet(tp.getTestCasesFolder(), "Login");
+        checkout = made.testSet(tp.getTestCasesFolder(), "Checkout");
         made.testCase(checkout);
         bound().choose("NAFATH");
 
@@ -145,7 +145,7 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
     public void testTheBranchBoxAppearsWhenTheTestProjectIsARepository() {
         assertTrue("the branch box is hidden on a test project that is a Git repository", branchBox().isVisible());
 
-        final @NotNull TestProjectDirectoryDto notARepository = new NodesOnDisk(getProject()).testProject(root.resolve("Plain"));
+        final @NotNull TestProjectNode notARepository = new NodesOnDisk(getProject()).testProject(root.resolve("Plain"));
         final @NotNull BranchSelector selector = new BranchSelector(getProject(), panel, Optional.of(notARepository));
         assertFalse("the branch box shows on a test project that is not a Git repository", selector.getComponent().isVisible());
     }

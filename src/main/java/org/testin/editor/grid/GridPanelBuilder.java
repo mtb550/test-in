@@ -36,7 +36,7 @@ import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
 import org.testin.model.ToolBarAttribute;
 import org.testin.testcase.Can;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Tooltip;
 import org.testin.ui.framework.RowStripe;
@@ -311,18 +311,18 @@ public class GridPanelBuilder {
         Logger.debug("[GridPanelBuilder] buildRunTable: rows=" + rows.size() + ", attributes=" + attributes);
         final @NotNull List<TestRunEditorAttributes> ordered = TestRunEditorAttributes.COLUMNS;
 
-        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> stillOpen.getAsBoolean() && ordered.get(column).isEdited(), EditorKind.RUN);
+        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> stillOpen.getAsBoolean() && ordered.get(column).isEdited(), EditorKind.TEST_RUN);
         applyColumnVisibility(table, TestRunEditorAttributes.class, attributes);
         return table;
     }
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
-    public @NotNull JBTable buildTestTable(final @NotNull List<String[]> rows, final @NotNull Set<TestCaseEditorAttributes> attributes) {
+    public @NotNull JBTable buildTestTable(final @NotNull List<String[]> rows, final @NotNull Set<TestSetEditorAttributes> attributes) {
         Logger.debug("[GridPanelBuilder] buildTestTable: rows=" + rows.size() + ", attributes=" + attributes);
-        final @NotNull List<TestCaseEditorAttributes> ordered = TestCaseEditorAttributes.COLUMNS;
+        final @NotNull List<TestSetEditorAttributes> ordered = TestSetEditorAttributes.COLUMNS;
 
-        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> ordered.get(column).can(Can.EDIT), EditorKind.TEST);
-        applyColumnVisibility(table, TestCaseEditorAttributes.class, attributes);
+        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> ordered.get(column).can(Can.EDIT), EditorKind.TEST_SET);
+        applyColumnVisibility(table, TestSetEditorAttributes.class, attributes);
         return table;
     }
 

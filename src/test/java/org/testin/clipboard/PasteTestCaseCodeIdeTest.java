@@ -27,10 +27,10 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.codegen.GenType;
 import org.testin.editor.open.UnifiedVirtualFile;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -44,7 +44,7 @@ public class PasteTestCaseCodeIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String WRITTEN_BY_THE_TESTER = "int signedIn = 1;";
 
-    private @NotNull TestCaseDto automatedTestCase(final @NotNull TestSetDirectoryDto ts) {
+    private @NotNull TestCaseDto automatedTestCase(final @NotNull TestSetNode ts) {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").order("m").build();
         tc.setParent(ts);
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
@@ -65,13 +65,13 @@ public class PasteTestCaseCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-078
     public void testAPastedCopyGetsItsOwnMethodWithTheOriginalsBody() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto original = automatedTestCase(login);
         CopyPasteManager.getInstance().setContents(new StringSelection(Services.getInstance(getProject(), Mapper.class).writeValueAsString(List.of(original))));
 
-        final @NotNull TestCaseEditor editor = new TestCaseEditor(getProject(), new UnifiedVirtualFile(login));
+        final @NotNull TestSetEditor editor = new TestSetEditor(getProject(), new UnifiedVirtualFile(login));
         try {
-            Await.until("the test case editor never loaded", () -> !editor.isLoading());
+            Await.until("the test set editor never loaded", () -> !editor.isLoading());
             new PasteTestCaseWork(getProject(), editor).paste();
 
             Await.until("the copy was never pasted", () -> editor.getAllTestCases().size() == 2);

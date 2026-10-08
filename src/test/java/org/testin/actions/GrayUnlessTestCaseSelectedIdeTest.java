@@ -28,9 +28,9 @@ import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.clipboard.CopyTestCaseValueAction;
 import org.testin.clipboard.CutTestCaseAction;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.testcase.RemoveTestCaseAction;
 import org.testin.testcase.UpdateTestCaseAction;
@@ -45,7 +45,7 @@ public class GrayUnlessTestCaseSelectedIdeTest extends AbstractTempRootIdeTest {
         return List.of(new CopyTestCaseAction(), new CopyTestCaseValueAction(), new CutTestCaseAction(), new NavigateToTestCaseAction(), new RemoveTestCaseAction(), new UpdateTestCaseAction(), new ViewDetailsAction());
     }
 
-    private @NotNull AnActionEvent updated(final @NotNull AnAction action, final @NotNull TestCaseEditor editor, final @NotNull List<TestCaseDto> selected) {
+    private @NotNull AnActionEvent updated(final @NotNull AnAction action, final @NotNull TestSetEditor editor, final @NotNull List<TestCaseDto> selected) {
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action, SimpleDataContext.builder()
                 .add(CommonDataKeys.PROJECT, getProject())
                 .add(TestinData.EDITOR, editor)
@@ -57,9 +57,9 @@ public class GrayUnlessTestCaseSelectedIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-230
     public void testEveryTestCaseActionIsGrayAndSaysSoUntilATestCaseIsSelected() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Login");
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Login");
         final @NotNull TestCaseDto tc = EditorFixtures.testCase(getProject(), ts, "Log in with a valid user", "a");
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
 
         for (final AnAction action : theSevenActions()) {
             final @NotNull String name = action.getClass().getSimpleName();

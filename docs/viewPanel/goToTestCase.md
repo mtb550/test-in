@@ -43,7 +43,7 @@ bug** without anyone copying anything.
   otherwise.
 - **Rule-VIEW-PANEL-063** — Going to the test case is an icon of its own,
   the third under the title, and the only thing that does it. It opens the
-  test case editor of the test case's own test set and selects it there. The
+  test set editor of the test case's own test set and selects it there. The
   tree does not move: the tester is already looking at the test case and asked
   for the editor, so revealing the node is an answer to a question nobody asked.
   The path is what moves the tree, and it still does. A test case with no test

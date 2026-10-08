@@ -21,9 +21,9 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.TreeGesture;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
@@ -59,7 +59,7 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
         return Services.getInstance(getProject(), UndoHistories.class);
     }
 
-    private void removeAsked(final @NotNull List<DirectoryDto> nodes) {
+    private void removeAsked(final @NotNull List<Node> nodes) {
         TreeGesture.pressed(getProject(), new RemoveAction(), nodes);
         assertTrue("Remove did not ask first", ShownDialog.isOpen(getProject(), ConfirmDialog.class));
     }
@@ -74,7 +74,7 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-006
     public void testRemovingChangesNothingUntilTheTesterConfirms() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
 
         removeAsked(List.of(login));
         settled();
@@ -89,8 +89,8 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-038
     public void testTheConfirmationSaysWhatOneNodeHoldsAndWhereItIs() {
-        final @NotNull TestSetPackageDirectoryDto payments = indexedPackage("Payments", theTestCasesDirectory());
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login", payments);
+        final @NotNull TestSetPackageNode payments = indexedPackage("Payments", theTestCasesDirectory());
+        final @NotNull TestSetNode login = createdTestSet("Login", payments);
         indexedTestCase(login, "Log in with a valid user", "m");
 
         removeAsked(List.of(payments));
@@ -103,8 +103,8 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-038
     public void testTheConfirmationCountsSeveralNodes() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        final @NotNull TestSetDirectoryDto checkout = createdTestSet("Checkout");
+        final @NotNull TestSetNode login = createdTestSet("Login");
+        final @NotNull TestSetNode checkout = createdTestSet("Checkout");
 
         removeAsked(List.of(login, checkout));
         final @NotNull List<String> words = confirmationWords();
@@ -114,7 +114,7 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-039
     public void testRemovingATestSetRemovesItsCode() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         assertTrue("the test set was given no class", generatedClass("nafath.LoginTest").isPresent());
 
         removeAsked(List.of(login));
@@ -126,7 +126,7 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-040, Rule-TREE-PANEL-011
     public void testARemovalIsPutBackFromTheTree() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull Path wasAt = login.getPath();
 
         removeAsked(List.of(login));

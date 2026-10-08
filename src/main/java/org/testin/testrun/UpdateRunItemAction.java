@@ -27,10 +27,10 @@ import org.testin.actions.TestinData;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.testrun.failure.FailureDetailDialog;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -51,10 +51,10 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
     private void edit(final @NotNull Project p, final @NotNull TestRunEditor testRunEditor, final @NotNull TestCaseDto testCase) {
-        final @NotNull Optional<TestRunItems> found = testRunEditor.runItem(testCase.getId());
+        final @NotNull Optional<RunItem> found = testRunEditor.runItem(testCase.getId());
         if (found.isEmpty()) return;
 
-        final @NotNull TestRunItems runItem = found.orElseThrow();
+        final @NotNull RunItem runItem = found.orElseThrow();
 
         if (runItem.isRemoved()) {
             Services.getInstance(p, RunItemStatusService.class).refuseRemoved();
@@ -63,7 +63,7 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
 
         Logger.trace("update test run item for: " + testCase.getDescription());
 
-        new FailedResultDialog(p, testRunEditor.getParent().getPath(), runItem, fields -> {
+        new FailureDetailDialog(p, testRunEditor.getParent().getPath(), runItem, fields -> {
             if (!Services.getInstance(p, RunItemStatusService.class).recordFailureDetails(testRunEditor.getParent().getPath(), testCase.getId(), fields))
                 return;
 
@@ -84,7 +84,7 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
 
         GrayWithReason.unless(this, e, signedOff.isEmpty() && TestinData.testRunEditor(e)
                         .flatMap(testRunEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> testRunEditor.runItem(tc.getId())))
-                        .filter(TestRunItems::isFailed)
+                        .filter(RunItem::isFailed)
                         .isPresent(),
                 signedOff.orElse(Bundle.message("run.item.details.disabled.description")));
     }

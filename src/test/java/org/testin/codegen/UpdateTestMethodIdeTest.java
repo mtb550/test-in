@@ -21,7 +21,7 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.TestCaseStatus;
 
 import java.util.List;
@@ -78,7 +78,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-079
     public void testADescriptionThatNamesAnotherTestCasesMethodLeavesTheName() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto logIn = createdTestCase(login, "Log in", "b");
         createdTestCase(login, "Log out", "c");
 
@@ -93,7 +93,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
     public void testTheGroupsAreWrittenAsAListEachAsTyped() {
         final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
 
-        tc.setGroup(List.of("smoke", "Log in & out"));
+        tc.setGroups(List.of("smoke", "Log in & out"));
         GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
         settled();
 
@@ -105,10 +105,10 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
         assertEquals("a test case created in no group was written with groups", "", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "groups"));
 
-        tc.setGroup(List.of("smoke"));
+        tc.setGroups(List.of("smoke"));
         GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
         settled();
-        tc.setGroup(List.of());
+        tc.setGroups(List.of());
         GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
         settled();
 
@@ -143,12 +143,12 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-068
     public void testUndoWritesEveryPartTestinOwnsAndCreatesNoMissingMethod() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto restored = createdTestCase(login, "Log in with a valid user", "b");
         final @NotNull TestCaseDto withoutAMethod = indexedTestCase(login, "Log out", "c");
 
         restored.setDescription("Sign in");
-        restored.setGroup(List.of("smoke"));
+        restored.setGroups(List.of("smoke"));
         restored.setStatus(TestCaseStatus.DISABLED);
         GenType.RECONCILE_TEST_CASE.executeAllNow(getProject(), List.of(restored, withoutAMethod));
         settled();

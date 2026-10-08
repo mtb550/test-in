@@ -38,10 +38,10 @@ import org.testin.help.Hints;
 import org.testin.help.SetupStep;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
 import org.testin.model.status.TestRunStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -244,9 +244,9 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
     private void recordCompletedTestRuns(final @NotNull Path repoPath) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull List<String> leftOut = git.status(repoPath).stream().filter(change -> change.length() > 3).map(change -> change.substring(3)).toList();
-        final @NotNull List<TestRunDirectoryDto> completed = testRuns.getAllTestRuns().keySet().stream()
+        final @NotNull List<TestRunNode> completed = testRuns.getAllRunItems().keySet().stream()
                 .filter(testRun -> testRun.startsWith(repoPath))
-                .map(testRuns::findTestRunDir)
+                .map(testRuns::findTestRunNode)
                 .flatMap(Optional::stream)
                 .filter(testRun -> testRun.getMarker().getStatus() == TestRunStatus.COMPLETED)
                 .filter(testRun -> isWholeInTheCommit(repoPath, testRun, leftOut))
@@ -257,16 +257,16 @@ public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryS
         ApplicationManager.getApplication().invokeAndWait(() -> completed.forEach(testRun -> testRuns.changeTestRunMarker(testRun.getPath(), marker -> marker.recordCommit(hash))));
         testRuns.awaitWrites();
 
-        final @NotNull List<String> names = completed.stream().map(TestRunDirectoryDto::getName).toList();
+        final @NotNull List<String> names = completed.stream().map(TestRunNode::getName).toList();
         commits.commit(repoPath, Bundle.message("test.run.record.commit", Display.andJoin(names)), completed.stream()
-                .map(testRun -> repoPath.relativize(testRun.getPath().resolve(DirectoryType.TR.getMarker())).toString().replace('\\', '/'))
+                .map(testRun -> repoPath.relativize(testRun.getPath().resolve(NodeType.TR.getMarker())).toString().replace('\\', '/'))
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     // Rule-SHARE-130
-    private boolean isWholeInTheCommit(final @NotNull Path repoPath, final @NotNull TestRunDirectoryDto testRun, final @NotNull List<String> leftOut) {
+    private boolean isWholeInTheCommit(final @NotNull Path repoPath, final @NotNull TestRunNode testRun, final @NotNull List<String> leftOut) {
         final @NotNull String folder = repoPath.relativize(testRun.getPath()).toString().replace('\\', '/') + "/";
-        final @NotNull Set<String> testCaseFiles = Services.getInstance(p, TestRuns.class).findTestRun(testRun.getPath()).map(TestRunDto::coveredIds).orElse(Set.of()).stream()
+        final @NotNull Set<String> testCaseFiles = Services.getInstance(p, TestRuns.class).findRunItems(testRun.getPath()).map(RunItems::coveredIds).orElse(Set.of()).stream()
                 .map(FileKind.TEST_CASE::fileName)
                 .collect(Collectors.toSet());
 

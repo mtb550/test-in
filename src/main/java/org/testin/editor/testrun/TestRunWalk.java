@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
+import org.testin.model.testrun.RunItems;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.result.Failure;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.Segment;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.Failure;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.Segment;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.ExecutionStatus;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
@@ -104,7 +104,7 @@ public final class TestRunWalk {
         if (globalIndex >= shown.size()) {
             stopExecution();
             finishIfEverythingIsJudged();
-            saveTestRun();
+            saveRunItems();
             return;
         }
 
@@ -113,7 +113,7 @@ public final class TestRunWalk {
 
         editor.showExecuting(globalIndex);
 
-        editor.runItem(currentTc.getId()).ifPresent(item -> executionTimer.start(item, () -> {
+        editor.runItem(currentTc.getId()).ifPresent(runItem -> executionTimer.start(runItem, () -> {
             editor.repaint(currentTc);
             editor.showElapsed();
         }));
@@ -127,7 +127,7 @@ public final class TestRunWalk {
 
         for (int i = Math.max(from, 0); i < shown.size(); i++) {
             if (editor.runItem(shown.get(i).getId())
-                    .filter(item -> item.shownStatus() == RunItemStatus.PENDING)
+                    .filter(runItem -> runItem.shownStatus() == RunItemStatus.PENDING)
                     .isPresent()) return i;
         }
 
@@ -173,7 +173,7 @@ public final class TestRunWalk {
         }
 
         final @NotNull List<TestCaseDto> pending = editor.snapshotOfAll().stream()
-                .filter(tc -> editor.runItem(tc.getId()).filter(item -> item.shownStatus() == RunItemStatus.PENDING).isPresent())
+                .filter(tc -> editor.runItem(tc.getId()).filter(runItem -> runItem.shownStatus() == RunItemStatus.PENDING).isPresent())
                 .filter(tc -> !testNGExecution.isRunning(tc.getId()))
                 .toList();
 
@@ -195,7 +195,7 @@ public final class TestRunWalk {
 
         if (!status.stillGoing()) launchedHere.remove(tc.getId());
 
-        if (editor.runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
+        if (editor.runItem(tc.getId()).filter(runItem -> !runItem.isRemoved()).isEmpty()) return;
 
         if (!editor.getParent().takesRunItemStatuses()) return;
 
@@ -217,7 +217,7 @@ public final class TestRunWalk {
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182, Rule-EDITOR-PANEL-220
     private void sayWhatTheRunItemStatusCleared(final @NotNull TestCaseDto tc, final @NotNull RunItemStatus runItemStatus, final @NotNull Failure failure) {
-        final @NotNull List<String> cleared = editor.runItem(tc.getId()).map(item -> item.wouldClear(runItemStatus, failure)).orElseGet(List::of);
+        final @NotNull List<String> cleared = editor.runItem(tc.getId()).map(runItem -> runItem.wouldClear(runItemStatus, failure)).orElseGet(List::of);
         if (cleared.isEmpty()) return;
 
         notifier.info(p, Bundle.message("editor.cleared.title"),
@@ -227,8 +227,8 @@ public final class TestRunWalk {
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-008
     private void sayWhatTheTestRunRecorded() {
-        final @NotNull String recorded = ResultAnalysis
-                .segments(TestRunSummary.of(editor.results()), editor.getParent().getMarker().getStatus())
+        final @NotNull String recorded = TestRunResultAnalysis
+                .segments(TestRunSummary.of(editor.runItems()), editor.getParent().getMarker().getStatus())
                 .stream().map(Segment::text).collect(Collectors.joining(", "));
 
         if (!recorded.isEmpty()) notifier.softShow(p, recorded);
@@ -238,7 +238,7 @@ public final class TestRunWalk {
     public void finishIfEverythingIsJudged() {
         if (!editor.getParent().isOpen()) return;
 
-        if (editor.run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
+        if (editor.loadedRunItems().filter(RunItems::isFullyJudged).isEmpty()) return;
 
         testRunStatusChange.apply(editor.getParent(), TestRunStatus.COMPLETED);
     }
@@ -246,7 +246,7 @@ public final class TestRunWalk {
     // UC-EDITOR-PANEL-046
     public @NotNull Duration getCurrentTestCaseElapsed() {
         return executingTestCase.flatMap(editor::runItem)
-                .map(TestRunItems::getDuration)
+                .map(RunItem::getDuration)
                 .orElse(Duration.ZERO);
     }
 
@@ -307,23 +307,23 @@ public final class TestRunWalk {
         final boolean timing = executingTestCase.isPresent();
 
         halt();
-        if (timing) saveTestRun();
+        if (timing) saveRunItems();
     }
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149
     void stopAndWriteTheTestRunDown() {
         stopAutomation();
         stopExecution();
-        saveTestRun();
+        saveRunItems();
     }
 
-    private void saveTestRun() {
-        testRuns.saveTestRun(editor.getParent().getPath());
+    private void saveRunItems() {
+        testRuns.saveRunItems(editor.getParent().getPath());
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     void start() {
-        if (editor.run().isEmpty()) return;
+        if (editor.loadedRunItems().isEmpty()) return;
 
         if (!hasSomethingToWalk()) {
             notifier.softRefuse(p, Refused.NOTHING_SHOWING, editor.getParent().getName());

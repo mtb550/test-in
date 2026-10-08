@@ -22,8 +22,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -33,23 +33,23 @@ public class CreateTreeNodeAction extends AbstractAnyProjectAction {
     private static final @NotNull String CREATES = Bundle.message("action.Testin.CreateNode.description");
 
     // UC-TREE-PANEL-007, Rule-TREE-PANEL-096
-    private static @NotNull String shortWhyNot(final @NotNull Optional<DirectoryDto> selected) {
+    private static @NotNull String shortWhyNot(final @NotNull Optional<Node> selected) {
         return selected
                 .map(dir -> Bundle.message("create.node.nothing.under", dir.getType().getMarkerKind()))
                 .orElseGet(() -> Bundle.message("create.node.select.one"));
     }
 
     // UC-TREE-PANEL-007, Rule-TREE-PANEL-096
-    private static @NotNull String whyNot(final @NotNull Optional<DirectoryDto> selected) {
+    private static @NotNull String whyNot(final @NotNull Optional<Node> selected) {
         if (selected.isEmpty()) {
-            return Bundle.message("create.node.why.select", DirectoryType.TCD.getMarkerKind(), DirectoryType.TRD.getMarkerKind(),
-                    DirectoryType.TSP.getMarkerKind(), DirectoryType.TRP.getMarkerKind());
+            return Bundle.message("create.node.why.select", NodeType.TCF.getMarkerKind(), NodeType.TRF.getMarkerKind(),
+                    NodeType.TSP.getMarkerKind(), NodeType.TRP.getMarkerKind());
         }
 
-        final @NotNull DirectoryDto dir = selected.orElseThrow();
+        final @NotNull Node dir = selected.orElseThrow();
         if (dir.canCreateChildren()) return CREATES;
 
-        return Bundle.message("create.node.why.holds", dir.getType().getMarkerKind(), DirectoryType.TSP.getDescription(), DirectoryType.TRP.getDescription());
+        return Bundle.message("create.node.why.holds", dir.getType().getMarkerKind(), NodeType.TSP.getDescription(), NodeType.TRP.getDescription());
     }
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-009
@@ -61,8 +61,8 @@ public class CreateTreeNodeAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-007, Rule-TREE-PANEL-025
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        final @NotNull Optional<DirectoryDto> selected = TestinData.singleSelectedNode(e);
-        final boolean enabled = selected.filter(DirectoryDto::canCreateChildren).isPresent();
+        final @NotNull Optional<Node> selected = TestinData.singleSelectedNode(e);
+        final boolean enabled = selected.filter(Node::canCreateChildren).isPresent();
 
         e.getPresentation().setEnabled(enabled);
         e.getPresentation().setDescription(whyNot(selected));

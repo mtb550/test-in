@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.dialogs.Destination;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -44,7 +44,7 @@ public final class ExportDialog extends AbstractFrameworkDialog {
     private final @NotNull BiConsumer<@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
 
-    public ExportDialog(final @NotNull Project p, final @NotNull List<TestCaseEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
+    public ExportDialog(final @NotNull Project p, final @NotNull List<TestSetEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
         super(p);
         this.onExport = onExport;
 

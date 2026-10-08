@@ -16,7 +16,7 @@
 
 package org.testin.model;
 
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
@@ -26,7 +26,7 @@ public class AttributeOrderTest {
 
     @Test
     public void orderIsTheFirstTestAttribute() {
-        assertSame(TestCaseEditorAttributes.atColumn(0), TestCaseEditorAttributes.ORDER);
+        assertSame(TestSetEditorAttributes.atColumn(0), TestSetEditorAttributes.ORDER);
     }
 
     @Test

@@ -24,7 +24,7 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.StatusBarItem;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseDialogKey;
@@ -40,12 +40,12 @@ import java.util.function.Consumer;
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
     // Rule-INTERNAL-054
     private static final @NotNull StatusBarItem ADD_FIELD = StatusBarShortcut.hint(addFieldKeys(), Bundle.message("dialog.key.add.field"));
-    private final @NotNull TestSetDirectoryDto dir;
+    private final @NotNull TestSetNode dir;
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
     private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
     // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
-    public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
+    public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetNode dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p, TestCaseDto.builder().parent(dir).build(), onSave, ADD_FIELD, TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL);
         this.dir = dir;
 

@@ -17,6 +17,6 @@
 package org.testin.editor;
 
 public enum ViewMode {
-    LIST_VIEW,
+    CARD_VIEW,
     GRID_VIEW
 }

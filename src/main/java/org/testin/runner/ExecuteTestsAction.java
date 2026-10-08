@@ -28,8 +28,8 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestRunNode;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
@@ -53,21 +53,21 @@ public class ExecuteTestsAction extends AbstractAnyProjectAction {
         selectedTestRun(e).ifPresentOrElse(testRun -> openAndRun(p, testRun), () -> runnable(e).ifPresent(dir -> run(p, dir)));
     }
 
-    private @NotNull Optional<DirectoryDto> runnable(final @NotNull AnActionEvent e) {
-        return TestinData.firstSelected(e, DirectoryDto.class).filter(DirectoryDto::isTestCaseContainer);
+    private @NotNull Optional<Node> runnable(final @NotNull AnActionEvent e) {
+        return TestinData.firstSelected(e, Node.class).filter(Node::isTestCaseContainer);
     }
 
-    private @NotNull Optional<TestRunDirectoryDto> selectedTestRun(final @NotNull AnActionEvent e) {
-        return TestinData.firstSelected(e, TestRunDirectoryDto.class)
-                .filter(TestRunDirectoryDto::isOpen);
+    private @NotNull Optional<TestRunNode> selectedTestRun(final @NotNull AnActionEvent e) {
+        return TestinData.firstSelected(e, TestRunNode.class)
+                .filter(TestRunNode::isOpen);
     }
 
-    private void openAndRun(final @NotNull Project p, final @NotNull TestRunDirectoryDto testRun) {
+    private void openAndRun(final @NotNull Project p, final @NotNull TestRunNode testRun) {
         Services.getInstance(p, TestinEditors.class).openThen(testRun, TestinEditor::runWhenLoaded);
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-031
-    private void run(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    private void run(final @NotNull Project p, final @NotNull Node dir) {
         final @NotNull List<TestCaseDto> testCases = Services.getInstance(p, TestCases.class).getTestCasesUnder(dir);
 
         if (testCases.isEmpty()) {

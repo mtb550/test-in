@@ -21,14 +21,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -42,14 +42,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 final class ScannedProject {
-    private final @NotNull Map<String, TestProjectDirectoryDto> projects = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestCasesMainDirectoryDto> testCasesMainDirs = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestRunsMainDirectoryDto> testRunsMainDirs = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestSetPackageDirectoryDto> testSetPackages = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestRunPackageDirectoryDto> testRunPackages = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestSetDirectoryDto> testSets = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestRunDirectoryDto> testRunDirs = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, TestRunDto> testRuns = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestProjectNode> projects = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestCasesFolderNode> testCasesFolders = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunsFolderNode> testRunsFolders = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestSetPackageNode> testSetPackages = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunPackageNode> testRunPackages = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestSetNode> testSets = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunNode> testRunNodes = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, RunItems> runItemsByPath = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
     private final @NotNull Map<String, List<UUID>> testCaseIdsByTestSet = new ConcurrentHashMap<>();
 
@@ -62,10 +62,10 @@ final class ScannedProject {
     private final @NotNull Map<UUID, Path> handNamedFiles = new ConcurrentHashMap<>();
 
     // Rule-INTERNAL-011
-    private final @NotNull Set<String> unreadableResults = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> unreadableRunItems = ConcurrentHashMap.newKeySet();
 
     // Rule-INTERNAL-094
-    private final @NotNull Set<String> handNamedResults = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> handNamedRunItems = ConcurrentHashMap.newKeySet();
 
     // UC-SHARE-002, Rule-SHARE-001
     private final @NotNull Map<String, Set<String>> unreadableTestCases = new ConcurrentHashMap<>();

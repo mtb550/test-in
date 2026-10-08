@@ -24,19 +24,19 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SubtreeCode {
     // UC-CODEGEN-004, Rule-CODEGEN-022, Rule-CODEGEN-024
-    public static void generate(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public static void generate(final @NotNull Project p, final @NotNull Node dir) {
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("codegen.generate.command"), null, () -> walk(p, dir));
     }
 
     // UC-CODEGEN-004, Rule-CODEGEN-023
-    private static void walk(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    private static void walk(final @NotNull Project p, final @NotNull Node dir) {
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
         final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
@@ -45,7 +45,7 @@ public final class SubtreeCode {
 
         GenType.CREATE_TEST_CASE.executeAllNow(p, testCases.getTestCasesForTestSet(dir.getPath()));
 
-        for (final DirectoryDto child : nodes.getChildren(dir.getPath())) {
+        for (final Node child : nodes.getChildren(dir.getPath())) {
             walk(p, child);
         }
     }

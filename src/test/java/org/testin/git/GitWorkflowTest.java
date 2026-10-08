@@ -175,8 +175,8 @@ public class GitWorkflowTest {
 
     private @NotNull List<TestCaseDto> writeTestProject() {
         write(work, ".tp", "{\"status\":\"ACTIVE\"}");
-        write(work, "Test Cases/.tcd", "{}");
-        write(work, "Test Runs/.trd", "{}");
+        write(work, "Test Cases/.tcf", "{}");
+        write(work, "Test Runs/.trf", "{}");
         write(work, "Test Cases/login flow/.ts", "{}");
 
         final List<TestCaseDto> testCases = List.of(
@@ -260,7 +260,7 @@ public class GitWorkflowTest {
         final Path colleague = cloneAsColleague();
 
         assertTrue(Files.exists(colleague.resolve(".tp")), "the test project marker travelled");
-        assertTrue(Files.exists(colleague.resolve("Test Cases/.tcd")), "the test cases container marker travelled");
+        assertTrue(Files.exists(colleague.resolve("Test Cases/.tcf")), "the test cases container marker travelled");
         assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/.ts")),
                 "the test set marker travelled - without it the test cases are in a directory nothing recognises");
     }
@@ -274,9 +274,9 @@ public class GitWorkflowTest {
                 .toList());
 
         assertTrue(staged.contains(".tp"));
-        assertTrue(staged.contains("Test Cases/.tcd"));
+        assertTrue(staged.contains("Test Cases/.tcf"));
         assertTrue(staged.contains("Test Cases/login flow/.ts"));
-        assertFalse(staged.contains("Test Runs/.trd"),
+        assertFalse(staged.contains("Test Runs/.trf"),
                 "no test case sits under Test Runs, so its marker is not part of this commit");
     }
 

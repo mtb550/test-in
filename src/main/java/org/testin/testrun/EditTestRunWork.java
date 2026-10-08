@@ -25,10 +25,10 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunConfiguration;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.TestRunConfiguration;
+import org.testin.model.testrun.RunItem;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.rename.NodeRename;
@@ -61,25 +61,25 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
         EditTestRunAction.selectedTestRun(TreeValues.directoryAt(path)).ifPresent(this::edit);
     }
 
-    private void edit(final @NotNull TestRunDirectoryDto testRun) {
-        final @NotNull TestRunDto held = testRuns.getTestRunByPath(testRun.getPath());
-        final @NotNull List<TestCaseDto> deleted = held.getResults().stream().filter(TestRunItems::isRemoved).map(TestRunItems::shownTestCase).toList();
+    private void edit(final @NotNull TestRunNode testRun) {
+        final @NotNull RunItems held = testRuns.getRunItems(testRun.getPath());
+        final @NotNull List<TestCaseDto> deleted = held.getAll().stream().filter(RunItem::isRemoved).map(RunItem::shownTestCase).toList();
 
         boundTestProject.get().ifPresentOrElse(
-                tp -> new TestRunForm(p).open(tp.getTestCasesDirectory(), testRun.getName(), held.coveredIds(), deleted, testRun.getMarker().getConfiguration(), saves(testRun)),
+                tp -> new TestRunForm(p).open(tp.getTestCasesFolder(), testRun.getName(), held.coveredIds(), deleted, testRun.getMarker().getConfiguration(), saves(testRun)),
                 () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
     }
 
-    private @NotNull TestRunFormAction saves(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull TestRunFormAction saves(final @NotNull TestRunNode testRun) {
         return new TestRunFormAction(Bundle.message("test.run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(testRun, form, selection));
     }
 
-    private boolean save(final @NotNull TestRunDirectoryDto testRun, final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection) {
+    private boolean save(final @NotNull TestRunNode testRun, final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection) {
         return saveEdit(testRun, form.getTestRunName(), TestRunForm.checkedTestCases(selection), TestRunForm.offeredTestCases(selection), TestRunConfiguration.answered(form.configuration()));
     }
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-060, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076, Rule-TREE-PANEL-128
-    boolean saveEdit(final @NotNull TestRunDirectoryDto testRun, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Set<UUID> offered, final @NotNull Map<TestRunConfiguration, String> configuration) {
+    boolean saveEdit(final @NotNull TestRunNode testRun, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Set<UUID> offered, final @NotNull Map<TestRunConfiguration, String> configuration) {
         if (name.isEmpty()) {
             notifier.softRefuse(p, Bundle.message("test.run.needs.a.name"));
             return false;
@@ -98,7 +98,7 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
         if (!name.equals(testRun.getName()) && NodeRename.refused(p, testRun, name)) return false;
 
         applyEdit(testRun, name, testRunPath -> {
-            testRuns.changeTestRun(testRunPath, held -> held.cover(wanted(held, checked, offered::contains)));
+            testRuns.changeRunItems(testRunPath, held -> held.cover(wanted(held, checked, offered::contains)));
             testRuns.changeTestRunMarker(testRunPath, marker -> marker.configure(configuration));
         }, () -> notifier.softShow(p, Done.UPDATED));
 
@@ -106,7 +106,7 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
     }
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-076
-    private @NotNull Set<UUID> wanted(final @NotNull TestRunDto from, final @NotNull Set<UUID> checked, final @NotNull Predicate<UUID> couldBeTicked) {
+    private @NotNull Set<UUID> wanted(final @NotNull RunItems from, final @NotNull Set<UUID> checked, final @NotNull Predicate<UUID> couldBeTicked) {
         final @NotNull Set<UUID> wanted = new LinkedHashSet<>(checked);
         from.coveredIds().stream()
                 .filter(couldBeTicked.negate())
@@ -114,7 +114,7 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
         return wanted;
     }
 
-    private void applyEdit(final @NotNull TestRunDirectoryDto testRun, final @NotNull String toName, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
+    private void applyEdit(final @NotNull TestRunNode testRun, final @NotNull String toName, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
         final @NotNull Path from = testRun.getPath();
 
         if (toName.equals(testRun.getName())) {

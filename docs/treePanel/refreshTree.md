@@ -91,7 +91,7 @@ bottom right of the IDE.
 6. Testin shows *Refreshed* when it finishes.
 7. In the background, Testin asks GitHub again for the state of every bug the
    test project holds, and the view panel shows them beside their links
-   ([Rule-VIEW-PANEL-092](../viewPanel/readRunItemResult.md)).
+   ([Rule-VIEW-PANEL-092](../viewPanel/readRunItem.md)).
 
 ## What Testin refuses
 

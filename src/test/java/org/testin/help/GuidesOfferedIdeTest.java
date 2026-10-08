@@ -26,8 +26,8 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.git.GitFailure;
 import org.testin.git.conflict.GitConflictOffer;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
 import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -68,9 +68,9 @@ public class GuidesOfferedIdeTest extends AbstractTempRootIdeTest {
     // Rule-INTERNAL-129
     public void testATestRunOffersItsShortcutsAndAFailedRunItemOffersBugReports() {
         guides().forgetAll();
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), EditorFixtures.testSet(getProject(), tp, "Login"), 2);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
 
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
         try {

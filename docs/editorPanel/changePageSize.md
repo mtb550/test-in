@@ -73,7 +73,7 @@ the tester can see what happened.
 1. The tester clicks the small box at the right of the status bar.
 2. The tester types 200 and presses `Enter`.
 3. The view is drawn again from the first page, 200 test cases at a time.
-4. The size is remembered. Every test case editor and test run editor opened
+4. The size is remembered. Every test set editor and test run editor opened
    afterward starts at 200, after a restart too.
 5. The keyboard goes back to the list.
 6. Nothing is said.

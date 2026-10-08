@@ -79,16 +79,16 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
     // UC-SHARE-012, Rule-SHARE-054
     public void testTheMarkersAboveACommittedTestCaseAreCommittedWithIt() {
         write(work, ".tp", "{}");
-        write(work, "Test Cases/.tcd", "{}");
+        write(work, "Test Cases/.tcf", "{}");
         write(work, "Test Cases/login/.ts", "{}");
-        write(work, "Test Runs/.trd", "{}");
+        write(work, "Test Runs/.trf", "{}");
         write(work, "Test Cases/login/a.tc", "{}");
 
         commits().stageAndCommit(work, "one test case", List.of(ticked("Test Cases/login/a.tc", DiffType.ADDED)));
 
         final @NotNull List<String> committed = committedPaths();
-        assertTrue(committed.toString(), committed.containsAll(List.of(".tp", "Test Cases/.tcd", "Test Cases/login/.ts", "Test Cases/login/a.tc")));
-        assertFalse("no test case sits under Test Runs, so its marker waits: " + committed, committed.contains("Test Runs/.trd"));
+        assertTrue(committed.toString(), committed.containsAll(List.of(".tp", "Test Cases/.tcf", "Test Cases/login/.ts", "Test Cases/login/a.tc")));
+        assertFalse("no test case sits under Test Runs, so its marker waits: " + committed, committed.contains("Test Runs/.trf"));
     }
 
     // UC-SHARE-012, Rule-SHARE-055

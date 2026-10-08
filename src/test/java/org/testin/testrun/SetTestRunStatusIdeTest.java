@@ -21,11 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
@@ -40,17 +40,17 @@ public class SetTestRunStatusIdeTest extends AbstractTempRootIdeTest {
 
     private void finish(final @NotNull TestRunStatus finalStatus) {
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        final @NotNull TestSetDirectoryDto login = made.testSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestSetNode login = made.testSet(tp.getTestCasesFolder(), "Login");
         final @NotNull UUID passed = made.testCase(login).getId();
         final @NotNull UUID stillPending = made.testCase(login).getId();
         final @NotNull UUID alsoPending = made.testCase(login).getId();
 
-        final @NotNull TestRunDirectoryDto testRun = made.testRun(tp.getTestRunsDirectory(), "Cycle-1");
-        indexedTestRuns().putTestRun(testRun.getPath(), new TestRunDto().setResults(List.of(
-                new TestRunItems().setId(passed).setStatus(RunItemStatus.PASSED),
-                new TestRunItems().setId(stillPending).setStatus(RunItemStatus.PENDING),
-                new TestRunItems().setId(alsoPending).setStatus(RunItemStatus.PENDING))));
+        final @NotNull TestRunNode testRun = made.testRun(tp.getTestRunsFolder(), "Cycle-1");
+        indexedTestRuns().putRunItems(testRun.getPath(), new RunItems().setAll(List.of(
+                new RunItem().setId(passed).setStatus(RunItemStatus.PASSED),
+                new RunItem().setId(stillPending).setStatus(RunItemStatus.PENDING),
+                new RunItem().setId(alsoPending).setStatus(RunItemStatus.PENDING))));
 
         new TestRunStatusChange(getProject()).apply(testRun, finalStatus);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -62,8 +62,8 @@ public class SetTestRunStatusIdeTest extends AbstractTempRootIdeTest {
         assertEquals("a pending test case is still pending once the test run is " + finalStatus, RunItemStatus.UNTESTED, statusOf(testRun, alsoPending));
     }
 
-    private @NotNull RunItemStatus statusOf(final @NotNull TestRunDirectoryDto testRun, final @NotNull UUID testCaseId) {
-        return indexedTestRuns().getTestRunByPath(testRun.getPath()).resultOf(testCaseId).map(TestRunItems::getStatus).orElse(RunItemStatus.REMOVED);
+    private @NotNull RunItemStatus statusOf(final @NotNull TestRunNode testRun, final @NotNull UUID testCaseId) {
+        return indexedTestRuns().getRunItems(testRun.getPath()).runItemOf(testCaseId).map(RunItem::getStatus).orElse(RunItemStatus.REMOVED);
     }
 
     // Rule-TREE-PANEL-067, Rule-TREE-PANEL-009

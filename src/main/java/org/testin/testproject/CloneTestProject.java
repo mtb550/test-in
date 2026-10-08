@@ -29,7 +29,7 @@ import org.testin.git.GitRepositoryService;
 import org.testin.git.GitSafeText;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
@@ -94,7 +94,7 @@ public final class CloneTestProject {
         if (path.toLowerCase(Locale.ROOT).endsWith(".git")) path = path.substring(0, path.length() - ".git".length());
 
         final @NotNull String last = path.substring(Math.max(path.lastIndexOf('/'), path.lastIndexOf(':')) + 1);
-        return DirectoryType.TP.canTakeName(last) ? last : NameSanitizer.packageName(last);
+        return NodeType.TP.canTakeName(last) ? last : NameSanitizer.packageName(last);
     }
 
     // UC-TREE-PANEL-003, Rule-TREE-PANEL-107, Rule-SHARE-062

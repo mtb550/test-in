@@ -6,12 +6,12 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
-**Before you update:** install 2.13.0-alpha first, and open each test project with it once. This build no longer
-converts test data an older build wrote, so a test project 2.13.0-alpha has not converted is refused, naming
-2.13.0-alpha as the release that can. The run items of a test run recorded with 2.13.0-alpha are not read either: each
-one stored an empty bug severity and bug priority, and a run item now always has both. Remove such a test run rather
-than repairing it, and a team sharing a test project should update together. Wipe the test runs too: a run item no
-longer keeps a copy of its test case, and the copies earlier builds wrote are not read.
+**Before you update:** wipe your test data. This build reads format 3 and converts nothing, so every test project an
+earlier build wrote is refused as written by an older Testin: remove it and create it again. Format 3 renames three keys
+so each says the business word - a folder marker's `modifiedBy` and `modifiedAt` are now `updatedBy` and `updatedAt`, and
+a test case's `group` is now `groups` - and renames two marker files: the Test Cases folder's `.tcd` is now `.tcf`
+and the Test Runs folder's `.trd` is now `.trf`. `testin.yml` spells its remote `repoUrl` instead of `RepoUrl`: edit
+that one line in a committed `testin.yml`. A team sharing a test project should update together.
 
 ### Added
 

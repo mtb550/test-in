@@ -75,7 +75,7 @@ table; this is all of them together.
 
 ## The editor panel: writing test cases
 
-On the cards of a test case editor.
+On the cards of a test set editor.
 
 | Key                                     | What it does                                    |
 |-----------------------------------------|-------------------------------------------------|
@@ -96,7 +96,7 @@ On the cards of a test run editor.
 | `F2`        | Changes the failure details without changing the run item status                          |
 | `Alt+Enter` | In the failure details, offers the corrections for a misspelled word in the actual result |
 
-`P` and `B` mean a field in the test case editor and a run item status in the
+`P` and `B` mean a field in the test set editor and a run item status in the
 test run editor. They are different keys on different screens, not one key with
 two jobs.
 
@@ -219,16 +219,16 @@ Testin**, where any key can be put on it. Thirty-one entries are declared: 29
 actions, and two more that each stand for a list and become one entry per
 status. Nine of them carry a default key, on seven keys:
 
-| Key                                 | The action                                                | Where it works                                                                                                                                  |
-|-------------------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Ctrl+Alt+F`                        | Search Test Project                                       | Anywhere in the IDE                                                                                                                             |
-| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac | Create Test Case                                          | A test case editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
-| `Shift+F6`                          | Rename Testin Node                                        | The tree                                                                                                                                        |
-| `F2`                                | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree                                                                                                      |
-| *none by default*                   | Copy, Cut and Paste Test Case                             | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it                                            |
-| `F5`                                | Run Test Method                                           | Both editors and the view panel                                                                                                                 |
-| `Shift+F5`                          | Navigate to Test Method                                   | Both editors and the view panel                                                                                                                 |
-| `F12`, `Ctrl+Alt+Cmd+F12` on a Mac  | Automate Test Case                                        | Both editors                                                                                                                                    |
+| Key                                 | The action                                                | Where it works                                                                                                                                 |
+|-------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Ctrl+Alt+F`                        | Search Test Project                                       | Anywhere in the IDE                                                                                                                            |
+| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac | Create Test Case                                          | A test set editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
+| `Shift+F6`                          | Rename Testin Node                                        | The tree                                                                                                                                       |
+| `F2`                                | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree                                                                                                     |
+| *none by default*                   | Copy, Cut and Paste Test Case                             | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it                                           |
+| `F5`                                | Run Test Method                                           | Both editors and the view panel                                                                                                                |
+| `Shift+F5`                          | Navigate to Test Method                                   | Both editors and the view panel                                                                                                                |
+| `F12`, `Ctrl+Alt+Cmd+F12` on a Mac  | Automate Test Case                                        | Both editors                                                                                                                                   |
 
 Rebinding one of these moves it everywhere it works at once, including the
 tooltips and status bars that print it — those ask the keymap rather than

@@ -74,7 +74,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
             @Override
             protected boolean isEnabled(final int index) {
                 return Optional.ofNullable(getItemAt(index))
-                        .map(item -> item.getToolBarDefault().isSwitchable())
+                        .map(field -> field.getToolBarDefault().isSwitchable())
                         .orElse(true);
             }
         };
@@ -83,9 +83,9 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
         options.forEach(attr -> detailsList.addItem(attr, attr.getName(), selectedDetails.contains(attr)));
 
         detailsList.setCheckBoxListListener((index, state) -> {
-            Optional.ofNullable(detailsList.getItemAt(index)).ifPresent(item -> {
-                if (state) selectedDetails.add(item);
-                else selectedDetails.remove(item);
+            Optional.ofNullable(detailsList.getItemAt(index)).ifPresent(field -> {
+                if (state) selectedDetails.add(field);
+                else selectedDetails.remove(field);
             });
 
             ShownFields.write(propertyKey, selectedDetails);

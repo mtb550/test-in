@@ -20,12 +20,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.change.TestCaseChangeComparator;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChangedSinceCommit {
     // Rule-EDITOR-PANEL-263
-    public static boolean of(final @NotNull TestRunItems runItem) {
+    public static boolean of(final @NotNull RunItem runItem) {
         return runItem.recordedTestCase()
                 .filter(committed -> !TestCaseChangeComparator.compare(committed, runItem.liveTestCase()).isEmpty())
                 .isPresent();

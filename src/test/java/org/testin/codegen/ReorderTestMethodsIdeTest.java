@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 
 import java.util.Arrays;
@@ -32,7 +32,7 @@ public class ReorderTestMethodsIdeTest extends AbstractCodegenIdeTest {
     private static final @NotNull String LOGIN_TEST = "nafath.LoginTest";
 
     private @NotNull Reordered openThePageMovedToTheEnd() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto openThePage = createdTestCase(login, "Open the login page", "b");
         final @NotNull TestCaseDto logIn = createdTestCase(login, "Log in with a valid user", "c");
         final @NotNull TestCaseDto logOut = createdTestCase(login, "Log out", "d");

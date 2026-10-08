@@ -40,16 +40,22 @@ a folder is a node because of the marker inside it:
 | Marker          | Node                                    |
 |-----------------|-----------------------------------------|
 | `.tp`           | Test project                            |
-| `.tcd` / `.trd` | The Test Cases and Test Runs containers |
+| `.tcf` / `.trf` | The Test Cases and Test Runs containers |
 | `.tsp` / `.ts`  | Test set package, test set              |
 | `.trp` / `.tr`  | Test run package, test run              |
 
-The records beside those markers are JSON too, and **each one is named by what it
-is about**: a test case is `<id>.tc`, and one test case's result in a test run
-is `<test case id>.ri`. So renaming or moving anything leaves every file still
-valid, two testers recording run item statuses on different test cases of the
-same test run never touch the same file, and what a test run recorded about
-itself — its status, when it ran, how it was configured — lives in the test
+Inside those folders, each thing a tester works on is a record of its own:
+
+| Record              | What it is                                     |
+|---------------------|------------------------------------------------|
+| `<id>.tc`           | A test case, in its test set's folder          |
+| `<test case id>.ri` | A run item, in its test run's folder           |
+
+The records are JSON too, and **each one is named by what it is about**: a test
+case by its own id, a run item by the id of the test case it records. So
+renaming or moving anything leaves every file still valid, two testers recording
+run item statuses on different test cases of the same test run never touch the
+same file, and what a test run recorded about itself — its status, when it ran, how it was configured — lives in the test
 run's own `.tr`.
 
 **Stored values are byte-identical to what you typed** — Testin formats for

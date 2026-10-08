@@ -19,7 +19,7 @@ package org.testin.editor.toolbar;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.filter.FilterSource;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
 public interface Toolbar extends FilterSource {
     void onToolBarSearchValueChanged();
@@ -30,14 +30,14 @@ public interface Toolbar extends FilterSource {
 
     void onToolBarRefreshButtonClicked();
 
-    default void onToolBarResultAnalysisClicked() {
+    default void onToolBarTestRunResultAnalysisClicked() {
     }
 
     @NotNull Project getProject();
 
-    @NotNull DirectoryDto getEditedNode();
+    @NotNull Node getEditedNode();
 
-    default void onToolBarSwitchedToListView() {
+    default void onToolBarSwitchedToCardView() {
     }
 
     default void onToolBarSwitchedToGridView() {

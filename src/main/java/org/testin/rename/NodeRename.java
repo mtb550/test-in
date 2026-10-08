@@ -27,8 +27,8 @@ import org.testin.config.TestinYml;
 import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -42,7 +42,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NodeRename {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-036, Rule-TREE-PANEL-111
-    public static void apply(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
+    public static void apply(final @NotNull Project p, final @NotNull Node dir, final @NotNull String newName, final @NotNull Runnable onDone) {
         Services.getInstance(p, TestinEditors.class).close(dir);
 
         final @NotNull Renamed renamed = new Renamed(dir, newName);
@@ -58,7 +58,7 @@ public final class NodeRename {
         JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
 
         Services.getInstance(p, Nodes.class).renameNode(oldPath, newPath, () -> {
-            if (dir instanceof TestProjectDirectoryDto) projectFollows(p, oldName, newName);
+            if (dir instanceof TestProjectNode) projectFollows(p, oldName, newName);
 
             Logger.info("Success! Renamed to: " + newName);
 
@@ -76,7 +76,7 @@ public final class NodeRename {
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-004, Rule-CODEGEN-080, Rule-CODEGEN-081
-    public static boolean refused(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+    public static boolean refused(final @NotNull Project p, final @NotNull Node dir, final @NotNull String newName) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         if (Services.getInstance(p, Nodes.class).isTaken(dir.getPath().resolveSibling(newName), Optional.of(dir.getPath()))) {

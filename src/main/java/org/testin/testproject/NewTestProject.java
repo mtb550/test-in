@@ -19,9 +19,9 @@ package org.testin.testproject;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -33,7 +33,7 @@ public final class NewTestProject {
     private final @NotNull Project p;
     private final @NotNull TreePanel tp;
     private final @NotNull String tpName;
-    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull NodeMapper directoryMapper;
     private final @NotNull Nodes nodes;
     private final @NotNull BoundTestProject boundTestProject;
     private final @NotNull Notifier notifier;
@@ -42,7 +42,7 @@ public final class NewTestProject {
         this.p = p;
         this.tp = tp;
         this.tpName = tpName;
-        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.directoryMapper = Services.getInstance(p, NodeMapper.class);
         this.nodes = Services.getInstance(p, Nodes.class);
         this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
         this.notifier = Services.getInstance(p, Notifier.class);
@@ -55,7 +55,7 @@ public final class NewTestProject {
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     private void create(final @NotNull Path tpPath) {
-        final @NotNull TestProjectDirectoryDto created = directoryMapper.setTestProjectNode(tpPath);
+        final @NotNull TestProjectNode created = directoryMapper.setTestProjectNode(tpPath);
 
         if (!nodes.addTestProject(created)) return;
 

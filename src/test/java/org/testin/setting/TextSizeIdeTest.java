@@ -26,10 +26,10 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.explorer.tree.TreePanelTree;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.ui.FontSync;
 import org.testin.util.Fonts;
 import org.testin.view.Drawn;
@@ -111,10 +111,10 @@ public class TextSizeIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-039
     public void testTheGestureWorksOverTheEditorAndTheViewPanel() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
-        final @NotNull TestSetDirectoryDto login = EditorFixtures.testSet(getProject(), tp, "Login");
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetNode login = EditorFixtures.testSet(getProject(), tp, "Login");
         EditorFixtures.testCases(getProject(), login, 2);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), login, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), login, getTestRootDisposable());
         final @NotNull ViewPanel view = new ViewPanel(getProject());
 
         final @NotNull Map<String, JComponent> surfaces = new LinkedHashMap<>();

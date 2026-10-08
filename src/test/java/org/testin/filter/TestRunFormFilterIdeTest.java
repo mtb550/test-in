@@ -29,10 +29,10 @@ import org.testin.NodesOnDisk;
 import org.testin.indexer.TestCases;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.form.TestRunFormFilter;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
@@ -51,7 +51,7 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
     private TestCaseDto paid;
     private TestRunFormFilter filter;
 
-    private static @NotNull CheckedTreeNode holding(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto... testCases) {
+    private static @NotNull CheckedTreeNode holding(final @NotNull TestSetNode testSet, final @NotNull TestCaseDto... testCases) {
         final @NotNull CheckedTreeNode node = new CheckedTreeNode(testSet);
         for (final TestCaseDto tc : testCases) node.add(new CheckedTreeNode(tc));
         return node;
@@ -65,20 +65,20 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
     protected void setUp() {
         super.setUp();
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        final @NotNull TestSetDirectoryDto login = made.testSet(tp.getTestCasesDirectory(), "Login");
-        final @NotNull TestSetDirectoryDto card = made.testSet(tp.getTestCasesDirectory(), "Card");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestSetNode login = made.testSet(tp.getTestCasesFolder(), "Login");
+        final @NotNull TestSetNode card = made.testSet(tp.getTestCasesFolder(), "Card");
         urgent = aTestCase(login, Priority.HIGH, "a");
         later = aTestCase(login, Priority.LOW, "b");
         paid = aTestCase(card, Priority.LOW, "c");
 
-        final @NotNull CheckedTreeNode top = new CheckedTreeNode(tp.getTestCasesDirectory());
+        final @NotNull CheckedTreeNode top = new CheckedTreeNode(tp.getTestCasesFolder());
         top.add(holding(login, urgent, later));
         top.add(holding(card, paid));
-        filter = new TestRunFormFilter(getProject(), tp.getTestCasesDirectory().getPath(), top);
+        filter = new TestRunFormFilter(getProject(), tp.getTestCasesFolder().getPath(), top);
     }
 
-    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto testSet, final @NotNull Priority priority, final @NotNull String order) {
+    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetNode testSet, final @NotNull Priority priority, final @NotNull String order) {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Pay with a " + priority + " card").order(order).priority(priority).build();
         tc.setParent(testSet);
         assertTrue(Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(testSet.getPath(), tc));
@@ -113,9 +113,9 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
     public void testTheFilterMenuIsTheEditorsWithoutRunItemStatus() {
         final @NotNull List<String> names = menu().stream().map(TestRunFormFilterIdeTest::nameOf).toList();
 
-        assertTrue("the Filter menu has no priority filter: " + names, names.contains(TestCaseEditorAttributes.PRIORITY.getName()));
-        assertTrue("the Filter menu has no group filter: " + names, names.contains(TestCaseEditorAttributes.GROUP.getName()));
-        assertTrue("the Filter menu has no module filter: " + names, names.contains(TestCaseEditorAttributes.MODULE.getName()));
+        assertTrue("the Filter menu has no priority filter: " + names, names.contains(TestSetEditorAttributes.PRIORITY.getName()));
+        assertTrue("the Filter menu has no group filter: " + names, names.contains(TestSetEditorAttributes.GROUP.getName()));
+        assertTrue("the Filter menu has no module filter: " + names, names.contains(TestSetEditorAttributes.MODULE.getName()));
         assertTrue("the Filter menu has no automation filter: " + names, names.contains(Bundle.message("filter.automation")));
         assertTrue("the Filter menu has no status filter: " + names, names.contains(Bundle.message("filter.test.case.status")));
         assertFalse("the Filter menu offers Run Item Status for test cases that are all Pending: " + names, names.contains(Bundle.message("filter.run.item.status")));
@@ -124,7 +124,7 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-129
     public void testAPriorityFilterPicksTheSameTestCasesAsInAnEditor() {
-        final @NotNull ToggleAction high = entriesOf(TestCaseEditorAttributes.PRIORITY.getName()).stream()
+        final @NotNull ToggleAction high = entriesOf(TestSetEditorAttributes.PRIORITY.getName()).stream()
                 .filter(entry -> nameOf(entry).equals(Priority.HIGH.getLabel()))
                 .map(ToggleAction.class::cast)
                 .findFirst()

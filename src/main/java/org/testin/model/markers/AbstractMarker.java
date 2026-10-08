@@ -16,7 +16,6 @@
 
 package org.testin.model.markers;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -48,22 +47,20 @@ public abstract class AbstractMarker implements Marker {
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime createdAt = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS);
-    @JsonAlias("updatedBy")
     @NonNull
-    private String modifiedBy = "";
-    @JsonAlias("updatedAt")
+    private String updatedBy = "";
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
-    private ZonedDateTime modifiedAt = Config.NOT_EXECUTED;
+    private ZonedDateTime updatedAt = Config.NOT_EXECUTED;
 
     @Override
-    public @NotNull String getModifiedBy() {
-        return modifiedBy.isBlank() ? createdBy : modifiedBy;
+    public @NotNull String getUpdatedBy() {
+        return updatedBy.isBlank() ? createdBy : updatedBy;
     }
 
     @Override
-    public @NotNull ZonedDateTime getModifiedAt() {
-        return Config.isNotExecuted(modifiedAt) ? createdAt : modifiedAt;
+    public @NotNull ZonedDateTime getUpdatedAt() {
+        return Config.isNotExecuted(updatedAt) ? createdAt : updatedAt;
     }
 
     static final class Unordered {

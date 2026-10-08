@@ -21,7 +21,7 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.config.TestinYml;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.rename.NodeRename;
 import org.testin.services.Services;
 
@@ -43,7 +43,7 @@ public class RenamedTestProjectIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-110
     public void testRenamingTheChosenTestProjectMovesTheChoiceAndWritesNoTestinYml() {
-        final @NotNull TestProjectDirectoryDto tp = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
+        final @NotNull TestProjectNode tp = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
         assertFalse("a testin.yml was there before the rename", aTestinYmlExists());
         bound().choose("NAFATH");
 

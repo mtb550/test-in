@@ -218,7 +218,7 @@ public class ExecutionRegistryTest {
     }
 
     @Test
-    public void anExecutionThatEndedWithEveryResultInLeavesNothingBehind() {
+    public void anExecutionThatEndedWithEveryRunItemInLeavesNothingBehind() {
         final ExecutionRegistry registry = new ExecutionRegistry();
         final TestCaseDto tc = aTestCase("passes");
 

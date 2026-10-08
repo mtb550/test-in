@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.bug.BugIssueUrl;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -32,7 +32,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RunItemChangeComparator {
     // UC-SHARE-010, Rule-SHARE-046
-    static @NotNull List<FieldChange> compare(final @NotNull TestRunItems oldItem, final @NotNull TestRunItems newItem) {
+    static @NotNull List<FieldChange> compare(final @NotNull RunItem oldItem, final @NotNull RunItem newItem) {
         final @NotNull List<FieldChange> changes = differences(oldItem, newItem);
         if (changes.isEmpty()) {
             changes.add(new FieldChange(TestRunEditorAttributes.RUN_STATUS.getName(), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_RUN_ITEM));
@@ -42,7 +42,7 @@ public final class RunItemChangeComparator {
     }
 
     // UC-SHARE-010, Rule-SHARE-046, Rule-VIEW-PANEL-105
-    public static @NotNull List<FieldChange> differences(final @NotNull TestRunItems oldItem, final @NotNull TestRunItems newItem) {
+    public static @NotNull List<FieldChange> differences(final @NotNull RunItem oldItem, final @NotNull RunItem newItem) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
         addIfChanged(changes, TestRunEditorAttributes.RUN_STATUS.getName(), oldItem.getStatus().getLabel(), newItem.getStatus().getLabel());
@@ -57,9 +57,9 @@ public final class RunItemChangeComparator {
         return changes;
     }
 
-    static @NotNull String summary(final @NotNull TestRunItems item) {
-        final @NotNull String said = item.getActualResult().isBlank() ? "" : " - " + item.getActualResult();
-        return item.getStatus().getLabel() + said;
+    static @NotNull String summary(final @NotNull RunItem runItem) {
+        final @NotNull String said = runItem.getActualResult().isBlank() ? "" : " - " + runItem.getActualResult();
+        return runItem.getStatus().getLabel() + said;
     }
 
     private static void addIfChanged(final @NotNull List<FieldChange> changes, final @NotNull String field, final @NotNull String oldValue, final @NotNull String newValue) {

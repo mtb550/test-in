@@ -39,13 +39,13 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
-    public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
-        super(p, existingDto, onSave, TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL);
+    public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingTestCase, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
+        super(p, existingTestCase, onSave, TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL);
 
         // Rule-CODEGEN-001
         descriptionSection.compareAgainst(() -> testCases
-                .getTestCasesForTestSet(existingDto.getParent().getPath()).stream()
-                .filter(sibling -> !sibling.getId().equals(existingDto.getId()))
+                .getTestCasesForTestSet(existingTestCase.getParent().getPath()).stream()
+                .filter(sibling -> !sibling.getId().equals(existingTestCase.getId()))
                 .toList());
 
         final @NotNull CreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
@@ -56,13 +56,13 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         onlyEditable(targetSection);
 
         for (final CreateTestCaseSection section : getAllSections()) {
-            section.fillData(existingDto);
+            section.fillData(existingTestCase);
 
             final boolean isTarget = section.equals(targetSection);
 
             if (isTarget) section.readyForEditing();
 
-            if (!(section.isShownWith(existingDto) || isTarget)) continue;
+            if (!(section.isShownWith(existingTestCase) || isTarget)) continue;
 
             final @NotNull JBPanel<?> slot = form.newSlot();
             section.showSection(slot);

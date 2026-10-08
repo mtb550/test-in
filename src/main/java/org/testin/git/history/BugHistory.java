@@ -25,9 +25,9 @@ import org.testin.git.GitRepositoryService;
 import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;
@@ -67,7 +67,7 @@ public final class BugHistory {
             return history.with(notCommitted(testProject, List.of(), now, Map.of(), mapper), List.of());
 
         try {
-            final @NotNull List<BugCommit> commits = commits(git.log(testProject, FORMAT, "--name-status", "--", pathspec(DirectoryType.TRD, FileKind.RUN_ITEM, testCaseId), pathspec(DirectoryType.TCD, FileKind.TEST_CASE, testCaseId)));
+            final @NotNull List<BugCommit> commits = commits(git.log(testProject, FORMAT, "--name-status", "--", pathspec(NodeType.TRF, FileKind.RUN_ITEM, testCaseId), pathspec(NodeType.TCF, FileKind.TEST_CASE, testCaseId)));
             final @NotNull List<String> paths = commits.stream().flatMap(BugCommit::paths).distinct().toList();
             final @NotNull Map<String, String> versions = commits.isEmpty()
                     ? Map.of()
@@ -82,7 +82,7 @@ public final class BugHistory {
         }
     }
 
-    static @NotNull String pathspec(final @NotNull DirectoryType folder, final @NotNull FileKind kind, final @NotNull UUID testCaseId) {
+    static @NotNull String pathspec(final @NotNull NodeType folder, final @NotNull FileKind kind, final @NotNull UUID testCaseId) {
         return ":(glob)" + folder.getFolderName() + "/**/" + kind.fileName(testCaseId);
     }
 
@@ -117,8 +117,8 @@ public final class BugHistory {
 
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-106
     private static @NotNull Optional<BugCard> card(final @NotNull Path testProject, final @NotNull BugCommit commit, final @NotNull ChangedFile changed, final @NotNull Map<String, String> versions, final @NotNull Mapper mapper) {
-        final @NotNull Optional<TestRunItems> before = version(mapper, versions, commit.hash() + "^", changed.before());
-        final @NotNull Optional<TestRunItems> after = version(mapper, versions, commit.hash(), changed.after());
+        final @NotNull Optional<RunItem> before = version(mapper, versions, commit.hash() + "^", changed.before());
+        final @NotNull Optional<RunItem> after = version(mapper, versions, commit.hash(), changed.after());
         if (before.isEmpty() != changed.before().isEmpty() || after.isEmpty() != changed.after().isEmpty())
             return Optional.empty();
 
@@ -126,7 +126,7 @@ public final class BugHistory {
                 .map(event -> new BugCard(commit.hash(), commit.who(), commit.when(), event));
     }
 
-    private static @NotNull Optional<TestRunItems> version(final @NotNull Mapper mapper, final @NotNull Map<String, String> versions, final @NotNull String revision, final @NotNull String path) {
+    private static @NotNull Optional<RunItem> version(final @NotNull Mapper mapper, final @NotNull Map<String, String> versions, final @NotNull String revision, final @NotNull String path) {
         return path.isEmpty() ? Optional.empty() : parsed(mapper, versions.getOrDefault(revision + ":" + path, ""));
     }
 
@@ -135,11 +135,11 @@ public final class BugHistory {
         return Optional.ofNullable(file.getParent()).orElse(testProject);
     }
 
-    private static @NotNull Optional<TestRunItems> parsed(final @NotNull Mapper mapper, final @NotNull String json) {
+    private static @NotNull Optional<RunItem> parsed(final @NotNull Mapper mapper, final @NotNull String json) {
         if (json.isBlank()) return Optional.empty();
 
         try {
-            return Optional.of(mapper.readValue(json, TestRunItems.class));
+            return Optional.of(mapper.readValue(json, RunItem.class));
         } catch (final UncheckedIOException unreadable) {
             return Optional.empty();
         }

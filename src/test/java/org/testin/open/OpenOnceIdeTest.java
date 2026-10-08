@@ -22,8 +22,8 @@ import org.testin.AbstractOpenEditorsIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.TreeGesture;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +33,9 @@ public class OpenOnceIdeTest extends AbstractOpenEditorsIdeTest {
     // Rule-TREE-PANEL-023
     public void testOpeningAnOpenTestSetBringsItsTabForward() {
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        final @NotNull TestSetDirectoryDto login = made.testSet(tp.getTestCasesDirectory(), "Login");
-        final @NotNull TestSetDirectoryDto checkout = made.testSet(tp.getTestCasesDirectory(), "Checkout");
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestSetNode login = made.testSet(tp.getTestCasesFolder(), "Login");
+        final @NotNull TestSetNode checkout = made.testSet(tp.getTestCasesFolder(), "Checkout");
 
         TreeGesture.pressed(getProject(), new OpenAction(), List.of(login));
         Await.until("Open did not open the test set", () -> openOn(login).size() == 1);

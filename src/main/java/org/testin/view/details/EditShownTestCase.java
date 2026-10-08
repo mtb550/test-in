@@ -79,7 +79,7 @@ public final class EditShownTestCase {
             return Optional.of(Bundle.message("details.deleted.no.edit"));
 
         final boolean committed = !currentPath.isEmpty() && Services.getInstance(p, TestRuns.class)
-                .findTestRunDir(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
+                .findTestRunNode(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(testRun -> !testRun.takesRunItemStatuses())
                 .isPresent();
         return committed ? Optional.of(Bundle.message("details.committed.no.edit")) : Optional.empty();

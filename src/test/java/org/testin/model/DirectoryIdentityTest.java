@@ -17,9 +17,9 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -36,8 +36,8 @@ public class DirectoryIdentityTest {
     // Rule-INTERNAL-116
     @Test
     public void twoReadingsOfOneFolderAreOneNode() {
-        final TestSetDirectoryDto first = TestSetDirectoryDto.builder().path(LOGIN).name("Login").build();
-        final TestSetDirectoryDto second = TestSetDirectoryDto.builder().path(LOGIN).name("Log in").build();
+        final TestSetNode first = TestSetNode.builder().path(LOGIN).name("Login").build();
+        final TestSetNode second = TestSetNode.builder().path(LOGIN).name("Log in").build();
 
         assertEquals(second, first);
         assertEquals(new HashSet<>(List.of(first, second)).size(), 1, "a set held one folder twice");
@@ -46,14 +46,14 @@ public class DirectoryIdentityTest {
     // Rule-INTERNAL-116
     @Test
     public void twoKindsAtOnePathAreTwoNodes() {
-        final @NotNull DirectoryDto testSetPackage = TestSetPackageDirectoryDto.builder().path(LOGIN).build();
-        final @NotNull DirectoryDto testSet = TestSetDirectoryDto.builder().path(LOGIN).build();
+        final @NotNull Node testSetPackage = TestSetPackageNode.builder().path(LOGIN).build();
+        final @NotNull Node testSet = TestSetNode.builder().path(LOGIN).build();
 
         assertNotEquals(testSetPackage, testSet);
     }
 
     @Test
     public void twoFoldersAreTwoNodes() {
-        assertNotEquals(TestSetDirectoryDto.builder().path(LOGIN.resolveSibling("Logout")).build(), TestSetDirectoryDto.builder().path(LOGIN).build());
+        assertNotEquals(TestSetNode.builder().path(LOGIN.resolveSibling("Logout")).build(), TestSetNode.builder().path(LOGIN).build());
     }
 }

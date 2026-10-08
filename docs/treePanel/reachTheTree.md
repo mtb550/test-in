@@ -91,7 +91,7 @@ prevent.
   file is corrected in an editor and there is no button that does it, so a
   screen holding only that sentence is a screen with no way off it.
 - **Rule-TREE-PANEL-124** — A `location` that is neither `local` nor `remote` is
-  read as `local`, and `location: remote` with no `RepoUrl` is read as it is
+  read as `local`, and `location: remote` with no `repoUrl` is read as it is
   written. Neither refuses the file, and each is noted in Testin's log.
 - **Rule-TREE-PANEL-127** — A test set and a test run show no expand arrow. They
   hold test cases and results rather than nodes, so the tree has nothing to open

@@ -19,7 +19,7 @@ Two things follow, and they are not optional.
 
 ```java
 // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
-public void removeSelected(final @NotNull List<DirectoryDto> nodes) {
+public void removeSelected(final @NotNull List<Node> nodes) {
 }
 ```
 

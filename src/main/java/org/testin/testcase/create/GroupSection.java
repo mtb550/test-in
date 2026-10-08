@@ -44,12 +44,12 @@ public class GroupSection extends AbstractMultiValueSection {
 
     @Override
     protected @NotNull List<String> valuesOf(final @NotNull TestCaseDto dto) {
-        return dto.getGroup();
+        return dto.getGroups();
     }
 
     @Override
     protected @NotNull TestCaseDto write(final @NotNull TestCaseDto dto, final @NotNull List<String> values) {
-        return dto.edit().group(values).build();
+        return dto.edit().groups(values).build();
     }
 
     @Override

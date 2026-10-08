@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunNode;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.NameSanitizer;
@@ -37,7 +37,7 @@ public final class ReportFileName {
             DateTimeFormatter.ofPattern("dd-MM-yyyy_hh-mm-ssa", Locale.US);
 
     // UC-REPORT-001, Rule-REPORT-006
-    public static @NotNull String suggestedFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto testRun, final @NotNull ZonedDateTime at) {
+    public static @NotNull String suggestedFor(final @NotNull Project p, final @NotNull TestRunNode testRun, final @NotNull ZonedDateTime at) {
         return of(Services.getInstance(p, BoundTestProject.class).name(), testRun.getName(), at);
     }
 

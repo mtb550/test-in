@@ -39,15 +39,15 @@ import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
 import org.testin.codegen.GenType;
 import org.testin.codegen.JavaCode;
 import org.testin.config.TestinYml;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testng.annotations.Test;
 
@@ -77,7 +77,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
         }
     };
 
-    private TestProjectDirectoryDto testProject;
+    private TestProjectNode testProject;
 
     protected static @NotNull String attributeOf(final @NotNull PsiMethod pm, final @NotNull String attribute) {
         return Optional.ofNullable(pm.getModifierList().findAnnotation(TESTNG_TEST))
@@ -103,7 +103,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
         assertTrue("could not write " + TestinYml.fileName(), TestinYml.save(getProject(), TestinYml.lines(TEST_PROJECT)));
 
         testProject = WriteAction.computeAndWait(() -> {
-            final @NotNull TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve(TEST_PROJECT));
+            final @NotNull TestProjectNode tp = Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(root.resolve(TEST_PROJECT));
             nodes().addTestProject(tp);
             return tp;
         });
@@ -113,49 +113,49 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull DirectoryMapper mapper() {
-        return Services.getInstance(getProject(), DirectoryMapper.class);
+    private @NotNull NodeMapper mapper() {
+        return Services.getInstance(getProject(), NodeMapper.class);
     }
 
-    protected @NotNull DirectoryDto theTestCasesDirectory() {
-        return testProject.getTestCasesDirectory();
+    protected @NotNull Node theTestCasesDirectory() {
+        return testProject.getTestCasesFolder();
     }
 
-    protected @NotNull TestSetPackageDirectoryDto indexedPackage(final @NotNull String name, final @NotNull DirectoryDto parent) {
+    protected @NotNull TestSetPackageNode indexedPackage(final @NotNull String name, final @NotNull Node parent) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetPackageDirectoryDto created = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
+            final @NotNull TestSetPackageNode created = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
             nodes().addTestSetPackage(created);
             return created;
         });
     }
 
-    protected @NotNull TestSetDirectoryDto indexedTestSet(final @NotNull String name, final @NotNull DirectoryDto parent) {
+    protected @NotNull TestSetNode indexedTestSet(final @NotNull String name, final @NotNull Node parent) {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetDirectoryDto created = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
+            final @NotNull TestSetNode created = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
             nodes().addTestSet(created);
             return created;
         });
     }
 
-    protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name) {
+    protected @NotNull TestSetNode createdTestSet(final @NotNull String name) {
         return createdTestSet(name, theTestCasesDirectory());
     }
 
-    protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name, final @NotNull DirectoryDto parent) {
-        final @NotNull TestSetDirectoryDto ts = indexedTestSet(name, parent);
+    protected @NotNull TestSetNode createdTestSet(final @NotNull String name, final @NotNull Node parent) {
+        final @NotNull TestSetNode ts = indexedTestSet(name, parent);
 
-        JavaCode.of(DirectoryType.TS).getCreated().execute(getProject(), ts);
+        JavaCode.of(NodeType.TS).getCreated().execute(getProject(), ts);
         return ts;
     }
 
-    protected @NotNull TestCaseDto indexedTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description, final @NotNull String order) {
+    protected @NotNull TestCaseDto indexedTestCase(final @NotNull TestSetNode ts, final @NotNull String description, final @NotNull String order) {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order(order).build();
         tc.setParent(ts);
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
         return tc;
     }
 
-    protected @NotNull TestCaseDto createdTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description, final @NotNull String order) {
+    protected @NotNull TestCaseDto createdTestCase(final @NotNull TestSetNode ts, final @NotNull String description, final @NotNull String order) {
         final @NotNull TestCaseDto tc = indexedTestCase(ts, description, order);
         GenType.CREATE_TEST_CASE.execute(getProject(), tc);
         return tc;

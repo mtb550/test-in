@@ -53,8 +53,8 @@ public class TestRunMergeTest {
             {
               "createdBy" : "Muteb",
               "createdAt" : "Sunday 13-09-2026 At 09:00:00 [Asia/Riyadh]",
-              "modifiedBy" : "Muteb",
-              "modifiedAt" : "Monday 14-09-2026 At 10:05:00 [Asia/Riyadh]",
+              "updatedBy" : "Muteb",
+              "updatedAt" : "Monday 14-09-2026 At 10:05:00 [Asia/Riyadh]",
               "status" : "IN_PROGRESS",
               "configuration" : { "PLATFORM" : "Web", "BROWSER" : "Chrome" },
               "executionStartedAt" : "Monday 14-09-2026 At 10:00:00 [Asia/Riyadh]",
@@ -64,8 +64,8 @@ public class TestRunMergeTest {
             {
               "createdBy" : "Muteb",
               "createdAt" : "Sunday 13-09-2026 At 09:00:00 [Asia/Riyadh]",
-              "modifiedBy" : "Sara",
-              "modifiedAt" : "Monday 14-09-2026 At 11:40:00 [Asia/Riyadh]",
+              "updatedBy" : "Sara",
+              "updatedAt" : "Monday 14-09-2026 At 11:40:00 [Asia/Riyadh]",
               "status" : "COMPLETED",
               "configuration" : { "PLATFORM" : "Web", "COMPONENT" : "Storefront" },
               "executionStartedAt" : "Monday 14-09-2026 At 09:30:00 [Asia/Riyadh]",
@@ -110,7 +110,7 @@ public class TestRunMergeTest {
         assertEquals(merge.merged().path("executionStartedAt").asText(), "Monday 14-09-2026 At 09:30:00 [Asia/Riyadh]");
         assertEquals(merge.merged().path("executionEndedAt").asText(), "Monday 14-09-2026 At 11:35:00 [Asia/Riyadh]");
         assertEquals(merge.merged().path("status").asText(), "COMPLETED", "the status further along");
-        assertEquals(merge.merged().path("modifiedBy").asText(), "Sara", "the audit block takes the later edit");
+        assertEquals(merge.merged().path("updatedBy").asText(), "Sara", "the audit block takes the later edit");
     }
 
     // Rule-SHARE-130

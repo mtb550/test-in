@@ -21,10 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UpdateTestCaseAction;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 
 public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
-    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+    private @NotNull TestSetNode testSet = new TestSetNode();
 
     private static @NotNull String read(final @NotNull Path file) {
         try {
@@ -57,19 +57,19 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
         super.tearDown();
     }
 
-    private @NotNull TestCaseEditor sixTestCases() {
+    private @NotNull TestSetEditor sixTestCases() {
         testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), testSet, 6);
-        return EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
     }
 
-    private void select(final @NotNull TestCaseEditor editor, final @NotNull String description) {
+    private void select(final @NotNull TestSetEditor editor, final @NotNull String description) {
         for (int i = 0; i < editor.getList().getModel().getSize(); i++)
             if (editor.getList().getModel().getElementAt(i).getDescription().equals(description))
                 editor.getList().setSelectedIndex(i);
     }
 
-    private @NotNull IntegerField theOrderBox(final @NotNull TestCaseEditor editor) {
+    private @NotNull IntegerField theOrderBox(final @NotNull TestSetEditor editor) {
         ShownDialog.open(getProject(), UpdateTestCaseDialog.class, () -> UpdateTestCaseAction.openField(getProject(), editor, UpdateTestCaseFields.ORDER));
         return Drawn.components(ShownDialog.content(getProject(), UpdateTestCaseDialog.class)).stream()
                 .filter(IntegerField.class::isInstance).map(IntegerField.class::cast).findFirst()
@@ -80,7 +80,7 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
         return TestCaseOrder.ordered(Services.getInstance(getProject(), TestCases.class).getTestCasesForTestSet(testSet.getPath())).stream().map(TestCaseDto::getDescription).map(description -> description.replace("Test case number ", "")).toList();
     }
 
-    private void moveToThird(final @NotNull TestCaseEditor editor, final @NotNull String description) {
+    private void moveToThird(final @NotNull TestSetEditor editor, final @NotNull String description) {
         select(editor, description);
         theOrderBox(editor).setValue(3);
         ShownDialog.press(getProject(), UpdateTestCaseDialog.class, Shortcuts.Enter.getKey());
@@ -96,7 +96,7 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-054
     public void testTheNumberIsThePositionInTheWholeTestSet() {
-        final @NotNull TestCaseEditor editor = sixTestCases();
+        final @NotNull TestSetEditor editor = sixTestCases();
         editor.getToolBar().getSearchTxt().setText("number 5");
         Await.until("the search never narrowed the list to one", () -> editor.getList().getModel().getSize() == 1);
 
@@ -107,7 +107,7 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-055, Rule-EDITOR-PANEL-056
     public void testTypingThreePutsItThirdAndOnlyItsOwnFileIsWritten() {
-        final @NotNull TestCaseEditor editor = sixTestCases();
+        final @NotNull TestSetEditor editor = sixTestCases();
         final @NotNull List<String> others = everyFileButNumber6();
 
         moveToThird(editor, "Test case number 6");
@@ -118,7 +118,7 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-055
     public void testMovingDownCountsWithTheTestCaseTakenOut() {
-        final @NotNull TestCaseEditor editor = sixTestCases();
+        final @NotNull TestSetEditor editor = sixTestCases();
 
         moveToThird(editor, "Test case number 1");
 

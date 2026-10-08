@@ -28,12 +28,12 @@ import org.testin.editor.PageWindow;
 import org.testin.editor.card.BaseCard;
 import org.testin.editor.grid.GridRows;
 import org.testin.editor.grid.TestRunGridEditListener;
-import org.testin.editor.list.TestRunListRenderer;
+import org.testin.editor.cardview.RunItemCardRenderer;
 import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.editor.statusbar.StatusBarListener;
 import org.testin.editor.toolbar.GenerateReportBtn;
 import org.testin.editor.toolbar.LightModeBtn;
-import org.testin.editor.toolbar.ResultAnalysisBtn;
+import org.testin.editor.toolbar.TestRunResultAnalysisBtn;
 import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.editor.toolbar.StopExecutionBtn;
 import org.testin.editor.toolbar.TestRunDetailsPopupBtn;
@@ -49,18 +49,18 @@ import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.ResultAnalysis;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.TestRunResultAnalysis;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.TestRunStatus;
 import org.testin.notifications.Done;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.testrun.ResultAnalysisDialog;
+import org.testin.testrun.TestRunResultAnalysisDialog;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.SideScroll;
 import org.testin.util.Bundle;
@@ -79,12 +79,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes, TestRunDirectoryDto> implements Toolbar {
+public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes, TestRunNode> implements Toolbar {
     private final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
     private final @NotNull LightMode lightMode = Services.getInstance(p, LightMode.class);
 
-    private final @NotNull Map<UUID, TestRunItems> resultsMap = new ConcurrentHashMap<>();
+    private final @NotNull Map<UUID, RunItem> runItemsById = new ConcurrentHashMap<>();
 
     @Getter
     private final @NotNull TestRunToolbar toolBar;
@@ -94,7 +94,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
 
-    private volatile @NotNull Optional<TestRunDto> testRun = Optional.empty();
+    private volatile @NotNull Optional<RunItems> loadedRunItems = Optional.empty();
 
     private boolean loaded;
 
@@ -123,19 +123,19 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
             try {
                 indexer.awaitIndexing();
                 TestRunFromGit.read(p, parent.getPath());
-                final @NotNull TestRunDto fromDisk = testRun.orElseGet(() -> testRuns.getTestRunByPath(parent.getPath()));
+                final @NotNull RunItems fromDisk = loadedRunItems.orElseGet(() -> testRuns.getRunItems(parent.getPath()));
 
-                final @NotNull Map<UUID, TestRunItems> results = fromDisk.getResults().stream()
-                        .collect(Collectors.toMap(TestRunItems::getId, item -> item,
+                final @NotNull Map<UUID, RunItem> runItemsOnDisk = fromDisk.getAll().stream()
+                        .collect(Collectors.toMap(RunItem::getId, runItem -> runItem,
                                 (existingItem, _) -> existingItem));
 
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getResults().stream().map(TestRunItems::liveTestCase).toList());
+                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getAll().stream().map(RunItem::liveTestCase).toList());
                 testCaseValues.load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
-                    testRun = Optional.of(fromDisk);
-                    resultsMap.putAll(results);
+                    loadedRunItems = Optional.of(fromDisk);
+                    runItemsById.putAll(runItemsOnDisk);
                     allTestCases.clear();
                     allTestCases.addAll(ordered);
                     currentTestCases.clear();
@@ -180,9 +180,9 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     @Override
     protected void clearLoadedData() {
-        resultsMap.clear();
+        runItemsById.clear();
 
-        testRun = Optional.empty();
+        loadedRunItems = Optional.empty();
     }
 
     @Override
@@ -198,21 +198,21 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     @Override
     protected void disposeLoadedData() {
-        resultsMap.clear();
+        runItemsById.clear();
     }
 
-    public @NotNull Optional<TestRunItems> runItem(final @NotNull UUID id) {
-        return Optional.ofNullable(resultsMap.get(id));
+    public @NotNull Optional<RunItem> runItem(final @NotNull UUID id) {
+        return Optional.ofNullable(runItemsById.get(id));
     }
 
-    public @NotNull Optional<TestRunDto> run() {
-        return testRun;
+    public @NotNull Optional<RunItems> loadedRunItems() {
+        return loadedRunItems;
     }
 
     private void buildOpeningPanel() {
         StatusBarListener.attach(this);
 
-        list.setCellRenderer(new TestRunListRenderer(p, this));
+        list.setCellRenderer(new RunItemCardRenderer(p, this));
 
         wireList();
 
@@ -220,26 +220,26 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         mainPanel.add(SideScroll.of(statusBar), BorderLayout.SOUTH);
         toolBar.installSearchFocusShortcut(mainPanel);
 
-        onToolBarSwitchedToListView();
+        onToolBarSwitchedToCardView();
 
         refreshView();
     }
 
     // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191, Rule-TREE-PANEL-135
     @Override
-    public void onToolBarResultAnalysisClicked() {
-        run().ifPresent(testRunData -> new ResultAnalysisDialog(p,
-                TestRunSummary.of(testRunData.getResults()),
+    public void onToolBarTestRunResultAnalysisClicked() {
+        loadedRunItems().ifPresent(runItems -> new TestRunResultAnalysisDialog(p,
+                TestRunSummary.of(runItems.getAll()),
                 parent.getMarker().getResultAnalysis(),
                 parent.getMarker().getStatus().isRecord(),
                 analysis -> {
-                    if (testRuns.findTestRunDir(parent.getPath()).map(testRun -> testRun.getMarker().getStatus().isRecord()).orElse(false)) {
+                    if (testRuns.findTestRunNode(parent.getPath()).map(testRun -> testRun.getMarker().getStatus().isRecord()).orElse(false)) {
                         notifier.softRefuse(p, Bundle.message("run.item.status.test.run.signed.off", TestRunStatus.COMMITTED.getLabel()));
                         return;
                     }
 
                     testRuns.changeTestRunMarker(parent.getPath(),
-                            marker -> marker.recordAnalysis(ResultAnalysis.written(analysis)));
+                            marker -> marker.recordAnalysis(TestRunResultAnalysis.written(analysis)));
                     notifier.softShow(p, Done.SAVED);
                 }).show());
     }
@@ -248,11 +248,11 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     @Override
     public @NotNull String cardTitle(final @NotNull TestCaseDto tc) {
         final @NotNull Set<TestRunEditorAttributes> selected = getSelectedDetails();
-        final @NotNull TestCaseDto shown = runItem(tc.getId()).map(TestRunItems::shownTestCase).orElse(tc);
+        final @NotNull TestCaseDto shown = runItem(tc.getId()).map(RunItem::shownTestCase).orElse(tc);
 
         return BaseCard.titleText(positionOf(tc),
                 selected.contains(TestRunEditorAttributes.ORDER),
-                selected.contains(TestRunEditorAttributes.DESCRIPTION) ? TestCaseEditorAttributes.DESCRIPTION.displayValue(shown) : "");
+                selected.contains(TestRunEditorAttributes.DESCRIPTION) ? TestSetEditorAttributes.DESCRIPTION.displayValue(shown) : "");
     }
 
     @Override
@@ -266,8 +266,8 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     }
 
     @Override
-    protected @NotNull Class<TestRunDirectoryDto> nodeType() {
-        return TestRunDirectoryDto.class;
+    protected @NotNull Class<TestRunNode> nodeType() {
+        return TestRunNode.class;
     }
 
     @Override
@@ -327,7 +327,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
     protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
-        return GridRows.ofRunItems(pageItems, resultsMap, this::positionOf);
+        return GridRows.ofRunItems(pageItems, runItemsById, this::positionOf);
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
@@ -365,7 +365,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     // UC-REPORT-001
     @Override
-    public @NotNull Optional<TestRunDirectoryDto> shownTestRun() {
+    public @NotNull Optional<TestRunNode> shownTestRun() {
         return Optional.of(getParent());
     }
 
@@ -397,8 +397,8 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         if (model.contains(tc)) model.contentsChanged(tc);
     }
 
-    @NotNull List<TestRunItems> results() {
-        return List.copyOf(resultsMap.values());
+    @NotNull List<RunItem> runItems() {
+        return List.copyOf(runItemsById.values());
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-177
@@ -406,7 +406,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         final @NotNull TestRunStatus status = parent.getMarker().getStatus();
 
         statusBar.showTestRunStatus(parent.getMarker());
-        statusBar.showRunItemStatuses(ResultAnalysis.segments(TestRunSummary.of(results()), status));
+        statusBar.showRunItemStatuses(TestRunResultAnalysis.segments(TestRunSummary.of(runItems()), status));
 
         showElapsed();
     }
@@ -419,8 +419,8 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     }
 
     public @NotNull Duration getElapsed() {
-        return resultsMap.values().stream()
-                .map(TestRunItems::getDuration)
+        return runItemsById.values().stream()
+                .map(RunItem::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
     }
 
@@ -442,7 +442,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         startBtn.setVisible(!executing);
         stopBtn.setVisible(executing);
         startBtn.updateEnabledState();
-        toolBar.getToolbarItem(ResultAnalysisBtn.class).updateEnabledState();
+        toolBar.getToolbarItem(TestRunResultAnalysisBtn.class).updateEnabledState();
         toolBar.getToolbarItem(GenerateReportBtn.class).updateEnabledState();
         toolBar.getToolbarItem(LightModeBtn.class).updateState();
 

@@ -44,7 +44,7 @@ final class RunItemMerge {
         return new Merge(takeTheirs ? theirsNode : mineNode, List.of(), List.of(Bundle.message("git.merge.run.item.status")));
     }
 
-    private static @NotNull ZonedDateTime executedAt(final @NotNull ObjectNode item) {
-        return TestDataParser.date(item.path(EXECUTED_AT).asText("")).orElse(Config.NOT_EXECUTED);
+    private static @NotNull ZonedDateTime executedAt(final @NotNull ObjectNode runItem) {
+        return TestDataParser.date(runItem.path(EXECUTED_AT).asText("")).orElse(Config.NOT_EXECUTED);
     }
 }

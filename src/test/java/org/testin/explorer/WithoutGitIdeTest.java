@@ -37,7 +37,7 @@ import org.testin.actions.TestinData;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -88,8 +88,8 @@ public class WithoutGitIdeTest extends AbstractTempRootIdeTest {
     // Rule-PRODUCT-021
     public void testWithoutGitThereIsNoSyncAndNoCloneAndTheDataIsStillUsable() {
         final @NotNull NodesOnDisk onDisk = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = onDisk.testProject(root.resolve("NAFATH"));
-        final @NotNull TestCaseDto tc = onDisk.testCase(onDisk.testSet(tp.getTestCasesDirectory(), "Login"));
+        final @NotNull TestProjectNode tp = onDisk.testProject(root.resolve("NAFATH"));
+        final @NotNull TestCaseDto tc = onDisk.testCase(onDisk.testSet(tp.getTestCasesFolder(), "Login"));
 
         final @NotNull AnAction sync = Optional.ofNullable(ActionManager.getInstance().getAction("Testin.SyncWithRemote")).orElseThrow(() -> new AssertionError("Sync is not registered"));
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(sync, SimpleDataContext.builder()

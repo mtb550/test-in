@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -43,21 +43,21 @@ public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest
     }
 
     protected static @NotNull Path aTestProjectAt(final @NotNull Path folder) {
-        marked(folder, DirectoryType.TP);
-        marked(theTestCasesOf(folder), DirectoryType.TCD);
-        marked(theTestRunsOf(folder), DirectoryType.TRD);
+        marked(folder, NodeType.TP);
+        marked(theTestCasesOf(folder), NodeType.TCF);
+        marked(theTestRunsOf(folder), NodeType.TRF);
         return folder;
     }
 
     protected static @NotNull Path theTestCasesOf(final @NotNull Path testProject) {
-        return testProject.resolve(DirectoryType.TCD.getFolderName());
+        return testProject.resolve(NodeType.TCF.getFolderName());
     }
 
     protected static @NotNull Path theTestRunsOf(final @NotNull Path testProject) {
-        return testProject.resolve(DirectoryType.TRD.getFolderName());
+        return testProject.resolve(NodeType.TRF.getFolderName());
     }
 
-    protected static @NotNull Path marked(final @NotNull Path folder, final @NotNull DirectoryType kind) {
+    protected static @NotNull Path marked(final @NotNull Path folder, final @NotNull NodeType kind) {
         SyntheticTree.write(folder.resolve(kind.getMarker()), SyntheticTree.marker());
         return folder;
     }

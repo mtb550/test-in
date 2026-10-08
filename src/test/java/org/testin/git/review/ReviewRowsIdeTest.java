@@ -27,8 +27,8 @@ import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.git.ShareGestures;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoHistories;
@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class ReviewRowsIdeTest extends AbstractGitRemoteIdeTest {
-    private TestSetDirectoryDto login;
+    private TestSetNode login;
     private TestCaseDto first;
     private TestCaseDto second;
 
@@ -70,8 +70,8 @@ public class ReviewRowsIdeTest extends AbstractGitRemoteIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        final @NotNull TestProjectDirectoryDto demo = new NodesOnDisk(getProject()).testProject(work);
-        login = new NodesOnDisk(getProject()).testSet(demo.getTestCasesDirectory(), "Login");
+        final @NotNull TestProjectNode demo = new NodesOnDisk(getProject()).testProject(work);
+        login = new NodesOnDisk(getProject()).testSet(demo.getTestCasesFolder(), "Login");
         first = new NodesOnDisk(getProject()).testCase(login);
         second = TestCaseDto.builder().id(UUID.randomUUID()).description("A wrong password is refused").order("n").build();
         assertTrue(indexedTestCases().putTestCaseVerbatim(login.getPath(), second));

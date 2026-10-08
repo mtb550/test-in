@@ -20,9 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
@@ -43,11 +43,11 @@ public class RemovedTestMethodComesBackIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-EDITOR-PANEL-069
     public void testATestCaseComingBackFromARemovalGetsItsTestMethodAgain() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull TestCaseDto tc = createdTestCase(login, "Log in with a valid user", "m");
         settled();
         writtenMethodOf(LOGIN_CLASS, tc);
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), login, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), login, getTestRootDisposable());
 
         ShownDialog.open(getProject(), ConfirmDialog.class, () -> new RemoveTestCaseWork(getProject(), editor, login, List.of(tc)).remove());
         ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter.getKey());

@@ -18,12 +18,12 @@ package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.change.FieldChange;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 
 import java.nio.file.Path;
 import java.util.List;
 
-public record BugEvent(@NotNull BugEventKind kind, @NotNull Path testRun, @NotNull TestRunItems item, @NotNull List<FieldChange> changes) {
+public record BugEvent(@NotNull BugEventKind kind, @NotNull Path testRun, @NotNull RunItem runItem, @NotNull List<FieldChange> changes) {
     // Rule-VIEW-PANEL-109
     public @NotNull String testRunName() {
         return String.valueOf(testRun.getFileName());

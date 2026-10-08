@@ -16,8 +16,8 @@
 
 package org.testin.explorer.tree;
 
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
 import org.testng.annotations.Test;
 
 import javax.swing.TransferHandler;
@@ -36,7 +36,7 @@ public class ProjectTreeInfrastructureTest {
 
     @Test
     public void transferPayloadKeepsSelectedDirectories() {
-        final DirectoryDto directory = new TestSetDirectoryDto();
+        final Node directory = new TestSetNode();
         directory.setPath(Path.of("project", "test-cases", "set"));
 
         final TreeTransferPayload payload = new TreeTransferPayload(List.of(directory), TransferHandler.COPY);

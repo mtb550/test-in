@@ -27,9 +27,9 @@ import org.testin.Await;
 import org.testin.Said;
 import org.testin.TempTree;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
@@ -67,15 +67,15 @@ public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
         return Services.getInstance(getProject(), UndoHistories.class);
     }
 
-    private void cutAndPasted(final @NotNull DirectoryDto node, final @NotNull DirectoryDto target) {
+    private void cutAndPasted(final @NotNull Node node, final @NotNull Node target) {
         CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(List.of(node), TransferHandler.MOVE)));
         handler.pasteFromClipboard(target);
     }
 
     // Rule-TREE-PANEL-048
     public void testMovingATestSetMovesItsClass() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetNode login = createdTestSet("Login");
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
 
         cutAndPasted(login, checkout);
 
@@ -86,9 +86,9 @@ public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-048
     public void testMovingATestSetPackageMovesTheClassesBeneathIt() {
-        final @NotNull TestSetPackageDirectoryDto payments = indexedPackage("Payments", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode payments = indexedPackage("Payments", theTestCasesDirectory());
         createdTestSet("Card", payments);
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
 
         cutAndPasted(payments, checkout);
 
@@ -98,8 +98,8 @@ public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-098
     public void testAMoveTheTreeRefusesLeavesTheClassWhereItWas() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetNode login = createdTestSet("Login");
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
         TempTree.delete(checkout.getPath());
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
@@ -114,8 +114,8 @@ public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-TREE-PANEL-098
     public void testAnUndoneMoveTheTreeRefusesLeavesTheClassWhereItWas() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetNode login = createdTestSet("Login");
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
         cutAndPasted(login, checkout);
         Await.until("the test set was not moved", () -> nodes().nodeExists(checkout.getPath().resolve("Login")));
         Await.until("the class did not move with its test set", () -> generatedClass("nafath.checkout.LoginTest").isPresent());

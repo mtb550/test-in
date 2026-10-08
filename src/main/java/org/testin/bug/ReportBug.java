@@ -29,9 +29,9 @@ import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
@@ -43,27 +43,27 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportBug {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-067
-    public static void start(final @NotNull Project p, final @NotNull TestRunDirectoryDto testRunDirectory, final @NotNull UUID runItemId, final @NotNull TestCaseDto tc, final @NotNull Runnable redraw) {
+    public static void start(final @NotNull Project p, final @NotNull TestRunNode testRunNode, final @NotNull UUID runItemId, final @NotNull TestCaseDto tc, final @NotNull Runnable redraw) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
-        final @NotNull RunItem item = new RunItem(testRunDirectory.getPath(), runItemId);
+        final @NotNull RunItemPath runItemPath = new RunItemPath(testRunNode.getPath(), runItemId);
 
-        final @NotNull Optional<TestRunDto> testRun = testRuns.findTestRun(item.testRunPath());
-        final @NotNull Optional<TestRunItems> failed = testRun.flatMap(item::failedIn);
-        if (failed.isEmpty() || reports.whyReportBugIsOff(item, failed.orElseThrow()).isPresent()) return;
+        final @NotNull Optional<RunItems> runItems = testRuns.findRunItems(runItemPath.testRunPath());
+        final @NotNull Optional<RunItem> failed = runItems.flatMap(runItemPath::failedIn);
+        if (failed.isEmpty() || reports.whyReportBugIsOff(runItemPath, failed.orElseThrow()).isPresent()) return;
 
-        reports.begin(item);
+        reports.begin(runItemPath);
         redraw.run();
 
-        final @NotNull TestRunItems failedItem = failed.orElseThrow();
+        final @NotNull RunItem failedItem = failed.orElseThrow();
         final @NotNull Optional<TestCaseFile> file = testCases.testCaseFile(tc);
 
         BackgroundWork.run(p, Bundle.message("bug.preparing"), Bundle.message("bug.send.failed.title"), true,
-                indicator -> prepare(p, BugFacts.of(failedItem, tc, testRunDirectory.getMarker(), testRunDirectory.getName(), testRuns.screenshots(item.testRunPath(), failedItem)), file, indicator),
-                bug -> open(p, item, bug, redraw),
+                indicator -> prepare(p, BugFacts.of(failedItem, tc, testRunNode.getMarker(), testRunNode.getName(), testRuns.screenshots(runItemPath.testRunPath(), failedItem)), file, indicator),
+                bug -> open(p, runItemPath, bug, redraw),
                 () -> {
-                    reports.end(item, Stage.PREPARING);
+                    reports.end(runItemPath, Stage.PREPARING);
                     redraw.run();
                 });
     }
@@ -83,14 +83,14 @@ public final class ReportBug {
         return new PreparedBug(facts, BugTemplate.body(facts, link), BugRepository.of(bugRepoUrl), whyNotReady);
     }
 
-    private static void open(final @NotNull Project p, final @NotNull RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
+    private static void open(final @NotNull Project p, final @NotNull RunItemPath runItemPath, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
-        if (reports.anotherIsOpen(item)) {
+        if (reports.anotherIsOpen(runItemPath)) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("bug.finish.open.report"));
             return;
         }
 
-        reports.moveTo(item, Stage.OPEN);
-        new ReportBugDialog(p, item, bug, redraw).open();
+        reports.moveTo(runItemPath, Stage.OPEN);
+        new ReportBugDialog(p, runItemPath, bug, redraw).open();
     }
 }

@@ -22,16 +22,16 @@ import org.testin.codegen.CodeOn;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.config.TestinYml;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
 import org.testin.services.OptionalPlugin;
 import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record Renamed(@NotNull DirectoryDto dir, @NotNull List<String> from, @NotNull String newName) {
-    public Renamed(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+public record Renamed(@NotNull Node dir, @NotNull List<String> from, @NotNull String newName) {
+    public Renamed(final @NotNull Node dir, final @NotNull String newName) {
         this(dir, dir.getPath2(), newName);
     }
 
@@ -48,7 +48,7 @@ public record Renamed(@NotNull DirectoryDto dir, @NotNull List<String> from, @No
 
     // UC-TREE-PANEL-011, Rule-CODEGEN-082
     public boolean toTheFilesName(final @NotNull Project p) {
-        return dir.getType() == DirectoryType.TP && TestinYml.names(p, newName);
+        return dir.getType() == NodeType.TP && TestinYml.names(p, newName);
     }
 
     // Rule-CODEGEN-082
@@ -58,7 +58,7 @@ public record Renamed(@NotNull DirectoryDto dir, @NotNull List<String> from, @No
 
     // UC-CODEGEN-017, Rule-CODEGEN-080
     public boolean packageInTheWay(final @NotNull Project p) {
-        if (!DirectoryType.BECOME_JAVA_PACKAGES.contains(dir.getType()) || !movesCode(p)) return false;
+        if (!NodeType.BECOME_JAVA_PACKAGES.contains(dir.getType()) || !movesCode(p)) return false;
 
         final @NotNull List<String> from = Fqcn.ofPackage(dir);
         final @NotNull List<String> to = new ArrayList<>(from);

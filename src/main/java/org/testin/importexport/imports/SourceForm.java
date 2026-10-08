@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.PreviewLoader;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.dialogs.CollapsiblePanel;
 import org.testin.ui.dialogs.FormRows;
 import org.testin.ui.framework.DialogComponent;
@@ -43,7 +43,7 @@ public final class SourceForm implements DialogComponent {
     private final @NotNull JComponent panel;
 
     // UC-SHARE-005, Rule-INTERNAL-099
-    public SourceForm(final @NotNull Project p, final @NotNull List<TestCaseEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onDataLoaded) {
+    public SourceForm(final @NotNull Project p, final @NotNull List<TestSetEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onDataLoaded) {
         source = SourceSection.of(p);
         hint = FileTypeHint.of(importAttributes);
 

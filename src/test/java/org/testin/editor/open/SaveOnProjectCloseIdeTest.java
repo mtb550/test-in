@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 
 import java.util.Objects;
@@ -30,7 +30,7 @@ public class SaveOnProjectCloseIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-015
     public void testClosingTheCodeProjectRemembersEveryOpenEditorAndClosesItsTab() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), ts, 1);
         final @NotNull TestinEditors editors = Services.getInstance(getProject(), TestinEditors.class);
         try {

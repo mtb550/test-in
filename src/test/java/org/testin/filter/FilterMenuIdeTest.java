@@ -36,21 +36,21 @@ import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.Automated;
 import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestCaseStatus;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -125,15 +125,15 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the editor did not move to page 3", 3, editor.getCurrentPage());
     }
 
-    private @NotNull TestProjectDirectoryDto aTestProject() {
+    private @NotNull TestProjectNode aTestProject() {
         return EditorFixtures.testProject(getProject(), root);
     }
 
-    private @NotNull TestSetDirectoryDto aTestSet(final @NotNull TestProjectDirectoryDto tp) {
+    private @NotNull TestSetNode aTestSet(final @NotNull TestProjectNode tp) {
         return EditorFixtures.testSet(getProject(), tp, "Checkout");
     }
 
-    private @NotNull List<TestCaseDto> createdTestCases(final @NotNull TestSetDirectoryDto ts, final int count) {
+    private @NotNull List<TestCaseDto> createdTestCases(final @NotNull TestSetNode ts, final int count) {
         final @NotNull List<TestCaseDto> made = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             final @NotNull TestCaseDto tc = TestCaseDto.builder()
@@ -141,7 +141,7 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
                     .description("Test case number " + (i + 1))
                     .order(String.format("m%04d", i))
                     .priority(i == 0 ? Priority.HIGH : Priority.LOW)
-                    .group(new ArrayList<>(i % 2 == 0 ? List.of("Smoke") : List.of()))
+                    .groups(new ArrayList<>(i % 2 == 0 ? List.of("Smoke") : List.of()))
                     .module(i % 3 == 0 ? "Payments" : "")
                     .build();
             tc.setParent(ts);
@@ -151,27 +151,27 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         return made;
     }
 
-    private @NotNull TestCaseEditor openedTestSet(final int count) {
-        final @NotNull TestSetDirectoryDto ts = aTestSet(aTestProject());
+    private @NotNull TestSetEditor openedTestSet(final int count) {
+        final @NotNull TestSetNode ts = aTestSet(aTestProject());
         createdTestCases(ts, count);
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     private @NotNull TestRunEditor openedTestRun(final int count) {
-        final @NotNull TestProjectDirectoryDto tp = aTestProject();
+        final @NotNull TestProjectNode tp = aTestProject();
         final @NotNull List<TestCaseDto> testCases = createdTestCases(aTestSet(tp), count);
-        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        final @NotNull TestRunNode tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
         return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
     }
 
     // Rule-EDITOR-PANEL-094
     public void testSevenThingsCanBeFilteredOnEachWhereItBelongs() {
-        final @NotNull List<String> everywhere = List.of(TestCaseEditorAttributes.PRIORITY.getName(), Bundle.message("filter.automation"), TestCaseEditorAttributes.GROUP.getName(), TestCaseEditorAttributes.MODULE.getName(), Bundle.message("filter.test.case.status"));
+        final @NotNull List<String> everywhere = List.of(TestSetEditorAttributes.PRIORITY.getName(), Bundle.message("filter.automation"), TestSetEditorAttributes.GROUP.getName(), TestSetEditorAttributes.MODULE.getName(), Bundle.message("filter.test.case.status"));
 
         final @NotNull FilterPopupBtn inATestSet = filterOf(openedTestSet(3));
-        assertEquals("a test case editor does not filter on the priority, the automation, the group, the module and the status", everywhere, entriesOf(inATestSet).subList(0, everywhere.size()));
-        assertFalse("a test case editor offers the run item status", entriesOf(inATestSet).contains(Bundle.message("filter.run.item.status")));
-        assertFalse("a test case editor offers to pick across test sets", enabled(entry(inATestSet.menu(), Bundle.message("filter.test.set.one"))));
+        assertEquals("a test set editor does not filter on the priority, the automation, the group, the module and the status", everywhere, entriesOf(inATestSet).subList(0, everywhere.size()));
+        assertFalse("a test set editor offers the run item status", entriesOf(inATestSet).contains(Bundle.message("filter.run.item.status")));
+        assertFalse("a test set editor offers to pick across test sets", enabled(entry(inATestSet.menu(), Bundle.message("filter.test.set.one"))));
 
         final @NotNull FilterPopupBtn inATestRun = filterOf(openedTestRun(3));
         assertEquals("a test run editor does not add the run item status to the five", Bundle.message("filter.run.item.status"), entriesOf(inATestRun).get(everywhere.size()));
@@ -207,11 +207,11 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-097, Rule-EDITOR-PANEL-098
     public void testFilteringGoesBackToTheFirstPageAndTheButtonCountsTheFiltersOn() {
-        final @NotNull TestCaseEditor editor = openedTestSet(120);
+        final @NotNull TestSetEditor editor = openedTestSet(120);
         final @NotNull FilterPopupBtn filter = filterOf(editor);
         onThirdPage(editor);
 
-        tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.LOW.getLabel());
+        tick(filter, TestSetEditorAttributes.PRIORITY.getName(), Priority.LOW.getLabel());
 
         assertEquals("filtering did not go back to the first page", 1, editor.getCurrentPage());
         assertEquals("the button does not say one filter is on", "(1)", filter.getText());
@@ -226,10 +226,10 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         final @NotNull FilterPopupBtn filter = filterOf(editor);
         searchForNumberOne(editor);
 
-        tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.LOW.getLabel());
+        tick(filter, TestSetEditorAttributes.PRIORITY.getName(), Priority.LOW.getLabel());
         tick(filter, Bundle.message("filter.automation"), Automated.NONE.getLabel());
-        tick(filter, TestCaseEditorAttributes.GROUP.getName(), Groups.NONE);
-        tick(filter, TestCaseEditorAttributes.MODULE.getName(), "Payments");
+        tick(filter, TestSetEditorAttributes.GROUP.getName(), Groups.NONE);
+        tick(filter, TestSetEditorAttributes.MODULE.getName(), "Payments");
         tick(filter, Bundle.message("filter.run.item.status"), RunItemStatus.PENDING.getLabel());
         assertTrue("the filters did not narrow the list", editor.getCurrentTestCases().size() < 32);
 
@@ -247,12 +247,12 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-009
     public void testFilteringSaysNothingAndATestCaseItHidesIsReportedRatherThanShown() {
-        final @NotNull TestCaseEditor editor = openedTestSet(6);
+        final @NotNull TestSetEditor editor = openedTestSet(6);
         final @NotNull FilterPopupBtn filter = filterOf(editor);
         final @NotNull TestCaseDto hidden = editor.getAllTestCases().stream().filter(tc -> tc.getPriority() == Priority.LOW).findFirst().orElseThrow();
         final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
-        tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.HIGH.getLabel());
+        tick(filter, TestSetEditorAttributes.PRIORITY.getName(), Priority.HIGH.getLabel());
         assertEquals("the filter did not narrow the list to the one high priority test case", 1, editor.getCurrentTestCases().size());
         assertEquals("filtering said something", List.of(), balloons.shown());
 

@@ -49,7 +49,7 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
 
         final @NotNull Card card = new Card(getProject());
         card.feed(title);
-        card.applyListLayout(list);
+        card.applyCardViewLayout(list);
         return card;
     }
 

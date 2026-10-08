@@ -30,16 +30,16 @@ import org.testin.importexport.FileTypes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.notifications.Done;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testcase.Can;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
@@ -65,7 +65,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
     private @NotNull String downloadFolderBefore = "";
     private Path downloads;
-    private TestProjectDirectoryDto testProject;
+    private TestProjectNode testProject;
 
     private static @NotNull Path folder(final @NotNull Path path) {
         try {
@@ -133,7 +133,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static int descriptionColumn() {
-        return TestCaseEditorAttributes.all(Can.EXPORT).indexOf(TestCaseEditorAttributes.DESCRIPTION) + 2;
+        return TestSetEditorAttributes.all(Can.EXPORT).indexOf(TestSetEditorAttributes.DESCRIPTION) + 2;
     }
 
     @Override
@@ -162,20 +162,20 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description) {
+    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetNode ts, final @NotNull String description) {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order("m" + description.length()).build();
         assertTrue("the test case was not written", indexedTestCases().putTestCaseVerbatim(ts.getPath(), tc));
         return tc;
     }
 
-    private @NotNull JComponent theExportDialogFor(final @NotNull DirectoryDto node) {
+    private @NotNull JComponent theExportDialogFor(final @NotNull Node node) {
         new ExportWork(getProject()).exportFrom(node);
         return ShownDialog.waitedFor(getProject(), ExportDialog.class);
     }
 
     // UC-SHARE-001, Rule-SHARE-001, Rule-SHARE-011
     public void testExportingWithACorrectionChangesNoTestCase() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         final @NotNull TestCaseDto first = aTestCase(login, "log in with a valid user");
         final @NotNull TestCaseDto second = aTestCase(login, "a wrong password is refused");
         final @NotNull Path firstFile = login.getPath().resolve(first.getId() + ".tc");
@@ -198,7 +198,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-001, Rule-SHARE-009
     public void testOnlyTheTestCaseFilesInTheTestSetAreRead() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         aTestCase(login, "log in with a valid user");
         write(login.getPath().resolve("notes.txt"), "remember to ask about the locked account");
         write(login.getPath().resolve("draft.json"), "{\"id\":\"" + UUID.randomUUID() + "\",\"description\":\"a draft that is not a test case\"}");
@@ -212,7 +212,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-001, Rule-SHARE-010
     public void testTheFileIsWrittenWhereTheTesterChoseAndNothingUnderTheTestinFolder() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         aTestCase(login, "log in with a valid user");
         final @NotNull List<Path> testinBefore = everythingUnder(root.resolve("testin"));
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
@@ -229,7 +229,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-001, Rule-SHARE-005
     public void testAnExportRunsUnderAProgressBarThatCanBeCanceled() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         aTestCase(login, "log in with a valid user");
         final @NotNull List<Task> started = new CopyOnWriteArrayList<>();
         BackgroundWork.watch(getTestRootDisposable(), task -> {
@@ -250,10 +250,10 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
     // UC-SHARE-002, Rule-SHARE-013
     public void testEveryTestSetBeneathThePackageIsASheetAndASharedNameTakesItsPackage() {
         final @NotNull NodesOnDisk disk = new NodesOnDisk(getProject());
-        final @NotNull TestSetPackageDirectoryDto payments = disk.testSetPackage(testProject.getTestCasesDirectory(), "Payments");
-        final @NotNull TestSetPackageDirectoryDto web = disk.testSetPackage(payments, "Web");
-        final @NotNull TestSetPackageDirectoryDto mobile = disk.testSetPackage(payments, "Mobile");
-        final @NotNull TestSetPackageDirectoryDto legacy = disk.testSetPackage(web, "Legacy");
+        final @NotNull TestSetPackageNode payments = disk.testSetPackage(testProject.getTestCasesFolder(), "Payments");
+        final @NotNull TestSetPackageNode web = disk.testSetPackage(payments, "Web");
+        final @NotNull TestSetPackageNode mobile = disk.testSetPackage(payments, "Mobile");
+        final @NotNull TestSetPackageNode legacy = disk.testSetPackage(web, "Legacy");
         aTestCase(disk.testSet(web, "Checkout"), "pay with a saved card");
         aTestCase(disk.testSet(mobile, "Checkout"), "pay with a wallet");
         aTestCase(disk.testSet(legacy, "Refunds"), "refund a cancelled order");
@@ -269,7 +269,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
     // UC-SHARE-002, Rule-SHARE-014
     public void testATestSetHoldingNoTestCasesProducesNoSheet() {
         final @NotNull NodesOnDisk disk = new NodesOnDisk(getProject());
-        final @NotNull TestSetPackageDirectoryDto payments = disk.testSetPackage(testProject.getTestCasesDirectory(), "Payments");
+        final @NotNull TestSetPackageNode payments = disk.testSetPackage(testProject.getTestCasesFolder(), "Payments");
         aTestCase(disk.testSet(payments, "Checkout"), "pay with a saved card");
         disk.testSet(payments, "Empty");
 
@@ -278,7 +278,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-002, Rule-SHARE-015
     public void testAnUnreadableTestCaseIsNamedBeforeTheExportAndTheTesterChoosesToGoOn() {
-        final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesFolder(), "Login");
         aTestCase(login, "log in with a valid user");
         final @NotNull String broken = UUID.randomUUID() + ".tc";
         write(login.getPath().resolve(broken), "{ this is not a test case");

@@ -27,15 +27,15 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.creator.CreateTreeNodeAction;
 import org.testin.explorer.tree.UpdateStatusAction;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.status.TestRunStatus;
 import org.testin.model.status.TestSetStatus;
 import org.testin.open.OpenAction;
@@ -50,18 +50,18 @@ import java.util.Objects;
 
 public class TreeMenuIdeTest extends BasePlatformTestCase {
 
-    private static @NotNull List<DirectoryDto> everyKind() {
-        return List.of(new TestProjectDirectoryDto(), new TestCasesMainDirectoryDto(), new TestRunsMainDirectoryDto(),
-                new TestSetPackageDirectoryDto(), new TestRunPackageDirectoryDto(), new TestSetDirectoryDto(), aTestRunIn(TestRunStatus.CREATED));
+    private static @NotNull List<Node> everyKind() {
+        return List.of(new TestProjectNode(), new TestCasesFolderNode(), new TestRunsFolderNode(),
+                new TestSetPackageNode(), new TestRunPackageNode(), new TestSetNode(), aTestRunIn(TestRunStatus.CREATED));
     }
 
-    private static @NotNull TestRunDirectoryDto aTestRunIn(final @NotNull TestRunStatus status) {
-        final @NotNull TestRunDirectoryDto testRun = new TestRunDirectoryDto();
+    private static @NotNull TestRunNode aTestRunIn(final @NotNull TestRunStatus status) {
+        final @NotNull TestRunNode testRun = new TestRunNode();
         testRun.getMarker().changeStatus(status);
         return testRun;
     }
 
-    private static @NotNull String kindOf(final @NotNull DirectoryDto node) {
+    private static @NotNull String kindOf(final @NotNull Node node) {
         return node.getType().getDescription();
     }
 
@@ -69,7 +69,7 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
         return Objects.requireNonNullElse(shown.getDescription(), "");
     }
 
-    private @NotNull Presentation updated(final @NotNull AnAction action, final @NotNull List<DirectoryDto> selected) {
+    private @NotNull Presentation updated(final @NotNull AnAction action, final @NotNull List<Node> selected) {
         final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action, SimpleDataContext.builder()
                 .add(CommonDataKeys.PROJECT, getProject())
                 .add(TestinData.SELECTED_NODES, selected)
@@ -78,7 +78,7 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
         return e.getPresentation();
     }
 
-    private @NotNull Presentation updated(final @NotNull AnAction action, final @NotNull DirectoryDto selected) {
+    private @NotNull Presentation updated(final @NotNull AnAction action, final @NotNull Node selected) {
         return updated(action, List.of(selected));
     }
 
@@ -89,8 +89,8 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
 
     // Rule-TREE-PANEL-058
     public void testTheTestProjectAndTheTwoContainersCannotBeOrdered() {
-        for (final DirectoryDto node : everyKind()) {
-            final boolean fixed = node instanceof TestProjectDirectoryDto || node instanceof TestCasesMainDirectoryDto || node instanceof TestRunsMainDirectoryDto;
+        for (final Node node : everyKind()) {
+            final boolean fixed = node instanceof TestProjectNode || node instanceof TestCasesFolderNode || node instanceof TestRunsFolderNode;
 
             assertEquals("Order on " + kindOf(node), !fixed, updated(new OrderNodeAction(), node).isEnabled());
         }
@@ -115,25 +115,25 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
 
     // Rule-TREE-PANEL-096, Rule-TREE-PANEL-025
     public void testCreateIsGrayOnANodeThatCannotHoldOneAndNamesTheKindsThatCan() {
-        for (final DirectoryDto node : everyKind()) {
+        for (final Node node : everyKind()) {
             final @NotNull Presentation shown = updated(new CreateTreeNodeAction(), node);
-            final boolean holdsNewNodes = node instanceof TestCasesMainDirectoryDto || node instanceof TestRunsMainDirectoryDto
-                    || node instanceof TestSetPackageDirectoryDto || node instanceof TestRunPackageDirectoryDto;
+            final boolean holdsNewNodes = node instanceof TestCasesFolderNode || node instanceof TestRunsFolderNode
+                    || node instanceof TestSetPackageNode || node instanceof TestRunPackageNode;
 
             assertEquals("Create Testin Node on " + kindOf(node), holdsNewNodes, shown.isEnabled());
             if (holdsNewNodes) continue;
 
-            assertTrue("Create Testin Node on " + kindOf(node) + " does not name " + DirectoryType.TSP.getDescription() + ": " + said(shown),
-                    said(shown).contains(DirectoryType.TSP.getDescription()));
-            assertTrue("Create Testin Node on " + kindOf(node) + " does not name " + DirectoryType.TRP.getDescription() + ": " + said(shown),
-                    said(shown).contains(DirectoryType.TRP.getDescription()));
+            assertTrue("Create Testin Node on " + kindOf(node) + " does not name " + NodeType.TSP.getDescription() + ": " + said(shown),
+                    said(shown).contains(NodeType.TSP.getDescription()));
+            assertTrue("Create Testin Node on " + kindOf(node) + " does not name " + NodeType.TRP.getDescription() + ": " + said(shown),
+                    said(shown).contains(NodeType.TRP.getDescription()));
         }
     }
 
     // Rule-TREE-PANEL-022
     public void testOnlyATestSetAndATestRunOffersToOpen() {
-        for (final DirectoryDto node : everyKind()) {
-            final boolean opens = node instanceof TestSetDirectoryDto || node instanceof TestRunDirectoryDto;
+        for (final Node node : everyKind()) {
+            final boolean opens = node instanceof TestSetNode || node instanceof TestRunNode;
 
             assertEquals("Open on " + kindOf(node), opens, updated(new OpenAction(), node).isEnabled());
         }
@@ -141,35 +141,35 @@ public class TreeMenuIdeTest extends BasePlatformTestCase {
 
     // Rule-TREE-PANEL-042
     public void testTheTwoContainersAreNeverOfferedForRemoval() {
-        for (final DirectoryDto container : List.of(new TestCasesMainDirectoryDto(), new TestRunsMainDirectoryDto())) {
+        for (final Node container : List.of(new TestCasesFolderNode(), new TestRunsFolderNode())) {
             assertGrayWithAReason("Remove on " + kindOf(container), updated(new RemoveAction(), container));
         }
 
-        assertGrayWithAReason("Remove on both containers", updated(new RemoveAction(), List.of(new TestCasesMainDirectoryDto(), new TestRunsMainDirectoryDto())));
+        assertGrayWithAReason("Remove on both containers", updated(new RemoveAction(), List.of(new TestCasesFolderNode(), new TestRunsFolderNode())));
     }
 
     // Rule-TREE-PANEL-065
     public void testAStatusIsSetOnOneNodeAndTheCurrentOneIsGray() {
-        final @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+        final @NotNull TestSetNode testSet = new TestSetNode();
 
         assertGrayWithAReason("Active on an active test set", updated(new UpdateStatusAction(TestSetStatus.ACTIVE), testSet));
         assertTrue("the status a test set has is not shown", updated(new UpdateStatusAction(TestSetStatus.ACTIVE), testSet).isVisible());
         assertTrue("Deprecated is gray on an active test set", updated(new UpdateStatusAction(TestSetStatus.DEPRECATED), testSet).isEnabled());
 
         assertFalse("a status was offered for two nodes at once",
-                updated(new UpdateStatusAction(TestSetStatus.DEPRECATED), List.of(testSet, new TestSetDirectoryDto())).isEnabled());
+                updated(new UpdateStatusAction(TestSetStatus.DEPRECATED), List.of(testSet, new TestSetNode())).isEnabled());
     }
 
     // Rule-TREE-PANEL-104
     public void testAnEntryThatCannotWorkIsGrayAndSaysWhy() {
-        final @NotNull TestRunDirectoryDto signedOff = aTestRunIn(TestRunStatus.CLOSED);
+        final @NotNull TestRunNode signedOff = aTestRunIn(TestRunStatus.CLOSED);
 
-        assertGrayWithAReason("Order on Test Cases", updated(new OrderNodeAction(), new TestCasesMainDirectoryDto()));
-        assertGrayWithAReason("Rename on Test Runs", updated(new RenameAction(), new TestRunsMainDirectoryDto()));
+        assertGrayWithAReason("Order on Test Cases", updated(new OrderNodeAction(), new TestCasesFolderNode()));
+        assertGrayWithAReason("Rename on Test Runs", updated(new RenameAction(), new TestRunsFolderNode()));
         assertGrayWithAReason("Rename on a closed test run", updated(new RenameAction(), signedOff));
-        assertGrayWithAReason("Remove on Test Cases", updated(new RemoveAction(), new TestCasesMainDirectoryDto()));
+        assertGrayWithAReason("Remove on Test Cases", updated(new RemoveAction(), new TestCasesFolderNode()));
         assertGrayWithAReason("Edit on a closed test run", updated(new EditTestRunAction(), signedOff));
-        assertGrayWithAReason("Re-create on a test set", updated(new ReCreateTestRunAction(), new TestSetDirectoryDto()));
-        assertGrayWithAReason("Create Testin Node on a test set", updated(new CreateTreeNodeAction(), new TestSetDirectoryDto()));
+        assertGrayWithAReason("Re-create on a test set", updated(new ReCreateTestRunAction(), new TestSetNode()));
+        assertGrayWithAReason("Create Testin Node on a test set", updated(new CreateTreeNodeAction(), new TestSetNode()));
     }
 }

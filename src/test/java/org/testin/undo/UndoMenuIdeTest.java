@@ -26,14 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 import org.testin.view.Drawn;
@@ -45,7 +45,7 @@ public class UndoMenuIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull String testerBefore = "";
 
-    private static @NotNull AnAction entry(final @NotNull TestCaseEditor editor, final @NotNull UndoDirection direction) {
+    private static @NotNull AnAction entry(final @NotNull TestSetEditor editor, final @NotNull UndoDirection direction) {
         return ActionUtil.getActions(editor.getList()).stream()
                 .filter(UndoAction.class::isInstance)
                 .filter(action -> direction.getTitle().equals(action.getTemplatePresentation().getText()))
@@ -62,12 +62,12 @@ public class UndoMenuIdeTest extends AbstractTempRootIdeTest {
         return Objects.toString(updated(action).getPresentation().getText(), "");
     }
 
-    private static void typeSignInAsTheDescription(final @NotNull TestCaseEditor editor) {
+    private static void typeSignInAsTheDescription(final @NotNull TestSetEditor editor) {
         editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         final @NotNull JBTable grid = Drawn.components(editor.getComponent()).stream().filter(JBTable.class::isInstance).map(JBTable.class::cast).findFirst().orElseThrow();
 
-        assertTrue(grid.editCellAt(0, grid.convertColumnIndexToView(TestCaseEditorAttributes.DESCRIPTION.column())));
+        assertTrue(grid.editCellAt(0, grid.convertColumnIndexToView(TestSetEditorAttributes.DESCRIPTION.column())));
         ((JTextComponent) grid.getEditorComponent()).setText("Sign in");
         assertTrue(grid.getCellEditor().stopCellEditing());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -92,11 +92,11 @@ public class UndoMenuIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-067, Rule-EDITOR-PANEL-071, Rule-EDITOR-PANEL-068
     public void testTheEntriesSayWhatTheNextPressWouldTakeOrPutBackAndUndoIsExact() {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         final @NotNull TestCaseDto tc = EditorFixtures.testCase(getProject(), ts, "Log in", "m");
         final @NotNull Mapper mapper = Services.getInstance(getProject(), Mapper.class);
         final @NotNull String original = mapper.writeValueAsString(theTestCases().findTestCase(tc.getId()).orElseThrow());
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
         final @NotNull AnAction undo = entry(editor, UndoDirection.UNDO);
         final @NotNull AnAction redo = entry(editor, UndoDirection.REDO);
         final @NotNull String named = Bundle.message("snapshot.undo.one", Bundle.message("snapshot.verb.edit"), "Sign in");

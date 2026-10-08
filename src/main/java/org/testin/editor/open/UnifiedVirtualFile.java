@@ -20,18 +20,18 @@ import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
 
 @Getter
 public class UnifiedVirtualFile extends LightVirtualFile {
     private static final @NotNull String PROTOCOL = "testin";
 
-    private final @NotNull DirectoryDto dir;
+    private final @NotNull Node dir;
     private final @NotNull EditorKind kind;
 
-    public UnifiedVirtualFile(final @NotNull DirectoryDto dir) {
+    public UnifiedVirtualFile(final @NotNull Node dir) {
         super(dir.getName());
         this.dir = dir;
         this.kind = EditorKind.of(dir);
@@ -54,11 +54,11 @@ public class UnifiedVirtualFile extends LightVirtualFile {
         return dir.getPath().toAbsolutePath().toString();
     }
 
-    public @NotNull TestSetDirectoryDto getTestSet() {
-        return (TestSetDirectoryDto) dir;
+    public @NotNull TestSetNode getTestSet() {
+        return (TestSetNode) dir;
     }
 
-    public @NotNull TestRunDirectoryDto getTestRun() {
-        return (TestRunDirectoryDto) dir;
+    public @NotNull TestRunNode getTestRun() {
+        return (TestRunNode) dir;
     }
 }

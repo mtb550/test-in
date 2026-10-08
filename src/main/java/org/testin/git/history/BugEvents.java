@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.change.FieldChange;
 import org.testin.git.change.RunItemChangeComparator;
-import org.testin.model.result.FailureDetail;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.FailureDetail;
+import org.testin.model.testrun.RunItem;
 import org.testin.testrun.TestRunEditorAttributes;
 
 import java.nio.file.Path;
@@ -42,12 +42,12 @@ final class BugEvents {
     ).map(TestRunEditorAttributes::getName).collect(Collectors.toUnmodifiableSet());
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-106, Rule-VIEW-PANEL-108
-    static @NotNull Optional<BugEvent> between(final @NotNull Path testRun, final @NotNull Optional<TestRunItems> before, final @NotNull Optional<TestRunItems> after) {
-        final @NotNull Optional<TestRunItems> bugBefore = before.filter(FailureDetail::recordsABug);
-        final @NotNull Optional<TestRunItems> bugAfter = after.filter(FailureDetail::recordsABug);
+    static @NotNull Optional<BugEvent> between(final @NotNull Path testRun, final @NotNull Optional<RunItem> before, final @NotNull Optional<RunItem> after) {
+        final @NotNull Optional<RunItem> bugBefore = before.filter(FailureDetail::recordsABug);
+        final @NotNull Optional<RunItem> bugAfter = after.filter(FailureDetail::recordsABug);
 
         if (bugBefore.isEmpty())
-            return bugAfter.map(item -> new BugEvent(BugEventKind.RECORDED, testRun, item, List.of()));
+            return bugAfter.map(runItem -> new BugEvent(BugEventKind.RECORDED, testRun, runItem, List.of()));
         if (after.isEmpty())
             return Optional.of(new BugEvent(BugEventKind.REMOVED, testRun, bugBefore.orElseThrow(), List.of()));
         if (bugAfter.isEmpty())

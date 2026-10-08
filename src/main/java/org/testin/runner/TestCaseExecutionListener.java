@@ -19,7 +19,7 @@ package org.testin.runner;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.Failure;
+import org.testin.model.testrun.Failure;
 import org.testin.model.status.ExecutionStatus;
 
 import java.time.Duration;

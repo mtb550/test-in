@@ -29,13 +29,13 @@ import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
-import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.testrun.failure.FailureDetailDialog;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
@@ -69,7 +69,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialog.close(getProject(), FailedResultDialog.class);
+        ShownDialog.close(getProject(), FailureDetailDialog.class);
         super.tearDown();
     }
 
@@ -94,7 +94,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
 
             fixture.press(editor, RunItemStatus.PASSED);
 
-            final @NotNull TestRunItems recorded = fixture.resultOf(fixture.testCases().getFirst());
+            final @NotNull RunItem recorded = fixture.runItemOf(fixture.testCases().getFirst());
             assertEquals(RunItemStatus.PASSED, recorded.getStatus());
             assertTrue("the time the walk counted was not recorded with the run item status: " + recorded.getDuration(), recorded.getDuration().compareTo(Duration.ofMillis(1400)) >= 0);
         } finally {
@@ -147,7 +147,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
             fixture.press(editor, RunItemStatus.BLOCKED);
 
             assertTrue("Blocked asked for an explanation", fixture.failureDialog().isEmpty());
-            final @NotNull TestRunItems blocked = fixture.resultOf(fixture.testCases().getFirst());
+            final @NotNull RunItem blocked = fixture.runItemOf(fixture.testCases().getFirst());
             assertEquals(RunItemStatus.BLOCKED, blocked.getStatus());
             assertEquals("Blocked does not say who attempted it", Services.getInstance(getProject(), AppSettingsState.class).testerName, blocked.getExecutedBy());
             assertFalse("Blocked does not say when it was attempted", Config.isNotExecuted(blocked.getExecutedAt()));
@@ -204,7 +204,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
 
             assertTrue("Escape did not close the dialog at once", fixture.failureDialog().isEmpty());
             assertFalse("Escape asked before closing", ShownDialog.isOpen(getProject(), ConfirmDialog.class));
-            final @NotNull TestRunItems kept = fixture.resultOf(fixture.testCases().getFirst());
+            final @NotNull RunItem kept = fixture.runItemOf(fixture.testCases().getFirst());
             assertEquals("Escape recorded a run item status", RunItemStatus.PENDING, kept.getStatus());
             assertEquals("Escape recorded the detail", "", kept.getActualResult());
             awaitWrites();
@@ -230,13 +230,13 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
             awaitWrites();
 
             assertEquals("typing wrote to the test run", before, FilesUnder.snapshot(fixture.testRun().getPath()));
-            assertEquals("typing changed the test run Testin holds", "", fixture.resultOf(fixture.testCases().getFirst()).getActualResult());
+            assertEquals("typing changed the test run Testin holds", "", fixture.runItemOf(fixture.testCases().getFirst()).getActualResult());
 
             OnScreen.pressKey(dialog, Shortcuts.Enter.getKey());
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             awaitWrites();
 
-            final @NotNull TestRunItems saved = fixture.resultOf(fixture.testCases().getFirst());
+            final @NotNull RunItem saved = fixture.runItemOf(fixture.testCases().getFirst());
             assertEquals("The dashboard stayed blank", saved.getActualResult());
             assertEquals("java.lang.AssertionError: expected [true]", saved.getStacktrace());
             assertNotEquals("saving wrote nothing", before, FilesUnder.snapshot(fixture.testRun().getPath()));
@@ -256,7 +256,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
 
             assertTrue("failing several opened the failure dialog", fixture.failureDialog().isEmpty());
             for (final TestCaseDto tc : List.of(fixture.testCases().get(0), fixture.testCases().get(2))) {
-                final @NotNull TestRunItems failed = fixture.resultOf(tc);
+                final @NotNull RunItem failed = fixture.runItemOf(tc);
                 assertEquals(RunItemStatus.FAILED, failed.getStatus());
                 assertEquals("a test case failed with several was given detail", "", failed.getActualResult());
             }

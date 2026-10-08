@@ -26,7 +26,7 @@ import org.testin.actions.TestinData;
 import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -41,7 +41,7 @@ import java.util.Optional;
 // UC-TREE-PANEL-011
 public class RenameAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111
-    private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull Node dir) {
         if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
         if (Services.getInstance(p, TestinEditors.class).busyUnder(dir))
             return Optional.of(Bundle.message("rename.disabled.busy"));
@@ -58,7 +58,7 @@ public class RenameAction extends AbstractAnyProjectAction {
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-004
-    private void renameNode(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+    private void renameNode(final @NotNull Project p, final @NotNull Node dir, final @NotNull String newName) {
         if (newName.isBlank() || newName.equals(dir.getName())) return;
 
         if (Optional.ofNullable(dir.getPath().getParent()).isEmpty()) {
@@ -86,13 +86,13 @@ public class RenameAction extends AbstractAnyProjectAction {
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-037
     private boolean applyRename(final @NotNull Project p, final @NotNull Path path, final @NotNull String newName) {
-        final @NotNull Optional<DirectoryDto> node = Services.getInstance(p, Nodes.class).find(path);
+        final @NotNull Optional<Node> node = Services.getInstance(p, Nodes.class).find(path);
         if (node.isEmpty()) {
             Logger.warn("Nothing to rename at " + path + ", so the step is refused");
             return false;
         }
 
-        final @NotNull DirectoryDto dir = node.orElseThrow();
+        final @NotNull Node dir = node.orElseThrow();
         if (NodeRename.refused(p, dir, newName)) return false;
 
         NodeRename.apply(p, dir, newName, () -> {

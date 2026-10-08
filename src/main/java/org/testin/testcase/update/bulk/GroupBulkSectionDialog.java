@@ -43,7 +43,7 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected @NotNull List<List<String>> extractOriginalValues(final @NotNull List<TestCaseDto> items) {
-        return items.stream().map(tc -> (List<String>) new ArrayList<>(tc.getGroup())).toList();
+        return items.stream().map(tc -> (List<String>) new ArrayList<>(tc.getGroups())).toList();
     }
 
     // UC-EDITOR-PANEL-007
@@ -52,7 +52,7 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
         final @NotNull List<TestCaseDto> written = new ArrayList<>();
 
         for (int i = 0; i < items.size(); i++) {
-            written.add(items.get(i).edit().group(Groups.read(String.join(",", newValues.get(i)))).build());
+            written.add(items.get(i).edit().groups(Groups.read(String.join(",", newValues.get(i)))).build());
         }
 
         return written;

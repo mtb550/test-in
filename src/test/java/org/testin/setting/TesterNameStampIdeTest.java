@@ -19,12 +19,12 @@ package org.testin.setting;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 
 import java.util.UUID;
@@ -43,33 +43,33 @@ public class TesterNameStampIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull TestSetDirectoryDto loginTestSet() {
+    private @NotNull TestSetNode loginTestSet() {
         return WriteAction.computeAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+            final @NotNull NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
 
-            final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
+            final @NotNull TestProjectNode tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes.addTestProject(tp);
 
-            final @NotNull TestSetDirectoryDto set = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final @NotNull TestSetNode set = mapper.getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Login"), tp.getTestCasesFolder());
             nodes.addTestSet(set);
             return set;
         });
     }
 
-    private @NotNull TestCaseDto aTestCaseIn(final @NotNull TestSetDirectoryDto ts) {
+    private @NotNull TestCaseDto aTestCaseIn(final @NotNull TestSetNode ts) {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
         return tc;
     }
 
-    private void put(final @NotNull TestSetDirectoryDto ts, final @NotNull TestCaseDto tc) {
+    private void put(final @NotNull TestSetNode ts, final @NotNull TestCaseDto tc) {
         assertTrue("the test case was not written", Services.getInstance(getProject(), TestCases.class).putTestCase(ts.getPath(), tc));
     }
 
     // Rule-SETTING-018
     public void testTheNameIsReadAtTheMomentItIsStamped() {
-        final @NotNull TestSetDirectoryDto ts = loginTestSet();
+        final @NotNull TestSetNode ts = loginTestSet();
         final @NotNull TestCaseDto tc = aTestCaseIn(ts);
 
         asTester("Sara", () -> put(ts, tc));
@@ -83,7 +83,7 @@ public class TesterNameStampIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-019
     public void testAnEmptyNameWritesNoName() {
-        final @NotNull TestSetDirectoryDto ts = loginTestSet();
+        final @NotNull TestSetNode ts = loginTestSet();
         final @NotNull TestCaseDto tc = aTestCaseIn(ts);
 
         asTester("", () -> put(ts, tc));

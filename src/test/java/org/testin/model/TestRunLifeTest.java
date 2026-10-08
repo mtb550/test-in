@@ -18,9 +18,10 @@ package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
+import org.testin.model.testrun.RunItems;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -45,9 +46,9 @@ public class TestRunLifeTest {
 
         assertEquals(new TestRunMarker().getStatus(), TestRunStatus.CREATED, "a new test run does not start as Created");
 
-        final @NotNull TestRunDto testRun = new TestRunDto().coverOnly(chosen);
-        assertEquals(testRun.getResults().stream().map(TestRunItems::getId).toList(), List.copyOf(chosen));
-        assertEquals(testRun.getResults().stream().map(TestRunItems::getStatus).distinct().toList(), List.of(RunItemStatus.PENDING),
+        final @NotNull RunItems runItems = new RunItems().coverOnly(chosen);
+        assertEquals(runItems.getAll().stream().map(RunItem::getId).toList(), List.copyOf(chosen));
+        assertEquals(runItems.getAll().stream().map(RunItem::getStatus).distinct().toList(), List.of(RunItemStatus.PENDING),
                 "a test case in a new test run does not start Pending");
     }
 

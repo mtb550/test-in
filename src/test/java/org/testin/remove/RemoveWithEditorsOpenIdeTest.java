@@ -25,10 +25,10 @@ import org.testin.Said;
 import org.testin.TempTree;
 import org.testin.TreeGesture;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     private final @NotNull Map<String, Boolean> cancelableByTitle = new ConcurrentHashMap<>();
-    private TestProjectDirectoryDto tp;
+    private TestProjectNode tp;
     private @NotNull String cancelTheOneTitled = "";
 
     private boolean isCancelable(final @NotNull String title) {
@@ -79,20 +79,20 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
         return Services.getInstance(getProject(), UndoHistories.class);
     }
 
-    private @NotNull TestSetDirectoryDto aTestSet(final @NotNull DirectoryDto parent, final @NotNull String name) {
+    private @NotNull TestSetNode aTestSet(final @NotNull Node parent, final @NotNull String name) {
         return new NodesOnDisk(getProject()).testSet(parent, name);
     }
 
-    private void removedAndConfirmed(final @NotNull DirectoryDto node) {
+    private void removedAndConfirmed(final @NotNull Node node) {
         TreeGesture.pressed(getProject(), new RemoveAction(), List.of(node));
         ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
     }
 
     // Rule-TREE-PANEL-116
     public void testARemovalClosesEveryEditorOnTheNodeAndUnderIt() {
-        final @NotNull TestSetPackageDirectoryDto payments = new NodesOnDisk(getProject()).testSetPackage(tp.getTestCasesDirectory(), "Payments");
-        final @NotNull TestSetDirectoryDto card = aTestSet(payments, "Card");
-        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetPackageNode payments = new NodesOnDisk(getProject()).testSetPackage(tp.getTestCasesFolder(), "Payments");
+        final @NotNull TestSetNode card = aTestSet(payments, "Card");
+        final @NotNull TestSetNode login = aTestSet(tp.getTestCasesFolder(), "Login");
         opened(card);
         opened(login);
 
@@ -105,7 +105,7 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     // Rule-TREE-PANEL-102
     public void testCancelingTheCopyRemovesNothingAndClosesNoEditor() {
-        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = aTestSet(tp.getTestCasesFolder(), "Login");
         opened(login);
         cancelTheOneTitled = Bundle.message("remove.progress");
 
@@ -120,7 +120,7 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     // Rule-TREE-PANEL-102
     public void testKeepingTheCopyCanBeCanceledAndPuttingItBackCannot() {
-        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetNode login = aTestSet(tp.getTestCasesFolder(), "Login");
 
         removedAndConfirmed(login);
         Await.until("the test set was not removed", () -> undoHistories().canUndo(UndoScope.TREE));
@@ -133,8 +133,8 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     // Rule-TREE-PANEL-041
     public void testANodeThatCouldNotBeKeptIsRemovedAndSaysItCannotBeUndone() {
-        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
-        final @NotNull TestSetDirectoryDto checkout = aTestSet(tp.getTestCasesDirectory(), "Checkout");
+        final @NotNull TestSetNode login = aTestSet(tp.getTestCasesFolder(), "Login");
+        final @NotNull TestSetNode checkout = aTestSet(tp.getTestCasesFolder(), "Checkout");
         removedAndConfirmed(login);
         Await.until("the first test set was not removed", () -> !nodes().nodeExists(login.getPath()) && undoHistories().canUndo(UndoScope.TREE));
         TempTree.delete(checkout.getPath());

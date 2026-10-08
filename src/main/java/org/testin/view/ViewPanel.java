@@ -32,7 +32,7 @@ import org.testin.editor.WheelForwarding;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.ProjectLifetime;
 import org.testin.services.Services;
@@ -206,7 +206,7 @@ public class ViewPanel implements Disposable {
     // Rule-VIEW-PANEL-005
     public void refreshIfShowing(final @NotNull Collection<TestCaseDto> updated) {
         getCurrentTestCase()
-                .filter(current -> updated.stream().anyMatch(item -> item.getId().equals(current.getId())))
+                .filter(current -> updated.stream().anyMatch(testCase -> testCase.getId().equals(current.getId())))
                 .ifPresent(_ -> refreshCurrentView());
     }
 
@@ -216,7 +216,7 @@ public class ViewPanel implements Disposable {
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
     @NotNull Optional<TestCaseDto> shownTestCase() {
-        return getCurrentTestCase().map(shown -> shownRunItem().map(TestRunItems::shownTestCase).orElseGet(() -> liveOf(shown)));
+        return getCurrentTestCase().map(shown -> shownRunItem().map(RunItem::shownTestCase).orElseGet(() -> liveOf(shown)));
     }
 
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-112
@@ -229,12 +229,12 @@ public class ViewPanel implements Disposable {
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
-    @NotNull Optional<TestRunItems> shownRunItem() {
+    @NotNull Optional<RunItem> shownRunItem() {
         final @NotNull List<String> path = page.getCurrentPath();
         if (path.isEmpty()) return Optional.empty();
 
-        return getCurrentTestCase().flatMap(shown -> testRuns.findTestRun(testinRoot.resolve(path))
-                .flatMap(testRun -> testRun.resultOf(shown.getId())));
+        return getCurrentTestCase().flatMap(shown -> testRuns.findRunItems(testinRoot.resolve(path))
+                .flatMap(testRun -> testRun.runItemOf(shown.getId())));
     }
 
     // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-012

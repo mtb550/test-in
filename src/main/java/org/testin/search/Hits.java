@@ -24,11 +24,11 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestRunNode;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,7 +46,7 @@ public final class Hits {
     public static @NotNull Found forQuery(final @NotNull Project p, final @NotNull String query) {
         final @NotNull String wanted = query.trim().toLowerCase(Locale.ROOT);
 
-        final @NotNull List<DirectoryDto> nodes = wanted.isEmpty() ? everywhereToGo(p) : nodesNamed(p, wanted);
+        final @NotNull List<Node> nodes = wanted.isEmpty() ? everywhereToGo(p) : nodesNamed(p, wanted);
         final @NotNull List<TestCaseDto> testCases = testCasesMatching(p, wanted);
 
         final @NotNull List<Hit> inTestRuns = inTestRuns(p, testCases);
@@ -58,14 +58,14 @@ public final class Hits {
         return new Found(List.copyOf(found), nodes.size() + testCases.size() + inTestRuns.size());
     }
 
-    private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull Project p) {
+    private static @NotNull List<Node> everywhereToGo(final @NotNull Project p) {
         return Services.getInstance(p, Nodes.class).getAllNodes().stream()
-                .filter(DirectoryDto::isOpenableInEditor)
+                .filter(Node::isOpenableInEditor)
                 .sorted(Hits::inTreeOrder)
                 .toList();
     }
 
-    private static @NotNull List<DirectoryDto> nodesNamed(final @NotNull Project p, final @NotNull String wanted) {
+    private static @NotNull List<Node> nodesNamed(final @NotNull Project p, final @NotNull String wanted) {
         return Services.getInstance(p, Nodes.class).getAllNodes().stream()
                 .filter(node -> contains(node.getName(), wanted))
                 .sorted(Hits::byClosestName)
@@ -76,7 +76,7 @@ public final class Hits {
         if (tooShort(wanted)) return List.of();
 
         return Services.getInstance(p, TestCases.class).getAllTestCases().stream()
-                .filter(tc -> TestCaseEditorAttributes.anyContains(tc, wanted))
+                .filter(tc -> TestSetEditorAttributes.anyContains(tc, wanted))
                 .toList();
     }
 
@@ -87,10 +87,10 @@ public final class Hits {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull List<Hit> rows = new ArrayList<>();
 
-        for (final DirectoryDto node : Services.getInstance(p, Nodes.class).getAllNodes()) {
-            if (!(node instanceof TestRunDirectoryDto)) continue;
+        for (final Node node : Services.getInstance(p, Nodes.class).getAllNodes()) {
+            if (!(node instanceof TestRunNode)) continue;
 
-            final @NotNull Optional<TestRunDto> recorded = testRuns.findTestRun(node.getPath());
+            final @NotNull Optional<RunItems> recorded = testRuns.findRunItems(node.getPath());
             if (recorded.isEmpty()) continue;
 
             final @NotNull Set<UUID> covered = recorded.orElseThrow().coveredIds();
@@ -118,7 +118,7 @@ public final class Hits {
         return wanted.trim().length() < 2;
     }
 
-    static int inTreeOrder(final @NotNull DirectoryDto one, final @NotNull DirectoryDto other) {
+    static int inTreeOrder(final @NotNull Node one, final @NotNull Node other) {
         final int byPlace = String.join(" > ", one.getPath2())
                 .compareToIgnoreCase(String.join(" > ", other.getPath2()));
 
@@ -129,7 +129,7 @@ public final class Hits {
         return value.toLowerCase(Locale.ROOT).contains(wanted.toLowerCase(Locale.ROOT));
     }
 
-    static int byClosestName(final @NotNull DirectoryDto one, final @NotNull DirectoryDto other) {
+    static int byClosestName(final @NotNull Node one, final @NotNull Node other) {
         final int byLength = Integer.compare(one.getName().length(), other.getName().length());
 
         return byLength != 0 ? byLength : one.getName().compareToIgnoreCase(other.getName());

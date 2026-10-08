@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.Said;
 import org.testin.clipboard.CutState;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
@@ -38,7 +38,7 @@ import static org.testin.view.Drawn.holds;
 
 public class PanelKeysIdeTest extends AbstractViewPanelIdeTest {
 
-    private TestSetDirectoryDto ts;
+    private TestSetNode ts;
     private List<TestCaseDto> testCases;
 
     private static @NotNull KeyStroke key(final @NotNull Shortcuts shortcut) {
@@ -130,8 +130,8 @@ public class PanelKeysIdeTest extends AbstractViewPanelIdeTest {
 
     // Rule-VIEW-PANEL-058
     public void testEscapeInTheEditorDropsTheCutThenClosesThePanelThenClearsTheSelection() {
-        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-        editor.onToolBarSwitchedToListView();
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
+        editor.onToolBarSwitchedToCardView();
         final @NotNull JBList<?> list = (JBList<?>) editor.getPreferredFocusedComponent();
         list.setSelectedIndex(0);
         settled();

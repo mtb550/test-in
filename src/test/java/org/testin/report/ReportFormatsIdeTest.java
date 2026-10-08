@@ -33,17 +33,17 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.importexport.FileTypes;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -75,9 +75,9 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     private String wasBound;
 
-    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+    private @NotNull TestProjectNode testProject = new TestProjectNode();
 
-    private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
+    private @NotNull TestSetNode login = new TestSetNode();
 
     private static @NotNull String withoutTags(final @NotNull String html) {
         return html.replaceAll("<[^>]+>", "");
@@ -99,8 +99,8 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), BoundTestProject.class);
     }
 
-    private @NotNull DirectoryMapper mapper() {
-        return Services.getInstance(getProject(), DirectoryMapper.class);
+    private @NotNull NodeMapper mapper() {
+        return Services.getInstance(getProject(), NodeMapper.class);
     }
 
     private @NotNull Nodes nodes() {
@@ -117,7 +117,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
             testProject = mapper().setTestProjectNode(root.resolve(TEST_PROJECT));
             nodes().addTestProject(testProject);
 
-            login = mapper().getTestSetNode(testProject.getTestCasesDirectory().getPath().resolve("Login"), testProject.getTestCasesDirectory());
+            login = mapper().getTestSetNode(testProject.getTestCasesFolder().getPath().resolve("Login"), testProject.getTestCasesFolder());
             nodes().addTestSet(login);
         });
 
@@ -137,40 +137,40 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(login.getPath(), tc);
     }
 
-    private @NotNull TestRunDirectoryDto aTestRun(final @NotNull String named, final @NotNull List<TestRunItems> results) {
-        final @NotNull TestRunDirectoryDto testRun = WriteAction.computeAndWait(() -> {
-            final @NotNull TestRunDirectoryDto dir = mapper().setTestRunNode(testProject.getTestRunsDirectory().getPath().resolve(named), testProject.getTestRunsDirectory());
-            nodes().addTestRunDir(dir);
+    private @NotNull TestRunNode aTestRun(final @NotNull String named, final @NotNull List<RunItem> runItems) {
+        final @NotNull TestRunNode testRun = WriteAction.computeAndWait(() -> {
+            final @NotNull TestRunNode dir = mapper().setTestRunNode(testProject.getTestRunsFolder().getPath().resolve(named), testProject.getTestRunsFolder());
+            nodes().addTestRunNode(dir);
             return dir;
         });
 
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(testRun.getPath(), new TestRunDto().setResults(new ArrayList<>(results)));
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(testRun.getPath(), new RunItems().setAll(new ArrayList<>(runItems)));
         return testRun;
     }
 
-    private @NotNull TestRunDirectoryDto theTestRun() {
+    private @NotNull TestRunNode theTestRun() {
         return aTestRun(TEST_RUN, List.of(
-                new TestRunItems().setId(opens).setStatus(RunItemStatus.PASSED),
-                new TestRunItems().setId(locks).setStatus(RunItemStatus.FAILED)
+                new RunItem().setId(opens).setStatus(RunItemStatus.PASSED),
+                new RunItem().setId(locks).setStatus(RunItemStatus.FAILED)
                         .setActualResult("The account\nstayed open")
                         .setStacktrace(STACKTRACE)
                         .setScreenshots(List.of(SCREENSHOT)),
-                new TestRunItems().setId(deleted).setStatus(RunItemStatus.PASSED)));
+                new RunItem().setId(deleted).setStatus(RunItemStatus.PASSED)));
     }
 
-    private @NotNull TestRunDto resultsOf(final @NotNull TestRunDirectoryDto testRun) {
-        return Services.getInstance(getProject(), TestRuns.class).getTestRunByPath(testRun.getPath());
+    private @NotNull RunItems resultsOf(final @NotNull TestRunNode testRun) {
+        return Services.getInstance(getProject(), TestRuns.class).getRunItems(testRun.getPath());
     }
 
-    private byte @NotNull [] report(final @NotNull FileTypes format, final @NotNull TestRunDirectoryDto testRun) {
+    private byte @NotNull [] report(final @NotNull FileTypes format, final @NotNull TestRunNode testRun) {
         return format.generateReport(getProject(), testRun, resultsOf(testRun));
     }
 
-    private @NotNull String html(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull String html(final @NotNull TestRunNode testRun) {
         return new String(report(FileTypes.HTML, testRun), StandardCharsets.UTF_8);
     }
 
-    private @NotNull String pdf(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull String pdf(final @NotNull TestRunNode testRun) {
         try (PdfDocument document = new PdfDocument(new PdfReader(new ByteArrayInputStream(report(FileTypes.PDF, testRun))))) {
             final @NotNull StringBuilder text = new StringBuilder();
             for (int page = 1; page <= document.getNumberOfPages(); page++)
@@ -181,7 +181,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull String word(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull String word(final @NotNull TestRunNode testRun) {
         try (XWPFWordExtractor extractor = new XWPFWordExtractor(new XWPFDocument(new ByteArrayInputStream(report(FileTypes.WORD, testRun))))) {
             return extractor.getText();
         } catch (final IOException ex) {
@@ -189,7 +189,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull List<List<List<String>>> sheets(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull List<List<List<String>>> sheets(final @NotNull TestRunNode testRun) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(report(FileTypes.XLSX, testRun)))) {
             final @NotNull DataFormatter formatter = new DataFormatter();
             final @NotNull List<List<List<String>>> sheets = new ArrayList<>();
@@ -209,7 +209,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull List<String> sheetNames(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull List<String> sheetNames(final @NotNull TestRunNode testRun) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(report(FileTypes.XLSX, testRun)))) {
             final @NotNull List<String> names = new ArrayList<>();
             for (final Sheet sheet : workbook) names.add(sheet.getSheetName());
@@ -219,7 +219,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull String excel(final @NotNull TestRunDirectoryDto testRun) {
+    private @NotNull String excel(final @NotNull TestRunNode testRun) {
         final @NotNull StringBuilder text = new StringBuilder();
         sheets(testRun).forEach(sheet -> sheet.forEach(row -> text.append(String.join("\t", row)).append('\n')));
         return text.toString();
@@ -227,8 +227,8 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-002
     public void testEveryFormatPrintsTheSameFigures() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
-        final @NotNull TestRunSummary summary = TestRunSummary.of(resultsOf(testRun).getResults());
+        final @NotNull TestRunNode testRun = theTestRun();
+        final @NotNull TestRunSummary summary = TestRunSummary.of(resultsOf(testRun).getAll());
         final @NotNull String figures = Bundle.message("report.summary.named", TEST_RUN, String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%");
 
         assertPrints("The web page", withoutTags(html(testRun)), figures);
@@ -239,7 +239,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-005
     public void testTheProjectNamedIsTheTestProject() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
         final @NotNull String codeProject = getProject().getName();
 
         for (final String report : List.of(html(testRun), pdf(testRun), word(testRun), excel(testRun))) {
@@ -250,7 +250,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-017
     public void testNoReportShowsAScreenshotAndOnlyTheWebPagePrintsTheError() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
         final @NotNull String html = html(testRun);
 
         assertPrints("The web page", html, STACKTRACE);
@@ -266,7 +266,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
     // Rule-REPORT-018
     public void testThePdfSaysWhatItCouldNotPrint() {
         aTestCase(opens, "سجل الدخول");
-        final @NotNull TestRunDirectoryDto testRun = aTestRun("Cycle-Arabic", List.of(new TestRunItems().setId(opens).setStatus(RunItemStatus.PASSED)));
+        final @NotNull TestRunNode testRun = aTestRun("Cycle-Arabic", List.of(new RunItem().setId(opens).setStatus(RunItemStatus.PASSED)));
 
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
@@ -277,7 +277,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-019
     public void testEveryFormatNamesTheColumnsTheSameWay() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
         final @NotNull List<String> words = List.of(Bundle.message("caption.test.case"), TestRunEditorAttributes.BUG_PRIORITY.getName(), TestRunEditorAttributes.BUG_SEVERITY.getName());
 
         for (final String column : words) {
@@ -293,18 +293,18 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-020
     public void testTheSpreadsheetHasAnOverviewSheetAndATestCasesSheet() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
 
         assertEquals(List.of(Bundle.message("report.excel.sheet.overview"), Bundle.message("report.excel.sheet.test.cases")), sheetNames(testRun));
 
         final @NotNull List<List<String>> testCases = sheets(testRun).get(1);
         assertEquals("the Test Cases sheet holds the column names and one row per test case, and nothing else",
-                resultsOf(testRun).getResults().size() + 1, testCases.size());
+                resultsOf(testRun).getAll().size() + 1, testCases.size());
     }
 
     // Rule-REPORT-021
     public void testADeletedTestCaseIsNamedAsTheTestRunNamesIt() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
         final @NotNull String named = Bundle.message("testcase.deleted", deleted);
 
         assertPrints("The web page", html(testRun), named);
@@ -315,7 +315,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-023
     public void testALineBreakTheTesterTypedStaysALineBreak() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
 
         for (final String report : List.of(pdf(testRun), word(testRun), excel(testRun))) {
             assertTrue("a description was run together onto one line", report.lines().anyMatch(line -> line.strip().endsWith("Open the app")));

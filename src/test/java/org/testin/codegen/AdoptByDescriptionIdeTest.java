@@ -23,7 +23,7 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class AdoptByDescriptionIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-095
     public void testAHandWrittenTestDescribedLikeTheTestCaseIsAdoptedNotDoubled() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull PsiClass written = generatedClass("nafath.LoginTest").orElseThrow();
         WriteCommandAction.runWriteCommandAction(getProject(), () -> {
             written.add(JavaPsiFacade.getElementFactory(getProject()).createMethodFromText(

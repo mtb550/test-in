@@ -18,10 +18,10 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.markers.TestProjectMarker;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 
@@ -42,20 +42,20 @@ public class MarkerWritesIdeTest extends AbstractReadTheRootIdeTest {
     }
 
     private @NotNull TestProjectMarker markerOf(final @NotNull Path testProject) {
-        return nodes().readMarker(testProject, DirectoryType.TP, TestProjectMarker.class);
+        return nodes().readMarker(testProject, NodeType.TP, TestProjectMarker.class);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-083
     public void testAMarkerThatWillNotParseIsNeverWrittenOver() {
         final @NotNull Path project = aTestProjectAt(root.resolve("Checkout"));
         final @NotNull Path testSet = theTestCasesOf(project).resolve("Login");
-        SyntheticTree.write(testSet.resolve(DirectoryType.TS.getMarker()), DAMAGED);
+        SyntheticTree.write(testSet.resolve(NodeType.TS.getMarker()), DAMAGED);
         indexer().scanSingleProject(project);
 
-        final @NotNull DirectoryDto drawn = nodes().find(testSet).orElseThrow();
+        final @NotNull Node drawn = nodes().find(testSet).orElseThrow();
         WriteAction.runAndWait(() -> nodes().persistMarker(drawn));
 
-        assertEquals("the marker that would not parse was written over with defaults", DAMAGED, read(testSet.resolve(DirectoryType.TS.getMarker())));
+        assertEquals("the marker that would not parse was written over with defaults", DAMAGED, read(testSet.resolve(NodeType.TS.getMarker())));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-083
@@ -65,8 +65,8 @@ public class MarkerWritesIdeTest extends AbstractReadTheRootIdeTest {
 
         try {
             settings().testerName = "";
-            final @NotNull TestProjectDirectoryDto tp = WriteAction.computeAndWait(() -> {
-                final @NotNull TestProjectDirectoryDto created = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(path);
+            final @NotNull TestProjectNode tp = WriteAction.computeAndWait(() -> {
+                final @NotNull TestProjectNode created = Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(path);
                 nodes().addTestProject(created);
                 return created;
             });

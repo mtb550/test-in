@@ -19,7 +19,7 @@ package org.testin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunNode;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -44,7 +44,7 @@ public enum FileKind {
     // Rule-INTERNAL-011
     public static @NotNull FileKind of(final @NotNull Path file) {
         final @NotNull String name = String.valueOf(file.getFileName());
-        if (DirectoryType.byMarker(name).isPresent()) return MARKER;
+        if (NodeType.byMarker(name).isPresent()) return MARKER;
         if (name.endsWith(TEST_CASE.extension)) return TEST_CASE;
         if (name.endsWith(RUN_ITEM.extension)) return RUN_ITEM;
 
@@ -52,11 +52,11 @@ public enum FileKind {
     }
 
     // Rule-INTERNAL-011
-    public static @NotNull FileKind of(final @NotNull Path file, final @NotNull DirectoryType folder) {
+    public static @NotNull FileKind of(final @NotNull Path file, final @NotNull NodeType folder) {
         final @NotNull FileKind byName = of(file);
         if (byName != OTHER) return byName;
 
-        return folder.holdsScreenshots() && TestRunDirectoryDto.isScreenshotName(String.valueOf(file.getFileName())) ? SCREENSHOT : OTHER;
+        return folder.holdsScreenshots() && TestRunNode.isScreenshotName(String.valueOf(file.getFileName())) ? SCREENSHOT : OTHER;
     }
 
     // Rule-INTERNAL-012

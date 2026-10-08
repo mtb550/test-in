@@ -18,7 +18,7 @@ package org.testin.bug;
 
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.util.Bundle;
 
 import java.util.HashMap;
@@ -27,44 +27,44 @@ import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
 public final class BugReports {
-    private final @NotNull Map<RunItem, Stage> onTheWay = new HashMap<>();
-    private final @NotNull Map<RunItem, Edits> unsent = new HashMap<>();
+    private final @NotNull Map<RunItemPath, Stage> onTheWay = new HashMap<>();
+    private final @NotNull Map<RunItemPath, Edits> unsent = new HashMap<>();
 
-    void begin(final @NotNull RunItem item) {
-        onTheWay.put(item, Stage.PREPARING);
+    void begin(final @NotNull RunItemPath runItemPath) {
+        onTheWay.put(runItemPath, Stage.PREPARING);
     }
 
-    void moveTo(final @NotNull RunItem item, final @NotNull Stage stage) {
-        onTheWay.replace(item, stage);
+    void moveTo(final @NotNull RunItemPath runItemPath, final @NotNull Stage stage) {
+        onTheWay.replace(runItemPath, stage);
     }
 
-    boolean end(final @NotNull RunItem item, final @NotNull Stage stage) {
-        return onTheWay.remove(item, stage);
+    boolean end(final @NotNull RunItemPath runItemPath, final @NotNull Stage stage) {
+        return onTheWay.remove(runItemPath, stage);
     }
 
-    boolean anotherIsOpen(final @NotNull RunItem item) {
-        return onTheWay.entrySet().stream().anyMatch(entry -> entry.getValue() == Stage.OPEN && !entry.getKey().equals(item));
+    boolean anotherIsOpen(final @NotNull RunItemPath runItemPath) {
+        return onTheWay.entrySet().stream().anyMatch(entry -> entry.getValue() == Stage.OPEN && !entry.getKey().equals(runItemPath));
     }
 
-    void keep(final @NotNull RunItem item, final @NotNull Edits edits) {
-        unsent.put(item, edits);
+    void keep(final @NotNull RunItemPath runItemPath, final @NotNull Edits edits) {
+        unsent.put(runItemPath, edits);
     }
 
-    @NotNull Optional<Edits> unsent(final @NotNull RunItem item) {
-        return Optional.ofNullable(unsent.get(item));
+    @NotNull Optional<Edits> unsent(final @NotNull RunItemPath runItemPath) {
+        return Optional.ofNullable(unsent.get(runItemPath));
     }
 
-    void discard(final @NotNull RunItem item) {
-        unsent.remove(item);
+    void discard(final @NotNull RunItemPath runItemPath) {
+        unsent.remove(runItemPath);
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-072
-    public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItem item, final @NotNull TestRunItems result) {
-        final @NotNull Optional<Stage> stage = Optional.ofNullable(onTheWay.get(item));
+    public @NotNull Optional<String> whyReportBugIsOff(final @NotNull RunItemPath runItemPath, final @NotNull RunItem runItem) {
+        final @NotNull Optional<Stage> stage = Optional.ofNullable(onTheWay.get(runItemPath));
         if (stage.isPresent()) return stage.map(Stage::getReason);
 
-        if (result.bugIssue().isPresent()) return Optional.of(Bundle.message("bug.already.reported"));
-        if (anotherIsOpen(item)) return Optional.of(Bundle.message("bug.finish.open.report"));
+        if (runItem.bugIssue().isPresent()) return Optional.of(Bundle.message("bug.already.reported"));
+        if (anotherIsOpen(runItemPath)) return Optional.of(Bundle.message("bug.finish.open.report"));
 
         return Optional.empty();
     }

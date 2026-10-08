@@ -52,7 +52,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   the Java plugin *and* a `testin.yml` naming the open test project. Without
 >   the file, nothing is generated and Testin says so once. See Decision-013 on
 >   [the decisions page](decisions.md).
-> - **A test run's results are one file per test case now**, named by the test
+> - **A test run's run items are one file per test case now**, named by the test
 >   case, beside the test run's own file. Section 4's tree is right about what
 >   exists and says nothing about the files. [The formats on disk](formats.md) is
 >   the contract.
@@ -179,7 +179,7 @@ Test Project
 └── Test Runs                 (fixed container)
     ├── Test Run Package      (can hold another package)
     └── Test Run
-        └── Test Run Result   (one per test case in the run)
+        └── Run Item          (one per test case in the run)
 ```
 
 | Thing                | What it is                                                                                                                                    | Notes                                                       |
@@ -192,11 +192,11 @@ Test Project
 | **Test Case**        | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority                                     | The only thing in the tree a tester writes                  |
 | **Test Run Package** | A folder that groups test runs. One package can hold another                                                                                  | Carries a status                                            |
 | **Test Run**         | One pass through a chosen set of test cases, at one moment                                                                                    | Carries a status. Holds one result per test case            |
-| **Test Run Result**  | What happened to one test case in one test run: run item status, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the test run, not to the test case               |
+| **Run Item**         | What happened to one test case in one test run: run item status, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the test run, not to the test case               |
 
-> **The difference that matters most.** A test case is the *question*. A test
-> run result is one *answer*, at one moment, by one person. A test case can be
-> in many test runs, and carry a different result in each. This is why deleting a test case does
+> **The difference that matters most.** A test case is the *question*. A
+> run item is one *answer*, at one moment, by one person. A test case can be
+> in many test runs, and carry a different run item in each. This is why deleting a test case does
 > not erase history. See **Rule-PRODUCT-007**.
 
 ---
@@ -269,7 +269,7 @@ anything in it is executed, however it was started.
 still takes run item statuses and corrections. **A Committed test run records
 nothing further** (Rule-PRODUCT-011): it becomes Committed when a commit takes it
 while it is Completed, and from then on each run item shows its test case as
-that commit holds it. Any result arriving from anywhere else is refused. The one
+that commit holds it. Any run item arriving from anywhere else is refused. The one
 thing it still takes is the bug issue a failed test case is reported as. That
 changes no run item status. (UC-VIEW-PANEL-016)
 
@@ -460,13 +460,13 @@ Numbered so an issue or a commit can cite one.
 
 ### Test runs and history
 
-| BR                   | Rule                                                                                                                                                                                                                                                                                   |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a test run has judged it does not change what the test run recorded.                                                                                            |
-| **Rule-PRODUCT-008** | A result is written into the test run the tester started, and no other. The same test case running in another test run does not affect this one.                                                                                                                                       |
-| **Rule-PRODUCT-009** | A test case may belong to any number of test runs and carry a different run item status in each. The run item status belongs to the test run.                                                                                                                                          |
-| **Rule-PRODUCT-010** | Every run item status records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                           |
-| **Rule-PRODUCT-011** | A Committed test run records nothing further: no run item status is given or corrected on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no run item status (UC-VIEW-PANEL-016). |
+| BR                   | Rule                                                                                                                                                                                                                                                                                     |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a test run has judged it does not change what the test run recorded.                                                                                              |
+| **Rule-PRODUCT-008** | A run item is written into the test run the tester started, and no other. The same test case running in another test run does not affect this one.                                                                                                                                       |
+| **Rule-PRODUCT-009** | A test case may belong to any number of test runs and carry a different run item status in each. The run item status belongs to the test run.                                                                                                                                            |
+| **Rule-PRODUCT-010** | Every run item status records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                             |
+| **Rule-PRODUCT-011** | A Committed test run records nothing further: no run item status is given or corrected on it and no run item arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no run item status (UC-VIEW-PANEL-016). |
 
 ### Run item statuses
 
@@ -511,7 +511,7 @@ These are promises already kept, not hopes.
 | **Nothing is sent anywhere**                            | Testin makes no network calls of its own. The only traffic is the tester's own Git sync, which they set up and start                                                    |
 | **What you typed is what is stored**                    | Stored data matches what was typed, character for character — **Rule-PRODUCT-003**                                                                                      |
 | **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **Rule-PRODUCT-019**                                                                               |
-| **The keyboard is enough**                              | A tester can run a whole test run without the mouse. **True of the list view. The grid view was a gap, tracked as #74, which is now closed, so this needs re-checking** |
+| **The keyboard is enough**                              | A tester can run a whole test run without the mouse. **True of the card view. The grid view was a gap, tracked as #74, which is now closed, so this needs re-checking** |
 | **It runs in every JetBrains IDE**                      | IntelliJ IDEA, PyCharm, GoLand, WebStorm and the rest of the family                                                                                                     |
 
 ---
@@ -552,7 +552,7 @@ answered.
 | **Test Set**        | A named group of test cases. A test run is built from one                                       |
 | **Test Case**       | One testable thing, with its steps and expected result. The question                            |
 | **Test Run**        | One execution of a chosen set of test cases at a point in time                                  |
-| **Test Run Result** | What happened to one test case in one test run. The answer                                      |
+| **Run Item**        | What happened to one test case in one test run. The answer                                      |
 | **Run Item Status** | Passed, Failed or Blocked — the three a tester can give                                         |
 | **Pending**         | This test run holds the test case and has not reached it yet                                    |
 | **Untested**        | The test run ended without ever reaching the test case                                          |

@@ -20,13 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.TestSetMarker;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class SampleProjectTest {
     }
 
     private static @NotNull List<Path> testRunFolders() {
-        return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
+        return filesNamed(demo(), NodeType.TR.getMarker()).stream().map(Path::getParent).toList();
     }
 
     private static @NotNull List<Path> resultFilesIn(final @NotNull Path folder) {
@@ -105,7 +105,7 @@ public class SampleProjectTest {
     public void everyMarkerFormatHasACommittedExample() {
         final @NotNull List<String> missing = new ArrayList<>();
 
-        for (final DirectoryType type : DirectoryType.values()) {
+        for (final NodeType type : NodeType.values()) {
             if (filesNamed(demo(), type.getMarker()).isEmpty()) missing.add(type.getMarker());
         }
 
@@ -115,20 +115,20 @@ public class SampleProjectTest {
 
     @Test
     public void everyMarkerInTheSampleParses() {
-        read(demo().resolve(DirectoryType.TP.getMarker()), TestProjectMarker.class);
+        read(demo().resolve(NodeType.TP.getMarker()), TestProjectMarker.class);
 
-        for (final Path marker : filesNamed(demo(), DirectoryType.TS.getMarker())) {
+        for (final Path marker : filesNamed(demo(), NodeType.TS.getMarker())) {
             read(marker, TestSetMarker.class);
         }
 
-        for (final Path marker : filesNamed(demo(), DirectoryType.TR.getMarker())) {
+        for (final Path marker : filesNamed(demo(), NodeType.TR.getMarker())) {
             read(marker, TestRunMarker.class);
         }
     }
 
     @Test
     public void theSampleCarriesThisBuildsFormat() {
-        assertEquals(read(demo().resolve(DirectoryType.TP.getMarker()), TestProjectMarker.class).getFormat(),
+        assertEquals(read(demo().resolve(NodeType.TP.getMarker()), TestProjectMarker.class).getFormat(),
                 TestProjectMarker.FORMAT, "The sample says it is in another format than this build writes");
     }
 
@@ -150,7 +150,7 @@ public class SampleProjectTest {
     }
 
     @Test
-    public void everyTestRunParsesAndItsResultsNameTestCasesThatExist() {
+    public void everyTestRunParsesAndItsRunItemsNameTestCasesThatExist() {
         final @NotNull List<String> testCaseIds = testCaseFiles().stream()
                 .map(file -> file.getFileName().toString().replace(".tc", ""))
                 .toList();
@@ -167,12 +167,12 @@ public class SampleProjectTest {
                             + " A JSON file there is the format this build does not read: " + folder);
 
             for (final Path file : results) {
-                final @NotNull TestRunItems item = read(file, TestRunItems.class);
+                final @NotNull RunItem runItem = read(file, RunItem.class);
 
-                assertEquals(item.getId().toString(), file.getFileName().toString().replace(".ri", ""),
+                assertEquals(runItem.getId().toString(), file.getFileName().toString().replace(".ri", ""),
                         "A result's file name is its test case's id, so the sample must agree with itself: " + file);
-                assertTrue(testCaseIds.contains(item.getId().toString()),
-                        "The result " + file.getFileName() + " names a test case the sample does not hold: " + item.getId());
+                assertTrue(testCaseIds.contains(runItem.getId().toString()),
+                        "The result " + file.getFileName() + " names a test case the sample does not hold: " + runItem.getId());
             }
         }
     }

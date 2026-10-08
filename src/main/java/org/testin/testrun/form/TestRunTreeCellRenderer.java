@@ -24,7 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.util.Icons;
 
 import javax.swing.JTree;
@@ -36,7 +36,7 @@ public final class TestRunTreeCellRenderer {
             @Override
             public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                 if (value instanceof CheckedTreeNode node) {
-                    if (node.getUserObject() instanceof DirectoryDto dir) {
+                    if (node.getUserObject() instanceof Node dir) {
                         getTextRenderer().setIcon(dir.iconShownInTree());
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                     } else if (node.getUserObject() instanceof TestCaseDto tc) {

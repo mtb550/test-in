@@ -20,9 +20,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.util.FromContentModule;
 import org.testin.util.NameSanitizer;
 
@@ -77,7 +77,7 @@ public final class Fqcn {
 
     // UC-CODEGEN-001, Rule-CODEGEN-007
     @FromContentModule
-    public static @NotNull List<String> ofClass(final @NotNull DirectoryDto dir) {
+    public static @NotNull List<String> ofClass(final @NotNull Node dir) {
         return ofClass(dir.getPath2());
     }
 
@@ -96,7 +96,7 @@ public final class Fqcn {
     }
 
     // UC-CODEGEN-001, Rule-CODEGEN-008
-    public static @NotNull List<String> ofPackage(final @NotNull DirectoryDto dir) {
+    public static @NotNull List<String> ofPackage(final @NotNull Node dir) {
         return ofPackage(dir.getPath2());
     }
 
@@ -115,7 +115,7 @@ public final class Fqcn {
 
     private static @NotNull List<String> withoutTestCasesDir(final @NotNull List<String> path2) {
         final @NotNull List<String> names = new ArrayList<>(path2);
-        names.remove(DirectoryType.TCD.getFolderName());
+        names.remove(NodeType.TCF.getFolderName());
         return names;
     }
 

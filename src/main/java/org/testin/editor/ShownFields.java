@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ShownFields {
-    public static final @NotNull String IN_TEST_SETS = EditorKind.TEST.detailsKey(4);
+    public static final @NotNull String IN_TEST_SETS = EditorKind.TEST_SET.detailsKey(4);
 
-    public static final @NotNull String IN_TEST_RUNS = EditorKind.RUN.detailsKey(7);
+    public static final @NotNull String IN_TEST_RUNS = EditorKind.TEST_RUN.detailsKey(7);
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public static <E extends Enum<E> & ToolBarAttribute> @NotNull Set<E> read(final @NotNull String propertyKey, final @NotNull Class<E> attributes) {

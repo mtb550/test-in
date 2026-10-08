@@ -21,7 +21,7 @@ import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -32,16 +32,16 @@ public final class TreePanelStructure extends AbstractTreeStructure {
     private final @NotNull Project p;
     private volatile @NotNull TreePanelNode root;
 
-    public TreePanelStructure(final @NotNull Project p, final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+    public TreePanelStructure(final @NotNull Project p, final @NotNull Optional<TestProjectNode> selectedProject) {
         this.p = p;
         this.root = createRoot(selectedProject);
     }
 
-    public void setSelectedProject(final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+    public void setSelectedProject(final @NotNull Optional<TestProjectNode> selectedProject) {
         root = createRoot(selectedProject);
     }
 
-    private @NotNull TreePanelNode createRoot(final @NotNull Optional<TestProjectDirectoryDto> selectedProject) {
+    private @NotNull TreePanelNode createRoot(final @NotNull Optional<TestProjectNode> selectedProject) {
         return new TreePanelNode(p, selectedProject.map(Object.class::cast).orElse(NO_PROJECT));
     }
 

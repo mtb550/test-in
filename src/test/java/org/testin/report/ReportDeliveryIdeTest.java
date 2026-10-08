@@ -48,16 +48,16 @@ import org.testin.Notified;
 import org.testin.Said;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.exports.ExportNotice;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -93,9 +93,9 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     private Path testin;
 
-    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+    private @NotNull TestProjectNode testProject = new TestProjectNode();
 
-    private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
+    private @NotNull TestSetNode login = new TestSetNode();
 
     private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);
@@ -177,10 +177,10 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         settings().rootTestinPath = testin.toString();
 
         WriteAction.runAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+            final @NotNull NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
             testProject = mapper.setTestProjectNode(testin.resolve(TEST_PROJECT));
             Services.getInstance(getProject(), Nodes.class).addTestProject(testProject);
-            login = mapper.getTestSetNode(testProject.getTestCasesDirectory().getPath().resolve("Login"), testProject.getTestCasesDirectory());
+            login = mapper.getTestSetNode(testProject.getTestCasesFolder().getPath().resolve("Login"), testProject.getTestCasesFolder());
             Services.getInstance(getProject(), Nodes.class).addTestSet(login);
         });
         aTestCase(opens, "Open the app and log in with a valid user whose password has not expired yet");
@@ -213,24 +213,24 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(login.getPath(), tc);
     }
 
-    private @NotNull TestRunDirectoryDto aTestRun(final @NotNull String named, final @NotNull List<TestRunItems> results) {
-        final @NotNull TestRunDirectoryDto testRun = WriteAction.computeAndWait(() -> {
-            final @NotNull TestRunDirectoryDto dir = Services.getInstance(getProject(), DirectoryMapper.class).setTestRunNode(testProject.getTestRunsDirectory().getPath().resolve(named), testProject.getTestRunsDirectory());
-            Services.getInstance(getProject(), Nodes.class).addTestRunDir(dir);
+    private @NotNull TestRunNode aTestRun(final @NotNull String named, final @NotNull List<RunItem> runItems) {
+        final @NotNull TestRunNode testRun = WriteAction.computeAndWait(() -> {
+            final @NotNull TestRunNode dir = Services.getInstance(getProject(), NodeMapper.class).setTestRunNode(testProject.getTestRunsFolder().getPath().resolve(named), testProject.getTestRunsFolder());
+            Services.getInstance(getProject(), Nodes.class).addTestRunNode(dir);
             return dir;
         });
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(testRun.getPath(), new TestRunDto().setResults(new ArrayList<>(results)));
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(testRun.getPath(), new RunItems().setAll(new ArrayList<>(runItems)));
         return testRun;
     }
 
-    private @NotNull TestRunDirectoryDto theTestRun() {
+    private @NotNull TestRunNode theTestRun() {
         return aTestRun("Cycle-1", List.of(
-                new TestRunItems().setId(opens).setStatus(RunItemStatus.PASSED),
-                new TestRunItems().setId(locks).setStatus(RunItemStatus.FAILED).setActualResult("The account stayed open")));
+                new RunItem().setId(opens).setStatus(RunItemStatus.PASSED),
+                new RunItem().setId(locks).setStatus(RunItemStatus.FAILED).setActualResult("The account stayed open")));
     }
 
-    private @NotNull TestRunDto resultsOf(final @NotNull TestRunDirectoryDto testRun) {
-        return Services.getInstance(getProject(), TestRuns.class).getTestRunByPath(testRun.getPath());
+    private @NotNull RunItems resultsOf(final @NotNull TestRunNode testRun) {
+        return Services.getInstance(getProject(), TestRuns.class).getRunItems(testRun.getPath());
     }
 
     private @NotNull GenerateReportAction theAction() {
@@ -254,9 +254,9 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-001
     public void testAReportIsAboutExactlyOneTestRun() {
-        final @NotNull TestRunDirectoryDto chosen = theTestRun();
+        final @NotNull TestRunNode chosen = theTestRun();
         aTestCase(UUID.randomUUID(), "Reset a forgotten password");
-        final @NotNull TestRunDirectoryDto other = aTestRun("Cycle-2", List.of(new TestRunItems().setId(locks).setStatus(RunItemStatus.BLOCKED)));
+        final @NotNull TestRunNode other = aTestRun("Cycle-2", List.of(new RunItem().setId(locks).setStatus(RunItemStatus.BLOCKED)));
 
         final @NotNull String html = new String(FileTypes.HTML.generateReport(getProject(), chosen, resultsOf(chosen)), StandardCharsets.UTF_8);
 
@@ -282,7 +282,7 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-004
     public void testAReportIsWrittenWhereTheTesterChoseAndNeverUnderTheTestinFolder() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
         Services.getInstance(getProject(), TestRuns.class).awaitWrites();
         final @NotNull List<Path> before = everythingUnder(testin);
         final @NotNull File file = folder("reports").resolve("Cycle-1.pdf").toFile();
@@ -385,7 +385,7 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-024
     public void testTheNumberAndTheRunItemStatusTakeOnlyTheirOwnWidthAndTheDescriptionTheRest() {
-        final @NotNull TestRunDirectoryDto testRun = theTestRun();
+        final @NotNull TestRunNode testRun = theTestRun();
 
         final @NotNull String html = new String(FileTypes.HTML.generateReport(getProject(), testRun, resultsOf(testRun)), StandardCharsets.UTF_8);
         assertTrue("the web page does not give the number only its own width", html.contains(".detail-table td.seq, .detail-table th.seq { width: 1%; white-space: nowrap; }") && html.contains("<th class='seq'>#</th>"));

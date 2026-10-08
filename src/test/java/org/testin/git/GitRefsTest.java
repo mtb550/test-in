@@ -154,7 +154,7 @@ public class GitRefsTest {
     public void everyNewTestCaseInANewTestSetIsReported() {
         final List<StatusEntry> entries = GitRefs.parseStatus(List.of(
                 "?? .tp",
-                "?? Test Cases/.tcd",
+                "?? Test Cases/.tcf",
                 "?? Test Cases/rp/.ts",
                 "?? Test Cases/rp/73ebd4d7-4a2c-4813-92d5-30aebe3a3670.json",
                 "?? Test Cases/rp/84e8bf04-815d-4a48-81e2-3985b1e25c75.json"));

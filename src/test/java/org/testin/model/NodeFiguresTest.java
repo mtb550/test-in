@@ -18,8 +18,8 @@ package org.testin.model;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
 
@@ -31,16 +31,16 @@ import static org.testng.Assert.assertSame;
 
 public class NodeFiguresTest {
 
-    private static @NotNull TestRunItems item(final RunItemStatus status) {
-        return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
+    private static @NotNull RunItem runItem(final RunItemStatus status) {
+        return RunItem.builder().id(UUID.randomUUID()).status(status).build();
     }
 
     // Rule-INTERNAL-049
     @Test
     public void aTestRunHoldsItsSummaryRatherThanACopyOfTheNumbers() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(RunItemStatus.PASSED),
-                item(RunItemStatus.FAILED)));
+                runItem(RunItemStatus.PASSED),
+                runItem(RunItemStatus.FAILED)));
 
         assertSame(NodeFigures.ofTestRun(summary).testRun(), summary,
                 "seven fields copied out of the summary would make the popup a second "
@@ -50,11 +50,11 @@ public class NodeFiguresTest {
     @Test
     public void everyRunItemStatusReadsThroughThatSummary() {
         final NodeFigures figures = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
-                item(RunItemStatus.PASSED),
-                item(RunItemStatus.PASSED),
-                item(RunItemStatus.FAILED),
-                item(RunItemStatus.BLOCKED),
-                item(RunItemStatus.UNTESTED))));
+                runItem(RunItemStatus.PASSED),
+                runItem(RunItemStatus.PASSED),
+                runItem(RunItemStatus.FAILED),
+                runItem(RunItemStatus.BLOCKED),
+                runItem(RunItemStatus.UNTESTED))));
 
         assertEquals(NodeCount.PASSED.of(figures), "2");
         assertEquals(NodeCount.FAILED.of(figures), "1");
@@ -69,8 +69,8 @@ public class NodeFiguresTest {
     @Test
     public void aTestRunNobodyHasStartedSaysSoRatherThanReportingZeroPercent() {
         final NodeFigures untouched = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
-                item(RunItemStatus.PENDING),
-                item(RunItemStatus.PENDING))));
+                runItem(RunItemStatus.PENDING),
+                runItem(RunItemStatus.PENDING))));
 
         assertEquals(untouched.rateLabel(), "Not run");
     }
@@ -78,10 +78,10 @@ public class NodeFiguresTest {
     @Test
     public void aTestRunWithARunItemStatusReportsItsRate() {
         final NodeFigures testRun = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
-                item(RunItemStatus.PASSED),
-                item(RunItemStatus.PASSED),
-                item(RunItemStatus.PASSED),
-                item(RunItemStatus.FAILED))));
+                runItem(RunItemStatus.PASSED),
+                runItem(RunItemStatus.PASSED),
+                runItem(RunItemStatus.PASSED),
+                runItem(RunItemStatus.FAILED))));
 
         assertEquals(testRun.rateLabel(), "75%");
     }

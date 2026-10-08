@@ -18,14 +18,14 @@ package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.Marker;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestCasesMainDirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestRunPackageDirectoryDto;
-import org.testin.model.node.TestRunsMainDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestRunPackageNode;
+import org.testin.model.node.TestRunsFolderNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.status.PackageStatus;
 import org.testin.model.status.TestSetStatus;
 import org.testng.annotations.Test;
@@ -44,23 +44,23 @@ public class RetiredNodesTest {
 
     private static final Path PARENT = Path.of("root", "Test Cases");
 
-    private static @NotNull TestSetDirectoryDto testSet(final String name, final TestSetStatus status) {
-        final TestSetDirectoryDto dto = new TestSetDirectoryDto();
+    private static @NotNull TestSetNode testSet(final String name, final TestSetStatus status) {
+        final TestSetNode dto = new TestSetNode();
         dto.setName(name);
         dto.setPath(PARENT.resolve(name));
         dto.getMarker().setStatus(status);
         return dto;
     }
 
-    private static @NotNull TestSetPackageDirectoryDto testSetPackage(final String name, final PackageStatus status) {
-        final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
+    private static @NotNull TestSetPackageNode testSetPackage(final String name, final PackageStatus status) {
+        final TestSetPackageNode dto = new TestSetPackageNode();
         dto.setName(name);
         dto.setPath(PARENT.resolve(name));
         dto.getMarker().setStatus(status);
         return dto;
     }
 
-    private static <T extends DirectoryDto> T createdAt(final T node, final int daysAgo) {
+    private static <T extends Node> T createdAt(final T node, final int daysAgo) {
         node.getMarker().setCreatedAt(ZonedDateTime.now(ZoneId.systemDefault()).minusDays(daysAgo));
         return node;
     }
@@ -73,15 +73,15 @@ public class RetiredNodesTest {
         assertFalse(testSetPackage("p", PackageStatus.ACTIVE).isRetired());
         assertTrue(testSetPackage("p", PackageStatus.ARCHIVED).isRetired());
 
-        final TestRunPackageDirectoryDto testRunPackage = new TestRunPackageDirectoryDto();
+        final TestRunPackageNode testRunPackage = new TestRunPackageNode();
         testRunPackage.getMarker().setStatus(PackageStatus.ARCHIVED);
         assertTrue(testRunPackage.isRetired());
     }
 
     @Test
     public void nodesWithoutAStatusAreNeverRetired() {
-        for (final DirectoryDto fixed : List.of(new TestProjectDirectoryDto(), new TestCasesMainDirectoryDto(),
-                new TestRunsMainDirectoryDto(), new TestRunDirectoryDto())) {
+        for (final Node fixed : List.of(new TestProjectNode(), new TestCasesFolderNode(),
+                new TestRunsFolderNode(), new TestRunNode())) {
             assertFalse(fixed.isRetired(), fixed.getClass().getSimpleName());
         }
     }
@@ -89,43 +89,43 @@ public class RetiredNodesTest {
     // Rule-TREE-PANEL-010
     @Test
     public void retiredChildrenSortAfterTheLiveOnesAndByNameWithinEach() {
-        final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
+        final TestCasesFolderNode parent = new TestCasesFolderNode();
         parent.setPath(PARENT);
 
-        final List<DirectoryDto> children = List.of(
+        final List<Node> children = List.of(
                 testSetPackage("old", PackageStatus.ARCHIVED),
                 testSet("zeta", TestSetStatus.ACTIVE),
                 testSet("alpha", TestSetStatus.DEPRECATED),
                 testSetPackage("beta", PackageStatus.ACTIVE));
         children.forEach(child -> child.setParent(parent));
 
-        final List<DirectoryDto> ordered = new DirectoryChildrenIndex().get(PARENT,
+        final List<Node> ordered = new NodeChildrenIndex().get(PARENT,
                 () -> Stream.concat(Stream.of(parent), children.stream()).toList());
 
-        assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("beta", "zeta", "alpha", "old"));
+        assertEquals(ordered.stream().map(Node::getName).toList(), List.of("beta", "zeta", "alpha", "old"));
     }
 
     // Rule-TREE-PANEL-010, Rule-TREE-PANEL-055
     @Test
     public void numberedChildrenComeFirstAndTheRestFollowByDate() {
-        final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
+        final TestCasesFolderNode parent = new TestCasesFolderNode();
         parent.setPath(PARENT);
 
-        final TestSetDirectoryDto third = createdAt(testSet("aaa-oldest", TestSetStatus.ACTIVE), 3);
-        final TestSetDirectoryDto fourth = createdAt(testSet("bbb-newest", TestSetStatus.ACTIVE), 1);
-        final TestSetDirectoryDto first = testSet("zzz-numbered-one", TestSetStatus.ACTIVE);
-        final TestSetDirectoryDto second = testSet("yyy-numbered-two", TestSetStatus.ACTIVE);
+        final TestSetNode third = createdAt(testSet("aaa-oldest", TestSetStatus.ACTIVE), 3);
+        final TestSetNode fourth = createdAt(testSet("bbb-newest", TestSetStatus.ACTIVE), 1);
+        final TestSetNode first = testSet("zzz-numbered-one", TestSetStatus.ACTIVE);
+        final TestSetNode second = testSet("yyy-numbered-two", TestSetStatus.ACTIVE);
 
         first.getMarker().setOrder(1);
         second.getMarker().setOrder(2);
 
-        final List<DirectoryDto> children = List.of(third, fourth, first, second);
+        final List<Node> children = List.of(third, fourth, first, second);
         children.forEach(child -> child.setParent(parent));
 
-        final List<DirectoryDto> ordered = new DirectoryChildrenIndex().get(PARENT,
+        final List<Node> ordered = new NodeChildrenIndex().get(PARENT,
                 () -> Stream.concat(Stream.of(parent), children.stream()).toList());
 
-        assertEquals(ordered.stream().map(DirectoryDto::getName).toList(),
+        assertEquals(ordered.stream().map(Node::getName).toList(),
                 List.of("zzz-numbered-one", "yyy-numbered-two", "aaa-oldest", "bbb-newest"),
                 "numbers first, in order; then the unnumbered ones oldest first, whatever they are called");
     }
@@ -133,55 +133,55 @@ public class RetiredNodesTest {
     // Rule-TREE-PANEL-056
     @Test
     public void theSameNumberTwiceIsSettledByTheDate() {
-        final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
+        final TestCasesFolderNode parent = new TestCasesFolderNode();
         parent.setPath(PARENT);
 
-        final TestSetDirectoryDto older = createdAt(testSet("zzz-older", TestSetStatus.ACTIVE), 5);
-        final TestSetDirectoryDto newer = createdAt(testSet("aaa-newer", TestSetStatus.ACTIVE), 1);
+        final TestSetNode older = createdAt(testSet("zzz-older", TestSetStatus.ACTIVE), 5);
+        final TestSetNode newer = createdAt(testSet("aaa-newer", TestSetStatus.ACTIVE), 1);
 
         older.getMarker().setOrder(2);
         newer.getMarker().setOrder(2);
 
-        final List<DirectoryDto> children = List.of(newer, older);
+        final List<Node> children = List.of(newer, older);
         children.forEach(child -> child.setParent(parent));
 
-        final List<DirectoryDto> ordered = new DirectoryChildrenIndex().get(PARENT,
+        final List<Node> ordered = new NodeChildrenIndex().get(PARENT,
                 () -> Stream.concat(Stream.of(parent), children.stream()).toList());
 
-        assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("zzz-older", "aaa-newer"));
+        assertEquals(ordered.stream().map(Node::getName).toList(), List.of("zzz-older", "aaa-newer"));
     }
 
     // Rule-TREE-PANEL-057
     @Test
     public void aNumberDoesNotBringARetiredNodeBack() {
-        final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
+        final TestCasesFolderNode parent = new TestCasesFolderNode();
         parent.setPath(PARENT);
 
-        final TestSetDirectoryDto retired = testSet("deprecated", TestSetStatus.DEPRECATED);
+        final TestSetNode retired = testSet("deprecated", TestSetStatus.DEPRECATED);
         retired.getMarker().setOrder(1);
 
-        final TestSetDirectoryDto live = testSet("active", TestSetStatus.ACTIVE);
+        final TestSetNode live = testSet("active", TestSetStatus.ACTIVE);
 
-        final List<DirectoryDto> children = List.of(retired, live);
+        final List<Node> children = List.of(retired, live);
         children.forEach(child -> child.setParent(parent));
 
-        final List<DirectoryDto> ordered = new DirectoryChildrenIndex().get(PARENT,
+        final List<Node> ordered = new NodeChildrenIndex().get(PARENT,
                 () -> Stream.concat(Stream.of(parent), children.stream()).toList());
 
-        assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("active", "deprecated"));
+        assertEquals(ordered.stream().map(Node::getName).toList(), List.of("active", "deprecated"));
     }
 
     // Rule-TREE-PANEL-058
     @Test
     public void everythingATesterFilesCanBeOrdered() {
-        for (final DirectoryDto node : List.of(testSet("a", TestSetStatus.ACTIVE),
-                testSetPackage("p", PackageStatus.ACTIVE), new TestRunDirectoryDto(),
-                new TestRunPackageDirectoryDto())) {
+        for (final Node node : List.of(testSet("a", TestSetStatus.ACTIVE),
+                testSetPackage("p", PackageStatus.ACTIVE), new TestRunNode(),
+                new TestRunPackageNode())) {
             assertTrue(node.isOrderable(), node.getClass().getSimpleName());
         }
 
-        for (final DirectoryDto fixed : List.of(new TestProjectDirectoryDto(), new TestCasesMainDirectoryDto(),
-                new TestRunsMainDirectoryDto())) {
+        for (final Node fixed : List.of(new TestProjectNode(), new TestCasesFolderNode(),
+                new TestRunsFolderNode())) {
             assertFalse(fixed.isOrderable(), fixed.getClass().getSimpleName());
         }
     }

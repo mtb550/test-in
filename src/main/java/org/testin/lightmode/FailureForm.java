@@ -25,7 +25,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.ComponentWithEmptyText;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.testrun.RunItemStatusService;
 import org.testin.testrun.failure.FailureFields;
@@ -47,7 +47,7 @@ import java.util.Map;
 
 class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     private final @NotNull FailureFields fields;
-    private final @NotNull TestRunItems runItem;
+    private final @NotNull RunItem runItem;
     private final @NotNull Path testRunPath;
     private final @NotNull RunItemStatusService runItemStatusService;
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
@@ -55,7 +55,7 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     private final @NotNull Runnable onEnter;
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202
-    FailureForm(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized, final @NotNull Runnable onEnter) {
+    FailureForm(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull RunItem runItem, final float zoom, final @NotNull Runnable resized, final @NotNull Runnable onEnter) {
         this.testRunPath = testRunPath;
         this.runItemStatusService = Services.getInstance(p, RunItemStatusService.class);
         this.runItem = runItem;

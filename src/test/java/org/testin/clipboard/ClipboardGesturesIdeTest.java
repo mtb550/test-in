@@ -31,12 +31,12 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Gestures;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testset.TestSetEditor;
 import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testcase.TestCaseOrder;
@@ -65,9 +65,9 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull String CUT = "Testin.CutTestCaseNode";
     private static final @NotNull String PASTE = "Testin.PasteTestCaseNode";
 
-    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+    private @NotNull TestProjectNode testProject = new TestProjectNode();
 
-    private static @NotNull TestCaseDto at(final @NotNull TestCaseEditor editor, final int index) {
+    private static @NotNull TestCaseDto at(final @NotNull TestSetEditor editor, final int index) {
         return editor.getList().getModel().getElementAt(index);
     }
 
@@ -75,7 +75,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
         return testCases.stream().map(TestCaseDto::getDescription).toList();
     }
 
-    private static int opacityOfCard(final @NotNull TestCaseEditor editor, final int index) {
+    private static int opacityOfCard(final @NotNull TestSetEditor editor, final int index) {
         final @NotNull JBList<TestCaseDto> list = editor.getList();
         list.setSize(900, 2000);
         final @NotNull Component card = list.getCellRenderer().getListCellRendererComponent(list, at(editor, index), index, false, false);
@@ -114,14 +114,14 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), CutState.class);
     }
 
-    private @NotNull TestCaseEditor aTestSetOf(final @NotNull String name, final @NotNull String... descriptions) {
-        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), testProject, name);
+    private @NotNull TestSetEditor aTestSetOf(final @NotNull String name, final @NotNull String... descriptions) {
+        final @NotNull TestSetNode ts = EditorFixtures.testSet(getProject(), testProject, name);
         for (int i = 0; i < descriptions.length; i++) {
             final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(descriptions[i]).order(String.format("m%04d", i)).createdBy("Ann").build();
             tc.setParent(ts);
             theTestCases().putTestCaseVerbatim(ts.getPath(), tc);
         }
-        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+        return EditorFixtures.openTestSetEditor(getProject(), ts, getTestRootDisposable());
     }
 
     private @NotNull AnActionEvent eventOn(final @NotNull AnAction action, final @NotNull JComponent component) {
@@ -142,7 +142,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
-    private @NotNull List<TestCaseDto> orderedIn(final @NotNull TestCaseEditor editor) {
+    private @NotNull List<TestCaseDto> orderedIn(final @NotNull TestSetEditor editor) {
         return TestCaseOrder.ordered(theTestCases().getTestCasesForTestSet(editor.getParent().getPath()));
     }
 
@@ -156,7 +156,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-075
     public void testCopyingPutsTheTestCasesThemselvesOnTheClipboard() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out", "Reset the password");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out", "Reset the password");
         login.getList().setSelectedIndices(new int[]{0, 2});
 
         choose(COPY, login.getList());
@@ -168,7 +168,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-076, Rule-EDITOR-PANEL-078
     public void testACutCardIsFadedAndCopyingCallsTheCutOffAndBringsItBack() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out");
         final int opaque = opacityOfCard(login, 0);
         login.getList().setSelectedIndex(0);
 
@@ -187,7 +187,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-077
     public void testCopyTestCaseWorksOnACardAndInTheGrid() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out");
         login.getList().setSelectedIndex(1);
         assertTrue("Copy Test Case is gray on a selected card", offered(COPY, login.getList()));
 
@@ -204,7 +204,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-079
     public void testACutOnItsOwnChangesNothing() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out");
         final @NotNull List<String> before = everyFile();
         login.getList().setSelectedIndex(0);
 
@@ -217,7 +217,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-080
     public void testACutIsCalledOffByEscapeAndByAnythingWrittenToTheClipboard() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out");
         login.getList().setSelectedIndex(0);
 
         choose(CUT, login.getList());
@@ -236,8 +236,8 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-081, Rule-EDITOR-PANEL-083
     public void testAPastedCopyIsANewTestCaseLandingUnderTheSelectedOne() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out");
-        final @NotNull TestCaseEditor checkout = aTestSetOf("Checkout", "Open the cart", "Pay", "Get a receipt");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out");
+        final @NotNull TestSetEditor checkout = aTestSetOf("Checkout", "Open the cart", "Pay", "Get a receipt");
         login.getList().setSelectionInterval(0, 1);
         choose(COPY, login.getList());
 
@@ -253,8 +253,8 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-083
     public void testWithNothingSelectedPastedTestCasesLandAtTheEnd() {
-        final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in");
-        final @NotNull TestCaseEditor checkout = aTestSetOf("Checkout", "Open the cart", "Pay");
+        final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in");
+        final @NotNull TestSetEditor checkout = aTestSetOf("Checkout", "Open the cart", "Pay");
         login.getList().setSelectedIndex(0);
         choose(COPY, login.getList());
 
@@ -271,8 +271,8 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
         final @NotNull String tester = settings.testerName;
         settings.testerName = "Sara";
         try {
-            final @NotNull TestCaseEditor login = aTestSetOf("Login", "Log in", "Log out");
-            final @NotNull TestCaseEditor checkout = aTestSetOf("Checkout", "Pay");
+            final @NotNull TestSetEditor login = aTestSetOf("Login", "Log in", "Log out");
+            final @NotNull TestSetEditor checkout = aTestSetOf("Checkout", "Pay");
             final @NotNull UUID moved = at(login, 0).getId();
             final @NotNull UndoScope scope = UndoScope.of(checkout.getParent().getPath());
             login.getList().setSelectedIndex(0);
@@ -300,7 +300,7 @@ public class ClipboardGesturesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-EDITOR-PANEL-085
     public void testAnythingOnTheClipboardButTestCasesIsTurnedAway() {
-        final @NotNull TestCaseEditor checkout = aTestSetOf("Checkout", "Pay");
+        final @NotNull TestSetEditor checkout = aTestSetOf("Checkout", "Pay");
         final @NotNull List<String> before = everyFile();
 
         for (final String text : List.of("Log in with a valid user", "[1, 2, 3]", "{\"description\": \"Log in\"}")) {

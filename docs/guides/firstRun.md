@@ -112,7 +112,7 @@ Double-click it, or press `Enter`, and it opens in an editor.
 
 ## 5. Write a test case
 
-In the test case editor, press `Ctrl+M`.
+In the test set editor, press `Ctrl+M`.
 
 Fill in the description — *Log in with a valid user* — and the expected result — *The dashboard opens*. Save.
 

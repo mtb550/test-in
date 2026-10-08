@@ -18,8 +18,9 @@ package org.testin.model;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
+import org.testin.model.testrun.RunItems;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -30,33 +31,33 @@ import static org.testng.Assert.assertTrue;
 
 public class TestRunCompletionTest {
 
-    private static @NotNull TestRunItems item(final RunItemStatus status) {
-        return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
+    private static @NotNull RunItem runItem(final RunItemStatus status) {
+        return RunItem.builder().id(UUID.randomUUID()).status(status).build();
     }
 
-    private static @NotNull TestRunDto testRunOf(final TestRunItems... items) {
-        return TestRunDto.builder().results(List.of(items)).build();
+    private static @NotNull RunItems testRunOf(final RunItem... items) {
+        return RunItems.builder().all(List.of(items)).build();
     }
 
     @Test
     public void everyTestCaseJudgedMeansTheTestRunIsOver() {
-        assertTrue(testRunOf(item(RunItemStatus.PASSED), item(RunItemStatus.FAILED), item(RunItemStatus.BLOCKED)).isFullyJudged());
+        assertTrue(testRunOf(runItem(RunItemStatus.PASSED), runItem(RunItemStatus.FAILED), runItem(RunItemStatus.BLOCKED)).isFullyJudged());
     }
 
     @Test
     public void oneTestCaseStillPendingKeepsItOpen() {
-        assertFalse(testRunOf(item(RunItemStatus.PASSED), item(RunItemStatus.PENDING)).isFullyJudged(),
+        assertFalse(testRunOf(runItem(RunItemStatus.PASSED), runItem(RunItemStatus.PENDING)).isFullyJudged(),
                 "the test run is still expecting something about that test case");
     }
 
     @Test
     public void soDoesOneUntested() {
-        assertFalse(testRunOf(item(RunItemStatus.PASSED), item(RunItemStatus.UNTESTED)).isFullyJudged());
+        assertFalse(testRunOf(runItem(RunItemStatus.PASSED), runItem(RunItemStatus.UNTESTED)).isFullyJudged());
     }
 
     @Test
     public void aDeletedTestCaseDoesNotHoldItOpenForever() {
-        assertTrue(testRunOf(item(RunItemStatus.PASSED), item(RunItemStatus.REMOVED)).isFullyJudged());
+        assertTrue(testRunOf(runItem(RunItemStatus.PASSED), runItem(RunItemStatus.REMOVED)).isFullyJudged());
     }
 
     @Test

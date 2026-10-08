@@ -24,7 +24,7 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.open.EditorKind;
 import org.testin.testcase.Can;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Shortcuts;
 
@@ -51,20 +51,20 @@ public class GridIdeTest extends BasePlatformTestCase {
     private static final int EXPECTED = 3;
     private static final int ID = 2;
 
-    private static final @NotNull String DESCRIPTION_WIDTH = EditorKind.TEST.columnWidthKey(TestCaseEditorAttributes.DESCRIPTION.getName());
+    private static final @NotNull String DESCRIPTION_WIDTH = EditorKind.TEST_SET.columnWidthKey(TestSetEditorAttributes.DESCRIPTION.getName());
 
     private static String @NotNull [] aRow(final int order, final @NotNull String description, final @NotNull String expected, final @NotNull String id) {
-        final String[] row = new String[TestCaseEditorAttributes.values().length];
+        final String[] row = new String[TestSetEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.ORDER.column()] = String.valueOf(order);
-        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
-        row[TestCaseEditorAttributes.EXPECTED_RESULT.column()] = expected;
-        row[TestCaseEditorAttributes.ID.column()] = id;
+        row[TestSetEditorAttributes.ORDER.column()] = String.valueOf(order);
+        row[TestSetEditorAttributes.DESCRIPTION.column()] = description;
+        row[TestSetEditorAttributes.EXPECTED_RESULT.column()] = expected;
+        row[TestSetEditorAttributes.ID.column()] = id;
         return row;
     }
 
     private static @NotNull JBTable aGrid(final String @NotNull []... rows) {
-        return new GridPanelBuilder().buildTestTable(List.of(rows), EnumSet.of(TestCaseEditorAttributes.ORDER, TestCaseEditorAttributes.DESCRIPTION, TestCaseEditorAttributes.EXPECTED_RESULT, TestCaseEditorAttributes.ID));
+        return new GridPanelBuilder().buildTestTable(List.of(rows), EnumSet.of(TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT, TestSetEditorAttributes.ID));
     }
 
     private static @NotNull JBTable twoRows() {
@@ -146,7 +146,7 @@ public class GridIdeTest extends BasePlatformTestCase {
         }
 
         final int expectedBesideTheDescription = 2;
-        final @NotNull JBTable fresh = new GridPanelBuilder().buildTestTable(List.of(aRow(1, "Log in", "", "id-1"), aRow(2, "Log out", "", "id-2")), EnumSet.of(TestCaseEditorAttributes.ORDER, TestCaseEditorAttributes.DESCRIPTION, TestCaseEditorAttributes.EXPECTED_RESULT));
+        final @NotNull JBTable fresh = new GridPanelBuilder().buildTestTable(List.of(aRow(1, "Log in", "", "id-1"), aRow(2, "Log out", "", "id-2")), EnumSet.of(TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT));
         selectDownTo(fresh, 0, DESCRIPTION);
         onClipboard("A\tB\nC\tD");
 
@@ -179,10 +179,10 @@ public class GridIdeTest extends BasePlatformTestCase {
 
     // Rule-EDITOR-PANEL-047
     public void testOnlyTheColumnsThatCanBeTypedIntoEverOpen() {
-        final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(List.<String[]>of(aRow(1, "Log in", "The dashboard opens", "id-1")), EnumSet.allOf(TestCaseEditorAttributes.class));
+        final @NotNull JBTable table = new GridPanelBuilder().buildTestTable(List.<String[]>of(aRow(1, "Log in", "The dashboard opens", "id-1")), EnumSet.allOf(TestSetEditorAttributes.class));
 
         for (int column = 0; column < table.getColumnCount(); column++) {
-            final @NotNull TestCaseEditorAttributes attribute = TestCaseEditorAttributes.atColumn(table.convertColumnIndexToModel(column));
+            final @NotNull TestSetEditorAttributes attribute = TestSetEditorAttributes.atColumn(table.convertColumnIndexToModel(column));
             assertEquals(attribute.getName() + " opens for typing or does not as it should", attribute.can(Can.EDIT), table.editCellAt(0, column));
             if (table.isEditing()) table.getCellEditor().cancelCellEditing();
         }

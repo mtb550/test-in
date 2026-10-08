@@ -46,13 +46,13 @@ public class TestRunToolbar extends AbstractToolbarPanel {
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new TestRunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
                 new FilterPopupBtn(getCallbacks()),
-                new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
+                new CardViewBtn(getCallbacks()::onToolBarSwitchedToCardView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
         );
     }
 
     @Override
     protected @NotNull List<ToolbarItem> getTrailingComponents() {
-        return List.of(new ResultAnalysisBtn(editor, getCallbacks()::onToolBarResultAnalysisClicked));
+        return List.of(new TestRunResultAnalysisBtn(editor, getCallbacks()::onToolBarTestRunResultAnalysisClicked));
     }
 }

@@ -78,7 +78,7 @@ There is no key for this. It is what the **Details** tab shows.
 - **Rule-VIEW-PANEL-087** — The test case's band folds only where a test run
   stands above it, and there it is folded when a tester first meets it: its name
   carries the arrow that opens it, and opening it shows every field the test
-  case has. In the test case editor there is no test run, so the fields are
+  case has. In the test set editor there is no test run, so the fields are
   drawn straight under the badges with nothing to open. The state is remembered
   for the IDE rather than for one test case, so a tester who opens it keeps it
   open for the next test case they read.
@@ -114,7 +114,7 @@ There is no key for this. It is what the **Details** tab shows.
 1. **The top part** — the breadcrumb, then the title, then one line carrying the
    badges and the three icons (Rule-VIEW-PANEL-085). Each one is numbered on
    [the view panel page](main.md#the-panel).
-2. **No heading, and nothing to open** — in the test case editor the fields are
+2. **No heading, and nothing to open** — in the test set editor the fields are
    the only thing on the panel, so they are drawn straight under the identity
    line (Rule-VIEW-PANEL-087). Under a test run they fold behind **Test case
    details** instead.

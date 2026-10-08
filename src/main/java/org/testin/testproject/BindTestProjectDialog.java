@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.help.Guide;
 import org.testin.help.Guides;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.status.ProjectStatus;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
@@ -48,7 +48,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog {
         title = Bundle.message("dialog.bind.title");
 
         final @NotNull ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
-                .column(DirectoryType.TP.getDescription(), 260)
+                .column(NodeType.TP.getDescription(), 260)
                 .column(Bundle.message("caption.status"), 100)
                 .build();
 

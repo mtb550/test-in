@@ -19,13 +19,13 @@ package org.testin.rename;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RenameTestSetClassIdeTest extends AbstractCodegenIdeTest {
 
-    private void renamedToSignIn(final @NotNull TestSetDirectoryDto ts) {
+    private void renamedToSignIn(final @NotNull TestSetNode ts) {
         final @NotNull AtomicBoolean done = new AtomicBoolean();
         NodeRename.apply(getProject(), ts, "Sign in", () -> done.set(true));
 

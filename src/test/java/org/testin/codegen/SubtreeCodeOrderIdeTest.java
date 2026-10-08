@@ -22,8 +22,8 @@ import com.intellij.openapi.command.CommandListener;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.node.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.node.TestSetPackageNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +32,10 @@ public class SubtreeCodeOrderIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-023
     public void testATestSetsClassIsWrittenBeforeItsTestCasesMethods() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
-        final @NotNull TestSetDirectoryDto payment = indexedTestSet("Payment", checkout);
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetNode payment = indexedTestSet("Payment", checkout);
         final @NotNull TestCaseDto pay = indexedTestCase(payment, "Pay with a saved card", "b");
-        final @NotNull TestSetDirectoryDto visa = indexedTestSet("Visa", indexedPackage("Cards", checkout));
+        final @NotNull TestSetNode visa = indexedTestSet("Visa", indexedPackage("Cards", checkout));
         final @NotNull TestCaseDto payByVisa = indexedTestCase(visa, "Pay with a Visa card", "b");
         final @NotNull CodegenRecorder recorder = CodegenRecorder.installed(getTestRootDisposable());
 
@@ -54,7 +54,7 @@ public class SubtreeCodeOrderIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-024
     public void testTheWholeSubtreeIsOneChangeOnTheUndoHistory() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
+        final @NotNull TestSetPackageNode checkout = indexedPackage("Checkout", theTestCasesDirectory());
         indexedTestCase(indexedTestSet("Payment", checkout), "Pay with a saved card", "b");
         indexedTestCase(indexedTestSet("Refund", checkout), "Refund a payment", "b");
         indexedTestCase(indexedTestSet("Visa", indexedPackage("Cards", checkout)), "Pay with a Visa card", "b");

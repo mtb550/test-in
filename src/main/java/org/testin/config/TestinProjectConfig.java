@@ -32,7 +32,7 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
             TestinLocation.LOCAL, "", "", "");
     static final @NotNull String PROJECT_KEY = "testinProject";
     static final @NotNull String LOCATION_KEY = "location";
-    static final @NotNull String REPO_URL_KEY = "RepoUrl";
+    static final @NotNull String REPO_URL_KEY = "repoUrl";
     static final @NotNull String BUG_REPO_URL_KEY = "bugRepoUrl";
 
     public TestinProjectConfig {

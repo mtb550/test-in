@@ -21,7 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
@@ -172,11 +172,11 @@ final class NodeFiles {
             final @NotNull List<Path> all = files.filter(Files::isRegularFile).toList();
 
             testCaseFiles = all.stream()
-                    .filter(file -> ProjectIndexer.isTestCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
+                    .filter(file -> ProjectIndexer.isTestCaseFile(file, dir -> store.hasMarker(dir, NodeType.TS)))
                     .toList();
 
             markerFiles = all.stream()
-                    .filter(file -> DirectoryType.byMarker(String.valueOf(file.getFileName())).isPresent())
+                    .filter(file -> NodeType.byMarker(String.valueOf(file.getFileName())).isPresent())
                     .toList();
 
         } catch (final IOException ex) {

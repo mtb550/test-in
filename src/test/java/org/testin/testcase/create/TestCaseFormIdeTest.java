@@ -25,8 +25,8 @@ import org.testin.editor.EditorFixtures;
 import org.testin.model.Priority;
 import org.testin.model.StatusBarItem;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.TestCaseStatus;
 import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
@@ -81,8 +81,8 @@ public class TestCaseFormIdeTest extends AbstractTempRootIdeTest {
         super.tearDown();
     }
 
-    private @NotNull TestSetDirectoryDto aTestSet() {
-        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+    private @NotNull TestSetNode aTestSet() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
         return EditorFixtures.testSet(getProject(), tp, "Checkout");
     }
 

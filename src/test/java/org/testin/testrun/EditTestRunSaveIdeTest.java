@@ -20,13 +20,13 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
@@ -47,29 +47,29 @@ public class EditTestRunSaveIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private @NotNull TestRunDirectoryDto anOpenTestRun() {
-        final @NotNull TestRunDirectoryDto testRun = WriteAction.computeAndWait(() -> {
-            final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+    private @NotNull TestRunNode anOpenTestRun() {
+        final @NotNull TestRunNode testRun = WriteAction.computeAndWait(() -> {
+            final @NotNull NodeMapper mapper = Services.getInstance(getProject(), NodeMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
-            final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
+            final @NotNull TestProjectNode tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes.addTestProject(tp);
 
-            final @NotNull TestRunDirectoryDto tr = mapper.setTestRunNode(tp.getTestRunsDirectory().getPath().resolve("Cycle-1"), tp.getTestRunsDirectory());
-            nodes.addTestRunDir(tr);
+            final @NotNull TestRunNode tr = mapper.setTestRunNode(tp.getTestRunsFolder().getPath().resolve("Cycle-1"), tp.getTestRunsFolder());
+            nodes.addTestRunNode(tr);
             return tr;
         });
 
-        indexedTestRuns().putTestRun(testRun.getPath(), new TestRunDto().setResults(List.of(
-                new TestRunItems().setId(JUDGED_WHILE_OPEN).setStatus(RunItemStatus.PENDING),
-                new TestRunItems().setId(STILL_PENDING).setStatus(RunItemStatus.PENDING))));
+        indexedTestRuns().putRunItems(testRun.getPath(), new RunItems().setAll(List.of(
+                new RunItem().setId(JUDGED_WHILE_OPEN).setStatus(RunItemStatus.PENDING),
+                new RunItem().setId(STILL_PENDING).setStatus(RunItemStatus.PENDING))));
         return testRun;
     }
 
-    private @NotNull RunItemStatus statusOf(final @NotNull TestRunDirectoryDto testRun, final @NotNull UUID testCaseId) {
-        return indexedTestRuns().getTestRunByPath(testRun.getPath()).resultOf(testCaseId).map(TestRunItems::getStatus).orElse(RunItemStatus.REMOVED);
+    private @NotNull RunItemStatus statusOf(final @NotNull TestRunNode testRun, final @NotNull UUID testCaseId) {
+        return indexedTestRuns().getRunItems(testRun.getPath()).runItemOf(testCaseId).map(RunItem::getStatus).orElse(RunItemStatus.REMOVED);
     }
 
-    private boolean save(final @NotNull TestRunDirectoryDto testRun) {
+    private boolean save(final @NotNull TestRunNode testRun) {
         final @NotNull Set<UUID> chosen = Set.of(JUDGED_WHILE_OPEN, STILL_PENDING, ADDED_BY_THE_EDIT);
         final boolean saved = new EditTestRunWork(getProject()).saveEdit(testRun, testRun.getName(), chosen, chosen, Map.of());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -78,9 +78,9 @@ public class EditTestRunSaveIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-128, Rule-TREE-PANEL-074
     public void testSavingKeepsARunItemStatusThatArrivedWhileTheDialogWasOpen() {
-        final @NotNull TestRunDirectoryDto testRun = anOpenTestRun();
+        final @NotNull TestRunNode testRun = anOpenTestRun();
 
-        indexedTestRuns().changeTestRun(testRun.getPath(), held -> held.resultOf(JUDGED_WHILE_OPEN).ifPresent(result -> result.setStatus(RunItemStatus.FAILED)));
+        indexedTestRuns().changeRunItems(testRun.getPath(), held -> held.runItemOf(JUDGED_WHILE_OPEN).ifPresent(result -> result.setStatus(RunItemStatus.FAILED)));
 
         assertTrue("the edit was refused", save(testRun));
         assertEquals("the run item status that arrived while the dialog was open was replaced", RunItemStatus.FAILED, statusOf(testRun, JUDGED_WHILE_OPEN));
@@ -89,11 +89,11 @@ public class EditTestRunSaveIdeTest extends AbstractTempRootIdeTest {
     }
 
     private void refusedOnceSignedOff(final @NotNull TestRunStatus status) {
-        final @NotNull TestRunDirectoryDto testRun = anOpenTestRun();
+        final @NotNull TestRunNode testRun = anOpenTestRun();
         testRun.getMarker().changeStatus(status);
 
         assertFalse("a " + status + " test run took an edit", save(testRun));
-        assertEquals("a " + status + " test run changed what it covers", Set.of(JUDGED_WHILE_OPEN, STILL_PENDING), indexedTestRuns().getTestRunByPath(testRun.getPath()).coveredIds());
+        assertEquals("a " + status + " test run changed what it covers", Set.of(JUDGED_WHILE_OPEN, STILL_PENDING), indexedTestRuns().getRunItems(testRun.getPath()).coveredIds());
     }
 
     // Rule-TREE-PANEL-009, Rule-TREE-PANEL-073
@@ -113,7 +113,7 @@ public class EditTestRunSaveIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-TREE-PANEL-060
     public void testASavedEditCannotBeUndone() {
-        final @NotNull TestRunDirectoryDto testRun = anOpenTestRun();
+        final @NotNull TestRunNode testRun = anOpenTestRun();
 
         assertTrue("the edit was refused", save(testRun));
         assertFalse("a saved edit of a test run went onto the tree's undo history",

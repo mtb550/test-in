@@ -128,7 +128,7 @@ becomes **Filter**, then the count, then **active**.
 **If the module has never been used** — it is not offered. The list is built
 from what is there.
 
-**In a test case editor** — there is no **Run Item Status** row. Only a test
+**In a test set editor** — there is no **Run Item Status** row. Only a test
 run holds run items, so there is nothing for it to filter on.
 
 ---

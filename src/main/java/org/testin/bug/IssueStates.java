@@ -58,10 +58,10 @@ record IssueStates(@NotNull Map<Integer, BugIssueState> states, boolean boardRef
     }
 
     private static @NotNull BugIssueState stateOf(final @NotNull JsonNode issue) {
-        for (final JsonNode item : issue.path("projectItems").path("nodes")) {
-            final @NotNull JsonNode column = item.path("fieldValueByName");
+        for (final JsonNode projectItem : issue.path("projectItems").path("nodes")) {
+            final @NotNull JsonNode column = projectItem.path("fieldValueByName");
             if (column.path("name").isTextual()) {
-                return BugIssueState.onBoard(column.path("name").asText(), column.path("color").asText(""), item.path("project").path("title").asText(""));
+                return BugIssueState.onBoard(column.path("name").asText(), column.path("color").asText(""), projectItem.path("project").path("title").asText(""));
             }
         }
 

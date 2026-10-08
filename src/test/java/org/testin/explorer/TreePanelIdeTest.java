@@ -37,9 +37,9 @@ import org.testin.explorer.toolbar.ExpandAllAction;
 import org.testin.explorer.toolbar.SaveTestinYmlAction;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -66,7 +66,7 @@ public class TreePanelIdeTest extends AbstractReadTheRootIdeTest {
 
     private static @NotNull List<Object> settledRowsOf(final @NotNull TreePanel panel) {
         final @NotNull SimpleTree tree = panel.getProjectTree().getMainTree();
-        Await.until("the tree never showed Checkout", () -> !rowsOf(tree).isEmpty() && rowsOf(tree).getFirst() instanceof final DirectoryDto top && top.getName().equals("Checkout"));
+        Await.until("the tree never showed Checkout", () -> !rowsOf(tree).isEmpty() && rowsOf(tree).getFirst() instanceof final Node top && top.getName().equals("Checkout"));
         return rowsOf(tree);
     }
 
@@ -110,16 +110,16 @@ public class TreePanelIdeTest extends AbstractReadTheRootIdeTest {
     public void testThePanelShowsOnlyTheBoundTestProjectAndNoTestCase() {
         final @NotNull Path checkout = aTestProjectAt(root.resolve("Checkout"));
         aTestProjectAt(root.resolve("Payments"));
-        aTestCaseIn(marked(theTestCasesOf(checkout).resolve("Login"), DirectoryType.TS));
+        aTestCaseIn(marked(theTestCasesOf(checkout).resolve("Login"), NodeType.TS));
         readEverything();
         bound().choose("Checkout");
 
         final @NotNull List<Object> rows = settledRowsOf(aPanelShowingTheTree());
 
-        assertEquals("the tree does not show exactly one test project: " + rows, 1, rows.stream().filter(TestProjectDirectoryDto.class::isInstance).count());
-        assertTrue("the tree lists a test project it is not bound to: " + rows, rows.stream().noneMatch(row -> row instanceof final DirectoryDto node && node.getName().equals("Payments")));
-        assertTrue("a test case is a node in the tree: " + rows, rows.stream().allMatch(DirectoryDto.class::isInstance));
-        assertTrue("the test set holding the test case is not in the tree: " + rows, rows.stream().anyMatch(row -> row instanceof final DirectoryDto node && node.getName().equals("Login")));
+        assertEquals("the tree does not show exactly one test project: " + rows, 1, rows.stream().filter(TestProjectNode.class::isInstance).count());
+        assertTrue("the tree lists a test project it is not bound to: " + rows, rows.stream().noneMatch(row -> row instanceof final Node node && node.getName().equals("Payments")));
+        assertTrue("a test case is a node in the tree: " + rows, rows.stream().allMatch(Node.class::isInstance));
+        assertTrue("the test set holding the test case is not in the tree: " + rows, rows.stream().anyMatch(row -> row instanceof final Node node && node.getName().equals("Login")));
     }
 
     // Rule-TREE-PANEL-015
@@ -146,9 +146,9 @@ public class TreePanelIdeTest extends AbstractReadTheRootIdeTest {
     // Rule-TREE-PANEL-064
     public void testAnInactiveTestProjectIsOpenedAndBoundAndHoldsNothing() {
         final @NotNull Path checkout = aTestProjectAt(root.resolve("Checkout"));
-        aTestCaseIn(marked(theTestCasesOf(checkout).resolve("Login"), DirectoryType.TS));
+        aTestCaseIn(marked(theTestCasesOf(checkout).resolve("Login"), NodeType.TS));
         readEverything();
-        final @NotNull TestProjectDirectoryDto tp = (TestProjectDirectoryDto) nodes().find(checkout).orElseThrow();
+        final @NotNull TestProjectNode tp = (TestProjectNode) nodes().find(checkout).orElseThrow();
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
             nodes().persistMarker(tp);

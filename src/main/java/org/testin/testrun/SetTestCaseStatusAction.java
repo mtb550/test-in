@@ -26,10 +26,10 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
-import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.testrun.failure.FailureDetailDialog;
 import org.testin.util.Bundle;
 
 import java.util.List;
@@ -57,13 +57,13 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033
     private void record(final @NotNull Project p, final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        final @NotNull Optional<TestRunItems> runItem = askingForFailureDetails(editor, selectedItems);
+        final @NotNull Optional<RunItem> runItem = askingForFailureDetails(editor, selectedItems);
         if (runItem.isEmpty()) {
             applyStatus(p, editor, selectedItems);
             return;
         }
 
-        new FailedResultDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
+        new FailureDetailDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
             if (Services.getInstance(p, RunItemStatusService.class).recordFailureDetails(editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
                 applyStatus(p, editor, selectedItems);
             }
@@ -71,10 +71,10 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
     }
 
     // UC-EDITOR-PANEL-034
-    private @NotNull Optional<TestRunItems> askingForFailureDetails(final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private @NotNull Optional<RunItem> askingForFailureDetails(final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         if (!status.isCollectsFailureDetails() || selectedItems.size() != 1) return Optional.empty();
 
-        return editor.runItem(selectedItems.getFirst().getId()).filter(item -> !item.isRemoved());
+        return editor.runItem(selectedItems.getFirst().getId()).filter(runItem -> !runItem.isRemoved());
     }
 
     private void applyStatus(final @NotNull Project p, final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {

@@ -24,8 +24,8 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.node.Node;
+import org.testin.model.testrun.TestRunConfiguration;
 import org.testin.services.Services;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.util.Bundle;
@@ -80,7 +80,7 @@ public final class TestRunForm {
     }
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022
-    public void open(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull List<TestCaseDto> deleted, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull TestRunFormAction action) {
+    public void open(final @NotNull Node testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull List<TestCaseDto> deleted, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull TestRunFormAction action) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesRoot.getPath(), testCasesRoot);
 
@@ -116,19 +116,19 @@ public final class TestRunForm {
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-030
-    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull DirectoryDto thisNodeDto) {
+    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull Node thisNode) {
         indexer.awaitIndexing();
 
-        final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
+        final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNode);
 
-        if (thisNodeDto.holdsTestCases()) {
+        if (thisNode.holdsTestCases()) {
             for (final TestCaseDto tc : testCases.getTestCasesForTestSet(folder)) {
                 node.add(new DefaultMutableTreeNode(tc));
             }
             return node;
         }
 
-        for (final DirectoryDto child : nodes.getChildren(folder)) {
+        for (final Node child : nodes.getChildren(folder)) {
             if (child.isRetired()) continue;
 
             final @NotNull DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);

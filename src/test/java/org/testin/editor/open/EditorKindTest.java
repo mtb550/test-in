@@ -25,13 +25,13 @@ public class EditorKindTest {
     // Rule-EDITOR-PANEL-022
     @Test
     public void theDetailsKeysAreTheOnesAlreadyStored() {
-        assertEquals(EditorKind.TEST.detailsKey(4), "testin.selectedDetails.test.v4");
-        assertEquals(EditorKind.RUN.detailsKey(7), "testin.selectedDetails.run.v7");
+        assertEquals(EditorKind.TEST_SET.detailsKey(4), "testin.selectedDetails.test.v4");
+        assertEquals(EditorKind.TEST_RUN.detailsKey(7), "testin.selectedDetails.run.v7");
     }
 
     @Test
     public void theColumnWidthKeysAreTheOnesAlreadyStored() {
-        assertEquals(EditorKind.TEST.columnWidthKey("Expected Result"), "testin.grid.colWidth.test.Expected Result");
-        assertEquals(EditorKind.RUN.columnWidthKey("FQCN"), "testin.grid.colWidth.run.FQCN");
+        assertEquals(EditorKind.TEST_SET.columnWidthKey("Expected Result"), "testin.grid.colWidth.test.Expected Result");
+        assertEquals(EditorKind.TEST_RUN.columnWidthKey("FQCN"), "testin.grid.colWidth.run.FQCN");
     }
 }

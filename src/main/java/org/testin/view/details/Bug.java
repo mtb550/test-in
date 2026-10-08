@@ -24,13 +24,13 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.bug.BugReports;
 import org.testin.bug.ReportBug;
-import org.testin.bug.RunItem;
+import org.testin.bug.RunItemPath;
 import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.ui.Badge;
@@ -49,35 +49,35 @@ public final class Bug {
     private static final int LINK_GAP = 10;
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-086
-    public static @NotNull Optional<JComponent> of(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath, final @NotNull TestCaseDto dto) {
+    public static @NotNull Optional<JComponent> of(final @NotNull Project p, final @NotNull RunItem runItem, final @NotNull List<String> currentPath, final @NotNull TestCaseDto dto) {
         final @NotNull Optional<String> bugIssue = runItem.bugIssue();
         if (!runItem.isFailed() && bugIssue.isEmpty()) return Optional.empty();
 
         return Services.getInstance(p, Nodes.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
-                .filter(TestRunDirectoryDto.class::isInstance)
-                .map(TestRunDirectoryDto.class::cast)
-                .map(testRunDirectory -> drawn(p, runItem, dto, bugIssue, testRunDirectory));
+                .filter(TestRunNode.class::isInstance)
+                .map(TestRunNode.class::cast)
+                .map(testRunNode -> drawn(p, runItem, dto, bugIssue, testRunNode));
     }
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-086
-    private static @NotNull JComponent drawn(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto testRunDirectory) {
+    private static @NotNull JComponent drawn(final @NotNull Project p, final @NotNull RunItem runItem, final @NotNull TestCaseDto dto, final @NotNull Optional<String> bugIssue, final @NotNull TestRunNode testRunNode) {
         final @NotNull JBPanel<?> line = AbstractDetails.row(LINK_GAP);
 
         chip(runItem).ifPresent(line::add);
         bugIssue.ifPresentOrElse(
                 url -> line.add(BugIssueLink.of(p, url)),
-                () -> line.add(report(p, runItem, dto, testRunDirectory)));
+                () -> line.add(report(p, runItem, dto, testRunNode)));
 
         return line;
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
-    private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto testRunDirectory) {
+    private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull RunItem runItem, final @NotNull TestCaseDto dto, final @NotNull TestRunNode testRunNode) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
-                .whyReportBugIsOff(new RunItem(testRunDirectory.getPath(), runItem.getId()), runItem);
+                .whyReportBugIsOff(new RunItemPath(testRunNode.getPath(), runItem.getId()), runItem);
 
         final @NotNull ActionLink report = AbstractDetails.link(Bundle.message("bug.dialog.title"),
-                _ -> ReportBug.start(p, testRunDirectory, runItem.getId(), dto, () -> redraw(p, dto, testRunDirectory)));
+                _ -> ReportBug.start(p, testRunNode, runItem.getId(), dto, () -> redraw(p, dto, testRunNode)));
 
         report.setEnabled(off.isEmpty());
         Tooltip.set(report, off.orElse(""));
@@ -86,7 +86,7 @@ public final class Bug {
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
-    private static @NotNull Optional<JComponent> chip(final @NotNull TestRunItems runItem) {
+    private static @NotNull Optional<JComponent> chip(final @NotNull RunItem runItem) {
         if (!runItem.isFailed()) return Optional.empty();
 
         final @NotNull List<Badge> bug = new ArrayList<>();
@@ -99,8 +99,8 @@ public final class Bug {
         return Optional.of(holder);
     }
 
-    private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto testRunDirectory) {
+    private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunNode testRunNode) {
         ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
-        Services.getInstance(p, TestinEditors.class).testRunEditorFor(testRunDirectory).ifPresent(TestRunEditor::refreshView);
+        Services.getInstance(p, TestinEditors.class).testRunEditorFor(testRunNode).ifPresent(TestRunEditor::refreshView);
     }
 }

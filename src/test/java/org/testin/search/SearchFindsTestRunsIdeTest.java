@@ -18,16 +18,16 @@ package org.testin.search;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.NodeMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
-import org.testin.model.node.TestSetDirectoryDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
+import org.testin.model.node.TestSetNode;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.services.Services;
 
@@ -47,8 +47,8 @@ public class SearchFindsTestRunsIdeTest extends AbstractTempRootIdeTest {
     protected void setUp() {
         super.setUp();
 
-        final TestProjectDirectoryDto tp = WriteAction.computeAndWait(() -> {
-            final TestProjectDirectoryDto project = mapper().setTestProjectNode(root.resolve("NAFATH"));
+        final TestProjectNode tp = WriteAction.computeAndWait(() -> {
+            final TestProjectNode project = mapper().setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(project);
 
             return project;
@@ -59,8 +59,8 @@ public class SearchFindsTestRunsIdeTest extends AbstractTempRootIdeTest {
         ranSomethingElse = aTestRunOver(tp, "Cycle-2", UUID.randomUUID());
     }
 
-    private @NotNull DirectoryMapper mapper() {
-        return Services.getInstance(getProject(), DirectoryMapper.class);
+    private @NotNull NodeMapper mapper() {
+        return Services.getInstance(getProject(), NodeMapper.class);
     }
 
     private @NotNull TestCases indexedTestCases() {
@@ -75,9 +75,9 @@ public class SearchFindsTestRunsIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestCaseDto aTestCaseIn(final TestProjectDirectoryDto tp) {
-        final TestSetDirectoryDto login = WriteAction.computeAndWait(() -> {
-            final TestSetDirectoryDto set = mapper().getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+    private @NotNull TestCaseDto aTestCaseIn(final TestProjectNode tp) {
+        final TestSetNode login = WriteAction.computeAndWait(() -> {
+            final TestSetNode set = mapper().getTestSetNode(tp.getTestCasesFolder().getPath().resolve("Login"), tp.getTestCasesFolder());
             nodes().addTestSet(set);
 
             return set;
@@ -94,16 +94,16 @@ public class SearchFindsTestRunsIdeTest extends AbstractTempRootIdeTest {
         return tc;
     }
 
-    private @NotNull Path aTestRunOver(final TestProjectDirectoryDto tp, final String named, final UUID testCaseId) {
+    private @NotNull Path aTestRunOver(final TestProjectNode tp, final String named, final UUID testCaseId) {
         final Path testRunPath = WriteAction.computeAndWait(() -> {
-            final Path path = tp.getTestRunsDirectory().getPath().resolve(named);
-            final TestRunDirectoryDto tr = mapper().setTestRunNode(path, tp.getTestRunsDirectory());
-            nodes().addTestRunDir(tr);
+            final Path path = tp.getTestRunsFolder().getPath().resolve(named);
+            final TestRunNode tr = mapper().setTestRunNode(path, tp.getTestRunsFolder());
+            nodes().addTestRunNode(tr);
 
             return path;
         });
 
-        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(RunItemStatus.PASSED))));
+        indexedTestRuns().putRunItems(testRunPath, new RunItems().setAll(List.of(new RunItem().setId(testCaseId).setStatus(RunItemStatus.PASSED))));
         return testRunPath;
     }
 

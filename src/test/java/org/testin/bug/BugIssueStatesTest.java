@@ -17,8 +17,8 @@
 package org.testin.bug;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
 
@@ -33,18 +33,18 @@ import static org.testng.Assert.assertTrue;
 
 public class BugIssueStatesTest {
 
-    private static @NotNull TestRunDto filed(final @NotNull String... bugIssueUrls) {
-        final @NotNull List<TestRunItems> results = new ArrayList<>();
+    private static @NotNull RunItems filed(final @NotNull String... bugIssueUrls) {
+        final @NotNull List<RunItem> runItems = new ArrayList<>();
         for (final String url : bugIssueUrls) {
-            results.add(TestRunItems.builder().id(UUID.randomUUID()).status(RunItemStatus.FAILED).bugIssueUrl(url).build());
+            runItems.add(RunItem.builder().id(UUID.randomUUID()).status(RunItemStatus.FAILED).bugIssueUrl(url).build());
         }
-        return TestRunDto.builder().results(results).build();
+        return RunItems.builder().all(runItems).build();
     }
 
     // Rule-VIEW-PANEL-092
     @Test
     public void aTestProjectWithNoFiledBugHasNothingToAsk() {
-        assertTrue(BugIssueStates.filedIn(List.of(filed(), TestRunDto.builder().build())).isEmpty());
+        assertTrue(BugIssueStates.filedIn(List.of(filed(), RunItems.builder().build())).isEmpty());
     }
 
     // Rule-VIEW-PANEL-092

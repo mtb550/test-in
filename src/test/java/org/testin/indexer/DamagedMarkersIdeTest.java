@@ -18,7 +18,7 @@ package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.markers.TestSetMarker;
 import org.testin.services.Services;
 
@@ -33,16 +33,16 @@ public class DamagedMarkersIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull Path damagedTestSet(final @NotNull String testProject) {
-        final @NotNull Path testSet = root.resolve(testProject).resolve(DirectoryType.TCD.getFolderName()).resolve("Login");
+        final @NotNull Path testSet = root.resolve(testProject).resolve(NodeType.TCF.getFolderName()).resolve("Login");
 
         try {
             Files.createDirectories(testSet);
-            Files.writeString(testSet.resolve(DirectoryType.TS.getMarker()), "{ not a marker");
+            Files.writeString(testSet.resolve(NodeType.TS.getMarker()), "{ not a marker");
         } catch (final Exception ex) {
             throw new AssertionError("Could not write a damaged marker: " + ex.getMessage(), ex);
         }
 
-        store().readMarker(testSet, DirectoryType.TS, TestSetMarker.class);
+        store().readMarker(testSet, NodeType.TS, TestSetMarker.class);
         return testSet;
     }
 

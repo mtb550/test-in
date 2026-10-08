@@ -34,10 +34,7 @@ import java.util.Optional;
 @ToString(callSuper = true)
 public class TestProjectMarker extends AbstractMarker {
     // Rule-INTERNAL-091
-    public static final int FORMAT = 2;
-
-    // Rule-INTERNAL-091
-    public static final @NotNull String CONVERTING_RELEASE = "2.13.0-alpha";
+    public static final int FORMAT = 3;
 
     @NonNull
     private ProjectStatus status = ProjectStatus.ACTIVE;
@@ -52,7 +49,7 @@ public class TestProjectMarker extends AbstractMarker {
 
         return Optional.of(format > FORMAT
                 ? Bundle.message("scan.newer.format")
-                : Bundle.message("scan.older.format", CONVERTING_RELEASE));
+                : Bundle.message("scan.older.format"));
     }
 
     @Override

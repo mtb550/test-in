@@ -21,14 +21,14 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 
 import java.util.List;
 
-public class RemoveJavaClass implements GenAction<DirectoryDto> {
+public class RemoveJavaClass implements GenAction<Node> {
     // UC-CODEGEN-018, Rule-CODEGEN-059
     @Override
-    public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public void execute(final @NotNull Project p, final @NotNull Node dir) {
         final @NotNull List<String> fqcn = Fqcn.ofClass(dir);
         if (fqcn.isEmpty()) return;
 

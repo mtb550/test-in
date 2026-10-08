@@ -1376,12 +1376,12 @@ function Read-OrphanedJavadoc([string[]] $scopes)
         orphaned.
 
         One file is frozen by name, the way ArchitectureTest freezes a known
-        violation: TestRunDto's block separates a @JsonIgnore from the method
+        violation: RunItems's block separates a @JsonIgnore from the method
         it was written for, which is a data bug rather than a documentation
         one - the derived field reaches every test run file a tester commits. It
         is #73's, and deleting that name is how that story closes.
     #>
-    $frozen = @('src/main/java/org/testin/model/TestRunDto.java')
+    $frozen = @('src/main/java/org/testin/model/testrun/RunItems.java')
 
     foreach ($scope in $scopes)
     {
@@ -2176,7 +2176,7 @@ $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/mo
 # on being listed after #111 moved them and the check quietly shrank to comparing
 # one pair - printing "Gate clear" either way (#66, finding 98).
 $problems += @(Read-DriftedCaptions @(
-        (Join-Path $repo 'src/main/java/org/testin/testcase/TestCaseEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testcase/TestSetEditorAttributes.java'),
         (Join-Path $repo 'src/main/java/org/testin/testrun/TestRunEditorAttributes.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/CreateTestCaseFields.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/UpdateTestCaseFields.java')))

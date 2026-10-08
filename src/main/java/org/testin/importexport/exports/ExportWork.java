@@ -24,12 +24,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testcase.Can;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.ui.dialogs.Destination;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
@@ -68,19 +68,19 @@ record ExportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestC
         return String.join(" - ", path) + " (" + (taken.size() + 1) + ")";
     }
 
-    private static @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
-        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
+    private static @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull Node node) {
+        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(node.getPath().toString()))
                 .map(target -> target.isDirectory() ? target : target.getParent());
     }
 
     // UC-SHARE-001, Rule-SHARE-015
-    void exportFrom(final @NotNull DirectoryDto dirDto) {
-        final @NotNull Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
+    void exportFrom(final @NotNull Node node) {
+        final @NotNull Optional<VirtualFile> resolved = resolveTargetDir(node);
         if (resolved.isEmpty()) return;
         final @NotNull VirtualFile targetDir = resolved.orElseThrow();
 
-        BackgroundWork.run(p, Bundle.message("export.task.reading", dirDto.getName()), Bundle.message("export.failed.title"), _ -> {
-            final @NotNull Gathered gathered = gather(dirDto);
+        BackgroundWork.run(p, Bundle.message("export.task.reading", node.getName()), Bundle.message("export.failed.title"), _ -> {
+            final @NotNull Gathered gathered = gather(node);
             final @NotNull Map<String, List<TestCaseDto>> sheets = gathered.sheets();
             if (sheets.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() ->
@@ -101,7 +101,7 @@ record ExportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestC
     }
 
     private void chooseWhatToExport(final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull VirtualFile targetDir) {
-        new ExportDialog(p, TestCaseEditorAttributes.all(Can.EXPORT), sheets, targetDir, this::writeExport).show();
+        new ExportDialog(p, TestSetEditorAttributes.all(Can.EXPORT), sheets, targetDir, this::writeExport).show();
     }
 
     // UC-SHARE-001, Rule-SHARE-005
@@ -117,7 +117,7 @@ record ExportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestC
     }
 
     // UC-SHARE-002, Rule-SHARE-001
-    private @NotNull Gathered gather(final @NotNull DirectoryDto node) {
+    private @NotNull Gathered gather(final @NotNull Node node) {
         final @NotNull List<Sheet> found = new ArrayList<>();
         final @NotNull List<String> unreadable = new ArrayList<>();
 
@@ -136,13 +136,13 @@ record ExportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestC
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
+    private void walk(final @NotNull Node node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
         final @NotNull List<TestCaseDto> here = testCases.getTestCasesForTestSet(node.getPath());
         if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 
         unreadable.addAll(testCases.unreadableTestCasesIn(node.getPath()).stream().sorted().toList());
 
-        for (final DirectoryDto child : nodes.getChildren(node.getPath())) {
+        for (final Node child : nodes.getChildren(node.getPath())) {
             final @NotNull List<String> under = new ArrayList<>(path);
             under.add(child.getName());
             walk(child, under, found, unreadable);

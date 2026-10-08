@@ -65,21 +65,21 @@ final class ReadProblems {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
-    void unreadableResults(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
+    void unreadableRunItems(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
         final @NotNull List<String> names = unreadable.stream().sorted().toList();
 
-        say(Bundle.message("indexer.results.unread.title", projectName), names,
-                name -> Bundle.message("indexer.results.unread.one", name),
-                (named, rest) -> Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
+        say(Bundle.message("indexer.run.items.unread.title", projectName), names,
+                name -> Bundle.message("indexer.run.items.unread.one", name),
+                (named, rest) -> Bundle.message("indexer.run.items.unread.many", String.valueOf(names.size()), named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-094
-    void handNamedResults(final @NotNull String projectName, final @NotNull Set<String> handNamed) {
+    void handNamedRunItems(final @NotNull String projectName, final @NotNull Set<String> handNamed) {
         final @NotNull List<String> names = handNamed.stream().sorted().toList();
 
-        say(Bundle.message("indexer.results.unnamed.title", projectName), names,
-                name -> Bundle.message("indexer.results.unnamed.one", name),
-                (named, rest) -> Bundle.message("indexer.results.unnamed.many", String.valueOf(names.size()), named, rest));
+        say(Bundle.message("indexer.run.items.unnamed.title", projectName), names,
+                name -> Bundle.message("indexer.run.items.unnamed.one", name),
+                (named, rest) -> Bundle.message("indexer.run.items.unnamed.many", String.valueOf(names.size()), named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014

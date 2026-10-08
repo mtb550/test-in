@@ -20,10 +20,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
-import org.testin.model.DirectoryType;
-import org.testin.model.TestRunDto;
-import org.testin.model.node.TestProjectDirectoryDto;
-import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.testrun.RunItems;
+import org.testin.model.node.TestProjectNode;
+import org.testin.model.node.TestRunNode;
 import org.testin.model.status.TestRunStatus;
 import org.testin.services.Services;
 
@@ -36,11 +36,11 @@ public class MarkerNotSavedIdeTest extends AbstractTempRootIdeTest {
     // Rule-INTERNAL-123
     public void testATestRunMarkerThatCannotBeWrittenIsReadAgainFromDisk() {
         final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
-        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
-        final @NotNull TestRunDirectoryDto testRun = made.testRun(tp.getTestRunsDirectory(), "Cycle-1");
-        Services.getInstance(getProject(), TestRuns.class).putTestRun(testRun.getPath(), new TestRunDto());
+        final @NotNull TestProjectNode tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestRunNode testRun = made.testRun(tp.getTestRunsFolder(), "Cycle-1");
+        Services.getInstance(getProject(), TestRuns.class).putRunItems(testRun.getPath(), new RunItems());
 
-        final @NotNull Path marker = testRun.getPath().resolve(DirectoryType.TR.getMarker());
+        final @NotNull Path marker = testRun.getPath().resolve(NodeType.TR.getMarker());
         try {
             Files.delete(marker);
             Files.createDirectory(marker);

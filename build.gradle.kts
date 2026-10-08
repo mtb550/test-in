@@ -734,7 +734,7 @@ mapOf("runIde" to "config", "runPyCharm" to "config_runPyCharm").forEach { (runT
  *
  * Matched on what compileTestJava actually produced, never on names. This plugin
  * is about test cases, so a check that looked for the word "test" would fail on
- * TestCaseEditor, TestCaseCard and sixty others, and be switched off within a week.
+ * TestSetEditor, TestCaseCard and sixty others, and be switched off within a week.
  */
 // compileOnly cannot be resolved - it is a declaration bucket - so the check
 // resolves a configuration that extends it and can be.

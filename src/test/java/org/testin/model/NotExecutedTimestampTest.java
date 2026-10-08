@@ -17,7 +17,7 @@
 package org.testin.model;
 
 import org.testin.model.markers.TestRunMarker;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
 import org.testin.util.Display;
 import org.testng.annotations.Test;
@@ -34,20 +34,20 @@ public class NotExecutedTimestampTest {
 
     @Test
     public void aFreshRunItemHasNoExecutionTime() {
-        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
+        final RunItem runItem = RunItem.builder().id(UUID.randomUUID()).build();
 
-        assertTrue(Config.isNotExecuted(item.getExecutedAt()));
-        assertEquals(Display.formatDate(item.getExecutedAt()), "");
+        assertTrue(Config.isNotExecuted(runItem.getExecutedAt()));
+        assertEquals(Display.formatDate(runItem.getExecutedAt()), "");
     }
 
     @Test
     public void aRunItemStatusGivesTheTestCaseARealTime() {
-        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
+        final RunItem runItem = RunItem.builder().id(UUID.randomUUID()).build();
 
-        item.recordRunItemStatus(RunItemStatus.PASSED, "tester");
+        runItem.recordRunItemStatus(RunItemStatus.PASSED, "tester");
 
-        assertFalse(Config.isNotExecuted(item.getExecutedAt()));
-        assertFalse(Display.formatDate(item.getExecutedAt()).isEmpty());
+        assertFalse(Config.isNotExecuted(runItem.getExecutedAt()));
+        assertFalse(Display.formatDate(runItem.getExecutedAt()).isEmpty());
     }
 
     @Test

@@ -30,8 +30,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.logger.Logger;
-import org.testin.model.node.DirectoryDto;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.Node;
+import org.testin.model.node.TestProjectNode;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -139,7 +139,7 @@ public class TreePanelTree implements Disposable {
         if (disposed) return;
 
         TreeUtil.promiseSelect(mainTree, (final @NotNull TreePath path) -> {
-            final @NotNull Optional<Path> at = TreeValues.directoryAt(path).map(DirectoryDto::getPath);
+            final @NotNull Optional<Path> at = TreeValues.directoryAt(path).map(Node::getPath);
             if (at.isEmpty()) return TreeVisitor.Action.CONTINUE;
 
             if (at.get().equals(target)) return TreeVisitor.Action.INTERRUPT;
@@ -175,7 +175,7 @@ public class TreePanelTree implements Disposable {
     }
 
     private void rebuild() {
-        final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
+        final @NotNull Optional<TestProjectNode> boundProject = bound();
         treeStructure.setSelectedProject(boundProject);
 
         final @NotNull String projectPath = boundProject.map(dir -> dir.getPath().toString()).orElse("");
@@ -218,7 +218,7 @@ public class TreePanelTree implements Disposable {
         final @NotNull List<Path> folders = List.copyOf(changedFolders);
         folders.forEach(changedFolders::remove);
 
-        final @NotNull Optional<Path> root = bound().map(DirectoryDto::getPath);
+        final @NotNull Optional<Path> root = bound().map(Node::getPath);
         if (root.isEmpty()) return;
 
         final long started = System.nanoTime();
@@ -242,7 +242,7 @@ public class TreePanelTree implements Disposable {
         target.ifPresent(this::reveal);
     }
 
-    private @NotNull Optional<TestProjectDirectoryDto> bound() {
+    private @NotNull Optional<TestProjectNode> bound() {
         return boundTestProject.get();
     }
 

@@ -19,9 +19,9 @@ package org.testin.clipboard;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.model.status.TestCaseStatus;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testng.annotations.Test;
 
 import javax.swing.KeyStroke;
@@ -39,7 +39,7 @@ import static org.testng.Assert.assertTrue;
 public class CopyChoiceTest {
 
     private static @NotNull TestCaseDto writtenInFull() {
-        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        final @NotNull TestSetNode set = new TestSetNode();
         set.setPath2(new ArrayList<>(List.of("shop", "checkout", "Payment")));
 
         final @NotNull TestCaseDto tc = TestCaseDto.builder()
@@ -51,7 +51,7 @@ public class CopyChoiceTest {
                 .reference("JIRA-77")
                 .testData("card=4111")
                 .preConditions("A basket holds one item")
-                .group(List.of("Regression"))
+                .groups(List.of("Regression"))
                 .module("payments")
                 .status(TestCaseStatus.REVIEWED)
                 .build();
@@ -98,7 +98,7 @@ public class CopyChoiceTest {
 
     @Test
     public void theClassNameIsCopiedDotted() {
-        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        final @NotNull TestSetNode set = new TestSetNode();
         set.setPath2(new ArrayList<>(List.of("shop", "checkout", "Payment")));
 
         final @NotNull TestCaseDto tc = TestCaseDto.builder().description("card is declined").build();
@@ -111,18 +111,18 @@ public class CopyChoiceTest {
     @Test
     public void allDetailsCopiesEveryFieldTheTesterWroteAsNameColonValue() {
         final @NotNull TestCaseDto tc = writtenInFull();
-        final @NotNull List<TestCaseEditorAttributes> written = List.of(
-                TestCaseEditorAttributes.DESCRIPTION, TestCaseEditorAttributes.EXPECTED_RESULT, TestCaseEditorAttributes.STEPS,
-                TestCaseEditorAttributes.PRIORITY, TestCaseEditorAttributes.REFERENCE, TestCaseEditorAttributes.TEST_DATA,
-                TestCaseEditorAttributes.PRE_CONDITIONS, TestCaseEditorAttributes.GROUP, TestCaseEditorAttributes.MODULE,
-                TestCaseEditorAttributes.STATUS);
+        final @NotNull List<TestSetEditorAttributes> written = List.of(
+                TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT, TestSetEditorAttributes.STEPS,
+                TestSetEditorAttributes.PRIORITY, TestSetEditorAttributes.REFERENCE, TestSetEditorAttributes.TEST_DATA,
+                TestSetEditorAttributes.PRE_CONDITIONS, TestSetEditorAttributes.GROUP, TestSetEditorAttributes.MODULE,
+                TestSetEditorAttributes.STATUS);
 
         final @NotNull String copied = CopyChoice.ALL_DETAILS.from(tc);
 
-        for (final TestCaseEditorAttributes field : written) {
+        for (final TestSetEditorAttributes field : written) {
             assertTrue(copied.contains(field.getName() + ": " + field.gridValue(tc)), field.getName() + " is not copied as its name, a colon and its value: " + copied);
         }
-        for (final TestCaseEditorAttributes field : TestCaseEditorAttributes.values()) {
+        for (final TestSetEditorAttributes field : TestSetEditorAttributes.values()) {
             if (written.contains(field)) continue;
 
             assertFalse(copied.contains(field.getName() + ": "), field.getName() + " is not a field the tester wrote, yet All Details copied it: " + copied);
@@ -135,7 +135,7 @@ public class CopyChoiceTest {
         final @NotNull TestCaseDto tc = writtenInFull();
         tc.setReference("");
 
-        assertFalse(CopyChoice.ALL_DETAILS.from(tc).contains(TestCaseEditorAttributes.REFERENCE.getName() + ":"), "an empty reference still got a line");
+        assertFalse(CopyChoice.ALL_DETAILS.from(tc).contains(TestSetEditorAttributes.REFERENCE.getName() + ":"), "an empty reference still got a line");
     }
 
     // Rule-EDITOR-PANEL-074
@@ -158,6 +158,6 @@ public class CopyChoiceTest {
         assertEquals(CopyChoice.DESCRIPTION.from(tc), "Refuse an expired card", "a single value carries no caption");
         assertEquals(CopyChoice.ID.from(tc), tc.getId().toString(), "the identity can be copied on its own");
         assertEquals(CopyChoice.FQCN.from(tc), "shop.checkout.PaymentTest.refuseAnExpiredCard", "and the class name");
-        assertEquals(CopyChoice.PATH.from(tc), TestCaseEditorAttributes.PATH.gridValue(tc), "and the path");
+        assertEquals(CopyChoice.PATH.from(tc), TestSetEditorAttributes.PATH.gridValue(tc), "and the path");
     }
 }

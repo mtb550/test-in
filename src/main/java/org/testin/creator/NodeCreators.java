@@ -20,14 +20,14 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NodeCreators {
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-011
-    public static @NotNull NodeCreator of(final @NotNull Project p, final @NotNull DirectoryType type) {
+    public static @NotNull NodeCreator of(final @NotNull Project p, final @NotNull NodeType type) {
         return switch (type) {
-            case TP, TCD, TRD -> new NotCreatableFromTree(type.getDescription());
+            case TP, TCF, TRF -> new NotCreatableFromTree(type.getDescription());
             case TSP -> new CreateTestSetPackage(p);
             case TRP -> new CreateTestRunPackage(p);
             case TS -> new CreateTestSet(p);

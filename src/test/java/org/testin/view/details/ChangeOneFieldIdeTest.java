@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.Said;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 public class ChangeOneFieldIdeTest extends AbstractViewPanelIdeTest {
 
     private PopupsBuilt popups;
-    private TestSetDirectoryDto ts;
+    private TestSetNode ts;
 
     private static @NotNull FileTime writtenAt(final @NotNull Path file) {
         try {

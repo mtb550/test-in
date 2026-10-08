@@ -21,8 +21,8 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.DirectoryType;
-import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.NodeType;
+import org.testin.model.node.TestSetNode;
 
 public class TestSetClassIdeTest extends AbstractCodegenIdeTest {
 
@@ -47,13 +47,13 @@ public class TestSetClassIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-009
     public void testAClassAlreadyThereIsNeverWrittenOver() {
-        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestSetNode login = createdTestSet("Login");
         final @NotNull PsiClass written = generatedClass("nafath.LoginTest").orElseThrow();
         WriteCommandAction.runWriteCommandAction(getProject(), () -> {
             written.add(JavaPsiFacade.getElementFactory(getProject()).createMethodFromText("public void writtenByHand() {}", written));
         });
 
-        JavaCode.of(DirectoryType.TS).getCreated().execute(getProject(), login);
+        JavaCode.of(NodeType.TS).getCreated().execute(getProject(), login);
 
         assertEquals("the class was written over, and the tester's method went with it", 1, generatedClass("nafath.LoginTest").orElseThrow().findMethodsByName("writtenByHand", false).length);
     }

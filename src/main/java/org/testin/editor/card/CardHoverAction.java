@@ -29,7 +29,7 @@ import org.testin.codegen.CodeOn;
 import org.testin.editor.TestinEditor;
 import org.testin.model.Automated;
 import org.testin.model.TestCaseDto;
-import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.Node;
 import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.navigate.NavigateToTestMethodAction;
 import org.testin.notifications.Done;
@@ -65,7 +65,7 @@ public enum CardHoverAction {
             ImmutableList.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             ExecuteTestCases::run,
-            (shownIn, _) -> shownIn.flatMap(DirectoryDto::whySignedOff)
+            (shownIn, _) -> shownIn.flatMap(Node::whySignedOff)
     ),
 
     STOP_TEST_METHOD(
@@ -97,10 +97,10 @@ public enum CardHoverAction {
     private final @NotNull BiConsumer<Project, List<TestCaseDto>> onClick;
 
     @Getter(AccessLevel.NONE)
-    private final @NotNull BiFunction<Optional<DirectoryDto>, TestCaseDto, Optional<String>> whyNotHere;
+    private final @NotNull BiFunction<Optional<Node>, TestCaseDto, Optional<String>> whyNotHere;
 
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-235
-    public static @NotNull List<Offered> onCard(final @NotNull Project p, final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
+    public static @NotNull List<Offered> onCard(final @NotNull Project p, final @NotNull Node openOn, final @NotNull TestCaseDto tc) {
         final @NotNull List<CardHoverAction> buttons = openOn.isTestCaseContainer()
                 ? List.of(NAVIGATE_TO_TEST_METHOD, RUN_TEST_METHOD)
                 : List.of(NAVIGATE_TO_TEST_METHOD, RUN_TEST_METHOD, NAVIGATE_TO_TEST_CASE);
@@ -131,14 +131,14 @@ public enum CardHoverAction {
     }
 
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-266
-    public @NotNull Offered offer(final @NotNull Project p, final @NotNull Optional<DirectoryDto> shownIn, final @NotNull TestCaseDto tc) {
+    public @NotNull Offered offer(final @NotNull Project p, final @NotNull Optional<Node> shownIn, final @NotNull TestCaseDto tc) {
         final @NotNull CardHoverAction now = gestureOn(p, tc);
 
         return new Offered(now, now.whyNotOffered(p).or(() -> now.whyNotHere(shownIn, tc)));
     }
 
     // Rule-EDITOR-PANEL-266
-    public @NotNull Optional<String> whyNotHere(final @NotNull Optional<DirectoryDto> shownIn, final @NotNull TestCaseDto tc) {
+    public @NotNull Optional<String> whyNotHere(final @NotNull Optional<Node> shownIn, final @NotNull TestCaseDto tc) {
         return whyNotHere.apply(shownIn, tc);
     }
 

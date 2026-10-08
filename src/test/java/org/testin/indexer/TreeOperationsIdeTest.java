@@ -19,10 +19,10 @@ package org.testin.indexer;
 import com.intellij.openapi.application.WriteAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.model.DirectoryType;
-import org.testin.model.markers.TestCasesMainDirectoryMarker;
+import org.testin.model.NodeType;
+import org.testin.model.markers.TestCasesFolderMarker;
 import org.testin.model.markers.TestProjectMarker;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.status.ProjectStatus;
 import org.testin.services.Services;
 
@@ -39,10 +39,10 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestProjectDirectoryDto create(final Path path) {
+    private @NotNull TestProjectNode create(final Path path) {
         return WriteAction.computeAndWait(() -> {
-            final TestProjectDirectoryDto tp =
-                    Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(path);
+            final TestProjectNode tp =
+                    Services.getInstance(getProject(), NodeMapper.class).setTestProjectNode(path);
 
             nodes().addTestProject(tp);
             return tp;
@@ -53,7 +53,7 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
     public void testAnInactiveProjectIsANodeWithNothingInIt() {
         final Path testProject = root.resolve("NAFATH");
 
-        final TestProjectDirectoryDto tp = create(testProject);
+        final TestProjectNode tp = create(testProject);
 
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
@@ -77,12 +77,12 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
     public void testAFoldersIdIsWrittenOnceAndKept() {
         final Path testProject = root.resolve("NAFATH");
 
-        final TestProjectDirectoryDto tp = create(testProject);
+        final TestProjectNode tp = create(testProject);
         final String stamped = tp.getMarker().getId();
 
         assertFalse("a folder Testin wrote carries an id", stamped.isEmpty());
         assertFalse("and so do the two containers under it",
-                nodes().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, TestCasesMainDirectoryMarker.class).getId().isEmpty());
+                nodes().readMarker(testProject.resolve(NodeType.TCF.getFolderName()), NodeType.TCF, TestCasesFolderMarker.class).getId().isEmpty());
 
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
@@ -91,7 +91,7 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
 
         assertEquals("the id a folder has is the id it keeps",
                 stamped,
-                nodes().readMarker(testProject, DirectoryType.TP, TestProjectMarker.class).getId());
+                nodes().readMarker(testProject, NodeType.TP, TestProjectMarker.class).getId());
     }
 
     public void testACreatedNodeIsOnDiskAndInTheCache() {
@@ -112,9 +112,9 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
         create(testProject);
 
         assertTrue("the test cases directory is missing",
-                Files.isDirectory(testProject.resolve(DirectoryType.TCD.getFolderName())));
+                Files.isDirectory(testProject.resolve(NodeType.TCF.getFolderName())));
         assertTrue("the test runs directory is missing",
-                Files.isDirectory(testProject.resolve(DirectoryType.TRD.getFolderName())));
+                Files.isDirectory(testProject.resolve(NodeType.TRF.getFolderName())));
     }
 
     public void testAnAbsentNodeIsNotInTheCache() {

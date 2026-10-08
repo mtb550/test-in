@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
-import org.testin.model.result.TestRunItems;
+import org.testin.model.testrun.RunItem;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
@@ -51,7 +51,7 @@ public class IndexerBudgetTest {
 
     private static final @NotNull ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private static @NotNull List<String> results() {
+    private static @NotNull List<String> runItems() {
         final @NotNull List<String> documents = new ArrayList<>(RESULTS);
 
         for (int i = 0; i < RESULTS; i++) {
@@ -73,12 +73,12 @@ public class IndexerBudgetTest {
         return documents;
     }
 
-    private static @NotNull List<TestRunItems> parseResults(final @NotNull List<String> documents) {
-        final @NotNull List<TestRunItems> parsed = new ArrayList<>(documents.size());
+    private static @NotNull List<RunItem> parseRunItems(final @NotNull List<String> documents) {
+        final @NotNull List<RunItem> parsed = new ArrayList<>(documents.size());
 
         for (final String document : documents) {
             try {
-                parsed.add(MAPPER.readValue(document, TestRunItems.class));
+                parsed.add(MAPPER.readValue(document, RunItem.class));
             } catch (final Exception ex) {
                 throw new AssertionError("A result the test run writer would write did not parse: " + ex.getMessage(), ex);
             }
@@ -187,17 +187,17 @@ public class IndexerBudgetTest {
     }
 
     @Test(groups = "budget")
-    public void parsingAProjectsTestRunResultsStaysInsideTheBudget() {
-        final @NotNull List<String> documents = results();
+    public void parsingAProjectsRunItemsStaysInsideTheBudget() {
+        final @NotNull List<String> documents = runItems();
 
-        parseResults(documents);
+        parseRunItems(documents);
 
         long fastest = Long.MAX_VALUE;
         long slowest = 0;
 
         for (int pass = 0; pass < PASSES; pass++) {
             final long started = System.nanoTime();
-            final @NotNull List<TestRunItems> parsed = parseResults(documents);
+            final @NotNull List<RunItem> parsed = parseRunItems(documents);
             final long elapsed = System.nanoTime() - started;
 
             assertEquals(parsed.size(), RESULTS, "The parse read a different number of results than it was given");

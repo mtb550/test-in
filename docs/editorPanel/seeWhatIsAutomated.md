@@ -28,7 +28,7 @@ set at once, and the status bar says the same thing as a number.
 - **Rule-EDITOR-PANEL-198** — The filter offers the three states and behaves
   like the four filters beside it. Choosing none of them shows everything. It is
   offered in both editors, because a test run holds test cases too.
-- **Rule-EDITOR-PANEL-210** — The test case editor's status bar says how many of
+- **Rule-EDITOR-PANEL-210** — The test set editor's status bar says how many of
   the test set's test cases have a generated test method behind them.
 - **Rule-EDITOR-PANEL-211** — That count says nothing at all until an answer is
   in, and nothing in an IDE that cannot read one. Nobody has looked yet and none
@@ -84,7 +84,7 @@ everything. **Reset Filters** clears it with the rest.
 This is how a tester reads a whole test set at once. The icon answers for the
 card under the pointer; the filter answers for all of them.
 
-It is offered in the test case editor and in the test run editor. A test run is
+It is offered in the test set editor and in the test run editor. A test run is
 where the question matters most: a test run whose test cases have no methods
 will not execute much, and the filter is how a tester sees that before starting
 it.
@@ -104,7 +104,7 @@ property of the set, and a number that changed when a filter was switched on
 would be answering a different question every time it was read.
 
 The corner it sits in is the test run editor's run item status counts, which are
-blank in a test case editor — so the two bars differ by exactly the figures
+blank in a test set editor — so the two bars differ by exactly the figures
 their editor has. A test run editor shows the run item statuses and no
 automation count.
 

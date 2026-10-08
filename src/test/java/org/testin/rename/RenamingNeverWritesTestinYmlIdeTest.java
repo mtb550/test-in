@@ -23,7 +23,7 @@ import org.testin.NodesOnDisk;
 import org.testin.TreeGesture;
 import org.testin.config.TestinYml;
 import org.testin.indexer.Nodes;
-import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectNode;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.SaveTestinYml;
@@ -86,7 +86,7 @@ public class RenamingNeverWritesTestinYmlIdeTest extends AbstractTempRootIdeTest
 
     // Rule-TREE-PANEL-112
     public void testRenamingAndChoosingNeverWriteTestinYmlAndSaveDoes() {
-        final @NotNull TestProjectDirectoryDto testProject = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
+        final @NotNull TestProjectNode testProject = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
         final @NotNull String before = bytesOf(yml());
 
         TreeGesture.pressed(getProject(), new RenameAction(), List.of(testProject));

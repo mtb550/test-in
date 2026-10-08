@@ -21,7 +21,7 @@ import git4idea.commands.GitCommand;
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.change.PendingChange;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.NodeType;
 import org.testin.model.FileKind;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
@@ -49,7 +49,7 @@ public final class GitCommits {
         final @NotNull Set<String> markers = new LinkedHashSet<>();
 
         for (final String directory : GitRefs.ancestorDirectories(testCasePaths)) {
-            for (final DirectoryType type : DirectoryType.values()) {
+            for (final NodeType type : NodeType.values()) {
                 final @NotNull String marker = type.getMarker();
                 if (marker.isBlank()) continue;
 
@@ -69,7 +69,7 @@ public final class GitCommits {
 
         return GitRefs.parseStatus(statusLines).stream()
                 .map(StatusEntry::path)
-                .filter(path -> FileKind.of(Path.of(path), DirectoryType.TR) == FileKind.SCREENSHOT)
+                .filter(path -> FileKind.of(Path.of(path), NodeType.TR) == FileKind.SCREENSHOT)
                 .filter(path -> testRunFolders.contains(folderOf(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

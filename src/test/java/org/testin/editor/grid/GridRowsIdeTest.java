@@ -19,7 +19,7 @@ package org.testin.editor.grid;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestSetEditorAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,20 +28,20 @@ import java.util.Set;
 public class GridRowsIdeTest extends BasePlatformTestCase {
 
     private static String @NotNull [] aRow(final String description) {
-        final String[] row = new String[TestCaseEditorAttributes.values().length];
+        final String[] row = new String[TestSetEditorAttributes.values().length];
         Arrays.fill(row, "");
-        row[TestCaseEditorAttributes.DESCRIPTION.column()] = description;
+        row[TestSetEditorAttributes.DESCRIPTION.column()] = description;
         return row;
     }
 
     public void testANewPageKeepsTheTableAndTheColumnsTheTesterChose() {
-        final JBTable table = new GridPanelBuilder().buildTestTable(List.of(aRow("Log in"), aRow("Log out")), Set.of(TestCaseEditorAttributes.DESCRIPTION));
+        final JBTable table = new GridPanelBuilder().buildTestTable(List.of(aRow("Log in"), aRow("Log out")), Set.of(TestSetEditorAttributes.DESCRIPTION));
         final int shownColumns = table.getColumnCount();
 
         GridPanelBuilder.replaceRows(table, List.<String[]>of(aRow("Reset the password")));
 
         assertEquals("the new page did not replace the rows", 1, table.getRowCount());
-        assertEquals("Reset the password", table.getModel().getValueAt(0, TestCaseEditorAttributes.DESCRIPTION.column()));
+        assertEquals("Reset the password", table.getModel().getValueAt(0, TestSetEditorAttributes.DESCRIPTION.column()));
         assertEquals("a new page brought back columns the tester had hidden", shownColumns, table.getColumnCount());
     }
 }

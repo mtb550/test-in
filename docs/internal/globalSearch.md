@@ -131,7 +131,7 @@ the IDE, and the tree is only where it lands.
 6. The panel comes forward, and the tree expands to that node and selects it.
 7. A test set or a test run opens in its editor. Any other node is only revealed
    in the tree.
-8. A test case opens its test set in the test case editor with that test case
+8. A test case opens its test set in the test set editor with that test case
    selected, and fills the view panel on the right with it.
 9. A test run row opens that test run in the test run editor instead, with the
    same test case selected, so the panel shows what that test run recorded

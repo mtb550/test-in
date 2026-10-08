@@ -368,13 +368,13 @@ section has that name. A release sets `version`, runs `./gradlew
 patchChangelog` to put that version's heading over what Unreleased holds, and
 then publishes.
 
-**2.14.0-alpha's change notes have to say that 2.13.0-alpha is installed
-first.** The Unreleased section of `CHANGELOG.md` says so now. The converter that brought pre-2.13 test data forward was
-deleted
-after 2.13.0-alpha was published (#333), so a tester who updates from
-2.12.0-alpha straight to 2.14.0-alpha meets a refusal naming that release
-rather than a conversion. JetBrains cannot make one plugin version require an
-earlier one; the notes are the only place that can say it.
+**A release that moves the format number on has to say so first.** The format
+in a `.tp` (Rule-INTERNAL-091) is the only promise about old test data, and
+nothing converts it: a project in an older format is refused, and the tester
+removes it and creates it again. The Unreleased section of `CHANGELOG.md` opens
+with **Before you update** whenever the number moved, naming the keys that
+changed. JetBrains cannot make one plugin version require an earlier one; the
+notes are the only place that can say it.
 
 ## Compatibility: `since-build`, never `until-build`
 

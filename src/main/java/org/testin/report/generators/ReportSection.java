@@ -22,8 +22,8 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
-import org.testin.model.result.TestRunItems;
-import org.testin.model.result.TestRunSummary;
+import org.testin.model.testrun.RunItem;
+import org.testin.model.testrun.TestRunSummary;
 import org.testin.model.status.RunItemStatus;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
@@ -104,8 +104,8 @@ enum ReportSection {
         return raw <= 0.03928 ? raw / 12.92 : Math.pow((raw + 0.055) / 1.055, 2.4);
     }
 
-    public static @NotNull ReportSection of(final @NotNull TestRunItems item) {
-        return Arrays.stream(values()).filter(section -> section.matches(item)).findFirst().orElseThrow();
+    public static @NotNull ReportSection of(final @NotNull RunItem runItem) {
+        return Arrays.stream(values()).filter(section -> section.matches(runItem)).findFirst().orElseThrow();
     }
 
     public long count(final @NotNull TestRunSummary summary) {
@@ -125,7 +125,7 @@ enum ReportSection {
         return !failureDetailColumns.isEmpty();
     }
 
-    public boolean matches(final @NotNull TestRunItems item) {
-        return statuses.contains(item.shownStatus());
+    public boolean matches(final @NotNull RunItem runItem) {
+        return statuses.contains(runItem.shownStatus());
     }
 }

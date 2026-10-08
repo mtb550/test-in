@@ -33,8 +33,8 @@ final class SyntheticTree {
             {
               "createdBy" : "Mohammed AlZamil",
               "createdAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
-              "modifiedBy" : "Mohammed AlZamil",
-              "modifiedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
+              "updatedBy" : "Mohammed AlZamil",
+              "updatedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
               "status" : "ACTIVE",
               "format" : %d
             }""".formatted(TestProjectMarker.FORMAT);
@@ -50,7 +50,7 @@ final class SyntheticTree {
                   "steps" : [ "Open the login page", "Enter a valid user", "Submit" ],
                   "priority" : "HIGH",
                   "reference" : "JIRA-1234",
-                  "group" : [ "SMOKE" ],
+                  "groups" : [ "SMOKE" ],
                   "createdBy" : "Mohammed AlZamil",
                   "updatedBy" : "Mohammed AlZamil",
                   "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
@@ -68,8 +68,8 @@ final class SyntheticTree {
     static @NotNull Path write(final @NotNull Path root, final int sets, final int perSet) {
         final @NotNull Path project = root.resolve("BENCHMARK");
         write(project.resolve(".tp"), MARKER);
-        write(project.resolve("Test Cases").resolve(".tcd"), MARKER);
-        write(project.resolve("Test Runs").resolve(".trd"), MARKER);
+        write(project.resolve("Test Cases").resolve(".tcf"), MARKER);
+        write(project.resolve("Test Runs").resolve(".trf"), MARKER);
 
         for (int s = 0; s < sets; s++) {
             final @NotNull Path set = project.resolve("Test Cases").resolve("set-" + s);

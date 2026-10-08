@@ -35,7 +35,7 @@ public class TestinConfigTest {
             # testin.yml
             location: remote
             testinProject: checkout-testcases
-            RepoUrl: https://github.com/acme/checkout-testcases
+            repoUrl: https://github.com/acme/checkout-testcases
             """;
 
     private static @NotNull Map<String, String> savedLines() {
@@ -115,17 +115,17 @@ public class TestinConfigTest {
     // Rule-TREE-PANEL-117
     @Test
     public void keepsTheRepoUrlItWasGiven() {
-        assertEquals(TestinYml.parse("RepoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").repoUrl(),
+        assertEquals(TestinYml.parse("repoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").repoUrl(),
                 "https://x.com/r; rm -rf /", "kept in the file, and never offered as a clone");
-        assertEquals(TestinYml.parse("RepoUrl: file:///etc/passwd\n", "scheme").repoUrl(), "file:///etc/passwd");
-        assertEquals(TestinYml.parse("RepoUrl: git@github.com:acme/cases.git\n", "ssh").repoUrl(),
+        assertEquals(TestinYml.parse("repoUrl: file:///etc/passwd\n", "scheme").repoUrl(), "file:///etc/passwd");
+        assertEquals(TestinYml.parse("repoUrl: git@github.com:acme/cases.git\n", "ssh").repoUrl(),
                 "git@github.com:acme/cases.git");
     }
 
     // Rule-TREE-PANEL-117
     @Test
     public void stillTakesTheTokenOutOfARepoUrl() {
-        assertEquals(TestinYml.parse("RepoUrl: https://ghp_secret@github.com/acme/cases.git\n", "token").repoUrl(),
+        assertEquals(TestinYml.parse("repoUrl: https://ghp_secret@github.com/acme/cases.git\n", "token").repoUrl(),
                 "https://github.com/acme/cases.git");
     }
 
@@ -133,7 +133,7 @@ public class TestinConfigTest {
     public void aProjectIsLocalUntilTheFileSaysOtherwise() {
         final TestinProjectConfig quiet = TestinYml.parse("""
                         testinProject: cases
-                        RepoUrl: https://github.com/acme/cases.git
+                        repoUrl: https://github.com/acme/cases.git
                         """,
                 "an address and no location");
 
@@ -146,7 +146,7 @@ public class TestinConfigTest {
         final TestinProjectConfig stillLocal = TestinYml.parse(
                 """
                         location: local
-                        RepoUrl: https://github.com/acme/cases.git
+                        repoUrl: https://github.com/acme/cases.git
                         """, "local with an address left in");
 
         assertFalse(stillLocal.hasRepoUrl(), "local wins over everything below it");
@@ -158,7 +158,7 @@ public class TestinConfigTest {
                 """
                         location: remote
                         connection: git
-                        RepoUrl: https://github.com/acme/cases.git
+                        repoUrl: https://github.com/acme/cases.git
                         testinProject: cases
                         """, "old git");
 
@@ -187,7 +187,7 @@ public class TestinConfigTest {
                 """
                         location: remote
                         testinProject: cases
-                        RepoUrl: https://github.com/acme/cases.git
+                        repoUrl: https://github.com/acme/cases.git
                         """, "git");
 
         assertTrue(inGit.hasRepoUrl());
@@ -218,7 +218,7 @@ public class TestinConfigTest {
     public void aGitProjectIsNamedByTheKey() {
         final TestinProjectConfig named = TestinYml.parse("""
                 location: remote
-                RepoUrl: https://github.com/mtb550/test-01.git
+                repoUrl: https://github.com/mtb550/test-01.git
                 testinProject: checkout
                 """, "git");
 
@@ -230,7 +230,7 @@ public class TestinConfigTest {
     public void aUrlWithNoNameLeavesTheRepositoryUnbound() {
         final TestinProjectConfig unnamed = TestinYml.parse("""
                 location: remote
-                RepoUrl: https://github.com/mtb550/test-01.git
+                repoUrl: https://github.com/mtb550/test-01.git
                 """, "no name");
 
         assertEquals(unnamed.projectName(), "", "the tester picks once, on this machine");
@@ -258,7 +258,7 @@ public class TestinConfigTest {
         assertEquals(TestinYml.parse("""
                         location: remote
                         testinProject: test-01
-                        RepoUrl: https://mtb550:ghp_secret@github.com/mtb550/test-01.git
+                        repoUrl: https://mtb550:ghp_secret@github.com/mtb550/test-01.git
                         """, "token").repoUrl(), "https://github.com/mtb550/test-01.git",
                 "stripped on the way in too, however it got there");
     }
@@ -285,7 +285,7 @@ public class TestinConfigTest {
     @Test
     public void theLinesSaySharedOnlyWithARemote() {
         assertEquals(TestinYml.lines("NAFATH", ""), Map.of("testinProject", "NAFATH", "location", "local"));
-        assertEquals(TestinYml.lines("NAFATH", "https://ghp_secret@github.com/acme/nafath.git").get("RepoUrl"), "https://github.com/acme/nafath.git");
+        assertEquals(TestinYml.lines("NAFATH", "https://ghp_secret@github.com/acme/nafath.git").get("repoUrl"), "https://github.com/acme/nafath.git");
         assertEquals(TestinYml.lines("NAFATH"), Map.of("testinProject", "NAFATH"));
     }
 
@@ -296,7 +296,7 @@ public class TestinConfigTest {
         assertEquals(written, """
                 testinProject: NAFATH
                 location: remote
-                RepoUrl: https://github.com/acme/nafath-test-cases.git
+                repoUrl: https://github.com/acme/nafath-test-cases.git
                 """);
         assertEquals(TestinYml.parse(written, "saved").projectName(), "NAFATH");
         assertTrue(TestinYml.parse(written, "saved").hasRepoUrl(), "and a colleague's first open can clone it");
@@ -321,7 +321,7 @@ public class TestinConfigTest {
                 location: remote
                 # testinProject: test-01       which test project, local or shared
                 somethingFromALaterBuild: true
-                RepoUrl: https://github.com/acme/nafath-test-cases.git
+                repoUrl: https://github.com/acme/nafath-test-cases.git
                 """);
     }
 
