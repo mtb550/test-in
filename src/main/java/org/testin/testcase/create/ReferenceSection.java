@@ -17,53 +17,23 @@
 package org.testin.testcase.create;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EditorTextField;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
-import org.testin.testcase.UpdateTestCaseFields;
-import org.testin.util.Bundle;
+import org.testin.testcase.CreateTestCaseFields;
+import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
-import javax.swing.JComponent;
-
 // Rule-EDITOR-PANEL-194
-public class ReferenceSection implements CreateTestCaseSection {
-    private final @NotNull EditorTextField field;
-    private final @NotNull JBPanel<?> wrapper;
-
+public class ReferenceSection extends AbstractOneLineSection {
+    // Rule-EDITOR-PANEL-271
     public ReferenceSection(final @NotNull Project p) {
-        field = SpellChecker.createField(p);
-        field.setOneLineMode(true);
-        styleField(field, Bundle.message("field.set.reference"));
-
-        wrapper = createWrapper(UpdateTestCaseFields.REFERENCE.getIcon(), field);
-    }
-
-    @Override
-    public @NotNull JBPanel<?> getWrapper() {
-        return wrapper;
+        super(SpellChecker.createField(p), CreateTestCaseFields.REFERENCE, Shortcuts.CreateTestCaseReference);
     }
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-032
     @Override
     public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
         return dto.edit().reference(field.getText().trim()).build();
-    }
-
-    // Rule-EDITOR-PANEL-194
-    @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
-    }
-
-    @Override
-    public @NotNull JComponent getFocusComponent() {
-        return field;
-    }
-
-    @Override
-    public void setEditable(final boolean editable) {
-        field.setEnabled(editable);
     }
 
     @Override

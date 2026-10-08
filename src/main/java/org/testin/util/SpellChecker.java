@@ -18,6 +18,7 @@ package org.testin.util;
 
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
+import com.intellij.openapi.editor.actions.IncrementalFindAction;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
@@ -39,10 +40,12 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpellChecker {
+    // Rule-INTERNAL-134
     public static @NotNull EditorTextField createField(final @NotNull Project p) {
         final @NotNull List<EditorCustomization> customizations = new ArrayList<>();
         ContainerUtil.addIfNotNull(customizations,
                 SpellCheckingEditorCustomizationProvider.getInstance().getEnabledCustomization());
+        customizations.add(editor -> editor.putUserData(IncrementalFindAction.SEARCH_DISABLED, Boolean.TRUE));
 
         return EditorTextFieldProvider.getInstance()
                 .getEditorField(FileTypes.PLAIN_TEXT.getLanguage(), p, customizations);

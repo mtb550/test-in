@@ -235,6 +235,10 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
+    CreateTestCaseReference(
+            KeyStroke.getKeyStroke(KeyEvent.VK_R, menuMask())
+    ),
+
     UpdateTestCaseDescription(
             KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)
     ),

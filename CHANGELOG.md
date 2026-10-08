@@ -15,6 +15,9 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 
 ### Added
 
+- **Create Test Case offers Reference:** `Ctrl+R`, `Cmd+R` on a Mac, opens it like every other field, with R on its icon
+  as the update and copy menus show it. IntelliJ's Find and Replace bar no longer opens inside a field of any Testin
+  dialog, where `Ctrl+R` used to open Replace.
 - **A committed test run is the record:** committing in View Pending Commits makes every Completed test run of the test
   project **Committed**, and Testin commits its `.tr` with the commit's id straight after, in the same push. From then
   on

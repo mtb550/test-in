@@ -233,6 +233,10 @@ and which keys it answers, and the shell builds the rest.
   collapse* or *Click to expand*. That holds wherever Testin draws one, in a
   dialog and in the view panel alike. The chevron is what a tester clicks, so
   it carries the color, and the caption and the word beside it stay neutral.
+- **Rule-INTERNAL-134** — A text field in a Testin dialog never opens IntelliJ's
+  Find or Replace bar. A key IntelliJ would give to it either belongs to the
+  dialog, as Ctrl+R opens the reference in the test case dialogs, or does
+  nothing.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

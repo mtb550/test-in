@@ -18,6 +18,7 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actions.IncrementalFindAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.EditorTextField;
@@ -67,6 +68,11 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
         field.addNotify();
         realized.add(field);
         return Optional.ofNullable(field.getEditor(true)).orElseThrow(() -> new AssertionError("the box of many lines has no editor"));
+    }
+
+    // Rule-INTERNAL-134
+    public void testABoxNeverOpensIntelliJsFindOrReplace() {
+        assertTrue("a dialog field opens IntelliJ's Find or Replace bar", Optional.ofNullable(editorOf(aBox()).getUserData(IncrementalFindAction.SEARCH_DISABLED)).orElse(false));
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-097

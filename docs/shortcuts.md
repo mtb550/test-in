@@ -179,6 +179,7 @@ While the create or update dialog is open.
 | `Ctrl+S`, `Cmd+S` on a Mac          | Adds a step                                     |
 | `Ctrl+T`, `Cmd+T` on a Mac          | Opens the test data                             |
 | `Ctrl+B`, `Ctrl+Alt+Cmd+B` on a Mac | Opens the pre conditions                        |
+| `Ctrl+R`, `Cmd+R` on a Mac          | Opens the reference                             |
 | `Ctrl+G`, `Ctrl+Alt+G` on a Mac     | Adds a group                                    |
 | `Ctrl+P`, `Ctrl+Alt+P` on a Mac     | Opens the priority                              |
 | `Alt+Enter`                         | Offers the corrections for what was typed       |

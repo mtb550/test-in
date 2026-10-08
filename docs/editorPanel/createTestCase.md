@@ -79,6 +79,8 @@ This is how every test case in Testin begins.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-271** — Reference opens with Ctrl+R, Cmd+R on a Mac, and
+  carries R on its icon, the letter the update menu and the copy menu give it.
 
 ## The screen
 
@@ -119,6 +121,7 @@ This is how every test case in Testin begins.
 | Group           | `Ctrl+G`, `Ctrl+Alt+G` on a Mac     | *set group*, completing what the project uses |
 | Test Data       | `Ctrl+T`, `Cmd+T` on a Mac          | *set test data*                               |
 | Pre Conditions  | `Ctrl+B`, `Ctrl+Alt+Cmd+B` on a Mac | *set preconditions*                           |
+| Reference       | `Ctrl+R`, `Cmd+R` on a Mac          | *set reference*                               |
 
 Each field's icon is the letter of its key in a rounded frame, so Pre Conditions
 shows B. The same icon marks the field's values in its completion list.

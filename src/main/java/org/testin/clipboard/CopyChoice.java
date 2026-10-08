@@ -108,7 +108,7 @@ public enum CopyChoice implements MenuItem {
     REFERENCE(
             TestSetEditorAttributes.REFERENCE,
             Shortcuts.CopyReference,
-            Icons.fieldLetter("R", Icons.GRAY)
+            CreateTestCaseFields.REFERENCE.getIcon()
     ),
 
     FQCN(

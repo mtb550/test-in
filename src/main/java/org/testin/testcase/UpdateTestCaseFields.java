@@ -23,7 +23,6 @@ import com.intellij.util.ui.EmptyIcon;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.clipboard.CopyChoice;
 import org.testin.codegen.GenType;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
@@ -166,7 +165,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     REFERENCE(
             TestSetEditorAttributes.REFERENCE.getName(),
             Shortcuts.UpdateTestCaseReference,
-            CopyChoice.REFERENCE.getIcon(),
+            CreateTestCaseFields.REFERENCE.getIcon(),
             GenType.NO_CODE_CHANGE,
             Done.UPDATED,
             (p, items, updatedItems) -> new ReferenceBulkSectionDialog(p, items, updatedItems).open(),

@@ -109,10 +109,19 @@ public enum CreateTestCaseFields implements StatusBarItem {
             TestCaseBaseDialog::getGroupSection,
             Bundle.message("field.set.group"),
             ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB
+    ),
+
+    REFERENCE(
+            TestSetEditorAttributes.REFERENCE.getName(),
+            Shortcuts.CreateTestCaseReference,
+            Icons.fieldLetter("R", Icons.GRAY),
+            TestCaseBaseDialog::getReferenceSection,
+            Bundle.message("field.set.reference"),
+            CORRECTIONS, NAVIGATE_TAB
     );
 
     private static final @NotNull List<CreateTestCaseFields> JUMP_KEYS =
-            List.of(DESCRIPTION, EXPECTED_RESULT, MODULE, STEPS, TEST_DATA, PRE_CONDITIONS, PRIORITY, GROUP);
+            List.of(DESCRIPTION, EXPECTED_RESULT, MODULE, STEPS, TEST_DATA, PRE_CONDITIONS, PRIORITY, GROUP, REFERENCE);
 
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
