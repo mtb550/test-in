@@ -35,7 +35,7 @@ public final class CollapsiblePanel {
     public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
         final @NotNull JBLabel titleLabel = new JBLabel(title);
 
-        final @NotNull JBLabel hintLabel = DialogStyle.foldHint();
+        final @NotNull JBLabel hintLabel = DialogStyle.hint();
 
         final @NotNull JBPanel<?> header = Caption.header(titleLabel, Optional.of(hintLabel));
         header.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

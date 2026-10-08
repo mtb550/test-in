@@ -115,8 +115,8 @@ public final class DialogStyle {
         return asAction(expanded ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight);
     }
 
-    // Rule-INTERNAL-133
-    public static @NotNull JBLabel foldHint() {
+    // Rule-INTERNAL-095
+    public static @NotNull JBLabel hint() {
         final @NotNull JBLabel hint = new JBLabel();
         hint.setFont(Fonts.hint());
         hint.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);

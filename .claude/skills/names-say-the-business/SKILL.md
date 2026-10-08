@@ -40,9 +40,9 @@ It holds for the documentation and for issues as well: *test case id*, never *ca
 
 > *"test set has many test case, test run has many run items, so we can not say
 > TestCaseEditor and TestRunEditor, we must say TestSetEditor and TestRunEditor.
-> if you dont be specific in names of method and classes you will be confused and
-> may you implement somthing wrong, contributer may confused. business may will
-> not clear."* - Muteb, 9 October 2026
+> if you are not specific in names of methods and classes you will be confused and
+> may implement something wrong, a contributor may be confused, and the business
+> will not be clear."* - Muteb, 9 October 2026
 
 Two halves, and a pair of names must sit on the same half:
 
@@ -80,8 +80,8 @@ case's `group` became `groups`; `testin.yml`'s `RepoUrl` became `repoUrl`. A
 stored key is renamed on purpose, never by a sweep: it moves the format number
 on (Rule-INTERNAL-091), it gets no `@JsonAlias`, and old data is wiped rather
 than converted. A key that is persisted but not seen as a word - a settings key
-such as `testin.selectedDetails.test.v4` - keeps its string when the constant
-around it is renamed.
+such as `testin.selectedDetails.test.v4` - keeps its string when the surrounding
+constant is renamed.
 
 ## The two short names, and there are only two
 

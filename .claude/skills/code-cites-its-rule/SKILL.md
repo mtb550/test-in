@@ -18,8 +18,8 @@ Two things follow, and they are not optional.
 **1. Every method a tester can reach names its rule or its use case.**
 
 ```java
-// UC-TREE-PANEL-012, Rule-TREE-PANEL-038
-public void removeSelected(final @NotNull List<Node> nodes) {
+// UC-TREE-PANEL-012, Rule-TREE-PANEL-042
+public void refuseRemove(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
 }
 ```
 

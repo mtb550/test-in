@@ -86,7 +86,7 @@ public final class Band extends AbstractDetails {
         final @NotNull JBLabel caption = Caption.of(name, Fonts.panelCaption());
         if (alwaysOpen()) return Caption.header(caption, Optional.empty());
 
-        final @NotNull JBLabel hint = DialogStyle.foldHint();
+        final @NotNull JBLabel hint = DialogStyle.hint();
         final @NotNull JBPanel<?> heading = Caption.header(caption, Optional.of(hint));
         DialogStyle.showFold(heading, caption, hint, isOpen());
         heading.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

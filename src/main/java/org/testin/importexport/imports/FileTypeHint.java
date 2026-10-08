@@ -17,12 +17,11 @@
 package org.testin.importexport.imports;
 
 import com.intellij.ui.components.JBLabel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestSetEditorAttributes;
-import org.testin.util.Fonts;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Html;
 
 import javax.swing.JComponent;
@@ -31,10 +30,7 @@ import java.util.stream.Collectors;
 
 public record FileTypeHint(@NotNull JBLabel label, @NotNull List<TestSetEditorAttributes> attributes) {
     public static @NotNull FileTypeHint of(final @NotNull List<TestSetEditorAttributes> attributes) {
-        final @NotNull JBLabel label = new JBLabel();
-        // Rule-INTERNAL-095
-        label.setFont(Fonts.hint());
-        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        final @NotNull JBLabel label = DialogStyle.hint();
         label.setVisible(false);
 
         return new FileTypeHint(label, attributes);
