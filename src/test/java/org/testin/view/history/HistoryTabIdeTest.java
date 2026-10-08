@@ -16,17 +16,24 @@
 
 package org.testin.view.history;
 
+import com.intellij.openapi.roots.ui.componentsList.components.ScrollablePanel;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.TimeoutUtil;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
+import org.testin.git.change.ChangeType;
+import org.testin.git.change.FieldChange;
+import org.testin.git.history.HistoryEntry;
+import org.testin.git.history.HistoryEntryKind;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
 import org.testin.model.testrun.RunItems;
@@ -41,10 +48,13 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 
+import javax.swing.JComponent;
 import java.awt.BorderLayout;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class HistoryTabIdeTest extends AbstractTempRootIdeTest {
 
@@ -70,11 +80,11 @@ public class HistoryTabIdeTest extends AbstractTempRootIdeTest {
         Await.until("the bug cards were never drawn: " + Drawn.words(tab), () -> Drawn.holds(Drawn.words(tab), Bundle.message("view.history.not.under.git")));
 
         final @NotNull List<String> words = Drawn.words(tab);
-        for (final String shown : List.of(Bundle.message("view.history.bug.recorded"), Bundle.message("view.history.bug.in"), BugSeverity.MAJOR.getLabel(), BugPriority.HIGH.getLabel(), "#412", Bundle.message("view.history.not.committed"))) {
+        for (final String shown : List.of(Bundle.message("view.history.bug"), BugSeverity.MAJOR.getLabel(), BugPriority.HIGH.getLabel(), "#412")) {
             assertTrue("a bug card does not show " + shown + ": " + words, Drawn.holds(words, shown));
         }
         assertFalse("a bug card shows the actual result: " + words, Drawn.holds(words, "The basket was emptied"));
-        assertEquals("one bug card per test run, then the line: " + words, 2, words.stream().filter(Bundle.message("view.history.bug.recorded")::equals).count());
+        assertEquals("one bug card per test run, then the line: " + words, 2, words.stream().filter(Bundle.message("view.history.bug")::equals).count());
 
         final @NotNull JBLabel gone = (JBLabel) Drawn.reading(tab, "Cycle-0");
         assertTrue("a test run no longer in the test project does not say so: " + gone.getToolTipText(), String.valueOf(gone.getToolTipText()).contains(Bundle.message("view.history.bug.test.run.gone")));
@@ -88,6 +98,41 @@ public class HistoryTabIdeTest extends AbstractTempRootIdeTest {
         } finally {
             editors.closeAll();
         }
+    }
+
+    private static @NotNull HistoryEntry updated(final int fields, final @NotNull String newValue) {
+        final @NotNull List<FieldChange> changes = IntStream.range(0, fields)
+                .mapToObj(i -> new FieldChange("Field " + i, "was " + i, i == 0 ? newValue : "now " + i, ChangeType.CHANGE_DESCRIPTION))
+                .toList();
+        return new HistoryEntry(HistoryEntryKind.UPDATED, "", "Sara", ZonedDateTime.parse("2026-10-07T16:40:00+03:00"), "", "", changes, "before", "after");
+    }
+
+    // Rule-VIEW-PANEL-116
+    public void testATestCaseCardShowsTwoChangedFieldsAndHowManyMore() {
+        final @NotNull List<String> five = Drawn.words(HistoryCardView.of(getProject(), updated(5, "now 0"), aTestCase(), 0));
+        assertTrue("five changed fields do not end with +3 more: " + five, Drawn.holds(five, Bundle.message("view.history.more", "3")));
+        assertFalse("a third changed field was drawn: " + five, Drawn.holds(five, "was 2"));
+
+        final @NotNull List<String> three = Drawn.words(HistoryCardView.of(getProject(), updated(3, "now 0"), aTestCase(), 0));
+        assertTrue("three changed fields do not end with +1 more: " + three, Drawn.holds(three, Bundle.message("view.history.more", "1")));
+
+        final @NotNull List<String> two = Drawn.words(HistoryCardView.of(getProject(), updated(2, "now 0"), aTestCase(), 0));
+        assertFalse("two changed fields say there are more: " + two, Drawn.holds(two, "more"));
+    }
+
+    // Rule-VIEW-PANEL-116
+    public void testALongValueIsCutToThePanelAndWholeOnHover() {
+        final @NotNull String longValue = "The transfer is sent and the balance drops by the amount plus the fee. ".repeat(12).trim();
+        final @NotNull JComponent card = HistoryCardView.of(getProject(), updated(1, longValue), aTestCase(), 0);
+        final @NotNull ScrollablePanel tabPanel = new ScrollablePanel(new BorderLayout());
+        tabPanel.add(card, BorderLayout.NORTH);
+        final @NotNull JBScrollPane pane = new JBScrollPane(tabPanel);
+        pane.setSize(JBUI.scale(300), JBUI.scale(400));
+        pane.validate();
+
+        assertTrue("the card is wider than the panel: " + card.getWidth() + " > " + pane.getViewport().getWidth(), card.getWidth() <= pane.getViewport().getWidth());
+        final @NotNull JBLabel line = Drawn.first(card, JBLabel.class, label -> String.valueOf(label.getText()).contains("The transfer"));
+        assertEquals("a cut line is not whole on hover", "was 0 → " + longValue, Drawn.hovering(line));
     }
 
     // UC-VIEW-PANEL-007

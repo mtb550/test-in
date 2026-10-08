@@ -69,8 +69,8 @@ A test run is one round of testing, with a run item status for each test case.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-120** — A configuration row is shown only while the answers
-  above it call for it: pick a kind of test run that needs no commit id and the
-  commit id row goes, and comes back the moment the answer changes. A row that
+  above it call for it: pick a kind of test run that needs no commit and the
+  Commit row goes, and comes back the moment the answer changes. A row that
   is not shown is not asked, so what is saved holds nothing for it.
 - **Rule-TREE-PANEL-121** — Every configuration row that is shown is answered
   before a test run is created. The answers a row offers are the only answers it
@@ -101,7 +101,7 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 ├────────────────────────────────────────────────────────────────────────────┤
 │ ┌────────────────────────────────────────────────────────────────────────┐ │
 │ │ v Configuration details                                Collapse  (1)  │ │
-│ │   TEST RUN NAME:  [ cycle-2          ]  COMMIT ID [ 9f3c1ab      ] (2)│ │
+│ │   TEST RUN NAME:  [ cycle-2          ]  COMMIT [ 9f3c1ab         ] (2)│ │
 │ │   CHANGE LOG      [ Story-002 (register new user), Story-003...     ] │ │
 │ │   TEST TYPE                             PLATFORM                      │ │
 │ │     (o) Functional Test ( ) Performance   (o) Web  ( ) Mobile          │ │

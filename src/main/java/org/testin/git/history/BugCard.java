@@ -22,6 +22,17 @@ import org.testin.model.Config;
 import java.time.ZonedDateTime;
 
 public record BugCard(@NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull BugEvent event) implements HistoryCard {
+    // Rule-VIEW-PANEL-115
+    @Override
+    public @NotNull BugEventKind kind() {
+        return event.kind();
+    }
+
+    @Override
+    public @NotNull String message() {
+        return "";
+    }
+
     // Rule-VIEW-PANEL-107
     static @NotNull BugCard notCommitted(final @NotNull BugEvent event) {
         if (event.kind() == BugEventKind.REMOVED) return new BugCard("", "", Config.NOT_EXECUTED, event);

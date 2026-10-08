@@ -17,8 +17,10 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CopyChoice;
 import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
@@ -95,7 +97,7 @@ public class TestCaseHistoryTest {
         final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, version("The dashboard opens"))), Optional.of(now));
 
         assertEquals(entries.size(), 2, "nothing uncommitted, so no Not committed yet entry: " + entries);
-        assertEquals(entries.getFirst().kind(), HistoryEntryKind.CHANGED);
+        assertEquals(entries.getFirst().kind(), HistoryEntryKind.UPDATED);
         assertEquals(entries.getFirst().shortHash(), "0000000");
         assertEquals(entries.getFirst().changes().getFirst().oldValue(), "The dashboard opens");
         assertEquals(entries.getFirst().changes().getFirst().newValue(), "The dashboard opens within 2 seconds");
@@ -140,7 +142,8 @@ public class TestCaseHistoryTest {
 
         final @NotNull HistoryEntry broken = TestCaseHistory.entries(MAPPER, commits, versions, Optional.of(now)).getFirst();
 
-        assertEquals(broken.kind(), HistoryEntryKind.UNREADABLE);
+        assertEquals(broken.kind(), HistoryEntryKind.UPDATED);
+        assertEquals(broken.note(), Bundle.message("view.history.unreadable"));
         assertEquals(broken.who(), "Sara");
         assertEquals(broken.message(), "broken");
     }
@@ -155,8 +158,23 @@ public class TestCaseHistoryTest {
 
         final @NotNull HistoryEntry after = TestCaseHistory.entries(MAPPER, commits, versions, Optional.of(now)).getFirst();
 
-        assertEquals(after.kind(), HistoryEntryKind.UNCOMPARED);
+        assertEquals(after.kind(), HistoryEntryKind.UPDATED);
+        assertEquals(after.note(), Bundle.message("view.history.uncompared"));
         assertEquals(after.message(), "Cycle 4 review");
+    }
+
+    // Rule-VIEW-PANEL-117
+    @Test
+    public void anEntryCarriesTheTestCaseAsItWasAndAsItBecame() {
+        final @NotNull List<HistoryCommit> commits = List.of(commit(2, "Cycle 4 review"), commit(1, "UC-10"));
+        final @NotNull TestCaseDto before = version("The dashboard opens");
+        final @NotNull TestCaseDto after = version("The dashboard opens within a second");
+
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(after, before)), Optional.of(after));
+
+        assertEquals(entries.getFirst().was(), CopyChoice.ALL_DETAILS.from(before));
+        assertEquals(entries.getFirst().now(), CopyChoice.ALL_DETAILS.from(after));
+        assertEquals(entries.getLast().was(), "", "nothing came before the commit that created it");
     }
 
     // Rule-VIEW-PANEL-096
@@ -167,8 +185,9 @@ public class TestCaseHistoryTest {
 
         final @NotNull HistoryEntry reordered = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, now)), Optional.of(now)).getFirst();
 
-        assertEquals(reordered.kind(), HistoryEntryKind.CHANGED);
+        assertEquals(reordered.kind(), HistoryEntryKind.UPDATED);
         assertTrue(reordered.changes().isEmpty());
+        assertEquals(reordered.note(), Bundle.message("git.change.no.field"));
     }
 
     // Rule-VIEW-PANEL-101

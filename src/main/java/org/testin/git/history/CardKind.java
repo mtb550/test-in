@@ -16,33 +16,16 @@
 
 package org.testin.git.history;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Bundle;
 
 import java.awt.Color;
 
 // Rule-VIEW-PANEL-115
-@Getter
-@AllArgsConstructor
-public enum HistoryEntryKind implements CardKind {
-    CREATED(
-            Bundle.message("view.history.created")
-    ),
+public interface CardKind {
+    @NotNull Color PLAIN = JBColor.LIGHT_GRAY;
 
-    UPDATED(
-            Bundle.message("view.history.updated")
-    ),
+    @NotNull String getLabel();
 
-    REMOVED(
-            Bundle.message("view.history.removed")
-    );
-
-    private final @NotNull String label;
-
-    @Override
-    public @NotNull Color getColor() {
-        return PLAIN;
-    }
+    @NotNull Color getColor();
 }

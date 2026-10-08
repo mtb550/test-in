@@ -19,6 +19,7 @@ package org.testin.view;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ui.componentsList.components.ScrollablePanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.ToolWindow;
@@ -40,6 +41,7 @@ import org.testin.setting.TestinRoot;
 import org.testin.ui.FontSync;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -54,7 +56,7 @@ public class ViewPanel implements Disposable {
     @Getter
     private final @NotNull JBPanel<?> detailsTab;
     @Getter
-    private final @NotNull JBPanel<?> historyTab;
+    private final @NotNull JPanel historyTab;
 
     @Getter
     private final @NotNull JBScrollPane detailsScrollPane;
@@ -78,7 +80,7 @@ public class ViewPanel implements Disposable {
         this.testinRoot = Services.getInstance(p, TestinRoot.class);
         Disposer.register(ProjectLifetime.of(p), this);
         detailsTab = new JBPanel<>(new BorderLayout());
-        historyTab = new JBPanel<>(new BorderLayout());
+        historyTab = new ScrollablePanel(new BorderLayout());
 
         FontSync.syncWithNativeEditor(p, detailsTab, this);
         FontSync.syncWithNativeEditor(p, historyTab, this);
@@ -106,7 +108,7 @@ public class ViewPanel implements Disposable {
         TestCaseExecutionSubscriber.onReported(p, this, (tc, _, _, _) -> refreshIfShowing(List.of(tc)));
     }
 
-    private @NotNull Stream<JBPanel<?>> tabs() {
+    private @NotNull Stream<JPanel> tabs() {
         return Stream.of(detailsTab, historyTab);
     }
 

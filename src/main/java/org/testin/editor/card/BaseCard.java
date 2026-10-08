@@ -17,7 +17,6 @@
 package org.testin.editor.card;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.VerticalLayout;
@@ -35,30 +34,32 @@ import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
+import org.testin.ui.framework.CardEdge;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Display;
 import org.testin.util.Fonts;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.Optional;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JList;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.swing.SwingUtilities;
+import java.util.Optional;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull JTextArea titleArea = Prose.of("");
@@ -73,6 +74,9 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected boolean isRowHovered;
     protected @NotNull String hoveredAction = "";
     protected @NotNull Automated automation = Automated.UNKNOWN;
+    private static final @NotNull Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
+    private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
+
     protected @NotNull Priority priority = Priority.DEFAULT;
     @Setter
     private @NotNull List<Offered> hoverButtons = List.of();
@@ -152,7 +156,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         plainTitle = title;
 
         setBackground(RowStripe.of(index));
-        setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
         Badges.showBadges(badgePanel, badges);
         shownBadges = List.copyOf(badges);
@@ -187,7 +190,9 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         badgePanel.repaint();
     }
 
+    // Rule-EDITOR-PANEL-267
     public void setActionsState(final boolean isSelected, final boolean isRowHovered, final @NotNull String hoveredAction) {
+        setBorder(JBUI.Borders.compound(isSelected ? SELECTED_BORDER : UNSELECTED_BORDER, CardEdge.of(priority.barColor())));
         this.isRowHovered = isRowHovered;
         this.hoveredAction = hoveredAction;
         if (isSelected) {
@@ -199,7 +204,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     @Override
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
-        CardTitle.drawPriorityBar(this, g, priority);
         if (isRowHovered) {
             CardTitle.drawDescriptionActionIcons(this, g, titleWidth, hoveredAction, hoverButtons, automation);
         }
@@ -207,7 +211,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-269, Rule-EDITOR-PANEL-270, Rule-INTERNAL-132
     public @NotNull String tooltipAt(final @NotNull Point at, final @NotNull Dimension cell) {
-        if (CardTitle.priorityMargin(this).contains(at)) return priority == Priority.DEFAULT ? "" : priority.tooltip();
+        if (CardTitle.priorityMargin(cell.height).contains(at)) return priority == Priority.DEFAULT ? "" : priority.tooltip();
 
         layOutAs(cell);
         for (int i = 0; i < shownBadges.size(); i++) {

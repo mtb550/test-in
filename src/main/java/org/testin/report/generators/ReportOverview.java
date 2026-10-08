@@ -54,7 +54,7 @@ public final class ReportOverview {
 
     // Rule-REPORT-002
     private static void addConfiguration(final @NotNull List<DetailRow> rows, final @NotNull TestRunConfiguration field, final @NotNull TestRunMarker marker) {
-        if (field == TestRunConfiguration.COMMIT_ID) {
+        if (field == TestRunConfiguration.COMMIT) {
             rows.add(new DetailRow(field.getDisplayName(),
                     field.valueIn(marker).isEmpty() ? NOT_RECORDED : field.valueIn(marker)));
         } else if (field == TestRunConfiguration.PLATFORM) {

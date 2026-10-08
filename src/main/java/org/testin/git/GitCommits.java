@@ -111,11 +111,11 @@ public final class GitCommits {
         return GitCommandRunner.execute(p, repositoryPath, GitCommand.REV_PARSE, "HEAD").trim();
     }
 
-    public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
+    public @NotNull String shortHeadHash(final @NotNull Path repositoryPath) {
         try {
             return GitCommandRunner.execute(p, repositoryPath, GitCommand.REV_PARSE, "--short", "HEAD").trim();
         } catch (final GitFailed ex) {
-            Logger.warn("Could not read the commit id: " + FailureText.of(ex));
+            Logger.warn("Could not read the commit: " + FailureText.of(ex));
             return "";
         }
     }

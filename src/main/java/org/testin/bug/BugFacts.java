@@ -51,7 +51,7 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
                 TestRunConfiguration.BROWSER.valueIn(testRunMarker),
                 TestRunConfiguration.DEVICE_TYPE.valueIn(testRunMarker),
                 TestRunConfiguration.LANGUAGE.valueIn(testRunMarker),
-                TestRunConfiguration.COMMIT_ID.valueIn(testRunMarker),
+                TestRunConfiguration.COMMIT.valueIn(testRunMarker),
                 tc.getId(),
                 tc.getParent().getName());
     }

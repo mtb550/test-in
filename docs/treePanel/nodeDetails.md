@@ -166,7 +166,7 @@ else.
    executed.
 9. A test run also shows **Execution Started**, **Execution Ended** and **Execution Time**. It shows every setting the
    tester gave when the test run
-   was made: **Test Type**, **Change Log**, **Commit ID**, **Platform**, **Component**, **Language**, **Browser** and
+   was made: **Test Type**, **Change Log**, **Commit**, **Platform**, **Component**, **Language**, **Browser** and
    **Device Type**.
 10. A row with nothing in it is not drawn at all. A test run that never started
     shows none of the three execution rows, and one still running shows only

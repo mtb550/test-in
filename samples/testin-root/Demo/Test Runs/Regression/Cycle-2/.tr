@@ -9,7 +9,7 @@
     "PLATFORM" : "Web",
     "BROWSER" : "Chrome",
     "CHANGE_LOG" : "Story-114 (lockout counter)",
-    "COMMIT_ID" : "9f3c1ab"
+    "COMMIT" : "9f3c1ab"
   },
   "resultAnalysis" : {
     "UNTESTED" : "Checkout is not part of this retest."

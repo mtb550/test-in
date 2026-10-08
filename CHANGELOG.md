@@ -9,7 +9,7 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 **Before you update:** wipe your test data. This build reads format 3 and converts nothing, so every test project an
 earlier build wrote is refused as written by an older Testin: remove it and create it again. Format 3 renames three keys
 so each says the business word - a folder marker's `modifiedBy` and `modifiedAt` are now `updatedBy` and `updatedAt`, and
-a test case's `group` is now `groups` - and renames two marker files: the Test Cases folder's `.tcd` is now `.tcf`
+a test case's `group` is now `groups`, and a test run's configuration answer `COMMIT_ID` is now `COMMIT` - and renames two marker files: the Test Cases folder's `.tcd` is now `.tcf`
 and the Test Runs folder's `.trd` is now `.trf`. `testin.yml` spells its remote `repoUrl` instead of `RepoUrl`: edit
 that one line in a committed `testin.yml`. A team sharing a test project should update together.
 
@@ -19,7 +19,7 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
   as the update and copy menus show it. IntelliJ's Find and Replace bar no longer opens inside a field of any Testin
   dialog, where `Ctrl+R` used to open Replace.
 - **A committed test run is the record:** committing in View Pending Commits makes every Completed test run of the test
-  project **Committed**, and Testin commits its `.tr` with the commit's id straight after, in the same push. From then
+  project **Committed**, and Testin commits its `.tr` with that commit straight after, in the same push. From then
   on
   its run items show each test case as that commit holds it, edited or deleted since, and say *Changed since this test
   run was committed* where it differs today. A Committed test run takes nothing more; F2 on one of its run items says to
@@ -46,6 +46,15 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 
 ### Changed
 
+- **A card's priority bar runs its full height:** red for High, blue for Medium down the card's left edge, as wide
+  as a bug card's bar in History, instead of a short mark beside the description.
+- **Every History card opens with what it is:** Created, Updated or Removed for a test case, Bug for a bug, which
+  no longer says Bug in. A committed card adds the commit's short hash; one not committed yet shows none.
+  A commit that could not be read or changed no field is Updated, with a line saying which.
+- **A History card is three lines, and a click shows every change:** a test case's card shows at most two changed
+  fields, what each was, an arrow and what it became, then how many more. Clicking it opens
+  IntelliJ's diff window with the whole test case as it was and as it became. A Steps change names only the steps
+  that changed, in History and in View Pending Commits.
 - **Test data files hold only what was set:** a value equal to a fresh one is not written, so an empty field, a
   default bug severity or priority, and a passed run item's cleared failure detail no longer fill the files and
   their Git diffs. A key left out reads back as it always did.

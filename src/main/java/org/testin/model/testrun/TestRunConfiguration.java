@@ -53,8 +53,8 @@ public enum TestRunConfiguration {
             ""
     ),
 
-    COMMIT_ID(
-            Bundle.message("config.commit.id"),
+    COMMIT(
+            Bundle.message("config.commit"),
             AllIcons.Nodes.Type,
             ImmutableList.of(),
             ShownWhen.ALWAYS,

@@ -26,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class HistoryCardsTest {
 
@@ -34,11 +35,23 @@ public class HistoryCardsTest {
     }
 
     private static @NotNull HistoryEntry entry(final @NotNull String hash, final int day) {
-        return new HistoryEntry(HistoryEntryKind.CHANGED, hash, "Sara", on(day), "", List.of());
+        return new HistoryEntry(HistoryEntryKind.UPDATED, hash, "Sara", on(day), "", "", List.of(), "", "");
     }
 
     private static @NotNull BugCard bug(final @NotNull String hash, final int day) {
         return new BugCard(hash, "Sara", on(day), new BugEvent(BugEventKind.RECORDED, Path.of("Cycle 3"), RunItem.builder().build(), List.of()));
+    }
+
+    // Rule-VIEW-PANEL-115
+    @Test
+    public void everyCardSaysWhatHappenedAndWhetherItIsCommitted() {
+        final @NotNull HistoryEntry uncommitted = entry("", 1);
+        final @NotNull BugCard committedBug = bug("4f1c9e2a7d" + "0".repeat(30), 2);
+
+        assertEquals(uncommitted.kind().getLabel(), Bundle.message("view.history.updated"));
+        assertFalse(uncommitted.isCommitted());
+        assertEquals(committedBug.kind().getLabel(), Bundle.message("view.history.bug"));
+        assertEquals(committedBug.shortHash(), "4f1c9e2", "a committed card shows its short hash");
     }
 
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-107

@@ -98,14 +98,43 @@ public class TestCaseChangeComparatorTest {
         assertEquals(change.newValue(), TestCaseStatus.REVIEWED.getLabel());
     }
 
+    // Rule-VIEW-PANEL-118, Rule-SHARE-131
     @Test
-    public void stepsCompareAsOneBlockRatherThanLineByLine() {
+    public void aStepsChangeIsOneRowNamingOnlyTheStepsThatChanged() {
         final FieldChange change = onlyChange(
                 base().setSteps(new ArrayList<>(List.of("open the app", "log in as admin"))));
 
         assertEquals(change.changeType(), ChangeType.CHANGE_STEPS);
-        assertEquals(change.oldValue(), "open the app\nlog in");
-        assertEquals(change.newValue(), "open the app\nlog in as admin");
+        assertEquals(change.oldValue(), "2- Log in.");
+        assertEquals(change.newValue(), "2- Log in as admin.");
+    }
+
+    // Rule-VIEW-PANEL-118
+    @Test
+    public void aStepInsertedDoesNotMakeTheStepsAfterItReadAsChanged() {
+        final FieldChange change = onlyChange(
+                base().setSteps(new ArrayList<>(List.of("open the app", "choose an account", "log in"))));
+
+        assertEquals(change.oldValue(), "");
+        assertEquals(change.newValue(), "2- Choose an account.");
+    }
+
+    // Rule-VIEW-PANEL-118
+    @Test
+    public void aStepRemovedIsNamedWithTheNumberItHad() {
+        final FieldChange change = onlyChange(base().setSteps(new ArrayList<>(List.of("log in"))));
+
+        assertEquals(change.oldValue(), "1- Open the app.");
+        assertEquals(change.newValue(), "");
+    }
+
+    // Rule-VIEW-PANEL-118
+    @Test
+    public void stepsRemovedAltogetherAreEveryStep() {
+        final FieldChange change = onlyChange(base().setSteps(new ArrayList<>()));
+
+        assertEquals(change.oldValue(), "1- Open the app.\n2- Log in.");
+        assertEquals(change.newValue(), "");
     }
 
     @Test

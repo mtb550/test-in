@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.GitFailed;
 import org.testin.git.GitRepositoryService;
+import org.testin.git.change.FieldChange;
 import org.testin.git.change.TestCaseChangeComparator;
 import org.testin.indexer.TestCaseFile;
 import org.testin.model.Config;
@@ -31,6 +32,7 @@ import org.testin.model.TestCaseDto;
 import org.testin.model.node.Node;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
@@ -117,26 +119,34 @@ public final class TestCaseHistory {
 
     private static @NotNull Optional<HistoryEntry> uncommitted(final @NotNull List<Optional<TestCaseDto>> read, final @NotNull Optional<TestCaseDto> present) {
         if (present.isEmpty())
-            return read.isEmpty() || read.getFirst().isEmpty() ? Optional.empty() : Optional.of(new HistoryEntry(HistoryEntryKind.REMOVED, "", "", Config.NOT_EXECUTED, "", List.of()));
+            return read.isEmpty() || read.getFirst().isEmpty() ? Optional.empty() : Optional.of(HistoryEntry.uncommitted(HistoryEntryKind.REMOVED, "", Config.NOT_EXECUTED, List.of(), read.getFirst(), Optional.empty()));
 
         final @NotNull TestCaseDto now = present.orElseThrow();
         if (read.isEmpty()) {
-            return Optional.of(new HistoryEntry(HistoryEntryKind.CREATED, "", now.getCreatedBy(), now.getCreatedAt(), "", List.of()));
+            return Optional.of(HistoryEntry.uncommitted(HistoryEntryKind.CREATED, now.getCreatedBy(), now.getCreatedAt(), List.of(), Optional.empty(), present));
         }
 
         return read.getFirst()
                 .map(committed -> TestCaseChangeComparator.compare(committed, now))
                 .filter(changes -> !changes.isEmpty())
-                .map(changes -> new HistoryEntry(HistoryEntryKind.CHANGED, "", lastEditor(now), lastEdited(now), "", changes));
+                .map(changes -> HistoryEntry.uncommitted(HistoryEntryKind.UPDATED, lastEditor(now), lastEdited(now), changes, read.getFirst(), present));
     }
 
     private static @NotNull HistoryEntry entry(final @NotNull HistoryCommit commit, final @NotNull Optional<TestCaseDto> version, final @NotNull Optional<TestCaseDto> before, final boolean oldest, final boolean removedHere) {
-        if (version.isEmpty())
-            return HistoryEntry.of(removedHere ? HistoryEntryKind.REMOVED : HistoryEntryKind.UNREADABLE, commit, List.of());
-        if (oldest) return HistoryEntry.of(HistoryEntryKind.CREATED, commit, List.of());
+        if (version.isEmpty()) {
+            return removedHere
+                    ? HistoryEntry.of(HistoryEntryKind.REMOVED, commit, "", List.of(), before, version)
+                    : HistoryEntry.of(HistoryEntryKind.UPDATED, commit, Bundle.message("view.history.unreadable"), List.of(), before, version);
+        }
+        if (oldest) return HistoryEntry.of(HistoryEntryKind.CREATED, commit, "", List.of(), Optional.empty(), version);
 
-        return before.map(older -> HistoryEntry.of(HistoryEntryKind.CHANGED, commit, TestCaseChangeComparator.compare(older, version.orElseThrow())))
-                .orElseGet(() -> HistoryEntry.of(HistoryEntryKind.UNCOMPARED, commit, List.of()));
+        return before.map(older -> updated(commit, TestCaseChangeComparator.compare(older, version.orElseThrow()), before, version))
+                .orElseGet(() -> HistoryEntry.of(HistoryEntryKind.UPDATED, commit, Bundle.message("view.history.uncompared"), List.of(), before, version));
+    }
+
+    // Rule-VIEW-PANEL-096
+    private static @NotNull HistoryEntry updated(final @NotNull HistoryCommit commit, final @NotNull List<FieldChange> changes, final @NotNull Optional<TestCaseDto> was, final @NotNull Optional<TestCaseDto> now) {
+        return HistoryEntry.of(HistoryEntryKind.UPDATED, commit, changes.isEmpty() ? Bundle.message("git.change.no.field") : "", changes, was, now);
     }
 
     static @NotNull Optional<TestCaseDto> parsed(final @NotNull Mapper mapper, final @NotNull String json) {

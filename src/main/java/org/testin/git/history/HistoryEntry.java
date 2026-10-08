@@ -17,13 +17,26 @@
 package org.testin.git.history;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CopyChoice;
 import org.testin.git.change.FieldChange;
+import org.testin.model.TestCaseDto;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
-public record HistoryEntry(@NotNull HistoryEntryKind kind, @NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull List<FieldChange> changes) implements HistoryCard {
-    static @NotNull HistoryEntry of(final @NotNull HistoryEntryKind kind, final @NotNull HistoryCommit commit, final @NotNull List<FieldChange> changes) {
-        return new HistoryEntry(kind, commit.hash(), commit.who(), commit.when(), commit.message(), changes);
+public record HistoryEntry(@NotNull HistoryEntryKind kind, @NotNull String hash, @NotNull String who, @NotNull ZonedDateTime when, @NotNull String message, @NotNull String note, @NotNull List<FieldChange> changes, @NotNull String was, @NotNull String now) implements HistoryCard {
+    static @NotNull HistoryEntry of(final @NotNull HistoryEntryKind kind, final @NotNull HistoryCommit commit, final @NotNull String note, final @NotNull List<FieldChange> changes, final @NotNull Optional<TestCaseDto> was, final @NotNull Optional<TestCaseDto> now) {
+        return new HistoryEntry(kind, commit.hash(), commit.who(), commit.when(), commit.message(), note, changes, asText(was), asText(now));
+    }
+
+    // Rule-VIEW-PANEL-098
+    static @NotNull HistoryEntry uncommitted(final @NotNull HistoryEntryKind kind, final @NotNull String who, final @NotNull ZonedDateTime when, final @NotNull List<FieldChange> changes, final @NotNull Optional<TestCaseDto> was, final @NotNull Optional<TestCaseDto> now) {
+        return new HistoryEntry(kind, "", who, when, "", "", changes, asText(was), asText(now));
+    }
+
+    // Rule-VIEW-PANEL-117
+    private static @NotNull String asText(final @NotNull Optional<TestCaseDto> version) {
+        return version.map(CopyChoice.ALL_DETAILS::from).orElse("");
     }
 }

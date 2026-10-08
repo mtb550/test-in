@@ -49,7 +49,7 @@ public class BugFactsTest {
         testRunMarker.setConfiguration(new EnumMap<>(Map.of(
                 TestRunConfiguration.PLATFORM, "Web",
                 TestRunConfiguration.BROWSER, "Chrome",
-                TestRunConfiguration.COMMIT_ID, "933a3984")));
+                TestRunConfiguration.COMMIT, "933a3984")));
 
         final BugFacts facts = BugFacts.of(runItem, tc, testRunMarker, "Sprint 7", List.of());
 

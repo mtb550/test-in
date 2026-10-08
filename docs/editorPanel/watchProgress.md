@@ -79,7 +79,7 @@ There is no key for this. The figures are in the status bar.
 
 1. **The test run status** — the same icon the tree draws, alone. Its tooltip
    names the status: *Completed. A committed test run records no more run item
-   statuses*. Beside the icon: the tester's name when the test run is **Assigned**, the short commit id when it is
+   statuses*. Beside the icon: the tester's name when the test run is **Assigned**, the commit's short hash when it is
    **Committed**, nothing otherwise (Rule-EDITOR-PANEL-265).
 2. **The figures** — one for each run item status any test case carries, each
    in that run item status's own color, separated by a dot. Their tooltip reads *How this test run is going*.

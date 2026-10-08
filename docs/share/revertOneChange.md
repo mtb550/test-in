@@ -80,7 +80,7 @@ case change can be reverted*.
 
 **If that kind of change cannot be put back** — a message reads *A change to*,
 then the kind, then *cannot be reverted*. A test case that changed with no field
-different - a **Change File** row reading *reordered or restamped* - is the one
+different - a **Change File** row reading *No field changed* - is the one
 of those.
 
 **If the test case is no longer in the test project** — a message reads *That

@@ -16,22 +16,17 @@
 
 package org.testin.editor.cardview;
 
-import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorColors;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.card.BaseCard;
 import org.testin.model.TestCaseDto;
 
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import javax.swing.border.Border;
 
 @AllArgsConstructor
 public abstract class AbstractCardRenderer<U extends TestinEditor> implements ListCellRenderer<TestCaseDto> {
-    private static final @NotNull Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
-    private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
     protected final @NotNull U editor;
 
     // UC-EDITOR-PANEL-001, UC-EDITOR-PANEL-030
@@ -40,11 +35,7 @@ public abstract class AbstractCardRenderer<U extends TestinEditor> implements Li
         final boolean isRowHovered = (index == editor.getHoveredIndex());
         final @NotNull String hover = isRowHovered ? editor.getHoveredIconAction() : "";
 
-        final @NotNull BaseCard card = bindDataAndGetCard(list, tc, index, isSelected, isRowHovered, hover);
-
-        card.setBorder(isSelected ? SELECTED_BORDER : UNSELECTED_BORDER);
-
-        return card;
+        return bindDataAndGetCard(list, tc, index, isSelected, isRowHovered, hover);
     }
 
     protected abstract @NotNull BaseCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover);

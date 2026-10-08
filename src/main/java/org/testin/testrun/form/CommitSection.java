@@ -23,11 +23,11 @@ import org.testin.util.Bundle;
 
 import java.util.Map;
 
-public record CommitIdSection(@NotNull ComponentDialogBase<TextInput> component) implements TestRunSection {
+public record CommitSection(@NotNull ComponentDialogBase<TextInput> component) implements TestRunSection {
     // UC-TREE-PANEL-021
-    public static @NotNull CommitIdSection of(final @NotNull String value) {
-        return new CommitIdSection(ComponentDialogBase.textField()
-                .caption(TestRunConfiguration.COMMIT_ID.getDisplayName())
+    public static @NotNull CommitSection of(final @NotNull String value) {
+        return new CommitSection(ComponentDialogBase.textField()
+                .caption(TestRunConfiguration.COMMIT.getDisplayName())
                 .placeholder(Bundle.message("test.run.form.commit.hint"))
                 .value(value)
                 .build());
@@ -35,6 +35,6 @@ public record CommitIdSection(@NotNull ComponentDialogBase<TextInput> component)
 
     @Override
     public void applyTo(final @NotNull Map<TestRunConfiguration, String> answers) {
-        answers.put(TestRunConfiguration.COMMIT_ID, component.getComponent().getText().trim());
+        answers.put(TestRunConfiguration.COMMIT, component.getComponent().getText().trim());
     }
 }

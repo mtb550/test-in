@@ -14,35 +14,23 @@
  * limitations under the License.
  */
 
-package org.testin.git.history;
+package org.testin.ui.framework;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.intellij.util.ui.JBUI;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Bundle;
 
+import javax.swing.border.Border;
 import java.awt.Color;
+import java.util.Optional;
 
-// Rule-VIEW-PANEL-115
-@Getter
-@AllArgsConstructor
-public enum HistoryEntryKind implements CardKind {
-    CREATED(
-            Bundle.message("view.history.created")
-    ),
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CardEdge {
+    private static final int WIDTH = 3;
 
-    UPDATED(
-            Bundle.message("view.history.updated")
-    ),
-
-    REMOVED(
-            Bundle.message("view.history.removed")
-    );
-
-    private final @NotNull String label;
-
-    @Override
-    public @NotNull Color getColor() {
-        return PLAIN;
+    // Rule-EDITOR-PANEL-267, Rule-VIEW-PANEL-105
+    public static @NotNull Border of(final @NotNull Optional<Color> color) {
+        return color.<Border>map(shown -> JBUI.Borders.customLine(shown, 0, WIDTH, 0, 0)).orElseGet(() -> JBUI.Borders.emptyLeft(WIDTH));
     }
 }

@@ -29,34 +29,35 @@ import java.awt.Color;
 // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-108
 @Getter
 @AllArgsConstructor
-public enum BugEventKind {
+public enum BugEventKind implements CardKind {
     RECORDED(
-            Bundle.message("view.history.bug.recorded"),
             RunItemStatus.FAILED.getRowColor(),
             true
     ),
 
     CHANGED(
-            Bundle.message("view.history.bug.changed"),
             JBColor.ORANGE,
             true
     ),
 
     CLEARED(
-            Bundle.message("view.history.bug.cleared"),
             RunItemStatus.PASSED.getRowColor(),
             false
     ),
 
     REMOVED(
-            Bundle.message("view.history.bug.removed"),
             RunItemStatus.PASSED.getRowColor(),
             false
     );
 
-    private final @NotNull String label;
     private final @NotNull Color color;
     private final boolean open;
+
+    // Rule-VIEW-PANEL-115
+    @Override
+    public @NotNull String getLabel() {
+        return Bundle.message("view.history.bug");
+    }
 
     // Rule-VIEW-PANEL-105, Rule-VIEW-PANEL-108
     public @NotNull Color barOf(final @NotNull RunItem runItem) {

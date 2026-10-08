@@ -61,15 +61,15 @@ There is no key for this. The tab is called **History**.
 - **Rule-VIEW-PANEL-097** — A committed entry shows its commit's short hash, seven
   characters, and the full hash when the pointer rests on it.
 - **Rule-VIEW-PANEL-098** — Edits saved but not committed head the list as one
-  entry, Not committed yet. It names Testin's last editor and time, and each
-  field that differs from the last commit. It has no hash.
+  entry. It names Testin's last editor and time, and each field that differs
+  from the last commit. It has no hash.
 - **Rule-VIEW-PANEL-099** — The history is read from Git each time the tab shows
   a test case, and Testin stores none of it. It appears as soon as it is read,
   newest first. Only a read longer than 0.3 seconds shows a Reading line, and
   one test case's history is never drawn over another's.
 - **Rule-VIEW-PANEL-100** — A test project that is not under Git has no history.
-  The tab lists the bugs its test runs hold now, each as a Not committed yet bug
-  card. Then it says in one line that it has no history, and names Initialize
+  The tab lists the bugs its test runs hold now, each as a bug card with no
+  hash. Then it says in one line that it has no history, and names Initialize
   Git (git init) in View Pending Commits as the way to start one.
 - **Rule-VIEW-PANEL-101** — The tab shows every commit that changed the test
   case. Git is read away from the screen, and the entries are drawn in groups,
@@ -84,8 +84,8 @@ There is no key for this. The tab is called **History**.
 - **Rule-VIEW-PANEL-106** — The bugs are read from Git beside the test case's
   own changes, from its run item in every test run. A run item change that
   touches no bug is not shown.
-- **Rule-VIEW-PANEL-107** — Bugs not committed yet are Not committed yet bug
-  cards at the top: each test run's run item as this machine holds it now,
+- **Rule-VIEW-PANEL-107** — Bugs not committed yet are bug cards with no hash,
+  at the top: each test run's run item as this machine holds it now,
   against the last commit.
 - **Rule-VIEW-PANEL-108** — A cleared bug says why: its run item is no longer
   Failed and has no link, or its run item was removed from the test run.
@@ -98,10 +98,27 @@ There is no key for this. The tab is called **History**.
 - **Rule-VIEW-PANEL-112** — The History tab reads the test case as it is now,
   whether the view panel was opened from a test set or from a test run. A
   Committed test run's run item shows its commit's text on the Details tab, and
-  that text never makes a Not committed yet card.
+  that text never makes a card that is not committed.
 - **Rule-VIEW-PANEL-113** — The history of a deleted test case is read from Git
-  like any other's. Its newest card is Removed: marked Not committed yet until
-  the deletion is committed, then with the commit that deleted it.
+  like any other's. Its newest card is Removed: with no hash until the
+  deletion is committed, then with the hash of the commit that deleted it.
+- **Rule-VIEW-PANEL-115** — Every History card opens with a badge saying what
+  happened: Created, Updated or Removed for a test case, Bug for a bug. A
+  committed card adds a second badge, the commit's short hash; a card not
+  committed yet has none.
+- **Rule-VIEW-PANEL-116** — A test case's card is three lines at most: its two
+  badges, then up to two of the fields that changed, one to a line: what it was,
+  an arrow, then what it became. A line too long for the panel ends in an
+  ellipsis, shows more as the panel widens, and shows its whole value on hover.
+  When more fields changed, the last line ends with how many more. The cards
+  alternate the editors' two row colors.
+- **Rule-VIEW-PANEL-117** — Clicking a test case's card opens the IDE's diff
+  window: the whole test case as it was beside it as it became, written as Copy
+  as Text writes All Details. A bug card opens nothing; its test run's name is
+  its link.
+- **Rule-VIEW-PANEL-118** — A Steps change names only the steps that changed,
+  each with its number. A step inserted or removed does not make the steps after
+  it read as changed.
 
 ## The screen
 
@@ -109,48 +126,55 @@ There is no key for this. The tab is called **History**.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │   Details    | History |                                                   │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [Not committed yet]  Muteb  5 Oct 2026, 08:12                        (1)  │
+│  [Updated]  Muteb  05-10-2026                                         (1)  │
 │     Priority          Medium → High                                   (4)  │
-│ ┃[Recorded]  Bug in cycle 4  [Not committed yet]  Muteb  5 Oct, 18:40 (5)  │
+│ ┃[Bug]  cycle 4  Muteb  05-10-2026                                    (5)  │
 │ ┃   Bug Severity      Major                                                │
 │ ┃   Bug Priority      High                                                 │
 │ ┃   Bug Issue         #123  (In progress)                                  │
-│  2 Oct 2026, 16:40  Sara  [4f1c9e2]  Cycle 4 review                   (2)  │
+│  [Updated]  [4f1c9e2]  Sara  02-10-2026  Cycle 4 review               (2)  │
 │     Expected Result   The dashboard opens → The dashboard opens within …   │
 │     Steps             3 steps → 4 steps                                    │
-│ ┃[Changed]  Bug in cycle 2  Sara  2 Oct 2026, 16:40  [4f1c9e2]        (6)  │
+│ ┃[Bug]  cycle 2  [4f1c9e2]  Sara  02-10-2026                          (6)  │
 │ ┃   Bug Severity      Minor → Major                                        │
-│ ┃[Cleared]  Bug in cycle 1  mtb  1 Oct 2026, 20:42  [5e6594a]         (7)  │
+│ ┃[Bug]  cycle 1  [5e6594a]  mtb  01-10-2026                           (7)  │
 │ ┃   Because           run item now Passed                                  │
-│  24 Sep 2026, 16:07  Muteb  [a83d07e]  UC-10                          (3)  │
-│     Test Case         [Created]                                            │
+│  [Created]  [a83d07e]  Muteb  24-09-2026  UC-10                       (3)  │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Not committed yet** — edits saved but not committed. It names who saved
-   last and when. It has no hash.
-2. **A committed entry** — when, who, the commit's short hash, and the commit's
-   message. The full hash shows when the pointer rests on the short one.
+1. **The badges** — every card opens with what happened: **Created**,
+   **Updated** or **Removed** for a test case, **Bug** for a bug
+   (Rule-VIEW-PANEL-115). A committed card then shows the commit's short hash;
+   edits saved but not committed head the list with no hash.
+2. **A committed entry** — the badges, who, when, and the commit's message. The
+   full hash shows when the pointer rests on the short one. A commit whose
+   version cannot be read, or that changed none of the fields, is Updated and
+   says so in a line of its own.
 3. **Created** — the commit that first added the test case.
-4. **A field row** — the field, what it was, and what it became. The field is
-   its icon, the letter the update menu shows (**D** Description, **E** Expected
-   Result, **S** Steps, **P** Priority, **G** Group, **M** Module, **T** Test
-   Data, **B** Pre Conditions, **R** Reference), with its name on hover; Status
-   and the run item's fields have no icon and are named in words
+4. **A field row** — the field, then what it was, an arrow and what it became,
+   on one line. A test case's card shows at most two; when
+   more changed, the last ends with how many more, and a value too long for
+   the panel ends in an ellipsis, whole on hover (Rule-VIEW-PANEL-116). A
+   Steps row names only the steps that changed (Rule-VIEW-PANEL-118). The field
+   is its icon, the letter the update menu shows (**D** Description, **E**
+   Expected Result, **S** Steps, **P** Priority, **G** Group, **M** Module,
+   **T** Test Data, **B** Pre Conditions, **R** Reference), with its name on
+   hover; Status and the run item's fields have no icon and are named in words
    (Rule-VIEW-PANEL-111). A commit that changed none of the fields reads
-   *reordered or restamped*.
+   *No field changed*. Clicking a test case's card opens the IDE's diff
+   window with every change (Rule-VIEW-PANEL-117).
 5. **A bug card** — a card of its own, marked by a bar in the bug's severity
-   color, or in red when its run item did not fail and only has a filed issue. It opens with what happened,
-   **Recorded**, then **Bug in** and the test
-   run, who and when, and the commit's hash, or **Not committed yet**. Then the
+   color, or in red when its run item did not fail and only has a filed issue. It opens with **Bug** and the
+   test run, then the commit's hash when it is committed, then who and when. Then the
    bug's severity and priority when its run item failed, and its filed issue
    with its state on GitHub when there is one. Clicking the test run's name opens that test run
    with the run item selected; a test run no longer in the test project is gray,
    and its tooltip says so.
-6. **Changed** — each of the bug's own attributes, from what it was to what it
-   became. A run item change that touches no bug is not shown.
-7. **Cleared** — the bar is green, and the card says why: the run item is no
-   longer Failed and has no link. A run item removed from its test run reads **Run item removed**.
+6. **A changed bug** — each of the bug's own attributes, from what it was to
+   what it became. A run item change that touches no bug is not shown.
+7. **A cleared bug** — the bar is green, and the card says why: the run item is
+   no longer Failed and has no link, or it was removed from its test run.
 
 A commit that changed the test case and a bug gives two cards, the test case's
 first.
@@ -169,8 +193,8 @@ first.
 
 ## What Testin refuses
 
-**The test project is not under Git.** The tab shows a Not committed yet bug
-card for each bug the test runs hold now, then one line: *This test project is
+**The test project is not under Git.** The tab shows a bug card with no hash
+for each bug the test runs hold now, then one line: *This test project is
 not under Git, so it has no history. Choose View Pending Commits, then
 Initialize Git (git init), to start one.*
 

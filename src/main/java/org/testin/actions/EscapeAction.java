@@ -23,7 +23,6 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +37,7 @@ import org.testin.util.Shortcuts;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
+import javax.swing.JPanel;
 import java.awt.datatransfer.StringSelection;
 
 public class EscapeAction extends AbstractProjectAction {
@@ -60,7 +60,7 @@ public class EscapeAction extends AbstractProjectAction {
     }
 
     // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-088
-    public EscapeAction(final @NotNull Project p, final @NotNull JBPanel<?> tab) {
+    public EscapeAction(final @NotNull Project p, final @NotNull JPanel tab) {
         super(p, TITLE, Bundle.message("escape.panel"), AllIcons.Actions.InlayGear);
         this.onEscape = this::giveTheKeyboardBack;
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tab);

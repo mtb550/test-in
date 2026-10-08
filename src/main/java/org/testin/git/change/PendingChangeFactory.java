@@ -95,7 +95,7 @@ final class PendingChangeFactory {
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.MODIFIED, oldState,
                         fieldChanges.isEmpty()
-                                ? List.of(new FieldChange(Bundle.message("caption.test.case"), "", Bundle.message("git.change.reordered"), ChangeSubject.TEST_CASE.getChanged()))
+                                ? List.of(new FieldChange(Bundle.message("caption.test.case"), "", Bundle.message("git.change.no.field"), ChangeSubject.TEST_CASE.getChanged()))
                                 : fieldChanges);
             }
         };

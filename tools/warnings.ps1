@@ -16,7 +16,7 @@
       Inspections      tools/inspect.ps1, gated, runs in CI on every push
       Plugin Verifier  gradlew verifyPlugin, gated: any problem fails it
       Qodana           the cloud scan, gated: any finding fails it, CI only
-      Compiler         gradlew compileJava, -Xlint:deprecation,removal
+      Compiler         gradlew compileJava, -Xlint:deprecation,removal,cast
       Gradle           --warning-mode all
 
 .PARAMETER Full
@@ -140,7 +140,7 @@ else
 # --- Compiler --------------------------------------------------------------
 $compile = & ./gradlew compileJava --rerun-tasks --console=plain 2>&1
 $compilerWarnings = @($compile | Where-Object { $_ -match 'warning:|^Note:' })
-Add-Row 'Compiler' "$( $compilerWarnings.Count )" 'no' 'gradlew compileJava, -Xlint:deprecation,removal'
+Add-Row 'Compiler' "$( $compilerWarnings.Count )" 'no' 'gradlew compileJava, -Xlint:deprecation,removal,cast'
 
 # --- Gradle ----------------------------------------------------------------
 $gradle = & ./gradlew help --warning-mode all --console=plain 2>&1

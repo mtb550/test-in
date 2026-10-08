@@ -54,7 +54,7 @@ public class TestRunConfigurationForm implements DialogComponent {
         testRunName = TestRunNameSection.of(name);
         changeLog = ChangeLogSection.of(p, answers.getOrDefault(TestRunConfiguration.CHANGE_LOG, ""));
 
-        final @NotNull CommitIdSection commitId = CommitIdSection.of(answers.getOrDefault(TestRunConfiguration.COMMIT_ID, ""));
+        final @NotNull CommitSection commit = CommitSection.of(answers.getOrDefault(TestRunConfiguration.COMMIT, ""));
 
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
             if (!field.isChoice()) continue;
@@ -63,10 +63,10 @@ public class TestRunConfigurationForm implements DialogComponent {
         }
 
         sections.add(changeLog);
-        sections.add(commitId);
+        sections.add(commit);
         sections.addAll(choices.values());
 
-        rows.add(List.of(testRunName.component(), commitId.component()));
+        rows.add(List.of(testRunName.component(), commit.component()));
         rows.add(List.of(changeLog.component()));
         rows.add(List.of(choice(TestRunConfiguration.TEST_TYPE).component(), choice(TestRunConfiguration.PLATFORM).component()));
         rows.add(List.of(choice(TestRunConfiguration.COMPONENT).component(), choice(TestRunConfiguration.LANGUAGE).component()));

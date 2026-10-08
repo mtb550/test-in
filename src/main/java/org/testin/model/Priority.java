@@ -25,6 +25,7 @@ import org.testin.util.Bundle;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
@@ -56,6 +57,11 @@ public enum Priority {
     private final @NotNull String label;
     private final @NotNull Color color;
     private final boolean active;
+
+    // Rule-EDITOR-PANEL-267
+    public @NotNull Optional<Color> barColor() {
+        return this == DEFAULT ? Optional.empty() : Optional.of(color);
+    }
 
     // Rule-EDITOR-PANEL-267, Rule-EDITOR-PANEL-268, Rule-VIEW-PANEL-114
     public @NotNull String tooltip() {

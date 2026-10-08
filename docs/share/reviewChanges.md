@@ -59,6 +59,8 @@ uncommitted work.
 - **Rule-SHARE-129** — Every marker in View Pending Commits is ticked and cannot
   be unticked, because a node's own file always goes with the commit. Its row is
   gray and says so when pointed at.
+- **Rule-SHARE-131** — A Steps change is one row, naming only the steps that
+  changed, each with its number. History names the same steps.
 
 ## The screen
 

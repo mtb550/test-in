@@ -66,9 +66,10 @@ repositories {
 // and removal are the two the Marketplace also reports, so the gate, the report
 // and the plugin page now count the same things. -Xlint:all is deliberately not
 // taken: on a tree that has never had it on it is hundreds of findings, which is
-// a sweep rather than a gate.
+// a sweep rather than a gate. cast joined them on 8 October 2026: a redundant
+// cast is a finding CI's Inspect fails on, and javac names it while working.
 tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:removal"))
+    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:removal", "-Xlint:cast"))
 }
 
 java {
