@@ -43,6 +43,9 @@ that one line in a committed `testin.yml`. A team sharing a test project should 
 
 ### Changed
 
+- **A section that opens and closes says so the same way everywhere:** a blue chevron, the word Collapse or Expand at
+  the end of its line, and Click to collapse or Click to expand when hovered. The Test Case band of the details panel
+  now shows all three, as Create Test Run's sections do.
 - **A date shows its day:** the cards and the grid of both editors, the details panel, History and a node's details
   show a date as 17-09-2026. Hover it for the full date and time, as Thursday 17-09-2026 At 06:10:00 [Asia/Riyadh].
   History's Git dates now name the IDE's time zone, not an offset such as [+03:00]. Reports, bug issues and exported

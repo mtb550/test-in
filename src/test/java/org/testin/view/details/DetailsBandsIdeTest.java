@@ -15,19 +15,26 @@
  */
 package org.testin.view.details;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.model.testrun.RunItem;
 import org.testin.model.status.RunItemStatus;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import static org.testin.view.Drawn.holds;
 
@@ -94,5 +101,17 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertTrue("the test case band's name was not drawn: " + words, words.contains(TEST_CASE));
         assertFalse("a test case field was drawn while the band was folded: " + words, holds(words, "The dashboard opens"));
         assertFalse("a test case field was drawn while the band was folded: " + words, holds(words, "Accounts"));
+    }
+
+    // Rule-INTERNAL-133
+    public void testTheFoldedBandDrawsTheAccentChevron() {
+        final @NotNull JBPanel<?> tab = Drawn.detailsTab(getProject(), aTestCase(), Optional.of(failed()), List.of("Demo", "Test Cases", LAST_STEP));
+        final @NotNull JLabel caption = Drawn.first(tab, JLabel.class, label -> TEST_CASE.equalsIgnoreCase(label.getText()));
+
+        final @NotNull Icon chevron = Objects.requireNonNull(caption.getIcon());
+        assertNotSame("the band draws the platform's uncolored arrow", AllIcons.General.ArrowRight, chevron);
+        assertEquals("the band's chevron is not the one every collapsible section draws", DialogStyle.chevron(false).getClass(), chevron.getClass());
+        assertTrue("the folded band does not say Expand at the end of its line", Drawn.words(tab).contains(Bundle.message("panel.expand")));
+        assertEquals("hovering the folded band's heading does not say a click expands it", Bundle.message("panel.expand.tooltip"), Drawn.hovering((JComponent) caption.getParent()));
     }
 }

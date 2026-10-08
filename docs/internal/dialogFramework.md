@@ -226,6 +226,13 @@ and which keys it answers, and the shell builds the rest.
   Git commit's time is shown in the IDE's own time zone, the zone Testin stores
   its own dates in. Reports, bug issues and exported files keep the full text,
   because nothing can be hovered there.
+- **Rule-INTERNAL-133** — A section that opens and closes shows its chevron in
+  the accent color, pointing down while it is open and right while it is
+  closed, and ends its line with the word *Collapse* or *Expand*, saying what a
+  click does, and hovering anywhere on that line says it too: *Click to
+  collapse* or *Click to expand*. That holds wherever Testin draws one, in a
+  dialog and in the view panel alike. The chevron is what a tester clicks, so
+  it carries the color, and the caption and the word beside it stay neutral.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

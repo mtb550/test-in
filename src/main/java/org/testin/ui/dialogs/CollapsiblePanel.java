@@ -16,16 +16,12 @@
 
 package org.testin.ui.dialogs;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
-import org.testin.util.Bundle;
-import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.awt.Cursor;
@@ -35,13 +31,11 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CollapsiblePanel {
-    // Rule-INTERNAL-099
+    // Rule-INTERNAL-099, Rule-INTERNAL-133
     public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
         final @NotNull JBLabel titleLabel = new JBLabel(title);
 
-        final @NotNull JBLabel hintLabel = new JBLabel();
-        hintLabel.setFont(Fonts.hint());
-        hintLabel.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        final @NotNull JBLabel hintLabel = DialogStyle.foldHint();
 
         final @NotNull JBPanel<?> header = Caption.header(titleLabel, Optional.of(hintLabel));
         header.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -50,11 +44,7 @@ public final class CollapsiblePanel {
 
         final @NotNull JBPanel<?> wrapper = DialogStyle.section(header, content);
 
-        final @NotNull Runnable syncHeader = () -> {
-            final boolean expanded = content.isVisible();
-            titleLabel.setIcon(DialogStyle.asAction(expanded ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight));
-            hintLabel.setText(expanded ? Bundle.message("panel.collapse") : Bundle.message("panel.expand"));
-        };
+        final @NotNull Runnable syncHeader = () -> DialogStyle.showFold(header, titleLabel, hintLabel, content.isVisible());
         syncHeader.run();
 
         header.addMouseListener(new MouseAdapter() {

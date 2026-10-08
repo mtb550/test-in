@@ -16,7 +16,6 @@
 
 package org.testin.view.details;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
@@ -27,23 +26,21 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.ui.Caption;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.JComponent;
-import javax.swing.JSeparator;
-import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Band extends AbstractDetails {
-    private static final int GAP = 10;
     private static final int INSETS_TOP = 18;
     private static final int INSETS_SIDE = 16;
 
@@ -59,21 +56,6 @@ public final class Band extends AbstractDetails {
     // Rule-VIEW-PANEL-087
     public static @NotNull Band folding(final @NotNull String name, final @NotNull String rememberedAs, final @NotNull List<AbstractDetails> rows) {
         return new Band(name, rememberedAs, List.copyOf(rows));
-    }
-
-    // Rule-VIEW-PANEL-085
-    private static @NotNull JComponent hairline() {
-        final @NotNull JBPanel<?> holder = new JBPanel<>(new GridBagLayout());
-        holder.setOpaque(false);
-
-        final @NotNull GridBagConstraints centered = new GridBagConstraints();
-        centered.fill = GridBagConstraints.HORIZONTAL;
-        centered.anchor = GridBagConstraints.CENTER;
-        centered.weightx = 1.0;
-
-        holder.add(new JSeparator(), centered);
-
-        return holder;
     }
 
     // UC-VIEW-PANEL-004, UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087
@@ -99,25 +81,16 @@ public final class Band extends AbstractDetails {
         return alwaysOpen() || PropertiesComponent.getInstance().getBoolean(rememberedAs, false);
     }
 
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087, Rule-INTERNAL-133
     private @NotNull JComponent heading(final @NotNull Project p) {
-        final @NotNull JBPanel<?> heading = new JBPanel<>(new BorderLayout(JBUI.scale(GAP), 0));
-        heading.setOpaque(false);
-
-        heading.add(caption(p), BorderLayout.WEST);
-        heading.add(hairline(), BorderLayout.CENTER);
-
-        return heading;
-    }
-
-    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087
-    private @NotNull JBLabel caption(final @NotNull Project p) {
         final @NotNull JBLabel caption = Caption.of(name, Fonts.panelCaption());
+        if (alwaysOpen()) return Caption.header(caption, Optional.empty());
 
-        if (alwaysOpen()) return caption;
-
-        caption.setIcon(isOpen() ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight);
-        caption.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        caption.addMouseListener(new MouseAdapter() {
+        final @NotNull JBLabel hint = DialogStyle.foldHint();
+        final @NotNull JBPanel<?> heading = Caption.header(caption, Optional.of(hint));
+        DialogStyle.showFold(heading, caption, hint, isOpen());
+        heading.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        heading.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 PropertiesComponent.getInstance().setValue(rememberedAs, !isOpen(), false);
@@ -125,6 +98,6 @@ public final class Band extends AbstractDetails {
             }
         });
 
-        return caption;
+        return heading;
     }
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.ColorUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextIcon;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
@@ -35,6 +36,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Spacing;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
@@ -106,6 +108,26 @@ public final class DialogStyle {
     // Rule-INTERNAL-105
     public static @NotNull Icon asAction(final @NotNull Icon icon) {
         return IconUtil.colorize(icon, ACCENT);
+    }
+
+    // Rule-INTERNAL-133
+    public static @NotNull Icon chevron(final boolean expanded) {
+        return asAction(expanded ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight);
+    }
+
+    // Rule-INTERNAL-133
+    public static @NotNull JBLabel foldHint() {
+        final @NotNull JBLabel hint = new JBLabel();
+        hint.setFont(Fonts.hint());
+        hint.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        return hint;
+    }
+
+    // Rule-INTERNAL-133
+    public static void showFold(final @NotNull JComponent header, final @NotNull JBLabel title, final @NotNull JBLabel hint, final boolean expanded) {
+        title.setIcon(chevron(expanded));
+        hint.setText(expanded ? Bundle.message("panel.collapse") : Bundle.message("panel.expand"));
+        Tooltip.set(header, expanded ? Bundle.message("panel.collapse.tooltip") : Bundle.message("panel.expand.tooltip"));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-096

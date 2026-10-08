@@ -199,6 +199,13 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         return List.of();
     }
 
+    // Rule-INTERNAL-133
+    public void testACollapseChevronIsDrawnInTheAccentOpenOrClosed() {
+        assertNotSame("an open section draws the platform's uncolored arrow", AllIcons.General.ArrowDown, DialogStyle.chevron(true));
+        assertNotSame("a closed section draws the platform's uncolored arrow", AllIcons.General.ArrowRight, DialogStyle.chevron(false));
+        assertEquals("an open chevron is not colored like every action", DialogStyle.asAction(AllIcons.General.ArrowDown).getClass(), DialogStyle.chevron(true).getClass());
+    }
+
     // UC-INTERNAL-007, Rule-INTERNAL-077
     public void testEveryIconAFrameworkSurfaceDrawsIsGrayEvenWhenTheIconItIsHandedIsColored() {
         assertFalse("the icon this test hands the framework is not colored, so it proves nothing", isGray(GREEN));
