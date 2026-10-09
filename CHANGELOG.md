@@ -11,6 +11,13 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Status has a letter on the update menu:** **U** opens it after **F2**, or straight from a selected card as **D** does, with the U icon the copy menu already
   shows, so every field on the menu has a letter. Status's detail line on a card and in History leads with that icon.
 
+### Changed
+
+- **A test run is drawn test set by test set:** its test cases come in the order the Create Test Run form lists them,
+  each set in its own order, and each card is numbered by its place in its own set, as the details panel and the
+  generated test method already count it. The four reports list run items in the same order. A test case that was
+  deleted comes last, with no number.
+
 ### Fixed
 
 - **Git works in PyCharm and every IDE where the Testin folder sits outside the project:** reading a committed test

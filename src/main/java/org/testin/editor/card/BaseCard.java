@@ -31,6 +31,7 @@ import org.testin.editor.EditorColors;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
@@ -57,7 +58,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -116,7 +116,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014
     public static @NotNull String titleText(final int position, final boolean showOrder, final @NotNull String description) {
-        final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", position) : "";
+        final @NotNull String place = showOrder ? TestCaseOrder.placeText(position) : "";
+        final @NotNull String order = place.isEmpty() ? "" : place + ".";
         final @NotNull String title = description.trim();
 
         return order.isEmpty() || title.isEmpty() ? order + title : order + " " + title;

@@ -47,6 +47,11 @@ public final class TestCaseOrder {
         return ordered.size() + 1;
     }
 
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014
+    public static @NotNull String placeText(final int place) {
+        return place > 0 ? String.valueOf(place) : "";
+    }
+
     // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-060
     public static @NotNull List<TestCaseDto> place(final @NotNull List<TestCaseDto> arranged) {
         final @NotNull List<TestCaseDto> moved = new ArrayList<>();

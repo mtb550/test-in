@@ -25,6 +25,7 @@ import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.editor.toolbar.StopExecutionBtn;
+import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
 import org.testin.model.FileKind;
@@ -413,12 +414,38 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    // Rule-EDITOR-PANEL-127
-    public void testTheTestCasesAreDrawnInTheOrderOfTheirTestSet() {
-        final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
-        final @NotNull TestRunEditor editor = opened(aPendingTestRunOver(List.of(testCases.get(2), testCases.get(0), testCases.get(1))));
+    // Rule-EDITOR-PANEL-127, Rule-EDITOR-PANEL-014
+    public void testATestRunIsDrawnTestSetByTestSetAndNumberedWithinEachSet() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull List<TestCaseDto> login = EditorFixtures.testCases(getProject(), EditorFixtures.testSet(getProject(), tp, "Login"), 3);
+        final @NotNull List<TestCaseDto> checkout = EditorFixtures.testCases(getProject(), EditorFixtures.testSet(getProject(), tp, "Checkout"), 2);
+        final @NotNull List<UUID> asTheFormListsThem = Services.getInstance(getProject(), TestCases.class).getTestCasesUnder(tp.getTestCasesFolder()).stream().map(TestCaseDto::getId).toList();
+
+        final @NotNull TestRunNode tr = aPendingTestRunOver(List.of(checkout.get(1), login.get(2), checkout.get(0), login.get(0), login.get(1)));
+        final @NotNull TestRunEditor editor = opened(tr);
         try {
-            assertEquals(testCases.stream().map(TestCaseDto::getId).toList(), editor.getAllTestCases().stream().map(TestCaseDto::getId).toList());
+            assertEquals("the reports read the run items in this order", asTheFormListsThem, theTestRuns().getRunItems(tr.getPath()).getAll().stream().map(RunItem::getId).toList());
+            assertEquals(asTheFormListsThem, editor.getAllTestCases().stream().map(TestCaseDto::getId).toList());
+            for (final List<TestCaseDto> testSet : List.of(login, checkout)) {
+                for (int place = 1; place <= testSet.size(); place++) {
+                    assertEquals("a test run card is numbered by its place in its own test set", place, editor.positionOf(testSet.get(place - 1)));
+                }
+            }
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-127, Rule-EDITOR-PANEL-014
+    public void testATestCaseThatWasDeletedComesLastWithNoNumber() {
+        final @NotNull List<TestCaseDto> testCases = createdTestCases(2);
+        final @NotNull TestCaseDto deleted = TestCaseDto.builder().id(UUID.randomUUID()).description("Deleted since").build();
+
+        final @NotNull TestRunEditor editor = opened(aPendingTestRunOver(List.of(deleted, testCases.get(1), testCases.get(0))));
+        try {
+            assertEquals(deleted.getId(), editor.getAllTestCases().getLast().getId());
+            assertFalse("a test case that was deleted has no place in a set, so its card shows no number",
+                    Character.isDigit(editor.cardTitle(editor.getAllTestCases().getLast()).charAt(0)));
         } finally {
             Disposer.dispose(editor);
         }

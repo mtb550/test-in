@@ -62,8 +62,20 @@ public final class TestRuns {
         return indexer.getRunItemWriter();
     }
 
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-127, Rule-REPORT-026
     public @NotNull RunItems getRunItems(final @NotNull Path testRunPath) {
-        return withTestCasesShown(testRunPath, store().getRunItems(testRunPath));
+        return withTestCasesShown(testRunPath, store().getRunItems(testRunPath)).inOrderOf(testCaseIdsInTreeOrder(testRunPath));
+    }
+
+    // Rule-EDITOR-PANEL-127
+    private @NotNull List<UUID> testCaseIdsInTreeOrder(final @NotNull Path testRunPath) {
+        return indexer.testProjectHolding(testRunPath)
+                .flatMap(testProject -> Optional.ofNullable(store().getTestProjectsByPath().get(testProject.toString())))
+                .map(tp -> Services.getInstance(p, TestCases.class).getTestCasesUnder(tp.getTestCasesFolder()))
+                .orElse(List.of())
+                .stream()
+                .map(TestCaseDto::getId)
+                .toList();
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083

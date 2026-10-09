@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.status.RunItemStatus;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -80,6 +82,18 @@ public class RunItems {
 
     public @NotNull Set<UUID> coveredIds() {
         return all.stream().map(RunItem::getId).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    // Rule-EDITOR-PANEL-127, Rule-REPORT-026
+    public @NotNull RunItems inOrderOf(final @NotNull List<UUID> testCaseIds) {
+        final @NotNull Map<UUID, Integer> places = new HashMap<>();
+        for (int i = 0; i < testCaseIds.size(); i++) {
+            places.putIfAbsent(testCaseIds.get(i), i);
+        }
+
+        return new RunItems().setAll(all.stream()
+                .sorted(Comparator.comparingInt(runItem -> places.getOrDefault(runItem.getId(), testCaseIds.size())))
+                .collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public @NotNull Optional<RunItem> runItemOf(final @NotNull UUID testCaseId) {

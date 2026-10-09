@@ -69,6 +69,8 @@ cannot.
   result analysis line and a bug priority or severity that alarms; passed,
   blocked and untested the same. The color is the run item status's own, so
   changing it once changes every report.
+- **Rule-REPORT-026** — A report lists a test run's run items in the test run's
+  order, the order its editor draws them in.
 
 ## The screen
 

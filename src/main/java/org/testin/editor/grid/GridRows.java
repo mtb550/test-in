@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseDto;
 import org.testin.model.testrun.RunItem;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 
@@ -55,7 +56,7 @@ public final class GridRows {
         return testCases.stream()
                 .map(tc -> {
                     final @NotNull Function<A, String> value = valuesOf.apply(tc);
-                    return columns.stream().map(column -> column.equals(order) ? String.valueOf(position.applyAsInt(tc)) : value.apply(column)).toArray(String[]::new);
+                    return columns.stream().map(column -> column.equals(order) ? TestCaseOrder.placeText(position.applyAsInt(tc)) : value.apply(column)).toArray(String[]::new);
                 })
                 .toList();
     }

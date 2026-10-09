@@ -23,6 +23,7 @@ import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.bug.BugIssueStates;
+import org.testin.codegen.ExecutionPosition;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.PageWindow;
 import org.testin.editor.card.BaseCard;
@@ -59,7 +60,6 @@ import org.testin.notifications.Done;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
 import org.testin.testcase.TestSetEditorAttributes;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.TestRunResultAnalysisDialog;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.SideScroll;
@@ -96,6 +96,8 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     private volatile @NotNull Optional<RunItems> loadedRunItems = Optional.empty();
 
+    private volatile @NotNull Map<UUID, Integer> placesInTheirSets = Map.of();
+
     private boolean loaded;
 
     private boolean startWhenLoaded;
@@ -129,12 +131,14 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
                         .collect(Collectors.toMap(RunItem::getId, runItem -> runItem,
                                 (existingItem, _) -> existingItem));
 
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getAll().stream().map(RunItem::liveTestCase).toList());
+                final @NotNull List<TestCaseDto> ordered = fromDisk.getAll().stream().map(RunItem::liveTestCase).toList();
+                final @NotNull Map<UUID, Integer> places = ExecutionPosition.placesOf(p, ordered);
                 testCaseValues.load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
                     loadedRunItems = Optional.of(fromDisk);
+                    placesInTheirSets = places;
                     runItemsById.putAll(runItemsOnDisk);
                     allTestCases.clear();
                     allTestCases.addAll(ordered);
@@ -183,6 +187,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         runItemsById.clear();
 
         loadedRunItems = Optional.empty();
+        placesInTheirSets = Map.of();
     }
 
     @Override
@@ -203,6 +208,12 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     public @NotNull Optional<RunItem> runItem(final @NotNull UUID id) {
         return Optional.ofNullable(runItemsById.get(id));
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-014
+    @Override
+    public int positionOf(final @NotNull TestCaseDto tc) {
+        return placesInTheirSets.getOrDefault(tc.getId(), 0);
     }
 
     public @NotNull Optional<RunItems> loadedRunItems() {

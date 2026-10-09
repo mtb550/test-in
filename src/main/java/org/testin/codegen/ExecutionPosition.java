@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.ToIntFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,6 +44,20 @@ public final class ExecutionPosition {
         final @NotNull Map<Path, List<TestCaseDto>> sets = new HashMap<>();
 
         return tc -> TestCaseOrder.positionOf(sets.computeIfAbsent(tc.getParent().getPath(), _ -> setOf(p, tc)), tc);
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-014
+    public static @NotNull Map<UUID, Integer> placesOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull Map<Path, List<TestCaseDto>> sets = new HashMap<>();
+        final @NotNull Map<UUID, Integer> places = new HashMap<>();
+
+        for (final TestCaseDto tc : testCases) {
+            final @NotNull List<TestCaseDto> set = sets.computeIfAbsent(tc.getParent().getPath(), _ -> setOf(p, tc));
+            final int place = TestCaseOrder.positionOf(set, tc);
+            if (place <= set.size()) places.put(tc.getId(), place);
+        }
+
+        return places;
     }
 
     // UC-CODEGEN-011, Rule-CODEGEN-042

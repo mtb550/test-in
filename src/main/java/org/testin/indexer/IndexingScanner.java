@@ -35,7 +35,6 @@ import org.testin.model.node.TestSetNode;
 import org.testin.model.node.TestSetPackageNode;
 import org.testin.model.testrun.RunItem;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;
@@ -46,14 +45,10 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final class IndexingScanner {
@@ -81,25 +76,6 @@ final class IndexingScanner {
         scanned.getProjects().put(projectPath.toString(), tp);
 
         return scanned;
-    }
-
-    // Rule-INTERNAL-011
-    static @NotNull List<RunItem> inTestCaseOrder(final @NotNull List<RunItem> runItems, final @NotNull ScannedProject scanned) {
-        final @NotNull Map<UUID, RunItem> byId = new LinkedHashMap<>();
-        runItems.forEach(runItem -> byId.put(runItem.getId(), runItem));
-
-        final @NotNull List<TestCaseDto> testCases = runItems.stream()
-                .map(runItem -> scanned.getTestCasesById().get(runItem.getId()))
-                .filter(Objects::nonNull)
-                .toList();
-
-        final @NotNull List<RunItem> ordered = TestCaseOrder.ordered(testCases).stream()
-                .map(tc -> byId.remove(tc.getId()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        ordered.addAll(byId.values());
-        return ordered;
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-012
@@ -391,6 +367,6 @@ final class IndexingScanner {
             }
         }
 
-        return inTestCaseOrder(read, scanned);
+        return read;
     }
 }
