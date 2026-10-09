@@ -109,7 +109,7 @@ public class TestCaseTransferHandler extends TransferHandler {
         return support.isDataFlavorSupported(FLAVOR);
     }
 
-    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-061
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-061, Rule-EDITOR-PANEL-282
     @Override
     public boolean importData(final TransferSupport support) {
         if (!support.isDataFlavorSupported(FLAVOR)) return false;

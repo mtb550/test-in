@@ -25,7 +25,12 @@ import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.GridViewBtn;
+import org.testin.filter.SortDirection;
+import org.testin.filter.SortField;
+import org.testin.filter.SortPopupBtn;
+import org.testin.filter.Sorting;
 import org.testin.indexer.TestCases;
+import org.testin.model.Priority;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
@@ -168,5 +173,27 @@ public class DragToReorderIdeTest extends AbstractTempRootIdeTest {
         int dropIndex(final @NotNull TransferSupport support) {
             return index;
         }
+    }
+
+    // Rule-EDITOR-PANEL-282
+    public void testUnderASortACardLandsAfterTheCardAboveTheDropInTheSet() {
+        final @NotNull TestSetEditor editor = aTestSetOf("A", "B", "C", "D");
+        for (final TestCaseDto high : theTestCases().getTestCasesForTestSet(testSet.getPath())) {
+            if (!List.of("B", "D").contains(high.getDescription())) continue;
+            final @NotNull TestCaseDto raised = high.edit().priority(Priority.HIGH).build();
+            raised.setParent(testSet);
+            theTestCases().putTestCaseVerbatim(testSet.getPath(), raised);
+        }
+        editor.onToolBarRefreshButtonClicked();
+        Await.until("the editor never read the new priorities", () -> !editor.isLoading() && editor.getAllTestCases().stream().filter(tc -> tc.getPriority() == Priority.HIGH).count() == 2);
+        final @NotNull SortPopupBtn sort = editor.getToolBar().getToolbarItem(SortPopupBtn.class);
+        Sorting.choose(sort, SortField.PRIORITY.getLabel());
+        Sorting.choose(sort, SortDirection.DESCENDING.getLabel());
+        Await.until("the sort never put the high ones first", () -> editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList().equals(List.of("B", "D", "A", "C")));
+
+        assertTrue("the drop was refused under a sort", drag(editor, new int[]{2}, 1));
+
+        awaitStoredOrder(List.of("B", "A", "C", "D"));
+        Await.until("the sort was lost after the drop", () -> editor.getCurrentTestCases().stream().map(TestCaseDto::getDescription).toList().equals(List.of("B", "D", "A", "C")));
     }
 }

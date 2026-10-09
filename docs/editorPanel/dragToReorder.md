@@ -61,6 +61,11 @@ There is no key for this. Drag the cards.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-282** — O and dragging change the order whether a filter
+  or a sort is on, and the change shows at once. A dragged card lands right
+  after the card above where it is dropped, in the test set, and O asks for the
+  place in the set whatever the screen shows. Under a sort other than Order the
+  card then stays where the sort places it.
 
 ## What the tester sees
 

@@ -37,6 +37,10 @@ import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.testrun.TestRunEditor;
+import org.testin.filter.SortDirection;
+import org.testin.filter.SortField;
+import org.testin.filter.SortPopupBtn;
+import org.testin.filter.Sorting;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestCaseDto;
@@ -603,6 +607,25 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             lightMode().refresh(editor.getParent());
             assertFalse("turning Navigate to Test Case off left its button", buttonNames(frame).contains(Bundle.message("action.Testin.NavigateToTestCase.text")));
             assertEquals("turning one button off took another with it", 2, buttonNames(frame).size());
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-283
+    public void testLightModeFollowsTheTestCasesAsShownTheSortIncluded() {
+        final @NotNull TestRunFixture fixture = aTestRunOf(aTestSetWithSteps(3, 1));
+        final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
+        try {
+            final @NotNull SortPopupBtn sort = editor.getToolBar().getToolbarItem(SortPopupBtn.class);
+            Sorting.choose(sort, SortField.DESCRIPTION.getLabel());
+            Sorting.choose(sort, SortDirection.DESCENDING.getLabel());
+            editor.onStartExecutionClicked();
+            Await.until("the walk never started", () -> editor.getWalk().getCurrentlyExecutingIndex() == 0);
+
+            final @NotNull JFrame frame = lightModeOn(editor);
+
+            Await.until("light mode did not start on the first test case as sorted: " + describedIn(frame), () -> describedIn(frame).startsWith("Test case number 3"));
         } finally {
             Disposer.dispose(editor);
         }

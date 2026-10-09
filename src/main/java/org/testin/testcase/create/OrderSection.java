@@ -109,7 +109,7 @@ public class OrderSection implements CreateTestCaseSection {
         }
     }
 
-    // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055
+    // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055, Rule-EDITOR-PANEL-282
     @Override
     public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
         final @NotNull List<TestCaseDto> inSet = ExecutionPosition.setOf(p, dto);

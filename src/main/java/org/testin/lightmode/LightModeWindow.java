@@ -168,6 +168,7 @@ final class LightModeWindow {
         return editor.getParent().getPath().equals(other.getPath());
     }
 
+    // Rule-EDITOR-PANEL-283
     void refresh() {
         final @NotNull List<TestCaseDto> testCases = editor.getCurrentTestCases();
         final int index = editor.getWalk().getCurrentlyExecutingIndex();

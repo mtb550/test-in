@@ -121,7 +121,7 @@ public final class TestRunWalk {
         editor.onExecutionStateChanged();
     }
 
-    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-036, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-153
+    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-036, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-153, Rule-EDITOR-PANEL-283
     private int nextPendingIndex(final int from) {
         final @NotNull List<TestCaseDto> shown = editor.getCurrentTestCases();
 

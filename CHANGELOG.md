@@ -13,6 +13,7 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   their order and empty values come last either way. Sorting writes nothing and every card keeps its number; the
   button lights up and the status bar names the sort while one is on; Reset Sort puts it back. In a test set editor
   the three run fields are gray.
+  O and dragging still change the order under a sort, and the execution walk and light mode follow the sorted list.
 - **Status has a letter on the update menu:** **U** opens it after **F2**, or straight from a selected card as **D** does, with the U icon the copy menu already
   shows, so every field on the menu has a letter. Status's detail line on a card and in History leads with that icon.
 

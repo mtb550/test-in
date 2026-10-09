@@ -88,6 +88,10 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 - **Rule-EDITOR-PANEL-264** — When the test case the walk is on has been
   deleted, a run item status key records nothing: a short message says so, and
   the walk moves on to the next Pending test case.
+- **Rule-EDITOR-PANEL-283** — The execution walk and light mode follow the test
+  cases as shown, the sort included. Under a sort by Run Item Status, Executed
+  At or Duration a judged test case moves to where the sort places it, and the
+  walk goes on to the next one waiting.
 
 ## What the tester sees
 

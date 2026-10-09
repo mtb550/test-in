@@ -25,6 +25,10 @@ import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.editor.toolbar.StopExecutionBtn;
+import org.testin.filter.SortDirection;
+import org.testin.filter.SortField;
+import org.testin.filter.SortPopupBtn;
+import org.testin.filter.Sorting;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
@@ -480,6 +484,30 @@ public class ManualExecutionIdeTest extends AbstractTempRootIdeTest {
             assertEquals(RunItemStatus.PASSED, statusOf(tr, testCases.getFirst()));
             awaitWalkOn(editor, testCases.get(1));
             assertTrue("execution did not go on", editor.getWalk().isExecuting());
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-283
+    public void testUnderASortThatMovesEachJudgedCardTheWalkStillReachesEveryOneWaiting() {
+        final @NotNull List<TestCaseDto> testCases = createdTestCases(3);
+        final @NotNull TestRunNode tr = aPendingTestRunOver(testCases);
+        final @NotNull TestRunEditor editor = opened(tr);
+        try {
+            final @NotNull SortPopupBtn sort = editor.getToolBar().getToolbarItem(SortPopupBtn.class);
+            Sorting.choose(sort, SortField.RUN_ITEM_STATUS.getLabel());
+            Sorting.choose(sort, SortDirection.DESCENDING.getLabel());
+
+            editor.onStartExecutionClicked();
+            for (final TestCaseDto next : testCases) {
+                awaitWalkOn(editor, next);
+                record(editor, RunItemStatus.PASSED);
+            }
+
+            for (final TestCaseDto judged : testCases) {
+                assertEquals("the walk passed over a test case waiting for a run item status", RunItemStatus.PASSED, statusOf(tr, judged));
+            }
         } finally {
             Disposer.dispose(editor);
         }

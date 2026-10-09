@@ -22,6 +22,10 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testset.TestSetEditor;
+import org.testin.filter.SortDirection;
+import org.testin.filter.SortField;
+import org.testin.filter.SortPopupBtn;
+import org.testin.filter.Sorting;
 import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestSetNode;
@@ -123,5 +127,22 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
         moveToThird(editor, "Test case number 1");
 
         Await.until("typing three did not put the test case third: " + storedOrder(), () -> storedOrder().equals(List.of("2", "3", "1", "4", "5", "6")));
+    }
+
+    // Rule-EDITOR-PANEL-282
+    public void testUnderASortTheBoxHoldsThePlaceInTheSetAndThatIsWhatIsWritten() {
+        final @NotNull TestSetEditor editor = sixTestCases();
+        final @NotNull SortPopupBtn sort = editor.getToolBar().getToolbarItem(SortPopupBtn.class);
+        Sorting.choose(sort, SortField.DESCRIPTION.getLabel());
+        Sorting.choose(sort, SortDirection.DESCENDING.getLabel());
+        Await.until("the sort never put number 6 first", () -> editor.getList().getModel().getSize() > 0 && editor.getList().getModel().getElementAt(0).getDescription().equals("Test case number 6"));
+
+        select(editor, "Test case number 6");
+        assertEquals("under a sort the box does not hold the place in the set", Integer.valueOf(6), theOrderBox(editor).getValue());
+        ShownDialog.close(getProject(), UpdateTestCaseDialog.class);
+
+        moveToThird(editor, "Test case number 6");
+
+        Await.until("the place in the set was not what was written: " + storedOrder(), () -> storedOrder().equals(List.of("1", "2", "6", "3", "4", "5")));
     }
 }
