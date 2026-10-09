@@ -36,15 +36,15 @@ There is no key for this. The button's tooltip reads **Filter**.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-094** — Seven things can be filtered on: the priority,
-  the automation, the group, the module, the status, in a test run editor the
-  run item status, and in a test run editor and the Create Test Run dialog the
-  test set.
+- **Rule-EDITOR-PANEL-094** — The Filter menu is the same in the test set
+  editor, the test run editor and the Create Test Run dialog: the priority, the
+  automation, the group, the module, the status, the run item status and the
+  test set. An entry that cannot work there is gray, and hovering it says why.
 - **Rule-EDITOR-PANEL-095** — The module list is built from the test cases in
   this test set, so it only ever offers modules that exist.
 - **Rule-EDITOR-PANEL-096** — Choosing nothing in a filter means every test case
   matches it.
-- **Rule-EDITOR-PANEL-097** — Filtering goes back to the first page.
+- **Rule-EDITOR-PANEL-097** — Filtering or sorting goes back to the first page.
 - **Rule-EDITOR-PANEL-098** — The button says how many filters are on.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
@@ -71,8 +71,8 @@ There is no key for this. The button's tooltip reads **Filter**.
 - **Rule-EDITOR-PANEL-261** — Status filters on the test case's own status -
   Reviewed, Pending, Disabled, To Be Updated - and works in both editors and the
   Create Test Run dialog. Run Item Status is a different thing: what a test run
-  recorded for each run item, such as Passed or Failed. It is on the menu only
-  in a test run editor, the one place run items have a status.
+  recorded for each run item, such as Passed or Failed. It is on every menu, and
+  gray in a test set editor, where nothing has a run item; hovering it says so.
 
 ## The screen
 
@@ -102,12 +102,11 @@ There is no key for this. The button's tooltip reads **Filter**.
 6. **Status** — the test case's own status: **Reviewed**, **Pending**, **Disabled** and **To Be Updated**. It works in
    both editors and in the
    Create Test Run dialog.
-7. **Run Item Status** — what the test run recorded for each run item, such as **Passed** or **Failed**. Only a test run
-   editor has this row.
-8. **Test Set** — gray in both editors, reading *Test Set (only Create Test Run
-   picks across test sets)*. The same menu opens in the
-   [Create Test Run](../treePanel/createTestRun.md) dialog, where it offers the
-   test sets the dialog holds.
+7. **Run Item Status** — what the test run recorded for each run item, such as **Passed** or **Failed**. Gray in a test
+   set editor, where hovering it says only a test run has run items.
+8. **Test Set** — the test sets a test run holds, in the tree's order, named like **Payments / Cards**. Gray in a test
+   set editor, where hovering it says a test set editor shows one test set. The same menu opens in the
+   [Create Test Run](../treePanel/createTestRun.md) dialog, where it offers the test sets the dialog holds.
 
 While a filter is on, the button shows the count in brackets. Its tooltip
 becomes **Filter**, then the count, then **active**.
@@ -129,8 +128,9 @@ becomes **Filter**, then the count, then **active**.
 **If the module has never been used** — it is not offered. The list is built
 from what is there.
 
-**In a test set editor** — there is no **Run Item Status** row. Only a test
-run holds run items, so there is nothing for it to filter on.
+**In a test set editor** — **Run Item Status** and **Test Set** are gray, and
+hovering either says why: only a test run holds run items, and a test set editor
+shows one test set. The label stays plain; the reason is never written beside it.
 
 ---
 

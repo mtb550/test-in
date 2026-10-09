@@ -40,6 +40,8 @@ import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.filter.FilterPopupBtn;
+import org.testin.filter.SortPopupBtn;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
@@ -357,6 +359,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + getToolBar().getCurrentView());
+        getToolBar().getToolbarItem(FilterPopupBtn.class).clearFilters();
+        getToolBar().getToolbarItem(SortPopupBtn.class).reset();
 
         final @NotNull Done message = refreshed();
 

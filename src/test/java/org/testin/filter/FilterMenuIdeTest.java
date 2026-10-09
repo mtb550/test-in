@@ -152,7 +152,7 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
 
         final @NotNull FilterPopupBtn inATestSet = filterOf(openedTestSet(3));
         assertEquals("a test set editor does not filter on the priority, the automation, the group, the module and the status", everywhere, entriesOf(inATestSet).subList(0, everywhere.size()));
-        assertFalse("a test set editor offers the run item status", entriesOf(inATestSet).contains(Bundle.message("filter.run.item.status")));
+        assertFalse("the run item status works in a test set editor", enabled(entry(inATestSet.menu(), Bundle.message("filter.run.item.status"))));
         assertFalse("a test set editor offers to pick across test sets", enabled(entry(inATestSet.menu(), Bundle.message("filter.test.set"))));
 
         final @NotNull FilterPopupBtn inATestRun = filterOf(openedTestRun(3));

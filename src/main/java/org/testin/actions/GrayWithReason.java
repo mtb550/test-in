@@ -18,6 +18,7 @@ package org.testin.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ public final class GrayWithReason {
     public static void unless(final @NotNull AnAction action, final @NotNull AnActionEvent e, final boolean works, final @NotNull String reason) {
         e.getPresentation().setEnabled(works);
         e.getPresentation().setDescription(works ? Objects.requireNonNullElse(action.getTemplatePresentation().getDescription(), "") : reason);
+        e.getPresentation().putClientProperty(ActionUtil.TOOLTIP_TEXT, works ? null : reason);
     }
 
     // Rule-EDITOR-PANEL-230

@@ -107,8 +107,8 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
         return leaves;
     }
 
-    // Rule-TREE-PANEL-129
-    public void testTheFilterMenuIsTheEditorsWithoutRunItemStatus() {
+    // Rule-TREE-PANEL-129, Rule-EDITOR-PANEL-094
+    public void testTheFilterMenuIsTheEditorsOne() {
         final @NotNull List<String> names = menu().stream().map(TestRunFormFilterIdeTest::nameOf).toList();
 
         assertTrue("the Filter menu has no priority filter: " + names, names.contains(TestSetEditorAttributes.PRIORITY.getName()));
@@ -116,7 +116,7 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
         assertTrue("the Filter menu has no module filter: " + names, names.contains(TestSetEditorAttributes.MODULE.getName()));
         assertTrue("the Filter menu has no automation filter: " + names, names.contains(Bundle.message("filter.automation")));
         assertTrue("the Filter menu has no status filter: " + names, names.contains(Bundle.message("filter.test.case.status")));
-        assertFalse("the Filter menu offers Run Item Status for test cases that are all Pending: " + names, names.contains(Bundle.message("filter.run.item.status")));
+        assertTrue("the Filter menu is not the editors' one: " + names, names.contains(Bundle.message("filter.run.item.status")));
         assertEquals("Test Set does not offer the test sets the tree holds", List.of("Login", "Card"), entriesOf(Bundle.message("filter.test.set")).stream().map(TestRunFormFilterIdeTest::nameOf).toList());
     }
 

@@ -17,27 +17,10 @@
 package org.testin.filter;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestCaseDto;
+import org.testin.model.testrun.RunItem;
 
-import java.util.Set;
+import java.util.Optional;
 
-@FunctionalInterface
-public interface FilterMembership<T> {
-    static <T> @NotNull FilterMembership<T> plain() {
-        return (value, selection, selected) -> {
-            if (selected) selection.add(value);
-            else selection.remove(value);
-        };
-    }
-
-    // UC-EDITOR-PANEL-049, Rule-EDITOR-PANEL-274
-    static <T> @NotNull FilterMembership<T> single() {
-        return (value, selection, selected) -> {
-            if (!selected) return;
-
-            selection.clear();
-            selection.add(value);
-        };
-    }
-
-    void apply(final @NotNull T value, final @NotNull Set<T> selection, final boolean selected);
+record ShownTestCase(@NotNull TestCaseDto testCase, @NotNull Optional<RunItem> runItem) {
 }

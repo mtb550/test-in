@@ -30,6 +30,9 @@ import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.editor.toolbar.RefreshBtn;
 import org.testin.editor.toolbar.TestSetDetailsPopupBtn;
 import org.testin.filter.FilterPopupBtn;
+import org.testin.filter.SortField;
+import org.testin.filter.SortPopupBtn;
+import org.testin.filter.Sorting;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Priority;
@@ -73,7 +76,7 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
     }
 
     // Rule-EDITOR-PANEL-117
-    public void testRefreshKeepsTheFiltersAndTheSearchAndReadsTheDataAgain() {
+    public void testRefreshClearsTheFiltersAndTheSortKeepsTheSearchAndReadsTheDataAgain() {
         final @NotNull TestSetNode ts = aTestSet();
         final @NotNull String oldGroup = "Old-" + UUID.randomUUID();
         final @NotNull String newGroup = "New-" + UUID.randomUUID();
@@ -87,6 +90,8 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
             final @NotNull FilterPopupBtn filters = editor.getToolBar().getToolbarItem(FilterPopupBtn.class);
             filters.getSelectedPriority().add(Priority.HIGH);
             editor.onToolBarFilterSelectionChanged();
+            final @NotNull SortPopupBtn sort = editor.getToolBar().getToolbarItem(SortPopupBtn.class);
+            Sorting.choose(sort, SortField.DESCRIPTION.getLabel());
             editor.getToolBar().getSearchTxt().setText("Log in");
             Await.until("the search never narrowed the list", () -> editor.getCurrentTestCases().size() == 1);
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
@@ -101,9 +106,10 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
             pressRefresh(editor);
 
             Await.until("refresh did not read the new test case", () -> editor.getAllTestCases().size() == 4 && !editor.isLoading());
-            assertEquals("refresh threw the filter or the search away", List.of("Log in with a valid user", "Log in with a new user"), shownDescriptions(editor));
-            assertEquals("Log in", editor.getToolBar().getSearchTxt().getText());
-            assertEquals(Set.of(Priority.HIGH), filters.getSelectedPriority());
+            assertEquals("refresh kept the filter or the sort, or threw the search away", List.of("Log in with a valid user", "Log in with a wrong password", "Log in with a new user"), shownDescriptions(editor));
+            assertEquals("refresh threw the search away", "Log in", editor.getToolBar().getSearchTxt().getText());
+            assertEquals("refresh kept the filter", Set.of(), filters.getSelectedPriority());
+            assertEquals("refresh kept the sort", SortField.ORDER, sort.sortBy());
             assertEquals("refresh left the grid", ViewMode.GRID_VIEW, editor.getToolBar().getCurrentView());
             assertEquals("refresh changed the fields shown", fields, editor.getToolBar().getToolbarItem(TestSetDetailsPopupBtn.class).getSelectedDetails());
             Await.until("the group filter still offers a group no test case uses", () -> values.getGroups().contains(newGroup) && !values.getGroups().contains(oldGroup));
@@ -231,14 +237,14 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
             assertTrue(editor.getWalk().isExecuting());
 
             Services.getInstance(getProject(), TestRuns.class).putRunItems(tr.getPath(), new RunItems().setAll(new ArrayList<>(List.of(
-                    EditorFixtures.pending(testCases.get(0)),
+                    EditorFixtures.pending(testCases.getFirst()),
                     EditorFixtures.pending(testCases.get(1)).setStatus(RunItemStatus.PASSED)))));
 
             pressRefresh(editor);
 
             Await.until("refresh did not read the test run again", () -> editor.runItem(testCases.get(1).getId()).map(RunItem::getStatus).filter(RunItemStatus.PASSED::equals).isPresent());
             assertFalse("refresh did not stop the execution", editor.getWalk().isExecuting());
-            assertFalse("the clock kept running on the copy refresh replaced", editor.getWalk().clockIsOn(testCases.get(0).getId()));
+            assertFalse("the clock kept running on the copy refresh replaced", editor.getWalk().clockIsOn(testCases.getFirst().getId()));
             Await.until("the message did not say the execution stopped: " + balloons, () -> balloons.contains(Done.REFRESHED_EXECUTION_STOPPED.getOutcome()));
             assertFalse("the message said only Refreshed", balloons.contains(Done.REFRESHED.getOutcome()));
         } finally {

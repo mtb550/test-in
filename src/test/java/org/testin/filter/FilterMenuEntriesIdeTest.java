@@ -127,10 +127,10 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
                 assertEquals("choosing no state did not show everything", 3, shown(editor).size());
 
                 choose(editor, Bundle.message("filter.automation"), Automated.WRITTEN.getLabel());
-                assertEquals("the Automation filter does not behave like the filters beside it", List.of(testCases.get(0).getDescription()), shown(editor));
+                assertEquals("the Automation filter does not behave like the filters beside it", List.of(testCases.getFirst().getDescription()), shown(editor));
 
                 choose(editor, Bundle.message("filter.automation"), Automated.MISSING.getLabel());
-                assertEquals(List.of(testCases.get(0).getDescription(), testCases.get(2).getDescription()), shown(editor));
+                assertEquals(List.of(testCases.getFirst().getDescription(), testCases.get(2).getDescription()), shown(editor));
 
                 filterOf(editor).resetToolBarFilter();
                 assertEquals("clearing the Automation filter did not show everything", 3, shown(editor).size());
@@ -163,7 +163,7 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
     }
 
     // Rule-EDITOR-PANEL-261
-    public void testStatusFiltersOnTheTestCasesOwnStatusAndRunItemStatusIsOnlyInATestRun() {
+    public void testStatusFiltersOnTheTestCasesOwnStatusAndRunItemStatusIsGrayInATestSetEditor() {
         threeStatesOfAutomation();
         final @NotNull TestCaseDto reviewed = testCases.get(1).edit().status(TestCaseStatus.REVIEWED).build();
         reviewed.setParent(testSet);
@@ -179,9 +179,10 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
                 filterOf(editor).resetToolBarFilter();
             }
 
-            final boolean inTheTestSetEditor = childrenOf(filterOf(testSetEditor).menu()).stream().anyMatch(action -> nameOf(action).equals(Bundle.message("filter.run.item.status")));
-            assertFalse("Run Item Status is offered in a test set editor", inTheTestSetEditor);
-            assertNotNull("Run Item Status is not offered in a test run editor", entry(filterOf(testRunEditor), Bundle.message("filter.run.item.status")));
+            final @NotNull Presentation inATestSet = Gestures.updated(getProject(), entry(filterOf(testSetEditor), Bundle.message("filter.run.item.status")), testSetEditor.getList());
+            assertFalse("Run Item Status works in a test set editor", inATestSet.isEnabled());
+            assertEquals("Run Item Status does not say why it is gray", Bundle.message("filter.run.only"), inATestSet.getDescription());
+            assertTrue("Run Item Status does not work in a test run editor", Gestures.updated(getProject(), entry(filterOf(testRunEditor), Bundle.message("filter.run.item.status")), testRunEditor.getList()).isEnabled());
 
             final @NotNull CheckedTreeNode tree = new CheckedTreeNode("all");
             final @NotNull CheckedTreeNode set = new CheckedTreeNode(testSet);

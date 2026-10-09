@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.filter.FilterPopupBtn;
+import org.testin.filter.SortPopupBtn;
 
 import java.util.List;
 
@@ -46,6 +47,7 @@ public class TestRunToolbar extends AbstractToolbarPanel {
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new TestRunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
                 new FilterPopupBtn(getCallbacks()),
+                new SortPopupBtn(getCallbacks()),
                 new CardViewBtn(getCallbacks()::onToolBarSwitchedToCardView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
         );

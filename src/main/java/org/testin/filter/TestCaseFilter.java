@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseFilter {
@@ -41,16 +40,17 @@ public final class TestCaseFilter {
         return filter(source, wanted, _ -> Optional.empty());
     }
 
-    // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020
+    // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-049
     public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {
         if (source.isEmpty()) {
             return Collections.emptyList();
         }
 
         final @NotNull String normalizedQuery = wanted.query().trim().toLowerCase(Locale.ROOT);
-        return source.stream()
+        final @NotNull List<TestCaseDto> matched = source.stream()
                 .filter(testCase -> matches(testCase, normalizedQuery, wanted, runItemProvider))
-                .collect(Collectors.toList());
+                .toList();
+        return wanted.sortBy().sorted(matched, wanted.direction(), runItemProvider);
     }
 
     // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239, Rule-EDITOR-PANEL-260, Rule-EDITOR-PANEL-261

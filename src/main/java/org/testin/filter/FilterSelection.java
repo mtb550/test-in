@@ -26,12 +26,18 @@ import org.testin.model.status.TestCaseStatus;
 import java.nio.file.Path;
 import java.util.Set;
 
-public record FilterSelection(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<TestCaseStatus> testCaseStatuses, @NotNull Set<RunItemStatus> runItemStatuses, @NotNull Set<Automated> automation, @NotNull Set<Path> testSets) {
+public record FilterSelection(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<TestCaseStatus> testCaseStatuses, @NotNull Set<RunItemStatus> runItemStatuses, @NotNull Set<Automated> automation, @NotNull Set<Path> testSets, @NotNull SortField sortBy, @NotNull SortDirection direction) {
+    // UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-049
     public static @NotNull FilterSelection of(final @NotNull AbstractToolbarPanel toolBar) {
-        return of(toolBar.getToolbarItem(FilterPopupBtn.class), toolBar.getSearchTxt().getSearchQuery());
+        final @NotNull SortPopupBtn sort = toolBar.getToolbarItem(SortPopupBtn.class);
+        return of(toolBar.getToolbarItem(FilterPopupBtn.class), toolBar.getSearchTxt().getSearchQuery(), sort.sortBy(), sort.direction());
     }
 
     public static @NotNull FilterSelection of(final @NotNull FilterPopupBtn filters, final @NotNull String query) {
+        return of(filters, query, SortField.ORDER, SortDirection.ASCENDING);
+    }
+
+    private static @NotNull FilterSelection of(final @NotNull FilterPopupBtn filters, final @NotNull String query, final @NotNull SortField sortBy, final @NotNull SortDirection direction) {
         return new FilterSelection(
                 query,
                 filters.getSelectedGroup(),
@@ -40,6 +46,8 @@ public record FilterSelection(@NotNull String query, @NotNull Set<String> groups
                 filters.getSelectedTestCaseStatus(),
                 filters.getSelectedStatus(),
                 filters.getSelectedAutomation(),
-                filters.getSelectedTestSet());
+                filters.getSelectedTestSet(),
+                sortBy,
+                direction);
     }
 }

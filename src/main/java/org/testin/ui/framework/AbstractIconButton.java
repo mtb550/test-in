@@ -17,10 +17,13 @@
 package org.testin.ui.framework;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.ActionButtonComponent;
+import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUiKind;
 import com.intellij.openapi.actionSystem.ex.ActionButtonLook;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.ActionSystem;
@@ -100,6 +103,13 @@ public abstract class AbstractIconButton extends JButton {
         };
         button.addActionListener(_ -> onClick.run());
         return button;
+    }
+
+    // UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-049
+    protected final void showMenuBelow(final @NotNull ActionGroup menu) {
+        JBPopupFactory.getInstance()
+                .createActionGroupPopup(null, menu, DataManager.getInstance().getDataContext(this), JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true)
+                .showUnderneathOf(this);
     }
 
     // Rule-INTERNAL-122

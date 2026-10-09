@@ -1,14 +1,14 @@
-[Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-021
+[Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-049
 
-# UC-EDITOR-PANEL-021: Clear the filters
+# UC-EDITOR-PANEL-049: Sort the test cases
 
-**As a** tester, **I want** every test case back, **so that** I can see the whole test set again without undoing four
-filters one
-at a time.
+**As a** tester, **I want** to arrange the test cases I am looking at by one field, **so that** I can work through them
+in the order the job in front of me needs. The order the test set is run in does not change.
 
-One click clears every filter. It does not clear the search box or the sort.
+A sort arranges the screen and writes nothing. Each card keeps it's number, the test case's place in its set, so a
+sorted list reads its numbers out of step. To keep an arrangement, change the order itself with **O** or by dragging.
 
-There is no key for this. The entry is at the top of the filter menu.
+There is no key for this. **Sort** is its own button on the editor's toolbar, beside **Filter**.
 
 ## Rules
 
@@ -36,11 +36,6 @@ There is no key for this. The entry is at the top of the filter menu.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-099** — **Reset Filters** clears every filter - the
-  priority, the automation, the group, the module, the status, the run item
-  status and the test set. With nothing to clear it is gray, and hovering it
-  says nothing is filtered. It leaves the sort alone.
-- **Rule-EDITOR-PANEL-100** — It does not clear the search text.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -59,38 +54,59 @@ There is no key for this. The entry is at the top of the filter menu.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-274** — The Sort button on the editor's toolbar arranges
+  the shown test cases by one field, Ascending or Descending: Order,
+  Description, Priority, Status, Module, Created At, Updated At, Run Item
+  Status, Executed At and Duration. Order, Ascending is the sort to start with,
+  the button lights up while any other is on, and every card keeps its number.
+- **Rule-EDITOR-PANEL-275** — Test cases that tie keep their order, and one with
+  nothing in the sorted field comes last in either direction. Priority puts High
+  first when Descending; Run Item Status follows the order the Run Item Status
+  filter lists them in.
+- **Rule-EDITOR-PANEL-276** — In a test set editor, Run Item Status, Executed
+  At and Duration are gray; hovering one says only a test run has run items.
+- **Rule-EDITOR-PANEL-277** — Sorting writes nothing: no test case, no marker,
+  no change for Git. To keep an arrangement, change the order with O or by
+  dragging.
+- **Rule-EDITOR-PANEL-278** — A sort belongs to the open editor, as a filter
+  does: opening it again starts on Order with no filter.
 
 ## What the tester sees
 
-This opens no screen of its own. **Reset Filters** is the first entry of the
-filter menu, above a separator line. It is always there, and gray while no
-filter is on.
+**Sort** sits on the toolbar beside **Filter**. Pressing it opens the list of fields, one of them ticked, and below a
+line the two directions, one ticked:
 
-Choosing it draws the whole test set again, from the first page. The count
-disappears from the filter button. Nothing is said.
+```
+  (•) Order
+  ( ) Description
+  ( ) Priority
+  ( ) Status
+  ( ) Module
+  ( ) Created At
+  ( ) Updated At
+  ( ) Run Item Status
+  ( ) Executed At
+  ( ) Duration
+  ─────────────
+  (•) Ascending
+  ( ) Descending
+```
+
+Choosing a field or a direction draws the list again from the first page. While the sort is anything but Order,
+Ascending, the button lights up and its tooltip names the sort, such as *Sorted by Priority, Descending*.
 
 ## Main flow
 
-1. The tester presses the filter button.
-2. **Reset Filters** is the first entry.
-3. The tester chooses it.
-4. Every filter is cleared and the whole test set is drawn again.
-5. The view goes back to the first page.
-6. The count disappears from the button.
+1. The tester presses **Sort**.
+2. The tester chooses a field.
+3. The list is drawn again in that field's order, from the first page.
+4. The tester chooses **Descending** to turn it round.
+5. Choosing **Order** and **Ascending**, or pressing **Refresh**, puts it back.
 
 ## What Testin refuses
 
-**If no filter is on** — the entry is gray, and hovering it says *Nothing is
-filtered*. It is always there: a popup that changes shape is one a tester
-cannot learn, and the entry is also how they find out filters live here at all.
-
-## What is left behind
-
-The search text stays. A tester who cannot see a test case after clearing the
-filters should check the search box, which is still narrowing the list.
-
-**Refresh** clears every filter and puts the sort back to Order, and keeps the
-search text (Rule-EDITOR-PANEL-117 on [UC-EDITOR-PANEL-027](refreshEditor.md)).
+**A run field in a test set editor** — Run Item Status, Executed At and Duration are gray in a test set editor, and
+hovering one says only a test run has run items.
 
 ---
 

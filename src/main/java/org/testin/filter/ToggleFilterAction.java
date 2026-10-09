@@ -21,22 +21,39 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareToggleAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 
 import javax.swing.Icon;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 final class ToggleFilterAction<T> extends DumbAwareToggleAction {
     private final @NotNull T value;
     private final @NotNull Set<T> selection;
     private final @NotNull FilterMembership<T> membership;
     private final @NotNull Runnable onChanged;
+    private final @NotNull BooleanSupplier works;
+    private final @NotNull String whyNot;
 
     ToggleFilterAction(final @NotNull String text, final @Nullable Icon icon, final @NotNull T value, final @NotNull Set<T> selection, final @NotNull FilterMembership<T> membership, final @NotNull Runnable onChanged) {
+        this(text, icon, value, selection, membership, onChanged, () -> true, "");
+    }
+
+    ToggleFilterAction(final @NotNull String text, final @Nullable Icon icon, final @NotNull T value, final @NotNull Set<T> selection, final @NotNull FilterMembership<T> membership, final @NotNull Runnable onChanged, final @NotNull BooleanSupplier works, final @NotNull String whyNot) {
         super(text, null, icon);
         this.value = value;
         this.selection = selection;
         this.membership = membership;
         this.onChanged = onChanged;
+        this.works = works;
+        this.whyNot = whyNot;
+    }
+
+    // Rule-EDITOR-PANEL-094, Rule-EDITOR-PANEL-276
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        super.update(e);
+        GrayWithReason.unless(this, e, works.getAsBoolean(), whyNot);
     }
 
     @Override

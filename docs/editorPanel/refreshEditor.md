@@ -34,7 +34,8 @@ There is no key for this. The button's tooltip reads **Refresh**.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-117** — Refresh keeps every filter and the search text. It
+- **Rule-EDITOR-PANEL-117** — Refresh clears every filter, as Reset Filters
+  does, puts the sort back to Order, Ascending, and keeps the search text. It
   reads the data again, rebuilds in the background the values the completion
   fields and the group filter offer, and changes nothing else about the view.
 - **Rule-EDITOR-PANEL-118** — Refresh remembers which test case was selected,
@@ -78,7 +79,7 @@ A small message appears at the bottom of the IDE and fades. It reads *Refreshed*
 2. The selected test case is remembered.
 3. The list empties and reads *Refreshing...*.
 4. Testin reads the test set from disk again.
-5. Every filter and the search text stay as they were.
+5. Every filter is cleared and the sort goes back to Order; the search text stays.
 6. The page holding the remembered test case is drawn.
 7. A message reads *Refreshed*. In a test run editor where an execution was
    running, it reads *Refreshed, and the execution stopped*.
