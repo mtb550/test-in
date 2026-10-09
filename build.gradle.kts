@@ -454,10 +454,10 @@ intellijPlatform {
     publishing {
         token.set(System.getenv("JETBRAINS_TOKEN"))
         // Two channels only: alpha while a release is being used, and default
-        // for production. A release goes out to alpha and is promoted to
-        // default from the Marketplace page rather than uploaded again - a
-        // version string can only be published once, whatever channel it
-        // goes to.
+        // for production. A release goes out to alpha first; to put the same
+        // version on default, swap the two lines below and publish again - the
+        // Marketplace takes one version once per channel, as 2.14.1-alpha
+        // showed - then swap them back so alpha stays the default.
         channels.set(listOf("alpha"))
         //channels.set(listOf("default"))
     }
