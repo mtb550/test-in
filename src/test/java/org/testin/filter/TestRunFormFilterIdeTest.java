@@ -16,9 +16,8 @@
 
 package org.testin.filter;
 
-import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.testFramework.TestActionEvent;
 import com.intellij.ui.CheckboxTree;
@@ -38,7 +37,6 @@ import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -90,13 +88,13 @@ public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull List<AnAction> menu() {
-        return Arrays.asList(button().menu().getChildren(TestActionEvent.createTestEvent()));
+        return MenuChildren.of(button().menu());
     }
 
     private @NotNull List<AnAction> entriesOf(final @NotNull String submenu) {
         final @NotNull AnAction found = menu().stream().filter(entry -> nameOf(entry).equals(submenu)).findFirst()
                 .orElseThrow(() -> new AssertionError("the Filter menu has no " + submenu + ": " + menu().stream().map(TestRunFormFilterIdeTest::nameOf).toList()));
-        return Arrays.asList(((DefaultActionGroup) found).getChildren(ActionManager.getInstance()));
+        return MenuChildren.of((ActionGroup) found);
     }
 
     private @NotNull List<Object> shown() {

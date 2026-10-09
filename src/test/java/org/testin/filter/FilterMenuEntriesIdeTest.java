@@ -16,11 +16,10 @@
 
 package org.testin.filter;
 
-import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiMethod;
 import com.intellij.ui.CheckedTreeNode;
@@ -59,8 +58,8 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
 
     private @NotNull List<TestCaseDto> testCases = List.of();
 
-    private static @NotNull List<AnAction> childrenOf(final @NotNull DefaultActionGroup group) {
-        return Arrays.stream(group.getChildren(ActionManager.getInstance())).filter(action -> !(action instanceof Separator)).toList();
+    private static @NotNull List<AnAction> childrenOf(final @NotNull ActionGroup group) {
+        return MenuChildren.of(group);
     }
 
     private static @NotNull String nameOf(final @NotNull AnAction action) {
@@ -143,17 +142,20 @@ public class FilterMenuEntriesIdeTest extends AbstractCodegenIdeTest {
     }
 
     // Rule-EDITOR-PANEL-260
-    public void testTestSetIsOnTheFilterMenuOfEveryEditorGrayAndSaysWhy() {
+    public void testTestSetIsGrayWithItsReasonInATestSetEditorAndListsTheRunsTestSets() {
         threeStatesOfAutomation();
         final @NotNull TestSetEditor testSetEditor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
         final @NotNull TestRunEditor testRunEditor = aTestRunEditorOver(testCases);
         try {
-            for (final AbstractTestinEditor<?, ?> editor : List.<AbstractTestinEditor<?, ?>>of(testSetEditor, testRunEditor)) {
-                final @NotNull AnAction testSetEntry = entry(filterOf(editor), Bundle.message("filter.test.set.one"));
-                final @NotNull Presentation shown = Gestures.updated(getProject(), testSetEntry, editor.getList());
-                assertFalse("Test Set works in " + editor.getClass().getSimpleName(), shown.isEnabled());
-                assertEquals("Test Set (only Create Test Run picks across test sets)", shown.getText());
-            }
+            final @NotNull Presentation inATestSet = Gestures.updated(getProject(), entry(filterOf(testSetEditor), Bundle.message("filter.test.set")), testSetEditor.getList());
+            assertFalse("Test Set works in a test set editor", inATestSet.isEnabled());
+            assertEquals("Test Set does not say why it is gray", Bundle.message("filter.test.set.one"), inATestSet.getDescription());
+            assertEquals("the label is not plain", Bundle.message("filter.test.set"), inATestSet.getText());
+
+            final @NotNull AnAction inATestRun = entry(filterOf(testRunEditor), Bundle.message("filter.test.set"));
+            assertTrue("Test Set does not work in a test run editor", Gestures.updated(getProject(), inATestRun, testRunEditor.getList()).isEnabled());
+            assertEquals("Test Set does not list the run's test set", List.of(testSet.getName()),
+                    childrenOf((ActionGroup) inATestRun).stream().map(child -> child.getTemplatePresentation().getText()).toList());
         } finally {
             Disposer.dispose(testSetEditor);
             Disposer.dispose(testRunEditor);

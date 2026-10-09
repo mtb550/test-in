@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public final class TestRunFormFilter implements FilterSource {
     private final @NotNull Project p;
     private final @NotNull AutomationState automation;
-    private final @NotNull List<OfferedTestCase> offered = new ArrayList<>();
+    private final @NotNull List<TestCaseDto> offered = new ArrayList<>();
     private final @NotNull Map<Path, String> testSets = new LinkedHashMap<>();
     private final @NotNull FilterPopupBtn button;
     private final @NotNull SelectionTree selection;
@@ -59,17 +59,19 @@ public final class TestRunFormFilter implements FilterSource {
         this.button = new FilterPopupBtn(this);
         this.selection = new SelectionTree(Bundle.message("test.run.form.test.cases.caption"), root, TestRunTreeCellRenderer.create(), Optional.of(button));
 
-        automation.read(p, testCases(), () -> {
+        automation.read(p, offered, () -> {
             if (!button.getSelectedAutomation().isEmpty()) onToolBarFilterSelectionChanged();
         });
     }
 
-    private static @NotNull String nameOf(final @NotNull Path testCasesRoot, final @NotNull Path testSet) {
-        return testCasesRoot.relativize(testSet).toString().replace(testCasesRoot.getFileSystem().getSeparator(), " / ");
-    }
-
     public @NotNull SelectionTree getSelection() {
         return selection;
+    }
+
+    // Rule-EDITOR-PANEL-260
+    @Override
+    public boolean holdsSeveralTestSets() {
+        return true;
     }
 
     // Rule-TREE-PANEL-129
@@ -80,7 +82,7 @@ public final class TestRunFormFilter implements FilterSource {
 
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        return Modules.in(testCases());
+        return Modules.in(offered);
     }
 
     @Override
@@ -92,15 +94,8 @@ public final class TestRunFormFilter implements FilterSource {
     @Override
     public void onToolBarFilterSelectionChanged() {
         final @NotNull FilterSelection wanted = FilterSelection.of(button, "");
-        final @NotNull Set<UUID> matched = automation.matching(TestCaseFilter.filter(testCases(), wanted), wanted.automation()).stream()
+        final @NotNull Set<UUID> shown = automation.matching(TestCaseFilter.filter(offered, wanted), wanted.automation()).stream()
                 .map(TestCaseDto::getId)
-                .collect(Collectors.toSet());
-
-        final @NotNull Set<Path> wantedSets = button.getSelectedTestSet();
-        final @NotNull Set<UUID> shown = offered.stream()
-                .filter(each -> matched.contains(each.testCase().getId()))
-                .filter(each -> wantedSets.isEmpty() || wantedSets.contains(each.testSet()))
-                .map(each -> each.testCase().getId())
                 .collect(Collectors.toSet());
 
         selection.show(leaf -> leaf instanceof TestCaseDto tc && shown.contains(tc.getId()));
@@ -111,18 +106,14 @@ public final class TestRunFormFilter implements FilterSource {
         onToolBarFilterSelectionChanged();
     }
 
-    private @NotNull List<TestCaseDto> testCases() {
-        return offered.stream().map(OfferedTestCase::testCase).toList();
-    }
-
     // Rule-TREE-PANEL-129
     private void collect(final @NotNull CheckedTreeNode node, final @NotNull Path testCasesRoot) {
         for (int i = 0; i < node.getChildCount(); i++) {
             final @NotNull CheckedTreeNode child = (CheckedTreeNode) node.getChildAt(i);
 
             if (child.getUserObject() instanceof TestCaseDto tc && node.getUserObject() instanceof Node testSet) {
-                offered.add(new OfferedTestCase(tc, testSet.getPath()));
-                testSets.putIfAbsent(testSet.getPath(), nameOf(testCasesRoot, testSet.getPath()));
+                offered.add(tc);
+                testSets.putIfAbsent(testSet.getPath(), testSet.nameUnder(testCasesRoot));
             } else {
                 collect(child, testCasesRoot);
             }

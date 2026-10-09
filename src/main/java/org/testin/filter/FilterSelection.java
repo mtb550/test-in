@@ -23,9 +23,10 @@ import org.testin.model.Priority;
 import org.testin.model.status.RunItemStatus;
 import org.testin.model.status.TestCaseStatus;
 
+import java.nio.file.Path;
 import java.util.Set;
 
-public record FilterSelection(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<TestCaseStatus> testCaseStatuses, @NotNull Set<RunItemStatus> runItemStatuses, @NotNull Set<Automated> automation) {
+public record FilterSelection(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<TestCaseStatus> testCaseStatuses, @NotNull Set<RunItemStatus> runItemStatuses, @NotNull Set<Automated> automation, @NotNull Set<Path> testSets) {
     public static @NotNull FilterSelection of(final @NotNull AbstractToolbarPanel toolBar) {
         return of(toolBar.getToolbarItem(FilterPopupBtn.class), toolBar.getSearchTxt().getSearchQuery());
     }
@@ -38,6 +39,7 @@ public record FilterSelection(@NotNull String query, @NotNull Set<String> groups
                 filters.getSelectedModule(),
                 filters.getSelectedTestCaseStatus(),
                 filters.getSelectedStatus(),
-                filters.getSelectedAutomation());
+                filters.getSelectedAutomation(),
+                filters.getSelectedTestSet());
     }
 }

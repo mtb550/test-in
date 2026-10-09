@@ -30,6 +30,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
+import org.testin.actions.GrayWithReason;
 import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.ToolbarItem;
 import org.testin.model.Automated;
@@ -48,7 +49,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
@@ -90,25 +90,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         addActionListener(_ -> showFilterPopup());
         updateToolBarFilterState();
-    }
-
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
-    private static @NotNull AnAction nothingToFilterOn(final @NotNull String text) {
-        return new DumbAwareAction(text) {
-            @Override
-            public void update(final @NotNull AnActionEvent e) {
-                e.getPresentation().setEnabled(false);
-            }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
-
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-            }
-        };
     }
 
     private @NotNull List<Set<?>> filters() {
@@ -250,14 +231,24 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
     // Rule-EDITOR-PANEL-260, Rule-TREE-PANEL-129
     private @NotNull AnAction testSetMenu(final @NotNull Runnable onChanged) {
-        final @NotNull Map<Path, String> testSets = source.getAvailableTestSets();
-        if (testSets.isEmpty()) return nothingToFilterOn(Bundle.message("filter.test.set.one"));
+        return new ActionGroup(Bundle.message("filter.test.set"), true) {
+            @Override
+            public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
+                return source.getAvailableTestSets().entrySet().stream()
+                        .map(testSet -> new ToggleFilterAction<>(testSet.getValue(), null, testSet.getKey(), selectedTestSet, FilterMembership.plain(), onChanged))
+                        .toArray(AnAction[]::new);
+            }
 
-        final @NotNull DefaultActionGroup filterTestSetMenu = new DefaultActionGroup(Bundle.message("filter.test.set"), true);
-        testSets.forEach((path, name) -> filterTestSetMenu.add(new ToggleFilterAction<>(name, null,
-                path, selectedTestSet, FilterMembership.plain(), onChanged)));
+            @Override
+            public void update(final @NotNull AnActionEvent e) {
+                GrayWithReason.unless(this, e, source.holdsSeveralTestSets(), Bundle.message("filter.test.set.one"));
+            }
 
-        return filterTestSetMenu;
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+        };
     }
 
     @TestOnly

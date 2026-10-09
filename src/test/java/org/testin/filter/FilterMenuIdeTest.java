@@ -19,14 +19,8 @@ package org.testin.filter;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.AnActionHolder;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.TestActionEvent;
@@ -55,7 +49,6 @@ import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,18 +66,7 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static @NotNull List<AnAction> childrenOf(final @NotNull ActionGroup group) {
-        final @NotNull List<AnAction> children = group instanceof final DefaultActionGroup plain ? Arrays.asList(plain.getChildActionsOrStubs()) : opened(group);
-        return children.stream().filter(child -> !(child instanceof Separator)).toList();
-    }
-
-    private static @NotNull List<AnAction> opened(final @NotNull ActionGroup group) {
-        final @NotNull ListPopup popup = JBPopupFactory.getInstance().createActionGroupPopup(null, group, DataContext.EMPTY_CONTEXT, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true);
-        try {
-            final @NotNull List<?> items = popup.getListStep().getValues();
-            return items.stream().map(AnActionHolder.class::cast).map(AnActionHolder::getAction).toList();
-        } finally {
-            Disposer.dispose(popup);
-        }
+        return MenuChildren.of(group);
     }
 
     private static @NotNull List<String> entriesOf(final @NotNull FilterPopupBtn filter) {
@@ -171,13 +153,18 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         final @NotNull FilterPopupBtn inATestSet = filterOf(openedTestSet(3));
         assertEquals("a test set editor does not filter on the priority, the automation, the group, the module and the status", everywhere, entriesOf(inATestSet).subList(0, everywhere.size()));
         assertFalse("a test set editor offers the run item status", entriesOf(inATestSet).contains(Bundle.message("filter.run.item.status")));
-        assertFalse("a test set editor offers to pick across test sets", enabled(entry(inATestSet.menu(), Bundle.message("filter.test.set.one"))));
+        assertFalse("a test set editor offers to pick across test sets", enabled(entry(inATestSet.menu(), Bundle.message("filter.test.set"))));
 
         final @NotNull FilterPopupBtn inATestRun = filterOf(openedTestRun(3));
         assertEquals("a test run editor does not add the run item status to the five", Bundle.message("filter.run.item.status"), entriesOf(inATestRun).get(everywhere.size()));
 
         final @NotNull Path checkout = root.resolve("Checkout");
         final @NotNull FilterPopupBtn inCreateTestRun = new FilterPopupBtn(new FilterSource() {
+            @Override
+            public boolean holdsSeveralTestSets() {
+                return true;
+            }
+
             @Override
             public @NotNull Map<Path, String> getAvailableTestSets() {
                 return Map.of(checkout, "Checkout");
@@ -261,5 +248,37 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the test case the filter hides was not reported", List.of(Refused.HIDDEN_BY_THE_FILTER.about(hidden.getDescription())), balloons.shown());
         assertEquals("going to a hidden test case threw the filter away", Set.of(Priority.HIGH), filter.getSelectedPriority());
         assertFalse("a test case the filter hides was brought into view", editor.getCurrentTestCases().contains(hidden));
+    }
+
+    // Rule-EDITOR-PANEL-260
+    public void testTheTestSetFilterNarrowsATestRunToTheChosenTestSet() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull List<TestCaseDto> login = EditorFixtures.testCases(getProject(), EditorFixtures.testSet(getProject(), tp, "Login"), 2);
+        final @NotNull List<TestCaseDto> checkout = EditorFixtures.testCases(getProject(), EditorFixtures.testSet(getProject(), tp, "Checkout"), 1);
+        final @NotNull List<TestCaseDto> both = new ArrayList<>(login);
+        both.addAll(checkout);
+        final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), EditorFixtures.testRun(getProject(), tp, both.stream().map(EditorFixtures::pending).toList()), getTestRootDisposable());
+        try {
+            tick(filterOf(editor), Bundle.message("filter.test.set"), "Checkout");
+
+            assertEquals("the Test Set filter did not narrow the test run to Checkout", checkout.stream().map(TestCaseDto::getId).toList(), editor.getCurrentTestCases().stream().map(TestCaseDto::getId).toList());
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-260
+    public void testATestCaseThatWasDeletedAddsNoTestSetToTheFilter() {
+        final @NotNull TestProjectNode tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull List<TestCaseDto> login = EditorFixtures.testCases(getProject(), EditorFixtures.testSet(getProject(), tp, "Login"), 2);
+        final @NotNull List<TestCaseDto> withADeletedOne = new ArrayList<>(login);
+        withADeletedOne.add(TestCaseDto.builder().id(UUID.randomUUID()).description("Deleted since").build());
+        final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), EditorFixtures.testRun(getProject(), tp, withADeletedOne.stream().map(EditorFixtures::pending).toList()), getTestRootDisposable());
+        try {
+            assertEquals("a deleted test case brought a test set of its own into the filter", List.of("Login"),
+                    childrenOf((ActionGroup) entry(filterOf(editor).menu(), Bundle.message("filter.test.set"))).stream().map(FilterMenuIdeTest::textOf).toList());
+        } finally {
+            Disposer.dispose(editor);
+        }
     }
 }

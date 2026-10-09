@@ -19,6 +19,9 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Order can be switched off:** the Order box in Choose Fields is on to start with and now hides the number on each card
   and the grid's Order column. In a test set editor, Enter or a double click on an Order cell opens the O dialog for that
   row.
+- **The Test Set filter works in a test run:** it lists the run's test sets in the tree's order, named by their place under
+  the test cases folder as the Create Test Run dialog names them, and narrows the run to the chosen ones. In a test set
+  editor it stays gray and its reason says why; the reason is no longer written into the menu label.
 - **A test run is drawn test set by test set:** its test cases come in the order the Create Test Run form lists them,
   each set in its own order, and each card is numbered by its place in its own set, as the details panel and the
   generated test method already count it. The four reports list run items in the same order. A test case that was

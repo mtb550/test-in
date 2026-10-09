@@ -69,7 +69,9 @@ import org.testin.util.FailureText;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.awt.BorderLayout;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -319,6 +321,23 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     @Override
     public boolean hasRunItemStatuses() {
         return true;
+    }
+
+    // Rule-EDITOR-PANEL-260
+    @Override
+    public boolean holdsSeveralTestSets() {
+        return true;
+    }
+
+    // Rule-EDITOR-PANEL-260
+    @Override
+    public @NotNull Map<Path, String> getAvailableTestSets() {
+        final @NotNull Map<Path, String> testSets = new LinkedHashMap<>();
+        testRuns.testCasesFolderOf(parent.getPath()).ifPresent(folder -> snapshotOfAll().stream()
+                .filter(tc -> placesInTheirSets.containsKey(tc.getId()))
+                .map(TestCaseDto::getParent)
+                .forEach(testSet -> testSets.putIfAbsent(testSet.getPath(), testSet.nameUnder(folder.getPath()))));
+        return testSets;
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-176

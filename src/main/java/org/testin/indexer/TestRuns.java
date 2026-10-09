@@ -22,6 +22,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestCasesFolderNode;
+import org.testin.model.node.TestProjectNode;
 import org.testin.model.testrun.RunItems;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.node.TestRunNode;
@@ -69,13 +71,19 @@ public final class TestRuns {
 
     // Rule-EDITOR-PANEL-127
     private @NotNull List<UUID> testCaseIdsInTreeOrder(final @NotNull Path testRunPath) {
-        return indexer.testProjectHolding(testRunPath)
-                .flatMap(testProject -> Optional.ofNullable(store().getTestProjectsByPath().get(testProject.toString())))
-                .map(tp -> Services.getInstance(p, TestCases.class).getTestCasesUnder(tp.getTestCasesFolder()))
+        return testCasesFolderOf(testRunPath)
+                .map(Services.getInstance(p, TestCases.class)::getTestCasesUnder)
                 .orElse(List.of())
                 .stream()
                 .map(TestCaseDto::getId)
                 .toList();
+    }
+
+    // Rule-EDITOR-PANEL-127, Rule-EDITOR-PANEL-260
+    public @NotNull Optional<TestCasesFolderNode> testCasesFolderOf(final @NotNull Path testRunPath) {
+        return indexer.testProjectHolding(testRunPath)
+                .flatMap(testProject -> Optional.ofNullable(store().getTestProjectsByPath().get(testProject.toString())))
+                .map(TestProjectNode::getTestCasesFolder);
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083

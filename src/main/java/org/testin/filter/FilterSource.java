@@ -27,6 +27,11 @@ public interface FilterSource {
         return false;
     }
 
+    // Rule-EDITOR-PANEL-260
+    default boolean holdsSeveralTestSets() {
+        return false;
+    }
+
     // Rule-EDITOR-PANEL-260, Rule-TREE-PANEL-129
     default @NotNull Map<Path, String> getAvailableTestSets() {
         return Map.of();

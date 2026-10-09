@@ -53,7 +53,7 @@ public final class TestCaseFilter {
                 .collect(Collectors.toList());
     }
 
-    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239, Rule-EDITOR-PANEL-261
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239, Rule-EDITOR-PANEL-260, Rule-EDITOR-PANEL-261
     private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {
         final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(RunItem::shownTestCase).orElse(testCase);
 
@@ -66,8 +66,9 @@ public final class TestCaseFilter {
         final boolean matchesTestCaseStatus = wanted.testCaseStatuses().isEmpty() || wanted.testCaseStatuses().contains(shown.getStatus());
         final boolean matchesRunItemStatus = wanted.runItemStatuses().isEmpty()
                 || matchesStatus(testCase.getId(), wanted.runItemStatuses(), runItemProvider);
+        final boolean matchesTestSet = wanted.testSets().isEmpty() || wanted.testSets().contains(testCase.getParent().getPath());
 
-        return matchesSearch && matchesPriority && matchesGroup && matchesModule && matchesTestCaseStatus && matchesRunItemStatus;
+        return matchesSearch && matchesPriority && matchesGroup && matchesModule && matchesTestCaseStatus && matchesRunItemStatus && matchesTestSet;
     }
 
     private static boolean matchesStatus(final @NotNull UUID id, final @NotNull Set<RunItemStatus> statuses, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {

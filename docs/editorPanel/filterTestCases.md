@@ -38,7 +38,8 @@ There is no key for this. The button's tooltip reads **Filter**.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-094** — Seven things can be filtered on: the priority,
   the automation, the group, the module, the status, in a test run editor the
-  run item status, and in the Create Test Run dialog the test set.
+  run item status, and in a test run editor and the Create Test Run dialog the
+  test set.
 - **Rule-EDITOR-PANEL-095** — The module list is built from the test cases in
   this test set, so it only ever offers modules that exist.
 - **Rule-EDITOR-PANEL-096** — Choosing nothing in a filter means every test case
@@ -63,10 +64,10 @@ There is no key for this. The button's tooltip reads **Filter**.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
-- **Rule-EDITOR-PANEL-260** — Test Set is on the Filter menu in every editor,
-  gray, and reads Test Set (only Create Test Run picks across test sets): a test
-  case editor shows one test set, and a test run does not record which test set
-  each of its test cases came from.
+- **Rule-EDITOR-PANEL-260** — Test Set filters a test run editor and the
+  Create Test Run dialog to the chosen test sets, listed in the tree's order and
+  named by their place under the test cases' folder. In a test set editor it is
+  gray, and its reason says a test set editor shows one test set.
 - **Rule-EDITOR-PANEL-261** — Status filters on the test case's own status -
   Reviewed, Pending, Disabled, To Be Updated - and works in both editors and the
   Create Test Run dialog. Run Item Status is a different thing: what a test run

@@ -119,6 +119,11 @@ public abstract class Node {
         return false;
     }
 
+    // Rule-TREE-PANEL-129, Rule-EDITOR-PANEL-260
+    public @NotNull String nameUnder(final @NotNull Path folder) {
+        return folder.relativize(path).toString().replace(folder.getFileSystem().getSeparator(), " / ");
+    }
+
     // Rule-TREE-PANEL-009, Rule-PRODUCT-011
     public @NotNull Optional<String> whySignedOff() {
         return Optional.empty();

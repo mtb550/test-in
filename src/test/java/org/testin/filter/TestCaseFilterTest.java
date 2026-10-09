@@ -26,6 +26,7 @@ import org.testin.model.status.TestCaseStatus;
 import org.testin.testcase.TestSetEditorAttributes;
 import org.testng.annotations.Test;
 
+import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class TestCaseFilterTest {
 
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(matching, other),
-                new FilterSelection("  LOGIN ", Set.of("Regression"), Set.of(Priority.HIGH), Set.of("accounts"), Set.of(), Set.of(), Set.of()));
+                new FilterSelection("  LOGIN ", Set.of("Regression"), Set.of(Priority.HIGH), Set.of("accounts"), Set.of(), Set.of(), Set.of(), Set.of()));
 
         assertEquals(result, List.of(matching));
     }
@@ -75,7 +76,7 @@ public class TestCaseFilterTest {
 
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(passed, missing),
-                new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(RunItemStatus.PASSED), Set.of()),
+                new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(RunItemStatus.PASSED), Set.of(), Set.of()),
                 id -> Optional.ofNullable(recorded.get(id)));
 
         assertEquals(result, List.of(passed));
@@ -93,7 +94,7 @@ public class TestCaseFilterTest {
                 .build();
 
         for (final String wanted : List.of("accounts", "admin@example.com", "The account exists", "JIRA-123", "Regression")) {
-            final List<TestCaseDto> result = TestCaseFilter.filter(List.of(tc), new FilterSelection(wanted, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of()));
+            final List<TestCaseDto> result = TestCaseFilter.filter(List.of(tc), new FilterSelection(wanted, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of()));
 
             assertEquals(result, List.of(tc), "the search did not read the field holding '" + wanted + "'");
         }
@@ -104,7 +105,7 @@ public class TestCaseFilterTest {
         final TestCaseDto reviewed = TestCaseDto.builder().description("reviewed").status(TestCaseStatus.REVIEWED).build();
         final TestCaseDto pending = TestCaseDto.builder().description("pending").status(TestCaseStatus.PENDING).build();
 
-        final List<TestCaseDto> result = TestCaseFilter.filter(List.of(reviewed, pending), new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(TestCaseStatus.REVIEWED), Set.of(), Set.of()));
+        final List<TestCaseDto> result = TestCaseFilter.filter(List.of(reviewed, pending), new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(TestCaseStatus.REVIEWED), Set.of(), Set.of(), Set.of()));
 
         assertEquals(result, List.of(reviewed));
     }
@@ -113,7 +114,7 @@ public class TestCaseFilterTest {
     public void aQueryNoFieldHoldsFindsNothing() {
         final TestCaseDto tc = TestCaseDto.builder().description("Log in").build();
 
-        assertEquals(TestCaseFilter.filter(List.of(tc), new FilterSelection("nothing holds this", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())), List.of());
+        assertEquals(TestCaseFilter.filter(List.of(tc), new FilterSelection("nothing holds this", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())), List.of());
     }
 
     // Rule-EDITOR-PANEL-091
@@ -145,7 +146,7 @@ public class TestCaseFilterTest {
             final @NotNull String value = field.gridValue(tc);
             if (value.isBlank()) continue;
 
-            if (TestCaseFilter.filter(List.of(tc), new FilterSelection(value, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())).isEmpty())
+            if (TestCaseFilter.filter(List.of(tc), new FilterSelection(value, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())).isEmpty())
                 notFound.add(field.getName() + " = " + value);
         }
 
@@ -159,8 +160,23 @@ public class TestCaseFilterTest {
         final @NotNull TestCaseDto low = TestCaseDto.builder().description("two").priority(Priority.LOW).module("payments").status(TestCaseStatus.DISABLED).build();
         final @NotNull TestCaseDto bare = TestCaseDto.builder().description("three").build();
 
-        final @NotNull List<TestCaseDto> result = TestCaseFilter.filter(List.of(high, low, bare), new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of()), _ -> Optional.empty());
+        final @NotNull List<TestCaseDto> result = TestCaseFilter.filter(List.of(high, low, bare), new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of()), _ -> Optional.empty());
 
         assertEquals(result, List.of(high, low, bare));
+    }
+
+    // Rule-EDITOR-PANEL-260
+    @Test
+    public void theTestSetFilterKeepsOnlyTestCasesOfTheChosenTestSets() {
+        final @NotNull TestSetNode login = TestSetNode.builder().path(Path.of("Login")).build();
+        final @NotNull TestSetNode checkout = TestSetNode.builder().path(Path.of("Checkout")).build();
+        final @NotNull TestCaseDto inLogin = TestCaseDto.builder().description("Sign in").build();
+        final @NotNull TestCaseDto inCheckout = TestCaseDto.builder().description("Pay").build();
+        inLogin.setParent(login);
+        inCheckout.setParent(checkout);
+
+        final @NotNull List<TestCaseDto> result = TestCaseFilter.filter(List.of(inLogin, inCheckout), new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(checkout.getPath())));
+
+        assertEquals(result, List.of(inCheckout), "a test case outside the chosen test set was kept");
     }
 }
