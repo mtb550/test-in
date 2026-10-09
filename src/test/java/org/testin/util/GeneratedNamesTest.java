@@ -141,7 +141,7 @@ public class GeneratedNamesTest {
         assertEquals(NameSanitizer.className("Login"), "LoginTest");
         assertEquals(NameSanitizer.className("user login"), "UserLoginTest");
         assertEquals(NameSanitizer.packageName("Checkout"), "checkout");
-        assertEquals(NameSanitizer.packageName("payment methods"), "paymentMethods");
+        assertEquals(NameSanitizer.packageName("Home Screen"), "homescreen");
     }
 
     // Rule-CODEGEN-011

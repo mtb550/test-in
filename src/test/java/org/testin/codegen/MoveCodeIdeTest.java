@@ -67,8 +67,8 @@ public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
 
         JavaCode.of(NodeType.TSP).getRenamed().execute(getProject(), new Renamed(checkout, "Payment methods"));
 
-        assertTrue("the class directly in the package does not carry its new name", generatedClass("nafath.paymentMethods.LoginTest").isPresent());
-        assertTrue("a class deeper in the package does not carry its new name", generatedClass("nafath.paymentMethods.cards.VisaTest").isPresent());
+        assertTrue("the class directly in the package does not carry its new name", generatedClass("nafath.paymentmethods.LoginTest").isPresent());
+        assertTrue("a class deeper in the package does not carry its new name", generatedClass("nafath.paymentmethods.cards.VisaTest").isPresent());
         assertTrue("the old package still holds the class", generatedClass("nafath.checkout.LoginTest").isEmpty());
     }
 

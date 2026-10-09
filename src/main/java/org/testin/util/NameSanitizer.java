@@ -42,19 +42,9 @@ public final class NameSanitizer {
     private static @NotNull String packageWord(final @NotNull String value) {
         final @NotNull String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
                 .replaceAll("").trim();
-        final @NotNull StringBuilder result = new StringBuilder();
-        for (final String word : cleanName.split("[\\s_]+", -1)) {
-            if (word.isEmpty()) continue;
-            if (result.isEmpty()) {
-                result.append(word.toLowerCase(Locale.ROOT));
-            } else {
-                result.append(Character.toUpperCase(word.charAt(0)))
-                        .append(word.substring(1).toLowerCase(Locale.ROOT));
-            }
-        }
+        final @NotNull String word = String.join("", cleanName.split("[\\s_]+", -1)).toLowerCase(Locale.ROOT);
 
-        if (!result.isEmpty() && Character.isDigit(result.charAt(0))) result.insert(0, '_');
-        return result.toString();
+        return !word.isEmpty() && Character.isDigit(word.charAt(0)) ? "_" + word : word;
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-011
