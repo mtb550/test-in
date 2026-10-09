@@ -93,8 +93,11 @@ public interface TestinEditor extends Disposable {
                 selectedIndices,
                 ((getCurrentPage() - 1) * getPageSize()) + firstRow,
                 getShownItemsCount(),
-                getTotalItemsCount());
+                getTotalItemsCount(),
+                sortedBy());
     }
+
+    @NotNull String sortedBy();
 
     default @NotNull List<TestCaseDto> snapshotOfAll() {
         synchronized (getAllTestCases()) {

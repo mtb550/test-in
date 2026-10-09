@@ -11,7 +11,8 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Sort:** a new **Sort** button beside **Filter** arranges the test cases by one field - Order, Description, Priority,
   Status, Module, Created At, Updated At, Run Item Status, Executed At or Duration - Ascending or Descending. Ties keep
   their order and empty values come last either way. Sorting writes nothing and every card keeps its number; the
-  button lights up while a sort is on. In a test set editor the three run fields are gray.
+  button lights up and the status bar names the sort while one is on; Reset Sort puts it back. In a test set editor
+  the three run fields are gray.
 - **Status has a letter on the update menu:** **U** opens it after **F2**, or straight from a selected card as **D** does, with the U icon the copy menu already
   shows, so every field on the menu has a letter. Status's detail line on a card and in History leads with that icon.
 
@@ -23,6 +24,8 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Order can be switched off:** the Order box in Choose Fields is on to start with and now hides the number on each card
   and the grid's Order column. In a test set editor, Enter or a double click on an Order cell opens the O dialog for that
   row.
+- **The Details dialog closes on a click outside it:** the dialog the toolbar's Details button and the tree open about
+  a node only reads, so a click anywhere else closes it, as Escape does.
 - **A gray menu entry says why on hover:** every entry Testin grays out - in menus and now in the Filter list too - shows
   its reason when the pointer rests on it. The Filter menu is the same in every editor: Run Item Status is listed in a
   test set editor too, gray, and Reset Filters no longer writes its reason into its label.

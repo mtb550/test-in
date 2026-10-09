@@ -70,13 +70,21 @@ There is no key for this. **Sort** is its own button on the editor's toolbar, be
   dragging.
 - **Rule-EDITOR-PANEL-278** — A sort belongs to the open editor, as a filter
   does: opening it again starts on Order with no filter.
+- **Rule-EDITOR-PANEL-279** — The Sort menu's first entry, Reset Sort, puts the
+  test cases back in their order: Order, Ascending. With nothing sorted it is
+  gray, and hovering it says nothing is sorted.
+- **Rule-EDITOR-PANEL-280** — While a sort other than Order, Ascending is on,
+  the status bar says so after the count of test cases: 12 test cases, then
+  Sorted by Priority, Descending.
 
 ## What the tester sees
 
-**Sort** sits on the toolbar beside **Filter**. Pressing it opens the list of fields, one of them ticked, and below a
-line the two directions, one ticked:
+**Sort** sits on the toolbar beside **Filter**. Pressing it opens **Reset Sort**, then the list of fields, one of them
+ticked, and below a line the two directions, one ticked:
 
 ```
+  Reset Sort
+  ─────────────
   (•) Order
   ( ) Description
   ( ) Priority
@@ -93,7 +101,8 @@ line the two directions, one ticked:
 ```
 
 Choosing a field or a direction draws the list again from the first page. While the sort is anything but Order,
-Ascending, the button lights up and its tooltip names the sort, such as *Sorted by Priority, Descending*.
+Ascending, the button lights up, its tooltip names the sort, and the status bar says it after the count:
+*12 test cases · Sorted by Priority, Descending*.
 
 ## Main flow
 
@@ -101,12 +110,14 @@ Ascending, the button lights up and its tooltip names the sort, such as *Sorted 
 2. The tester chooses a field.
 3. The list is drawn again in that field's order, from the first page.
 4. The tester chooses **Descending** to turn it round.
-5. Choosing **Order** and **Ascending**, or pressing **Refresh**, puts it back.
+5. **Reset Sort**, or **Refresh**, puts it back to Order, Ascending.
 
 ## What Testin refuses
 
 **A run field in a test set editor** — Run Item Status, Executed At and Duration are gray in a test set editor, and
 hovering one says only a test run has run items.
+
+**Reset Sort with nothing sorted** — the entry is gray, and hovering it says *Nothing is sorted*.
 
 ---
 

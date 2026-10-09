@@ -17,10 +17,14 @@
 package org.testin.filter;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
+import org.testin.actions.GrayWithReason;
 import org.testin.editor.toolbar.ToolbarItem;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
@@ -43,6 +47,26 @@ public class SortPopupBtn extends AbstractIconButton implements ToolbarItem {
             showState();
             source.onToolBarFilterSelectionChanged();
         };
+
+        menu.add(new DumbAwareAction(Bundle.message("sort.reset"), Bundle.message("sort.reset.description"), AllIcons.Actions.Cancel) {
+            // UC-EDITOR-PANEL-049, Rule-EDITOR-PANEL-279
+            @Override
+            public void update(final @NotNull AnActionEvent e) {
+                GrayWithReason.unless(this, e, !sortedBy().isEmpty(), Bundle.message("sort.reset.nothing"));
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                reset();
+                source.onToolBarFilterSelectionChanged();
+            }
+        });
+        menu.add(Separator.getInstance());
 
         for (final SortField field : SortField.values()) {
             menu.add(new ToggleFilterAction<>(field.getLabel(), null, field, selectedSort, FilterMembership.single(), onChanged,
@@ -74,11 +98,17 @@ public class SortPopupBtn extends AbstractIconButton implements ToolbarItem {
         showState();
     }
 
+    // UC-EDITOR-PANEL-049, Rule-EDITOR-PANEL-274, Rule-EDITOR-PANEL-280
+    public @NotNull String sortedBy() {
+        final boolean sorted = sortBy() != SortField.ORDER || direction() != SortDirection.ASCENDING;
+        return sorted ? Bundle.message("sort.button.active", sortBy().getLabel(), direction().getLabel()) : "";
+    }
+
     // UC-EDITOR-PANEL-049, Rule-EDITOR-PANEL-274
     private void showState() {
-        final boolean sorted = sortBy() != SortField.ORDER || direction() != SortDirection.ASCENDING;
-        setOn(sorted);
-        describe(sorted ? Bundle.message("sort.button.active", sortBy().getLabel(), direction().getLabel()) : Bundle.message("sort.button"));
+        final @NotNull String sortedBy = sortedBy();
+        setOn(!sortedBy.isEmpty());
+        describe(sortedBy.isEmpty() ? Bundle.message("sort.button") : sortedBy);
     }
 
     @TestOnly

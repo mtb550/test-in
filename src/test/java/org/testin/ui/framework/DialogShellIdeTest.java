@@ -29,12 +29,14 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.node.TestSetNode;
 import org.testin.search.GlobalSearchDialog;
 import org.testin.testrun.form.TestRunTreeCellRenderer;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
+import org.testin.view.marker.MarkerDetailsViewDialog;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -284,7 +286,7 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-076
-    public void testOnlyTheSearchClosesWhenTheTesterClicksAway() {
+    public void testOnlyTheSearchAndTheDetailsCloseWhenTheTesterClicksAway() {
         final @NotNull Form form = shown(new Form(getProject(), List.of(aField("Name"))));
         final @NotNull ConfirmDialog confirm = shown(new ConfirmDialog(getProject(), "Remove", "Remove Login?", "", "", "Remove", () -> {
         }));
@@ -293,6 +295,7 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
         assertFalse("a dialog holding what the tester typed closes on a stray click", form.dismissOnClickOutside);
         assertFalse("a confirmation closes on a stray click", confirm.dismissOnClickOutside);
         assertTrue("the search does not close when the tester clicks away", search.dismissOnClickOutside);
+        assertTrue("the Details dialog does not close when the tester clicks away", shown(new MarkerDetailsViewDialog(getProject(), new TestSetNode())).dismissOnClickOutside);
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-101

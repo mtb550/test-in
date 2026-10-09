@@ -57,6 +57,8 @@ There is no key for this. The button is at the far right of the toolbar.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-281** — The Details dialog closes on Escape or on a click
+  anywhere outside it: it only reads, so there is nothing to lose.
 
 ## The screen
 

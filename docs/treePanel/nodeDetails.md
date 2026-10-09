@@ -71,6 +71,8 @@ It is a read-only window. Nothing in it can be changed.
 - **Rule-TREE-PANEL-126** — Every run item status that at least one test case
   carries takes at least a sliver of the ring, so a single failure among a
   thousand passes is still there to see.
+- **Rule-TREE-PANEL-137** — The Details dialog closes on Escape or on a click
+  anywhere outside it: it only reads, so there is nothing to lose.
 
 ## The Details dialog
 

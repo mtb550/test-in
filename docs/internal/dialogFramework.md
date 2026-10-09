@@ -56,7 +56,7 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-076** — A dialog says whether clicking away closes it. Almost
   none do - one holding what the tester typed must not lose it to a stray click,
   and Escape is what cancels. The search does, because it holds a question
-  rather than an answer.
+  rather than an answer, and so does the Details dialog, because it only reads.
 - **Rule-INTERNAL-077** — Every icon a framework surface draws is gray. A stock
   platform icon may ship colored, and one colored glyph among gray ones is the
   loudest thing on the row. A color that means something - an error, a run item

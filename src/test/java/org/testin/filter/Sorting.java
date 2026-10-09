@@ -18,6 +18,7 @@ package org.testin.filter;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.TestActionEvent;
 import lombok.AccessLevel;
@@ -39,5 +40,11 @@ public final class Sorting {
                 .filter(action -> label.equals(Objects.requireNonNullElse(action.getTemplatePresentation().getText(), "")))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the Sort menu has no " + label));
+    }
+
+    static void press(final @NotNull SortPopupBtn sort, final @NotNull String label) {
+        final @NotNull AnAction entry = entry(sort, label);
+        ActionUtil.performAction(entry, TestActionEvent.createTestEvent(entry));
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 }

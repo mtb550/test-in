@@ -217,6 +217,12 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         return paging.window(filtered.size()).totalPages();
     }
 
+    // UC-EDITOR-PANEL-049, Rule-EDITOR-PANEL-280
+    @Override
+    public @NotNull String sortedBy() {
+        return getToolBar().getToolbarItem(SortPopupBtn.class).sortedBy();
+    }
+
     protected @NotNull List<TestCaseDto> getCurrentPageItems() {
         return paging.itemsOn(currentTestCases);
     }

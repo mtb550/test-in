@@ -33,6 +33,7 @@ import org.testin.model.node.TestProjectNode;
 import org.testin.model.node.TestSetNode;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.view.Drawn;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -117,5 +118,25 @@ public class SortMenuIdeTest extends AbstractTempRootIdeTest {
 
         assertEquals("the sort was remembered", SortField.ORDER, sortOf(again).sortBy());
         assertEquals("the sort was remembered", SortDirection.ASCENDING, sortOf(again).direction());
+    }
+
+    // Rule-EDITOR-PANEL-279, Rule-EDITOR-PANEL-280
+    public void testTheStatusBarNamesTheSortAndResetSortPutsItBack() {
+        lowHighMedium(EditorFixtures.testProject(getProject(), root));
+        final @NotNull TestSetEditor editor = EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
+        final @NotNull String sortedByPriority = Bundle.message("sort.button.active", SortField.PRIORITY.getLabel(), SortDirection.DESCENDING.getLabel());
+
+        final @NotNull Presentation nothingSorted = Gestures.updated(getProject(), Sorting.entry(sortOf(editor), Bundle.message("sort.reset")), editor.getList());
+        assertFalse("Reset Sort works with nothing sorted", nothingSorted.isEnabled());
+        assertEquals("Reset Sort does not say why it is gray", Bundle.message("sort.reset.nothing"), nothingSorted.getDescription());
+
+        Sorting.choose(sortOf(editor), SortField.PRIORITY.getLabel());
+        Sorting.choose(sortOf(editor), SortDirection.DESCENDING.getLabel());
+        Await.until("the status bar does not name the sort", () -> Drawn.holds(Drawn.words(editor.getStatusBar()), sortedByPriority));
+
+        Sorting.press(sortOf(editor), Bundle.message("sort.reset"));
+        assertEquals("Reset Sort did not put the sort back", SortField.ORDER, sortOf(editor).sortBy());
+        assertEquals("Reset Sort did not put the direction back", SortDirection.ASCENDING, sortOf(editor).direction());
+        Await.until("the status bar still names a sort", () -> !Drawn.holds(Drawn.words(editor.getStatusBar()), sortedByPriority));
     }
 }

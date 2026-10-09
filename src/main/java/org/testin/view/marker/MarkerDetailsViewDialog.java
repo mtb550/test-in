@@ -63,6 +63,9 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog {
         shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
 
         resizable = true;
+
+        // Rule-INTERNAL-076, Rule-EDITOR-PANEL-281, Rule-TREE-PANEL-137
+        dismissOnClickOutside = true;
     }
 
     @Override

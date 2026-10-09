@@ -280,13 +280,13 @@ public class StatusBar extends JBPanel<StatusBar> {
         return Objects.requireNonNull(pageButtons.get(step), step.name());
     }
 
-    // UC-EDITOR-PANEL-024
-    public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int shownCount, final int totalCount) {
+    // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-280
+    public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int shownCount, final int totalCount, final @NotNull String sortedBy) {
         final int selectedCount = selectedIndices.length;
         final @NotNull String testCases = shownCount == 1
                 ? Bundle.message("statusbar.test.cases.one")
                 : Bundle.message("statusbar.test.cases.many", String.valueOf(shownCount));
-        final @NotNull String of = testCases + narrowedFrom(shownCount, totalCount);
+        final @NotNull String of = testCases + narrowedFrom(shownCount, totalCount) + (sortedBy.isEmpty() ? "" : " " + Bundle.message("statusbar.sorted", sortedBy));
 
         if (selectedCount > 1) {
             statusLabel.setText(oneLine(Bundle.message("statusbar.selected.of", String.valueOf(selectedCount), of)));
