@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CardPanelBuilder {
@@ -86,7 +87,7 @@ public final class CardPanelBuilder {
         return new CardView(model, list, scrollPane);
     }
 
-    public static void wireCommonListeners(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull CardView view, final @NotNull Node dir, final @NotNull AbstractEditorContextMenu contextMenu, final @NotNull Supplier<Optional<JBTable>> gridTableSupplier, final @NotNull BooleanSupplier gridActiveSupplier) {
+    public static void wireCommonListeners(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull CardView view, final @NotNull Node dir, final @NotNull AbstractEditorContextMenu contextMenu, final @NotNull Supplier<Optional<JBTable>> gridTableSupplier, final @NotNull ToIntFunction<TestCaseDto> rowOnGrid, final @NotNull BooleanSupplier gridActiveSupplier) {
         final @NotNull JBList<TestCaseDto> list = view.list();
 
         final @NotNull CardMouseListener mouseListener = new CardMouseListener(p, editor, list, view.model(), dir, contextMenu);
@@ -97,6 +98,6 @@ public final class CardPanelBuilder {
         contextMenu.registerShortcuts(list);
 
         list.addListSelectionListener(new CardSelectionListener(p, list, editor, dir.getPath2()));
-        list.addListSelectionListener(new CardGridSelectionSynchronizer(list, gridTableSupplier, gridActiveSupplier));
+        list.addListSelectionListener(new CardGridSelectionSynchronizer(list, gridTableSupplier, gridActiveSupplier, rowOnGrid));
     }
 }

@@ -20,18 +20,21 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestCaseDto;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 @AllArgsConstructor
 public final class CardGridSelectionSynchronizer implements ListSelectionListener {
-    private final @NotNull JBList<?> list;
+    private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull Supplier<Optional<JBTable>> tableSupplier;
     private final @NotNull BooleanSupplier gridActiveSupplier;
+    private final @NotNull ToIntFunction<TestCaseDto> rowOnGrid;
 
     // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-111
     @Override
@@ -39,7 +42,7 @@ public final class CardGridSelectionSynchronizer implements ListSelectionListene
         if (event.getValueIsAdjusting() || !gridActiveSupplier.getAsBoolean()) return;
 
         tableSupplier.get().ifPresent(table -> {
-            final int row = list.getSelectedIndex();
+            final int row = Optional.ofNullable(list.getSelectedValue()).map(rowOnGrid::applyAsInt).orElse(-1);
             if (row < 0 || row >= table.getRowCount() || row == table.getSelectedRow()) return;
 
             table.changeSelection(row, Math.max(0, table.getSelectedColumn()), false, false);

@@ -59,6 +59,11 @@ final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
         return view.map(GridView::table);
     }
 
+    // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-111
+    int rowOf(final @NotNull TestCaseDto testCase) {
+        return rowsOnGrid.indexOf(testCase);
+    }
+
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
     boolean isCellOpen() {
         return view.map(GridView::isCellOpen).orElse(false);
@@ -89,7 +94,7 @@ final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
             table.getSelectionModel().addListSelectionListener(new GridSelectionListener(editor, table, editor.list, pageItems));
             editor.installEditListener(table, pageItems);
             new EscapeAction(editor.p, table);
-            new GridEnterAction(editor.p, table, pageItems, editor.parent.getPath2());
+            new GridEnterAction(editor, table, pageItems, editor.parent.getPath2());
             table.addMouseListener(new GridContextMenuListener(table, editor.list, editor.contextMenu, pageItems));
             editor.contextMenu.bindShortcutsTo(table);
             PageAction.bindToGrid(editor, table);

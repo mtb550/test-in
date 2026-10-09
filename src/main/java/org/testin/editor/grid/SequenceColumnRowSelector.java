@@ -38,7 +38,7 @@ final class SequenceColumnRowSelector extends MouseAdapter {
         final int viewRow = table.rowAtPoint(e.getPoint());
         final int viewCol = table.columnAtPoint(e.getPoint());
         if (viewRow < 0 || viewCol < 0) return;
-        if (!GridPanelBuilder.isOrderColumn(table, viewCol)) return;
+        if (!GridPanelBuilder.isSequenceColumn(table, viewCol)) return;
 
         final @NotNull ListSelectionModel rows = table.getSelectionModel();
 

@@ -65,6 +65,10 @@ The tester types the position they want. Testin moves the test case there.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-273** — In a test set editor, Enter or a double-click on a
+  grid Order cell opens the O dialog for that row, as pressing O does, and every
+  row's Order then shows its new number. In a test run editor the Order column
+  cannot be changed.
 
 ## The screen
 

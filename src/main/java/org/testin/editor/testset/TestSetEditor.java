@@ -357,7 +357,7 @@ public class TestSetEditor extends AbstractTestinEditor<TestSetEditorAttributes,
     // UC-EDITOR-PANEL-020
     @Override
     protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
-        return GridRows.ofTestCases(pageItems, this::positionOf);
+        return GridRows.ofTestCases(pageItems, firstRowOnPage(), this::positionOf);
     }
 
     // UC-EDITOR-PANEL-020

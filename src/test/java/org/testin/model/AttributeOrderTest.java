@@ -24,13 +24,17 @@ import static org.testng.Assert.assertSame;
 
 public class AttributeOrderTest {
 
+    // Rule-EDITOR-PANEL-272
     @Test
-    public void orderIsTheFirstTestAttribute() {
-        assertSame(TestSetEditorAttributes.atColumn(0), TestSetEditorAttributes.ORDER);
+    public void theSequenceThenTheOrderLeadTheTestAttributes() {
+        assertSame(TestSetEditorAttributes.atColumn(0), TestSetEditorAttributes.SEQUENCE);
+        assertSame(TestSetEditorAttributes.atColumn(1), TestSetEditorAttributes.ORDER);
     }
 
+    // Rule-EDITOR-PANEL-272
     @Test
-    public void orderIsTheFirstTestRunAttribute() {
-        assertSame(TestRunEditorAttributes.atColumn(0), TestRunEditorAttributes.ORDER);
+    public void theSequenceThenTheOrderLeadTheTestRunAttributes() {
+        assertSame(TestRunEditorAttributes.atColumn(0), TestRunEditorAttributes.SEQUENCE);
+        assertSame(TestRunEditorAttributes.atColumn(1), TestRunEditorAttributes.ORDER);
     }
 }

@@ -46,10 +46,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class GridIdeTest extends BasePlatformTestCase {
-    private static final int ORDER = 0;
-    private static final int DESCRIPTION = 1;
-    private static final int EXPECTED = 3;
-    private static final int ID = 2;
+    private static final int SEQUENCE = 0;
+    private static final int DESCRIPTION = 2;
+    private static final int EXPECTED = 4;
+    private static final int ID = 3;
 
     private static final @NotNull String DESCRIPTION_WIDTH = EditorKind.TEST_SET.columnWidthKey(TestSetEditorAttributes.DESCRIPTION.getName());
 
@@ -64,7 +64,7 @@ public class GridIdeTest extends BasePlatformTestCase {
     }
 
     private static @NotNull JBTable aGrid(final String @NotNull []... rows) {
-        return new GridPanelBuilder().buildTestTable(List.of(rows), EnumSet.of(TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT, TestSetEditorAttributes.ID));
+        return new GridPanelBuilder().buildTestTable(List.of(rows), EnumSet.of(TestSetEditorAttributes.SEQUENCE, TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT, TestSetEditorAttributes.ID));
     }
 
     private static @NotNull JBTable twoRows() {
@@ -105,8 +105,8 @@ public class GridIdeTest extends BasePlatformTestCase {
         return table.getColumnModel().getColumn(DESCRIPTION);
     }
 
-    private static void clickTheOrderOf(final @NotNull JBTable table, final int row, @MagicConstant(flags = {InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK, InputEvent.META_DOWN_MASK, InputEvent.ALT_DOWN_MASK}) final int modifiers) {
-        final @NotNull Rectangle cell = table.getCellRect(row, ORDER, true);
+    private static void clickTheSequenceOf(final @NotNull JBTable table, final int row, @MagicConstant(flags = {InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK, InputEvent.META_DOWN_MASK, InputEvent.ALT_DOWN_MASK}) final int modifiers) {
+        final @NotNull Rectangle cell = table.getCellRect(row, SEQUENCE, true);
         final @NotNull MouseEvent press = new MouseEvent(table, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), InputEvent.BUTTON1_DOWN_MASK | modifiers, (int) cell.getCenterX(), (int) cell.getCenterY(), 1, false, MouseEvent.BUTTON1);
         for (final MouseListener listener : table.getMouseListeners())
             if (listener instanceof SequenceColumnRowSelector) listener.mousePressed(press);
@@ -145,8 +145,8 @@ public class GridIdeTest extends BasePlatformTestCase {
             assertEquals("one value did not fill row " + row + "'s expected result", "Smoke", at(table, row, EXPECTED));
         }
 
-        final int expectedBesideTheDescription = 2;
-        final @NotNull JBTable fresh = new GridPanelBuilder().buildTestTable(List.of(aRow(1, "Log in", "", "id-1"), aRow(2, "Log out", "", "id-2")), EnumSet.of(TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT));
+        final int expectedBesideTheDescription = 3;
+        final @NotNull JBTable fresh = new GridPanelBuilder().buildTestTable(List.of(aRow(1, "Log in", "", "id-1"), aRow(2, "Log out", "", "id-2")), EnumSet.of(TestSetEditorAttributes.SEQUENCE, TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION, TestSetEditorAttributes.EXPECTED_RESULT));
         selectDownTo(fresh, 0, DESCRIPTION);
         onClipboard("A\tB\nC\tD");
 
@@ -246,9 +246,9 @@ public class GridIdeTest extends BasePlatformTestCase {
         final @NotNull JBTable table = aGrid(aRow(1, "a", "", "1"), aRow(2, "b", "", "2"), aRow(3, "c", "", "3"), aRow(4, "d", "", "4"), aRow(5, "e", "", "5"));
         table.setSize(800, 600);
 
-        clickTheOrderOf(table, 0, 0);
-        clickTheOrderOf(table, 2, InputEvent.CTRL_DOWN_MASK);
-        clickTheOrderOf(table, 4, InputEvent.CTRL_DOWN_MASK);
+        clickTheSequenceOf(table, 0, 0);
+        clickTheSequenceOf(table, 2, InputEvent.CTRL_DOWN_MASK);
+        clickTheSequenceOf(table, 4, InputEvent.CTRL_DOWN_MASK);
 
         assertEquals("separate runs of rows could not be taken together", List.of(0, 2, 4), Arrays.stream(table.getSelectedRows()).boxed().toList());
         assertEquals("a click on the order did not take the whole row", table.getColumnCount(), table.getSelectedColumnCount());

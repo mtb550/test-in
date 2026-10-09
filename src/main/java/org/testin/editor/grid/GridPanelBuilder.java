@@ -26,6 +26,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +87,8 @@ public class GridPanelBuilder {
 
     private static final @NotNull Border FIRST_CELL_BORDER = cellBorder(1);
     private static final @NotNull Border CELL_BORDER = cellBorder(0);
-    private static final int ORDER_COLUMN = 0;
+    private static final int SEQUENCE_COLUMN = 0;
+    private static final int ORDER_COLUMN = 1;
 
     private static @NotNull Border cellBorder(final int leftPadding) {
         return BorderFactory.createCompoundBorder(
@@ -105,8 +107,10 @@ public class GridPanelBuilder {
     private static @NotNull TableCellRenderer wrappingRenderer() {
         return new TableCellRenderer() {
             private final @NotNull JTextArea textArea = new JTextArea();
-            private final @NotNull JPanel wrapper = new JPanel(new GridBagLayout());
+            private final @NotNull GridBagLayout layout = new GridBagLayout();
+            private final @NotNull JPanel wrapper = new JPanel(layout);
             private final @NotNull GridBagConstraints c = new GridBagConstraints();
+            private final @NotNull GridBagConstraints centered = new GridBagConstraints();
 
             {
                 textArea.setLineWrap(true);
@@ -120,6 +124,11 @@ public class GridPanelBuilder {
                 c.weighty = 1.0;
                 c.fill = GridBagConstraints.HORIZONTAL;
                 c.anchor = GridBagConstraints.WEST;
+                centered.gridx = 0;
+                centered.gridy = 0;
+                centered.weightx = 1.0;
+                centered.weighty = 1.0;
+                centered.anchor = GridBagConstraints.CENTER;
                 wrapper.add(textArea, c);
             }
 
@@ -130,7 +139,10 @@ public class GridPanelBuilder {
                 textArea.setText(Display.shortDates(raw));
                 Tooltip.set(wrapper, Display.dateTooltip(raw));
                 wrapper.getAccessibleContext().setAccessibleName(raw);
-                textArea.setFont(table.getFont());
+                final boolean sequence = isSequenceColumn(table, column);
+                textArea.setLineWrap(!sequence);
+                layout.setConstraints(textArea, sequence ? centered : c);
+                textArea.setFont(sequence ? UIUtil.getTreeFont() : table.getFont());
                 textArea.setForeground(isSelected ? EditorColors.SELECTION_FOREGROUND : table.getForeground());
                 wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : RowStripe.of(row));
 
@@ -289,12 +301,16 @@ public class GridPanelBuilder {
         ));
     }
 
-    public static boolean isOrderColumn(final int modelColumn) {
-        return modelColumn == ORDER_COLUMN;
+    public static boolean isSequenceColumn(final int modelColumn) {
+        return modelColumn == SEQUENCE_COLUMN;
+    }
+
+    public static boolean isSequenceColumn(final @NotNull JTable table, final int viewColumn) {
+        return viewColumn >= 0 && isSequenceColumn(table.convertColumnIndexToModel(viewColumn));
     }
 
     public static boolean isOrderColumn(final @NotNull JTable table, final int viewColumn) {
-        return viewColumn >= 0 && isOrderColumn(table.convertColumnIndexToModel(viewColumn));
+        return viewColumn >= 0 && table.convertColumnIndexToModel(viewColumn) == ORDER_COLUMN;
     }
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-027

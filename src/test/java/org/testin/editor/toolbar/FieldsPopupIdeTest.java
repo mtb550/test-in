@@ -75,7 +75,7 @@ public class FieldsPopupIdeTest extends BasePlatformTestCase {
     }
 
     // Rule-EDITOR-PANEL-023
-    public void testOrderAndDescriptionAreAlwaysShownAndIdCanBeSwitchedOn() {
+    public void testDescriptionIsAlwaysShownOrderCanBeSwitchedOffAndIdOn() {
         final @NotNull TestSetDetailsPopupBtn button = new TestSetDetailsPopupBtn(() -> {
         });
         final @NotNull CheckBoxList<TestSetEditorAttributes> fields = button.fieldList(() -> {
@@ -83,17 +83,31 @@ public class FieldsPopupIdeTest extends BasePlatformTestCase {
         drawn(fields);
 
         assertFalse("ID is shown before anyone switched it on", button.getSelectedDetails().contains(TestSetEditorAttributes.ID));
+        assertTrue("Order is not on to start with", button.getSelectedDetails().contains(TestSetEditorAttributes.ORDER));
 
         spaceOn(fields, TestSetEditorAttributes.ORDER);
         spaceOn(fields, TestSetEditorAttributes.DESCRIPTION);
         spaceOn(fields, TestSetEditorAttributes.ID);
 
-        assertTrue("Order could be switched off", fields.isItemSelected(TestSetEditorAttributes.ORDER) && button.getSelectedDetails().contains(TestSetEditorAttributes.ORDER));
+        assertFalse("Order could not be switched off", button.getSelectedDetails().contains(TestSetEditorAttributes.ORDER));
         assertTrue("Description could be switched off", fields.isItemSelected(TestSetEditorAttributes.DESCRIPTION) && button.getSelectedDetails().contains(TestSetEditorAttributes.DESCRIPTION));
         assertTrue("ID could not be switched on", button.getSelectedDetails().contains(TestSetEditorAttributes.ID));
 
         ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.of(TestSetEditorAttributes.ID));
-        assertTrue("a remembered choice without Order and Description hid them", ShownFields.read(ShownFields.IN_TEST_SETS, TestSetEditorAttributes.class).containsAll(EnumSet.of(TestSetEditorAttributes.ORDER, TestSetEditorAttributes.DESCRIPTION)));
+        assertTrue("a remembered choice without Description hid it", ShownFields.read(ShownFields.IN_TEST_SETS, TestSetEditorAttributes.class).contains(TestSetEditorAttributes.DESCRIPTION));
+        assertFalse("a remembered choice without Order brought it back", ShownFields.read(ShownFields.IN_TEST_SETS, TestSetEditorAttributes.class).contains(TestSetEditorAttributes.ORDER));
+    }
+
+    // Rule-EDITOR-PANEL-272
+    public void testTheGridNumberIsNotAFieldToChoose() {
+        final @NotNull CheckBoxList<TestSetEditorAttributes> fields = new TestSetDetailsPopupBtn(() -> {
+        }).fieldList(() -> {
+        });
+
+        for (int i = 0; i < fields.getItemsCount(); i++) {
+            assertNotSame("Choose Fields lists the grid's # column", TestSetEditorAttributes.SEQUENCE, fields.getItemAt(i));
+        }
+        assertTrue("a remembered choice could hide the grid's # column", ShownFields.read(ShownFields.IN_TEST_SETS, TestSetEditorAttributes.class).contains(TestSetEditorAttributes.SEQUENCE));
     }
 
     // Rule-EDITOR-PANEL-024

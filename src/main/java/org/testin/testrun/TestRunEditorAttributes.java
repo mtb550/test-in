@@ -38,9 +38,19 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum TestRunEditorAttributes implements ToolBarAttribute {
+    SEQUENCE(
+            TestSetEditorAttributes.SEQUENCE.getName(),
+            ToolBarDefault.STRUCTURE,
+            _ -> ""
+    ) {
+        @Override
+        public void applyToUI(final @NotNull RunItem runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        }
+    },
+
     ORDER(
             TestSetEditorAttributes.ORDER.getName(),
-            ToolBarDefault.LOCKED_CHECKED,
+            ToolBarDefault.ON,
             _ -> ""
     ) {
         @Override

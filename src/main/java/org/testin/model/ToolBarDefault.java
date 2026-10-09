@@ -27,20 +27,30 @@ import java.util.Set;
 public enum ToolBarDefault {
     OFF(
             false,
+            true,
             true
     ),
 
     ON(
+            true,
             true,
             true
     ),
 
     LOCKED_CHECKED(
             true,
-            false
+            false,
+            true
     ),
 
     LOCKED_UNCHECKED(
+            false,
+            false,
+            true
+    ),
+
+    STRUCTURE(
+            true,
             false,
             false
     );
@@ -48,6 +58,8 @@ public enum ToolBarDefault {
     private final boolean selectedByDefault;
 
     private final boolean switchable;
+
+    private final boolean listed;
 
     public <E extends ToolBarAttribute> void enforceLock(final @NotNull E option, final @NotNull Set<E> selected) {
         if (switchable) return;

@@ -122,7 +122,7 @@ public class WaysInIdeTest extends AbstractViewPanelIdeTest {
                 .map(JBTable.class::cast)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the editor drew no grid"));
-        final int number = IntStream.range(0, grid.getColumnCount()).filter(column -> GridPanelBuilder.isOrderColumn(grid, column)).findFirst().orElseThrow(() -> new AssertionError("the grid has no number column"));
+        final int number = IntStream.range(0, grid.getColumnCount()).filter(column -> GridPanelBuilder.isSequenceColumn(grid, column)).findFirst().orElseThrow(() -> new AssertionError("the grid has no number column"));
         grid.setRowSelectionInterval(0, 2);
         grid.setColumnSelectionInterval(number, number);
 

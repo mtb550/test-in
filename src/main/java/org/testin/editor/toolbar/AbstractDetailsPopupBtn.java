@@ -28,6 +28,7 @@ import org.testin.ui.dialogs.DialogStyle;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
         super(tooltip, AllIcons.Actions.Selectall);
 
         this.propertyKey = propertyKey;
-        this.options = List.of(attributes.getEnumConstants());
+        this.options = Arrays.stream(attributes.getEnumConstants()).filter(attribute -> attribute.getToolBarDefault().isListed()).toList();
 
         selectedDetails.addAll(ShownFields.read(propertyKey, attributes));
 

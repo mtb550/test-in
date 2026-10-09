@@ -219,6 +219,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         return paging.itemsOn(currentTestCases);
     }
 
+    // Rule-EDITOR-PANEL-272
+    protected int firstRowOnPage() {
+        return paging.window(currentTestCases.size()).fromIndex() + 1;
+    }
+
     @Override
     public @NotNull List<TestCaseDto> getSelectedTestCases() {
         return list.getSelectedValuesList();
@@ -429,6 +434,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         CardPanelBuilder.wireCommonListeners(p, this, cardView, parent, contextMenu,
                 grid::table,
+                grid::rowOf,
                 () -> getToolBar().getCurrentView() == ViewMode.GRID_VIEW);
     }
 

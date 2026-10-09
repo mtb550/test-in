@@ -40,12 +40,12 @@ There is no key for this. The button's tooltip reads **Fields**.
   view is on screen.
 - **Rule-EDITOR-PANEL-022** — The choice is remembered, and is separate for a
   test set and a test run.
-- **Rule-EDITOR-PANEL-023** — Two fields cannot be changed: **Order** and **Description** are always shown. Order is the
-  grid's row header and not a
-  field a tester chooses: clicking it selects the row, and `Enter` or
-  double-clicking it opens the details panel. **ID** is off to start with and can
-  be switched on like any other field - it is the only place a tester can read a
-  test case's identity, and the view panel does not show it.
+- **Rule-EDITOR-PANEL-023** — In a test set editor **Description** is always
+  shown. **Order**, the number on a card and the grid's Order column, is on to
+  start with and can be switched off. The grid's first column, **#**, is not a
+  field: it is always shown and Choose Fields does not list it. **ID** is off to
+  start with and can be switched on like any other field - it is the only place a
+  tester can read a test case's identity, and the view panel does not show it.
 - **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for
   each.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
@@ -66,6 +66,12 @@ There is no key for this. The button's tooltip reads **Fields**.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-272** — The grid's first column, headed #, numbers the
+  rows as shown, 1 to n across pages, so page 2 of ten starts at 11, in the
+  IDE's own font as the tree is drawn rather than the editor font of the cells.
+  It is part of the grid: it cannot be hidden, and Choose Fields does not list
+  it. Clicking it selects the row, and Enter or a double-click on it opens the
+  details panel.
 
 ## The screen
 

@@ -338,7 +338,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
     protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
-        return GridRows.ofRunItems(pageItems, runItemsById, this::positionOf);
+        return GridRows.ofRunItems(pageItems, runItemsById, firstRowOnPage(), this::positionOf);
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094

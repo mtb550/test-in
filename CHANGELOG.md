@@ -13,6 +13,12 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **The grid numbers its rows:** its first column, **#**, counts the rows as shown, 1 to n across pages, like a
+  spreadsheet, in IntelliJ's own font as the tree is drawn rather than the editor font of the cells. It cannot be hidden
+  and Choose Fields does not list it; Enter or a double click on it opens the details panel, as the number column did.
+- **Order can be switched off:** the Order box in Choose Fields is on to start with and now hides the number on each card
+  and the grid's Order column. In a test set editor, Enter or a double click on an Order cell opens the O dialog for that
+  row.
 - **A test run is drawn test set by test set:** its test cases come in the order the Create Test Run form lists them,
   each set in its own order, and each card is numbered by its place in its own set, as the details panel and the
   generated test method already count it. The four reports list run items in the same order. A test case that was
@@ -20,6 +26,9 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Moving a test case from the grid no longer freezes the editor:** after a move, the list and the grid could each
+  select the other's row by its old index and correct each other until the IDE reported a stack overflow. The grid now
+  follows the selected test case, not its row number.
 - **Git works in PyCharm and every IDE where the Testin folder sits outside the project:** reading a committed test
   run's test cases no longer fails with Git's untrusted-project error. In a project still in safe mode, every Git step
   says so in one line and names Trust Project, and run items show as always.

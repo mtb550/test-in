@@ -20,11 +20,13 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.editor.TestinEditor;
 import org.testin.model.TestCaseDto;
+import org.testin.testcase.UpdateTestCaseAction;
+import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.util.Bundle;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
@@ -37,12 +39,14 @@ import java.util.List;
 import java.util.Optional;
 
 public final class GridEnterAction extends AbstractProjectAction {
+    private final @NotNull TestinEditor editor;
     private final @NotNull JBTable table;
     private final @NotNull List<TestCaseDto> pageItems;
     private final @NotNull List<String> path;
 
-    public GridEnterAction(final @NotNull Project p, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems, final @NotNull List<String> path) {
-        super(p, Bundle.message("grid.enter.text"), Bundle.message("grid.enter.description"), AllIcons.Actions.PreviewDetails);
+    public GridEnterAction(final @NotNull TestinEditor editor, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems, final @NotNull List<String> path) {
+        super(editor.getProject(), Bundle.message("grid.enter.text"), Bundle.message("grid.enter.description"), AllIcons.Actions.PreviewDetails);
+        this.editor = editor;
         this.table = table;
         this.pageItems = pageItems;
         this.path = path;
@@ -64,13 +68,28 @@ public final class GridEnterAction extends AbstractProjectAction {
             return;
         }
 
-        if (GridPanelBuilder.isOrderColumn(table, column)) showDetails(row);
+        openAt(row, column);
+    }
+
+    // UC-EDITOR-PANEL-025, UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-272, Rule-EDITOR-PANEL-273
+    private boolean openAt(final int row, final int column) {
+        if (GridPanelBuilder.isSequenceColumn(table, column)) {
+            showDetails(row);
+            return true;
+        }
+
+        if (GridPanelBuilder.isOrderColumn(table, column) && editor.getParent().isTestCaseContainer()) {
+            UpdateTestCaseAction.openField(p, editor, UpdateTestCaseFields.ORDER);
+            return true;
+        }
+
+        return false;
     }
 
     private int selectedCell() {
         final int anchor = table.getColumnModel().getSelectionModel().getAnchorSelectionIndex();
 
-        return table.getSelectedColumnCount() == table.getColumnCount() && GridPanelBuilder.isOrderColumn(table, anchor)
+        return table.getSelectedColumnCount() == table.getColumnCount() && GridPanelBuilder.isSequenceColumn(table, anchor)
                 ? anchor
                 : table.getSelectedColumn();
     }
@@ -94,10 +113,7 @@ public final class GridEnterAction extends AbstractProjectAction {
             public void mouseClicked(final @NotNull MouseEvent e) {
                 if (e.getClickCount() != 2 || !SwingUtilities.isLeftMouseButton(e)) return;
 
-                if (!GridPanelBuilder.isOrderColumn(table, table.columnAtPoint(e.getPoint()))) return;
-
-                showDetails(table.rowAtPoint(e.getPoint()));
-                e.consume();
+                if (openAt(table.rowAtPoint(e.getPoint()), table.columnAtPoint(e.getPoint()))) e.consume();
             }
         });
     }

@@ -54,9 +54,21 @@ import static org.testin.importexport.imports.ImportSetter.always;
 
 @Getter
 public enum TestSetEditorAttributes implements ToolBarAttribute {
+    SEQUENCE(
+            Bundle.message("attribute.sequence"),
+            ToolBarDefault.STRUCTURE,
+            _ -> "",
+            (_, tc, _) -> Optional.of(tc),
+            GenType.NO_CODE_CHANGE
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
+        }
+    },
+
     ORDER(
             Bundle.message("attribute.order"),
-            ToolBarDefault.LOCKED_CHECKED,
+            ToolBarDefault.ON,
             _ -> "",
             (_, tc, _) -> Optional.of(tc),
             GenType.NO_CODE_CHANGE
