@@ -6,6 +6,8 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+## 2.14.1-alpha - 2026-10-10
+
 ### Fixed
 
 - **Git works in PyCharm and every IDE where the Testin folder sits outside the project:** reading a committed test
