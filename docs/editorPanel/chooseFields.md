@@ -70,7 +70,7 @@ There is no key for this. The button's tooltip reads **Fields**.
   rows as shown, 1 to n across pages, so page 2 of ten starts at 11, in the
   IDE's own font as the tree is drawn rather than the editor font of the cells.
   It is part of the grid: it cannot be hidden, and Choose Fields does not list
-  it. Clicking it selects the row, and Enter or a double-click on it opens the
+  it. Clicking it selects the row, and Enter or a double click on it opens the
   details panel.
 
 ## The screen
