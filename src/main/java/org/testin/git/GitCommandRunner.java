@@ -18,12 +18,13 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.commands.Git;
 import git4idea.commands.GitBinaryHandler;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandler;
-import git4idea.config.GitExecutableManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -99,7 +101,9 @@ final class GitCommandRunner {
     }
 
     private static byte @NotNull [] batch(final @NotNull Project p, final @NotNull Path workingDirectory, final byte @NotNull [] request) {
-        final @NotNull GitBinaryHandler handler = new GitBinaryHandler(workingDirectory, GitExecutableManager.getInstance().getExecutable(p, workingDirectory), GitCommand.CAT_FILE);
+        final @NotNull VirtualFile root = Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(workingDirectory))
+                .orElseThrow(() -> new GitFailed(Bundle.message("git.command.failed", String.valueOf(workingDirectory))));
+        final @NotNull GitBinaryHandler handler = new GitBinaryHandler(p, root, GitCommand.CAT_FILE);
         handler.addParameters("--batch");
         handler.setInputProcessor(stdin -> {
             try (stdin) {
@@ -109,6 +113,8 @@ final class GitCommandRunner {
 
         try {
             return handler.run();
+        } catch (final IllegalStateException safeMode) {
+            throw inSafeMode(safeMode);
         } catch (final VcsException ex) {
             final @NotNull String details = GitSafeText.withoutCredentials(FailureText.of(ex));
             Logger.error("Git command failed: " + details);
@@ -146,6 +152,12 @@ final class GitCommandRunner {
         return contents;
     }
 
+    // Rule-SHARE-132
+    private static @NotNull GitFailed inSafeMode(final @NotNull IllegalStateException safeMode) {
+        Logger.warn("Git refused to run in a project in safe mode: " + safeMode.getMessage());
+        return new GitFailed(Bundle.message("git.safe.mode"));
+    }
+
     private static int lineEnd(final byte @NotNull [] batch, final int from) {
         for (int i = from; i < batch.length; i++) {
             if (batch[i] == '\n') return i;
@@ -162,7 +174,12 @@ final class GitCommandRunner {
         handler.addParameters(parameters);
         if (!remoteUrl.isBlank()) handler.setUrl(remoteUrl);
 
-        final @NotNull GitCommandResult result = Git.getInstance().runCommand(handler);
+        final @NotNull GitCommandResult result;
+        try {
+            result = Git.getInstance().runCommand(handler);
+        } catch (final IllegalStateException safeMode) {
+            throw inSafeMode(safeMode);
+        }
         if (!result.success()) {
             final @NotNull String details = GitSafeText.withoutCredentials(
                     result.getErrorOutputAsJoinedString().isBlank()

@@ -6,6 +6,12 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## Unreleased
 
+### Fixed
+
+- **Git works in PyCharm and every IDE where the Testin folder sits outside the project:** reading a committed test
+  run's test cases no longer fails with Git's untrusted-project error. In a project still in safe mode, every Git step
+  says so in one line and names Trust Project, and run items show as always.
+
 ## 2.14.0-alpha - 2026-10-09
 
 **Before you update:** wipe your test data. This build reads format 3 and converts nothing, so every test project an
