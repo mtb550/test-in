@@ -327,4 +327,26 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         assertTrue("the web page lays a test case's description out on one line", html.matches("(?s).*\\.detail-table td \\{[^}]*white-space: pre-wrap.*"));
         assertTrue("the web page lays an actual result out on one line", html.matches("(?s).*\\.actual \\{[^}]*white-space: pre-wrap.*"));
     }
+
+    // Rule-REPORT-026
+    public void testEveryFormatListsTheRunItemsInTheTestRunsOrder() {
+        final @NotNull List<UUID> inTheSet = Services.getInstance(getProject(), TestCases.class).getTestCasesUnder(testProject.getTestCasesFolder()).stream().map(TestCaseDto::getId).toList();
+        final @NotNull UUID first = inTheSet.get(0);
+        final @NotNull UUID second = inTheSet.get(1);
+        final @NotNull TestRunNode testRun = aTestRun("Stored backwards", List.of(
+                new RunItem().setId(second).setStatus(RunItemStatus.PASSED),
+                new RunItem().setId(first).setStatus(RunItemStatus.PASSED)));
+        final @NotNull String firstWords = squeezed(first.equals(opens) ? "Open the app" : "Lock the account");
+        final @NotNull String secondWords = squeezed(second.equals(opens) ? "Open the app" : "Lock the account");
+
+        for (final List<String> report : List.of(
+                List.of("The web page", withoutTags(html(testRun))),
+                List.of("The PDF", pdf(testRun)),
+                List.of("The Word document", word(testRun)),
+                List.of("The spreadsheet", excel(testRun)))) {
+            final @NotNull String text = squeezed(report.get(1));
+            assertTrue(report.get(0) + " does not list the run items in the test run's order",
+                    text.contains(firstWords) && text.indexOf(firstWords) < text.indexOf(secondWords));
+        }
+    }
 }

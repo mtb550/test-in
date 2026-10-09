@@ -19,6 +19,7 @@ package org.testin.editor.grid;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.ui.components.fields.IntegerField;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
@@ -28,12 +29,18 @@ import org.testin.editor.testset.TestSetEditor;
 import org.testin.model.TestCaseDto;
 import org.testin.model.node.TestProjectNode;
 import org.testin.model.node.TestSetNode;
-import org.testin.util.Shortcuts;
+import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testcase.update.UpdateTestCaseDialog;
 import org.testin.ui.framework.ShownDialog;
+import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
 import org.testin.view.KeyPress;
 
+import javax.swing.JTextArea;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -118,5 +125,51 @@ public class OrderCellIdeTest extends AbstractTempRootIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
         assertFalse("an Order cell in a test run opened the order dialog, though a test run cannot be reordered", ShownDialog.isOpen(getProject(), UpdateTestCaseDialog.class));
+    }
+
+    private @NotNull TestSetEditor threeTestCases() {
+        final @NotNull TestSetNode testSet = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
+        EditorFixtures.testCases(getProject(), testSet, 3);
+        return EditorFixtures.openTestSetEditor(getProject(), testSet, getTestRootDisposable());
+    }
+
+    private static @NotNull Component drawn(final @NotNull JBTable grid, final int viewColumn) {
+        return grid.prepareRenderer(grid.getCellRenderer(0, viewColumn), 0, viewColumn);
+    }
+
+    // Rule-EDITOR-PANEL-273
+    public void testADoubleClickOnAnOrderCellOpensTheOrderDialog() {
+        final @NotNull JBTable grid = gridOf(threeTestCases());
+        onTheOrderCellOfRow(grid, 1);
+        final @NotNull Rectangle cell = grid.getCellRect(1, grid.getSelectedColumn(), true);
+        final @NotNull MouseEvent doubleClick = new MouseEvent(grid, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, (int) cell.getCenterX(), (int) cell.getCenterY(), 2, false, MouseEvent.BUTTON1);
+
+        ShownDialog.open(getProject(), UpdateTestCaseDialog.class, () -> {
+            for (final MouseListener listener : grid.getMouseListeners()) listener.mouseClicked(doubleClick);
+        });
+
+        assertTrue("a double-click on an Order cell did not open the order dialog", ShownDialog.isOpen(getProject(), UpdateTestCaseDialog.class));
+    }
+
+    // Rule-EDITOR-PANEL-023, Rule-EDITOR-PANEL-014
+    public void testUntickingOrderHidesTheCardNumberAndTheGridsOrderColumn() {
+        final @NotNull TestSetEditor editor = threeTestCases();
+        editor.getSelectedDetails().remove(TestSetEditorAttributes.ORDER);
+        editor.onToolBarDetailsSelectionChanged();
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+        assertFalse("the card still shows its number with Order unticked", Character.isDigit(editor.cardTitle(editor.getAllTestCases().getFirst()).charAt(0)));
+        final @NotNull JBTable grid = gridOf(editor);
+        assertTrue("the grid lost its # column", GridPanelBuilder.isSequenceColumn(grid, 0));
+        assertTrue("the grid still shows the Order column with Order unticked", IntStream.range(0, grid.getColumnCount()).noneMatch(column -> GridPanelBuilder.isOrderColumn(grid, column)));
+    }
+
+    // Rule-EDITOR-PANEL-272
+    public void testTheGridNumberIsDrawnInTheIdesOwnFontAndTheCellsInTheEditorFont() {
+        final @NotNull JBTable grid = gridOf(threeTestCases());
+        final int description = IntStream.range(0, grid.getColumnCount()).filter(column -> !GridPanelBuilder.isSequenceColumn(grid, column) && !GridPanelBuilder.isOrderColumn(grid, column)).findFirst().orElseThrow();
+
+        assertEquals("the # column is not in the IDE's own font", UIUtil.getTreeFont(), Drawn.first(drawn(grid, 0), JTextArea.class).getFont());
+        assertEquals("a value cell left the editor font", grid.getFont(), Drawn.first(drawn(grid, description), JTextArea.class).getFont());
     }
 }

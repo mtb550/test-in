@@ -34,7 +34,7 @@ public class CountsStoredNowhereIdeTest extends AbstractTempRootIdeTest {
     private static @NotNull String markerOf(final @NotNull Node node) {
         final @NotNull Path marker = node.getPath().resolve(node.getType().getMarker());
         try {
-            return Files.readAllLines(marker).stream().filter(line -> !line.contains("\"updatedAt\"")).collect(Collectors.joining("\n"));
+            return Files.readAllLines(marker).stream().filter(line -> !line.contains("\"updatedAt\"")).map(line -> line.replaceFirst(",$", "")).collect(Collectors.joining("\n"));
         } catch (final IOException ex) {
             throw new AssertionError("could not read " + marker, ex);
         }
