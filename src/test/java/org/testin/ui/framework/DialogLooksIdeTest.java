@@ -378,7 +378,7 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
                 assertTrue("the picked row is not marked by a band", at(band, row.getWidth() - 3, row.getHeight() / 2).getAlpha() > 0);
             }
         }
-        assertTrue("what a row says about itself is lined up into a column instead of sitting against its name", hintStarts.get(0) < hintStarts.get(1));
+        assertTrue("what a row says about itself is lined up into a column instead of sitting against its name", hintStarts.getFirst() < hintStarts.get(1));
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-109
@@ -390,7 +390,7 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         assertNotNull("the arrow is not drawn", parts.get(1).getIcon());
 
         final @NotNull Color gray = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
-        assertEquals("where it is, is not gray", gray, parts.get(0).getForeground());
+        assertEquals("where it is, is not gray", gray, parts.getFirst().getForeground());
         assertEquals("the rest of where it lands is not gray", gray, parts.get(2).getForeground());
         assertNotEquals("the segment it gains is gray like the rest", gray, parts.get(3).getForeground());
 
@@ -398,7 +398,7 @@ public class DialogLooksIdeTest extends BasePlatformTestCase {
         for (final JLabel part : parts) {
             assertTrue("the place is not one row", Math.abs(within(part, place).y + part.getHeight() / 2 - middle) <= 2);
         }
-        assertTrue(within(parts.get(0), place).x < within(parts.get(1), place).x && within(parts.get(1), place).x < within(parts.get(2), place).x);
+        assertTrue(within(parts.getFirst(), place).x < within(parts.get(1), place).x && within(parts.get(1), place).x < within(parts.get(2), place).x);
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-119

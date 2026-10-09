@@ -331,7 +331,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
     // Rule-REPORT-026
     public void testEveryFormatListsTheRunItemsInTheTestRunsOrder() {
         final @NotNull List<UUID> inTheSet = Services.getInstance(getProject(), TestCases.class).getTestCasesUnder(testProject.getTestCasesFolder()).stream().map(TestCaseDto::getId).toList();
-        final @NotNull UUID first = inTheSet.get(0);
+        final @NotNull UUID first = inTheSet.getFirst();
         final @NotNull UUID second = inTheSet.get(1);
         final @NotNull TestRunNode testRun = aTestRun("Stored backwards", List.of(
                 new RunItem().setId(second).setStatus(RunItemStatus.PASSED),
@@ -345,7 +345,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
                 List.of("The Word document", word(testRun)),
                 List.of("The spreadsheet", excel(testRun)))) {
             final @NotNull String text = squeezed(report.get(1));
-            assertTrue(report.get(0) + " does not list the run items in the test run's order",
+            assertTrue(report.getFirst() + " does not list the run items in the test run's order",
                     text.contains(firstWords) && text.indexOf(firstWords) < text.indexOf(secondWords));
         }
     }

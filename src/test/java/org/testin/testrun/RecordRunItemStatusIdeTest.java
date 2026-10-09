@@ -255,7 +255,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
             fixture.press(editor, RunItemStatus.FAILED);
 
             assertTrue("failing several opened the failure dialog", fixture.failureDialog().isEmpty());
-            for (final TestCaseDto tc : List.of(fixture.testCases().get(0), fixture.testCases().get(2))) {
+            for (final TestCaseDto tc : List.of(fixture.testCases().getFirst(), fixture.testCases().get(2))) {
                 final @NotNull RunItem failed = fixture.runItemOf(tc);
                 assertEquals(RunItemStatus.FAILED, failed.getStatus());
                 assertEquals("a test case failed with several was given detail", "", failed.getActualResult());

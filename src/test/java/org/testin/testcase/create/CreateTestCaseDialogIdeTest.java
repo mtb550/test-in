@@ -118,7 +118,7 @@ public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
         dialog.getTestDataSection().field.setText("  4111 1111 1111 1111  ");
         final @NotNull List<EditorTextField> steps = dialog.getStepsSection().getFields();
         assertEquals("three presses did not give three steps", 3, steps.size());
-        steps.get(0).setText("  Open the cart  ");
+        steps.getFirst().setText("  Open the cart  ");
         steps.get(1).setText("   ");
         steps.get(2).setText("  Pay  ");
 

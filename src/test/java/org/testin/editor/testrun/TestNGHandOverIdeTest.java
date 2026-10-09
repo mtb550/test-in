@@ -99,7 +99,7 @@ public class TestNGHandOverIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestSetNode ts = createdTestSet("Checkout");
         final @NotNull List<TestCaseDto> testCases = List.of(createdTestCase(ts, "Log in with a valid user", "m0001"), createdTestCase(ts, "Log in with a wrong password", "m0002"), createdTestCase(ts, "Log out", "m0003"));
         settled();
-        final @NotNull TestRunEditor editor = runningTheWholeTestRunOf(List.of(testCases.get(2), testCases.get(0), testCases.get(1)));
+        final @NotNull TestRunEditor editor = runningTheWholeTestRunOf(List.of(testCases.get(2), testCases.getFirst(), testCases.get(1)));
         try {
             Await.until("the execution was never handed over", () -> !executed.isEmpty());
             assertEquals("the whole set was not one configuration in one process", 1, executed.size());

@@ -221,7 +221,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
     // Rule-INTERNAL-035
     public void testAMovedTestCaseIsInItsNewSetAndGoneFromTheOld() {
         final List<TestSetNode> sets = twoTestSets();
-        final TestSetNode login = sets.get(0);
+        final TestSetNode login = sets.getFirst();
         final TestSetNode signUp = sets.get(1);
         final TestCaseDto cut = aTestCaseIn(login, "m").setCreatedBy("Mohammed AlZamil");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);
@@ -241,7 +241,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
     // Rule-INTERNAL-112
     public void testAMoveWhoseWriteIsRefusedLeavesTheTestCaseWhereItWas() {
         final List<TestSetNode> sets = twoTestSets();
-        final TestSetNode login = sets.get(0);
+        final TestSetNode login = sets.getFirst();
         final TestSetNode signUp = sets.get(1);
         final TestCaseDto cut = aTestCaseIn(login, "m");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);
@@ -276,7 +276,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testAMoveWhoseOldFileWillNotGoLeavesTheTestCaseWhereItWas() {
         final List<TestSetNode> sets = twoTestSets();
-        final TestSetNode login = sets.get(0);
+        final TestSetNode login = sets.getFirst();
         final TestSetNode signUp = sets.get(1);
         final TestCaseDto cut = aTestCaseIn(login, "m");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);

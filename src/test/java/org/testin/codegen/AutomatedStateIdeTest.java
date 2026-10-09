@@ -74,9 +74,9 @@ public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
         final @NotNull List<TestCaseDto> testCases = threeStatesOfAutomation();
         final @NotNull TestCaseDto nameless = indexedTestCase(testSet, "!!!", "m0004");
 
-        readAndAwait(List.of(testCases.get(0), testCases.get(1), testCases.get(2), nameless));
+        readAndAwait(List.of(testCases.getFirst(), testCases.get(1), testCases.get(2), nameless));
 
-        assertEquals("a method with something in it is not automation", Automated.WRITTEN, state().of(testCases.get(0).getId()));
+        assertEquals("a method with something in it is not automation", Automated.WRITTEN, state().of(testCases.getFirst().getId()));
         assertEquals("a generated method nobody filled in counts as automation", Automated.NONE, state().of(testCases.get(1).getId()));
         assertEquals("a test case naming a method it does not have is not reported missing", Automated.MISSING, state().of(testCases.get(2).getId()));
         assertEquals("a test case that names no method is not reported not automated", Automated.NONE, state().of(nameless.getId()));

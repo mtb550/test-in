@@ -81,7 +81,7 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
         final @NotNull List<Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD)).slots();
         final @NotNull List<Slot> now = CardTitle.descriptionActionIcons(200, everyButton()).slots();
 
-        assertEquals("the method button moved", before.get(0).at(), now.get(0).at());
+        assertEquals("the method button moved", before.getFirst().at(), now.getFirst().at());
         assertEquals("the run button moved", before.get(1).at(), now.get(1).at());
         assertEquals(CardHoverAction.NAVIGATE_TO_TEST_CASE, now.getLast().button().action());
         assertEquals("the new button's slot is not the size of the others", now.getFirst().at().getSize(), now.getLast().at().getSize());

@@ -127,7 +127,7 @@ public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<UUID> testCases = aTestSet(tp.getTestCasesFolder(), "Login", 4, TestSetStatus.ACTIVE);
         final @NotNull TestRunNode tr = aTestRun(tp);
         Services.getInstance(getProject(), TestRuns.class).putRunItems(tr.getPath(), new RunItems().setAll(new ArrayList<>(List.of(
-                new RunItem().setId(testCases.get(0)).setStatus(RunItemStatus.PASSED),
+                new RunItem().setId(testCases.getFirst()).setStatus(RunItemStatus.PASSED),
                 new RunItem().setId(testCases.get(1)).setStatus(RunItemStatus.FAILED)))));
 
         final @NotNull TestRunSummary counted = NodeCounter.testRunFigures(getProject(), tr).testRun();

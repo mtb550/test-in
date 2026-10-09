@@ -75,7 +75,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
     public void testTypingWhatHappenedDoesNotChangeTheRunItemStatus() {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 2);
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(
-                EditorFixtures.pending(testCases.get(0)).setStatus(RunItemStatus.PASSED),
+                EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.PASSED),
                 EditorFixtures.pending(testCases.get(1))), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         try {
@@ -84,8 +84,8 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
             typedInto(grid, 0, "Slow but it passed");
             typedInto(grid, 1, "Not tried yet");
 
-            assertEquals("Slow but it passed", fixture.runItemOf(testCases.get(0)).getActualResult());
-            assertEquals("typing changed a recorded run item status", RunItemStatus.PASSED, fixture.statusOf(testCases.get(0)));
+            assertEquals("Slow but it passed", fixture.runItemOf(testCases.getFirst()).getActualResult());
+            assertEquals("typing changed a recorded run item status", RunItemStatus.PASSED, fixture.statusOf(testCases.getFirst()));
             assertEquals("typing recorded a run item status", RunItemStatus.PENDING, fixture.statusOf(testCases.get(1)));
         } finally {
             Disposer.dispose(editor);
@@ -172,7 +172,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
                 assertFalse("a test set editor shows a test run label", label.isVisible());
 
             final @NotNull List<JComponent> inTheTestRun = theThreeTestRunLabels(testRunEditor.getStatusBar());
-            assertTrue("the test run's status is not shown", inTheTestRun.get(0).isVisible());
+            assertTrue("the test run's status is not shown", inTheTestRun.getFirst().isVisible());
             assertFalse("the clock shows though nothing was timed", inTheTestRun.get(2).isVisible() && Drawn.text(inTheTestRun.get(2)).isEmpty());
 
             testRunEditor.runItem(fixture.testCases().getFirst().getId()).orElseThrow().setStatus(RunItemStatus.PASSED);
@@ -188,7 +188,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
     public void testTheClockAddsToTheTimeATestCaseAlreadyCarried() {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 2);
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(
-                EditorFixtures.pending(testCases.get(0)).setDuration(Duration.ofSeconds(7)),
+                EditorFixtures.pending(testCases.getFirst()).setDuration(Duration.ofSeconds(7)),
                 EditorFixtures.pending(testCases.get(1))), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         try {

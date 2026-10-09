@@ -394,7 +394,7 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
         final @NotNull List<Float> widths = pdfColumnWidths(FileTypes.PDF.generateReport(getProject(), testRun, resultsOf(testRun)));
         assertEquals("the PDF's failed test case table does not have its four columns: " + widths, 4, widths.size());
-        final float number = widths.get(0);
+        final float number = widths.getFirst();
         final float description = widths.get(1);
         assertTrue("in the PDF the number is " + number + " wide and the description " + description + ": " + widths, number * 4 < description);
         assertTrue("in the PDF the bug priority is " + widths.get(2) + " wide and the description " + description, widths.get(2) < description);

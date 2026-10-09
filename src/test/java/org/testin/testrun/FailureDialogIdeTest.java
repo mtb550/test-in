@@ -197,7 +197,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             assertEquals(RunItemStatus.FAILED, failed.getStatus());
             assertEquals("the screenshots were not kept", 2, failed.getScreenshots().size());
             final @NotNull List<byte[]> kept = Services.getInstance(getProject(), TestRuns.class).screenshots(fixture.testRun().getPath(), failed);
-            assertEquals("the first picture pasted is not the first kept", Color.RED.getRGB(), firstPixelOf(kept.get(0)));
+            assertEquals("the first picture pasted is not the first kept", Color.RED.getRGB(), firstPixelOf(kept.getFirst()));
             assertEquals("the second picture pasted is not the second kept", Color.BLUE.getRGB(), firstPixelOf(kept.get(1)));
             for (final String name : failed.getScreenshots()) {
                 assertTrue("a screenshot is not a picture file beside the test run: " + name, Files.isRegularFile(TestRunNode.screenshotFile(fixture.testRun().getPath(), name)));
@@ -360,7 +360,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
     public void testTheEntryWorksOnExactlyOneFailedTestCase() {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 3);
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(
-                EditorFixtures.pending(testCases.get(0)).setStatus(RunItemStatus.FAILED),
+                EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.FAILED),
                 EditorFixtures.pending(testCases.get(1)).setStatus(RunItemStatus.FAILED),
                 EditorFixtures.pending(testCases.get(2)).setStatus(RunItemStatus.PASSED)), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
@@ -385,7 +385,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
     public void testTheMessageComesOnlyAfterTheTestRunIsWritten() {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 2);
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(
-                EditorFixtures.pending(testCases.get(0)).setStatus(RunItemStatus.FAILED),
+                EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.FAILED),
                 EditorFixtures.pending(testCases.get(1)).setStatus(RunItemStatus.FAILED)), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
         final @NotNull List<String> heldWhenSaid = new ArrayList<>();

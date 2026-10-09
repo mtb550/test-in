@@ -132,7 +132,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
             typed(grid, 1, TestSetEditorAttributes.GROUP, "");
 
             Await.until("a blank group was not written", () -> stored(testCases.get(1)).getGroups().isEmpty());
-            assertEquals("a blank priority in a cell changed the priority", Priority.MEDIUM, stored(testCases.get(0)).getPriority());
+            assertEquals("a blank priority in a cell changed the priority", Priority.MEDIUM, stored(testCases.getFirst()).getPriority());
             assertTrue("a blank value was called unreadable: " + balloons, balloons.stream().noneMatch(said -> said.startsWith(unreadable("").substring(0, 14))));
 
             balloons.clear();
