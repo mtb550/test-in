@@ -145,19 +145,19 @@ public class GridPanelBuilder {
                 textArea.setFont(sequence ? UIUtil.getTreeFont() : table.getFont());
                 textArea.setForeground(isSelected ? EditorColors.SELECTION_FOREGROUND : table.getForeground());
                 wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : RowStripe.of(row));
-
-                if (isSelected) {
-                    wrapper.setBorder(column == 0 ? FIRST_CELL_SELECTION_BORDER : CELL_SELECTION_BORDER);
-
-                } else {
-                    wrapper.setBorder(column == 0 ? FIRST_CELL_BORDER : CELL_BORDER);
-                }
+                wrapper.setBorder(borderOf(isSelected, column));
 
                 final int width = table.getColumnModel().getColumn(column).getWidth();
                 textArea.setSize(new Dimension(width, Short.MAX_VALUE));
                 return wrapper;
             }
         };
+    }
+
+    private static @NotNull Border borderOf(final boolean selected, final int column) {
+        if (selected) return column == 0 ? FIRST_CELL_SELECTION_BORDER : CELL_SELECTION_BORDER;
+
+        return column == 0 ? FIRST_CELL_BORDER : CELL_BORDER;
     }
 
     private static void updateRowHeights(final @NotNull JBTable table) {

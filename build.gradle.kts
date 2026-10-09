@@ -107,8 +107,8 @@ allprojects {
             check("StringConcatToTextBlock", CheckSeverity.OFF)
             // Types an enum constant holds that Testin cannot annotate @Immutable:
             // the platform's Icon, KeyStroke, Font and SimpleTextAttributes, and
-            // the JDK's function interfaces, every one of which Testin fills with
-            // a method reference or a lambda capturing nothing that changes.
+            // the JDK's function interfaces and Comparator, every one of which Testin
+            // fills with a method reference or a lambda capturing nothing that changes.
             option(
                 "Immutable:KnownImmutable", listOf(
                     "javax.swing.Icon",
@@ -122,7 +122,8 @@ allprojects {
                     "java.util.function.Predicate",
                     "java.util.function.BiPredicate",
                     "java.util.function.ToLongFunction",
-                    "java.util.function.LongFunction"
+                    "java.util.function.LongFunction",
+                    "java.util.Comparator"
                 ).joinToString(",")
             )
             option("NullAway:AnnotatedPackages", "org.testin")

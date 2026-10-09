@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -122,7 +121,7 @@ public enum SortField {
     public @NotNull List<TestCaseDto> sorted(final @NotNull List<TestCaseDto> testCases, final @NotNull SortDirection direction, final @NotNull Function<UUID, Optional<RunItem>> runItemProvider) {
         if (this == ORDER) return direction.arranged(testCases);
 
-        final @NotNull Map<TestCaseDto, ShownTestCase> shown = new IdentityHashMap<>();
+        final @NotNull IdentityHashMap<TestCaseDto, ShownTestCase> shown = new IdentityHashMap<>();
         final @NotNull List<TestCaseDto> filled = new ArrayList<>();
         final @NotNull List<TestCaseDto> blank = new ArrayList<>();
 
