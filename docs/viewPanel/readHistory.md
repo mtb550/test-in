@@ -159,8 +159,8 @@ There is no key for this. The tab is called **History**.
    Steps row names only the steps that changed (Rule-VIEW-PANEL-118). The field
    is its icon, the letter the update menu shows (**D** Description, **E**
    Expected Result, **S** Steps, **P** Priority, **G** Group, **M** Module,
-   **T** Test Data, **B** Pre Conditions, **R** Reference), with its name on
-   hover; Status and the run item's fields have no icon and are named in words
+   **T** Test Data, **B** Pre Conditions, **R** Reference, **U** Status), with its
+   name on hover; the run item's fields have no icon and are named in words
    (Rule-VIEW-PANEL-111). A commit that changed none of the fields reads
    *No field changed*. Clicking a test case's card opens the IDE's diff
    window with every change (Rule-VIEW-PANEL-117).

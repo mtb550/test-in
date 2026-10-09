@@ -19,10 +19,10 @@ package org.testin.testcase;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.util.ui.EmptyIcon;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CopyChoice;
 import org.testin.codegen.GenType;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
@@ -176,8 +176,8 @@ public enum UpdateTestCaseFields implements MenuItem {
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
     STATUS(
             TestSetEditorAttributes.STATUS.getName(),
-            Shortcuts.EMPTY,
-            EmptyIcon.ICON_16,
+            Shortcuts.UpdateTestCaseStatus,
+            CopyChoice.STATUS.getIcon(),
             GenType.UPDATE_TEST_CASE_STATUS,
             Done.UPDATED,
             (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),

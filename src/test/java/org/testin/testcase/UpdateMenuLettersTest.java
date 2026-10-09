@@ -16,8 +16,6 @@
 
 package org.testin.testcase;
 
-import com.intellij.util.ui.EmptyIcon;
-import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CopyChoice;
 import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
@@ -25,27 +23,27 @@ import org.testng.annotations.Test;
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
 
 public class UpdateMenuLettersTest {
 
     // Rule-EDITOR-PANEL-194
     @Test
-    public void statusSitsLastWithNoLetterAndNoIcon() {
-        final @NotNull List<UpdateTestCaseFields> menu = List.of(UpdateTestCaseFields.values());
-
-        assertEquals(menu.getLast(), UpdateTestCaseFields.STATUS, "the one without a letter sits last");
-        assertTrue(Shortcuts.isNoKey(UpdateTestCaseFields.STATUS.getShortcut().getKey()), "Status has a letter");
-        assertSame(UpdateTestCaseFields.STATUS.getIcon(), EmptyIcon.ICON_16, "Status has an icon");
-        for (final UpdateTestCaseFields field : menu.subList(0, menu.size() - 1)) {
-            assertFalse(Shortcuts.isNoKey(field.getShortcut().getKey()), field + " sits above the one without a letter, so it needs one");
+    public void everyFieldOnTheUpdateMenuHasALetter() {
+        for (final UpdateTestCaseFields field : UpdateTestCaseFields.values()) {
+            assertFalse(Shortcuts.isNoKey(field.getShortcut().getKey()), field + " has no letter");
         }
+    }
+
+    // Rule-EDITOR-PANEL-194
+    @Test
+    public void statusIsOpenedByUAndDrawsTheUTheCopyMenuDraws() {
+        assertEquals(UpdateTestCaseFields.STATUS.getShortcut().getKey(), KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "Status is not opened by U");
+        assertSame(UpdateTestCaseFields.STATUS.getIcon(), CopyChoice.STATUS.getIcon(), "Status does not draw the U the copy menu draws");
     }
 
     // Rule-EDITOR-PANEL-194

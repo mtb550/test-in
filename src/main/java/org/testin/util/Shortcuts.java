@@ -277,6 +277,10 @@ public enum Shortcuts {
 
     UpdateTestCaseReference(
             KeyStroke.getKeyStroke(KeyEvent.VK_R, 0)
+    ),
+
+    UpdateTestCaseStatus(
+            KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)
     );
 
     public static final @NotNull KeyStroke NO_KEY = EMPTY.key;
