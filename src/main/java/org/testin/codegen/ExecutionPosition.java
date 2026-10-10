@@ -24,6 +24,7 @@ import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
+import org.testin.util.FromContentModule;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import java.util.function.ToIntFunction;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExecutionPosition {
     // UC-CODEGEN-002, Rule-CODEGEN-014
+    @FromContentModule
     public static int of(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         return ofEach(p).applyAsInt(tc);
     }
