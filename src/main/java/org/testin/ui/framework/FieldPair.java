@@ -90,16 +90,17 @@ public final class FieldPair implements DialogComponent {
         if (sideBySide) {
             panel.setLayout(new GridLayout(1, sections.size(), JBUI.scale(Spacing.XL), 0));
             sections.forEach(panel::add);
+            layoutButton.show(Bundle.message("dialog.pair.stacked"), AllIcons.Actions.SplitHorizontally);
         } else {
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             panel.add(sections.getFirst());
             panel.add(Box.createVerticalStrut(JBUI.scale(Spacing.XL)));
             panel.add(sections.getLast());
+            layoutButton.show(Bundle.message("dialog.pair.side.by.side"), AllIcons.Actions.SplitVertically);
         }
 
         first.capHeight(this::boxCap);
         second.capHeight(this::boxCap);
-        layoutButton.setOn(sideBySide);
 
         panel.revalidate();
         panel.repaint();

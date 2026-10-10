@@ -139,6 +139,8 @@ public class JsonModelTest {
     @Test
     public void whatIsNotJsonOrHasNoKeysIsRefused() {
         assertEquals(JsonModel.read("{ \"id\": 7,"), Optional.empty());
+        assertEquals(JsonModel.read("{\"orderId\":1024,\"isPaid\":}"), Optional.empty(), "a key with no value was read");
+        assertEquals(JsonModel.read("{\"orderId\":1024,\"isPaid\":tru}"), Optional.empty(), "a misspelled value was read");
         assertEquals(JsonModel.read("{ \"id\": 7 } and more"), Optional.empty(), "text after the JSON was ignored");
         assertEquals(JsonModel.read(""), Optional.empty());
 

@@ -73,11 +73,14 @@ public class FieldPairIdeTest extends BasePlatformTestCase {
 
     // Rule-INTERNAL-137
     public void testTheSwitchPutsThemSideBySideAndTheNextPairOpensThatWay() {
-        pair().switchLayout();
+        final @NotNull FieldPair first = pair();
+        assertEquals("stacked boxes do not offer side by side", Bundle.message("dialog.pair.side.by.side"), first.layoutButton().getAccessibleContext().getAccessibleName());
+        first.switchLayout();
 
         final @NotNull FieldPair next = pair();
         assertTrue("the switch was not remembered for the next time", next.isSideBySide());
         assertTrue("side by side is not laid out in one row", next.getPanel().getLayout() instanceof GridLayout);
+        assertEquals("boxes side by side do not offer stacked", Bundle.message("dialog.pair.stacked"), next.layoutButton().getAccessibleContext().getAccessibleName());
 
         next.switchLayout();
         assertFalse("switching back was not remembered", pair().isSideBySide());

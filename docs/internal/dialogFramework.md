@@ -244,11 +244,12 @@ and which keys it answers, and the shell builds the rest.
   what is typed or pasted until the dialog fills the IDE frame. Past that it
   scrolls, under a scrollbar drawn over the text that takes no width of its own.
 - **Rule-INTERNAL-137** — Two boxes can be paired, stacked or side by side, and
-  a button in the dialog's title bar switches between the two. Paired boxes
-  start stacked, and open the next time the way the tester left them. Each box
-  sits in a section that opens and closes, both open to start. A box that grows
-  never pushes the dialog past the frame: it stops at the height the frame has
-  left and scrolls there.
+  a button in the dialog's title bar switches between the two. The button shows
+  the layout it switches to: side by side while the boxes are stacked, stacked
+  while they are side by side. Paired boxes start stacked, and open the next
+  time the way the tester left them. Each box sits in a section that opens and
+  closes, both open to start. A box that grows never pushes the dialog past the
+  frame: it stops at the height the frame has left and scrolls there.
 - **Rule-INTERNAL-138** — A dialog can add buttons to its title bar, beside the
   maximize button. A dialog that adds none shows maximize alone, as before.
 - **Rule-INTERNAL-139** — A box that holds code is an editor for that code's

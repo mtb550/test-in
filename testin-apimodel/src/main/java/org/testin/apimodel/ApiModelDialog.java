@@ -87,7 +87,7 @@ final class ApiModelDialog extends AbstractFrameworkDialog {
         pair = ComponentDialogBase.fieldPair(p, REMEMBERED_LAYOUT, requestTitle, request, responseTitle, response).getComponent();
 
         components = List.of(
-                ComponentDialogBase.message(packageName.isEmpty() ? Bundle.message("dialog.api.model.into.root") : Bundle.message("dialog.api.model.into", packageName)),
+                ComponentDialogBase.details().row(Bundle.message("dialog.api.model.path"), packageName.isEmpty() ? Bundle.message("dialog.api.model.path.root") : packageName).build(),
                 ComponentDialogBase.of(nameInput),
                 ComponentDialogBase.of(pair),
                 ComponentDialogBase.button(Bundle.message("dialog.api.model.create")));

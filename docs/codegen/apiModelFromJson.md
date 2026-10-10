@@ -110,7 +110,7 @@ class to build, the response as a record to read.
 
 ```
 ┌─ Testin API Model from JSON ─────────────────────── [◫] [⤢] ─┐
-│ Into com.example.api                                         │
+│ PATH   com.example.api                                       │
 │ NAME                                                         │
 │ [ User                                                     ] │
 │ ┌─ ▾ REQUEST   UserRequest.java ──────────── Collapse [≣] ─┐ │
@@ -127,7 +127,7 @@ class to build, the response as a record to read.
 
 1. **The title bar** — the layout switch, stacked or side by side, and
    maximize.
-2. **Into** — the package the files go into, or *Into the source root*.
+2. **Path** — the package the files go into, or *Source root*.
 3. **Name** — the call's name; `User` gives `UserRequest` and `UserResponse`.
 4. **Request** and **Response** — a section each, three lines high while
    empty, growing with what is pasted, in the editor's JSON colors. The

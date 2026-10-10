@@ -42,8 +42,8 @@ import java.awt.event.MouseEvent;
 import java.util.Optional;
 
 public abstract class AbstractIconButton extends JButton {
-    private final @NotNull Icon restIcon;
-    private final @NotNull Icon zoomedIcon;
+    private @NotNull Icon restIcon;
+    private @NotNull Icon zoomedIcon;
     private final @NotNull Optional<String> shortcutText;
     private boolean hovered;
     private boolean on;
@@ -103,6 +103,15 @@ public abstract class AbstractIconButton extends JButton {
         };
         button.addActionListener(_ -> onClick.run());
         return button;
+    }
+
+    // Rule-INTERNAL-137
+    public final void show(final @NotNull String tooltip, final @NotNull Icon icon) {
+        restIcon = icon;
+        zoomedIcon = Icons.zoomStandardIcon(icon, this);
+        setIcon(hovered ? zoomedIcon : restIcon);
+        setDisabledIcon(IconLoader.getDisabledIcon(icon));
+        describe(tooltip);
     }
 
     // UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-049

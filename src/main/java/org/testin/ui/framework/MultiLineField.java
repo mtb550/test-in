@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.BulkAwareDocumentListener;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -44,6 +45,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntSupplier;
 
@@ -124,7 +126,8 @@ public final class MultiLineField implements DialogComponent {
 
     // Rule-INTERNAL-139
     @NotNull JComponent formatButton() {
-        return AbstractIconButton.of(Bundle.message("dialog.box.format", field.getFileType().getDisplayName()), AllIcons.Actions.ReformatCode, this::reformat);
+        final @NotNull FileType type = field.getFileType();
+        return AbstractIconButton.of(Bundle.message("dialog.box.format", type.getDisplayName()), Objects.requireNonNullElse(type.getIcon(), AllIcons.Actions.ReformatCode), this::reformat);
     }
 
     // Rule-INTERNAL-139
