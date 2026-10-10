@@ -251,6 +251,12 @@ and which keys it answers, and the shell builds the rest.
   left and scrolls there.
 - **Rule-INTERNAL-138** — A dialog can add buttons to its title bar, beside the
   maximize button. A dialog that adds none shows maximize alone, as before.
+- **Rule-INTERNAL-139** — A box that holds code is an editor for that code's
+  language, JSON for an API body, and shows it in the colors the IDE's editor
+  gives that language. Each section of a field pair carries a Format button in
+  its header, beside Collapse, named for its box's language. It lays the text
+  out with the IDE's own Reformat Code and the tester's code style for that
+  language, so only whitespace changes.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

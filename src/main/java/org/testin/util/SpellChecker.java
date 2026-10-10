@@ -20,6 +20,7 @@ import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.actions.IncrementalFindAction;
 import com.intellij.openapi.fileTypes.FileTypes;
+import com.intellij.lang.Language;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -42,18 +43,18 @@ import java.util.Optional;
 public final class SpellChecker {
     // Rule-INTERNAL-134
     public static @NotNull EditorTextField createField(final @NotNull Project p) {
-        return createField(p, true);
+        return createField(p, FileTypes.PLAIN_TEXT.getLanguage(), true);
     }
 
-    // Rule-INTERNAL-134, Rule-INTERNAL-136
-    public static @NotNull EditorTextField createField(final @NotNull Project p, final boolean spellChecked) {
+    // Rule-INTERNAL-134, Rule-INTERNAL-136, Rule-INTERNAL-139
+    public static @NotNull EditorTextField createField(final @NotNull Project p, final @NotNull Language language, final boolean spellChecked) {
         final @NotNull List<EditorCustomization> customizations = new ArrayList<>();
         final @NotNull SpellCheckingEditorCustomizationProvider spelling = SpellCheckingEditorCustomizationProvider.getInstance();
         ContainerUtil.addIfNotNull(customizations, spellChecked ? spelling.getEnabledCustomization() : spelling.getDisabledCustomization());
         customizations.add(editor -> editor.putUserData(IncrementalFindAction.SEARCH_DISABLED, Boolean.TRUE));
 
         return EditorTextFieldProvider.getInstance()
-                .getEditorField(FileTypes.PLAIN_TEXT.getLanguage(), p, customizations);
+                .getEditorField(language, p, customizations);
     }
 
     public static @NotNull EditorTextField createCompletionField(final @NotNull Project p, final @NotNull TextCompletionProvider provider, final @NotNull String text) {

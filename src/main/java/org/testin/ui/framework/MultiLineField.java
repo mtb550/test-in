@@ -16,22 +16,26 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.ui.laf.darcula.ui.DarculaEditorTextFieldBorder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.event.BulkAwareDocumentListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 import org.testin.util.Shortcuts;
 
@@ -83,9 +87,9 @@ public final class MultiLineField implements DialogComponent {
         field.setShowPlaceholderWhenFocused(true);
         field.setOneLineMode(false);
 
-        field.addDocumentListener(new DocumentListener() {
+        field.addDocumentListener(new BulkAwareDocumentListener.Simple() {
             @Override
-            public void documentChanged(final @NotNull DocumentEvent event) {
+            public void afterDocumentChange(final @NotNull Document document) {
                 fitToLines();
                 ApplicationManager.getApplication().invokeLater(MultiLineField.this::grew);
             }
@@ -116,6 +120,20 @@ public final class MultiLineField implements DialogComponent {
     void capHeight(final @NotNull IntSupplier cap) {
         heightCap = cap;
         fitToLines();
+    }
+
+    // Rule-INTERNAL-139
+    @NotNull JComponent formatButton() {
+        return AbstractIconButton.of(Bundle.message("dialog.box.format", field.getFileType().getDisplayName()), AllIcons.Actions.ReformatCode, this::reformat);
+    }
+
+    // Rule-INTERNAL-139
+    void reformat() {
+        final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
+        WriteCommandAction.runWriteCommandAction(p, () -> {
+            documents.commitDocument(field.getDocument());
+            Optional.ofNullable(documents.getPsiFile(field.getDocument())).ifPresent(file -> CodeStyleManager.getInstance(p).reformat(file));
+        });
     }
 
     // Rule-INTERNAL-060, Rule-EDITOR-PANEL-048, Rule-EDITOR-PANEL-246

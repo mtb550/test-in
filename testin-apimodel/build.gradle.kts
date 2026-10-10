@@ -27,6 +27,8 @@ dependencies {
 
         // The one this module exists to depend on, and the one the core cannot.
         bundledPlugin("com.intellij.java")
+        // The boxes are JSON editors: the IDE colors and reformats the bodies.
+        bundledPlugin("com.intellij.modules.json")
     }
 
     // The core, which ships beside this module rather than inside it - so

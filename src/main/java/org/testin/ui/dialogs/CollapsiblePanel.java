@@ -18,29 +18,34 @@ package org.testin.ui.dialogs;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.framework.Spacing;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CollapsiblePanel {
     // Rule-INTERNAL-099, Rule-INTERNAL-133
     public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
-        return build(new JBLabel(title), content, initiallyVisible);
+        return build(new JBLabel(title), content, initiallyVisible, List.of());
     }
 
-    // Rule-INTERNAL-099, Rule-INTERNAL-133, Rule-INTERNAL-137
-    public static @NotNull JBPanel<?> build(final @NotNull JBLabel titleLabel, final @NotNull JComponent content, final boolean initiallyVisible) {
+    // Rule-INTERNAL-099, Rule-INTERNAL-133, Rule-INTERNAL-137, Rule-INTERNAL-139
+    public static @NotNull JBPanel<?> build(final @NotNull JBLabel titleLabel, final @NotNull JComponent content, final boolean initiallyVisible, final @NotNull List<JComponent> buttons) {
         final @NotNull JBLabel hintLabel = DialogStyle.hint();
 
-        final @NotNull JBPanel<?> header = Caption.header(titleLabel, Optional.of(hintLabel));
+        final @NotNull JBPanel<?> header = Caption.header(titleLabel, Optional.of(buttons.isEmpty() ? hintLabel : besideEachOther(hintLabel, buttons)));
         header.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         content.setVisible(initiallyVisible);
@@ -61,5 +66,18 @@ public final class CollapsiblePanel {
         });
 
         return wrapper;
+    }
+
+    // Rule-INTERNAL-139
+    private static @NotNull JComponent besideEachOther(final @NotNull JComponent hint, final @NotNull List<JComponent> buttons) {
+        final @NotNull JBPanel<?> row = new JBPanel<>();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        row.setOpaque(false);
+        row.add(hint);
+        buttons.forEach(button -> {
+            row.add(Box.createHorizontalStrut(JBUI.scale(Spacing.S)));
+            row.add(button);
+        });
+        return row;
     }
 }

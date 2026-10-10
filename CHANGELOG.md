@@ -17,7 +17,8 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Testin API Model from JSON:** right-click a package of the automation project, choose New, Testin API Model from
   JSON, paste a call's request and response, and press Create: `UserRequest` arrives as a Lombok class with chained
   setters and `UserResponse` as a record, one file each however deep the JSON nests, with `@JsonProperty` only where a
-  key is not already camelCase. The boxes start three lines high and grow with the paste. The title bar switches them
+  key is not already camelCase. The boxes start three lines high, grow with the paste and show it in JSON colors, and
+  each has a Format JSON button that lays the body out without changing it. The title bar switches them
   between stacked and side by side, and nothing already in the package is replaced. Designed on the idea of
   RoboPOJOGenerator by Vadim Shchenev.
 - **Status has a letter on the update menu:** **U** opens it after **F2**, or straight from a selected card as **D** does, with the U icon the copy menu already

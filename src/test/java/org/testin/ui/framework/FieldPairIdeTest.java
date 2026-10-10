@@ -17,8 +17,10 @@
 package org.testin.ui.framework;
 
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.json.JsonLanguage;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.ActiveComponent;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
@@ -30,6 +32,8 @@ import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FieldPairIdeTest extends BasePlatformTestCase {
     private static final @NotNull String REMEMBERED_AS = "testin.test.fieldPair.sideBySide";
@@ -45,7 +49,7 @@ public class FieldPairIdeTest extends BasePlatformTestCase {
     }
 
     private @NotNull MultiLineField box() {
-        return ComponentDialogBase.multiLineField(getProject(), "", "", 3, MultiLineField.NO_LIMIT, false).getComponent();
+        return ComponentDialogBase.multiLineField(getProject(), "", "", 3, MultiLineField.NO_LIMIT, JsonLanguage.INSTANCE, false).getComponent();
     }
 
     private @NotNull FieldPair pair(final @NotNull JBLabel first, final @NotNull JBLabel second) {
@@ -95,6 +99,32 @@ public class FieldPairIdeTest extends BasePlatformTestCase {
         });
 
         assertSame("a dialog with no title buttons did not keep maximize as it was", maximize, TitleButtons.beside(List.of(), maximize));
+    }
+
+    // Rule-INTERNAL-139
+    public void testEachSectionFormatsItsBoxInItsLanguageChangingOnlyWhitespace() {
+        final @NotNull MultiLineField request = box();
+        final @NotNull FieldPair pair = ComponentDialogBase.fieldPair(getProject(), REMEMBERED_AS, new JBLabel("Request"), request, new JBLabel("Response"), box()).getComponent();
+        final @NotNull String pasted = IntStream.range(0, 2000).mapToObj(i -> "\"key" + i + "\":[{\"id\":" + i + "}]").collect(Collectors.joining(",", "{", "}"));
+        final @NotNull EditorTextField drawn = (EditorTextField) request.getFocusComponent();
+        drawn.addNotify();
+        try {
+            request.setText(pasted);
+
+            final @NotNull List<JButton> format = Drawn.components(pair.getPanel()).stream()
+                    .filter(JButton.class::isInstance)
+                    .map(JButton.class::cast)
+                    .filter(button -> Bundle.message("dialog.box.format", "JSON").equals(button.getAccessibleContext().getAccessibleName()))
+                    .toList();
+            assertEquals("each section does not carry its own Format JSON button", 2, format.size());
+
+            format.getFirst().doClick();
+
+            assertTrue("the body was not laid out over lines: " + request.getText(), request.getText().lines().count() > 1);
+            assertEquals("formatting changed more than whitespace", pasted, request.getText().replaceAll("\\s", ""));
+        } finally {
+            drawn.removeNotify();
+        }
     }
 
     // Rule-INTERNAL-138

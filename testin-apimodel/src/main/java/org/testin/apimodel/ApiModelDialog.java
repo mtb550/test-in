@@ -17,6 +17,7 @@
 package org.testin.apimodel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.intellij.json.JsonLanguage;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
@@ -66,7 +67,7 @@ final class ApiModelDialog extends AbstractFrameworkDialog {
     private final @NotNull JBLabel responseTitle = new JBLabel(Bundle.message("dialog.api.model.response.caption"));
     private final @NotNull FieldPair pair;
 
-    // UC-CODEGEN-022, Rule-CODEGEN-099, Rule-CODEGEN-106, Rule-CODEGEN-107
+    // UC-CODEGEN-022, Rule-CODEGEN-099, Rule-CODEGEN-106, Rule-CODEGEN-107, Rule-CODEGEN-109
     ApiModelDialog(final @NotNull Project p, final @NotNull PsiDirectory directory) {
         super(p);
         this.directory = directory;
@@ -81,8 +82,8 @@ final class ApiModelDialog extends AbstractFrameworkDialog {
                 .accepting("[A-Za-z][A-Za-z0-9]*")
                 .build()
                 .getComponent();
-        request = ComponentDialogBase.multiLineField(p, "", Bundle.message("dialog.api.model.request.placeholder"), EMPTY_LINES, MultiLineField.NO_LIMIT, false).getComponent();
-        response = ComponentDialogBase.multiLineField(p, "", Bundle.message("dialog.api.model.response.placeholder"), EMPTY_LINES, MultiLineField.NO_LIMIT, false).getComponent();
+        request = ComponentDialogBase.multiLineField(p, "", Bundle.message("dialog.api.model.request.placeholder"), EMPTY_LINES, MultiLineField.NO_LIMIT, JsonLanguage.INSTANCE, false).getComponent();
+        response = ComponentDialogBase.multiLineField(p, "", Bundle.message("dialog.api.model.response.placeholder"), EMPTY_LINES, MultiLineField.NO_LIMIT, JsonLanguage.INSTANCE, false).getComponent();
         pair = ComponentDialogBase.fieldPair(p, REMEMBERED_LAYOUT, requestTitle, request, responseTitle, response).getComponent();
 
         components = List.of(

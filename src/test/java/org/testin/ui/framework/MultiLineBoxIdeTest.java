@@ -17,6 +17,7 @@
 package org.testin.ui.framework;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.IncrementalFindAction;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -134,7 +135,7 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
 
     // Rule-INTERNAL-136
     public void testAGrowingBoxStartsAtThreeLinesAndShowsAWholePasteUnderAScrollbarOverTheText() {
-        final @NotNull MultiLineField box = ComponentDialogBase.multiLineField(getProject(), "", "Paste the request body", 3, MultiLineField.NO_LIMIT, false).getComponent();
+        final @NotNull MultiLineField box = ComponentDialogBase.multiLineField(getProject(), "", "Paste the request body", 3, MultiLineField.NO_LIMIT, PlainTextLanguage.INSTANCE, false).getComponent();
         final @NotNull Editor editor = editorOf(box);
         final int line = box.getFocusComponent().getFontMetrics(Fonts.field()).getHeight();
 
@@ -147,7 +148,7 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
 
     // Rule-INTERNAL-136, Rule-INTERNAL-137
     public void testAGrowingBoxStopsAtTheHeightItIsCappedAt() {
-        final @NotNull MultiLineField box = ComponentDialogBase.multiLineField(getProject(), "", "", 3, MultiLineField.NO_LIMIT, false).getComponent();
+        final @NotNull MultiLineField box = ComponentDialogBase.multiLineField(getProject(), "", "", 3, MultiLineField.NO_LIMIT, PlainTextLanguage.INSTANCE, false).getComponent();
         editorOf(box);
         final int line = box.getFocusComponent().getFontMetrics(Fonts.field()).getHeight();
 

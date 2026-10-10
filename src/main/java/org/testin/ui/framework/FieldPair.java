@@ -58,12 +58,17 @@ public final class FieldPair implements DialogComponent {
         this.rememberedAs = rememberedAs;
         this.first = first;
         this.second = second;
-        this.sections = List.of(CollapsiblePanel.build(firstTitle, first.getPanel(), true), CollapsiblePanel.build(secondTitle, second.getPanel(), true));
+        this.sections = List.of(section(firstTitle, first), section(secondTitle, second));
         this.sideBySide = PropertiesComponent.getInstance().getBoolean(rememberedAs, false);
         this.layoutButton = AbstractIconButton.of(Bundle.message("dialog.pair.side.by.side"), AllIcons.Actions.SplitVertically, this::switchLayout);
 
         panel.setOpaque(false);
         layOut();
+    }
+
+    // Rule-INTERNAL-137, Rule-INTERNAL-139
+    private static @NotNull JComponent section(final @NotNull JBLabel title, final @NotNull MultiLineField box) {
+        return CollapsiblePanel.build(title, box.getPanel(), true, List.of(box.formatButton()));
     }
 
     // Rule-INTERNAL-137, Rule-INTERNAL-138

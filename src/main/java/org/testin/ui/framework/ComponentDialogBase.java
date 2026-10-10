@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.lang.Language;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
@@ -56,9 +57,9 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         return new ComponentDialogBase<>(field);
     }
 
-    // Rule-INTERNAL-136
-    public static @NotNull ComponentDialogBase<MultiLineField> multiLineField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final int minimumLines, final int maximumLines, final boolean spellChecked) {
-        return new ComponentDialogBase<>(new MultiLineField(p, SpellChecker.createField(p, spellChecked), caption, placeholder, minimumLines, maximumLines));
+    // Rule-INTERNAL-136, Rule-INTERNAL-139
+    public static @NotNull ComponentDialogBase<MultiLineField> multiLineField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final int minimumLines, final int maximumLines, final @NotNull Language language, final boolean spellChecked) {
+        return new ComponentDialogBase<>(new MultiLineField(p, SpellChecker.createField(p, language, spellChecked), caption, placeholder, minimumLines, maximumLines));
     }
 
     // Rule-INTERNAL-137

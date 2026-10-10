@@ -100,6 +100,11 @@ class to build, the response as a record to read.
   only which files were written. Like the agent's transcript (Rule-CODEGEN-090),
   the bodies are recorded as pasted, secrets included, so Debug is for tracing a
   problem, not for every day.
+- **Rule-CODEGEN-109** — The request and response boxes are JSON editors: a body
+  shows in the editor's JSON colors, and the Format JSON button in each
+  section's header lays it out over lines with the tester's JSON code style.
+  Only whitespace changes, so a formatted body still holds exactly what was
+  pasted.
 
 ## The screen
 
@@ -108,11 +113,11 @@ class to build, the response as a record to read.
 │ Into com.example.api                                         │
 │ NAME                                                         │
 │ [ User                                                     ] │
-│ ┌─ ▾ REQUEST   UserRequest.java ──────────────── Collapse ─┐ │
+│ ┌─ ▾ REQUEST   UserRequest.java ──────────── Collapse [≣] ─┐ │
 │ │ { "first-name": "Muteb", "mobile": "0501234567", ... }  │ │
 │ └──────────────────────────────────────────────────────────┘ │
 │                                                              │
-│ ┌─ ▾ RESPONSE  UserResponse.java ─────────────── Collapse ─┐ │
+│ ┌─ ▾ RESPONSE  UserResponse.java ─────────── Collapse [≣] ─┐ │
 │ │ { "id": 7, "first-name": "Muteb", "class": "gold", ... } │ │
 │ └──────────────────────────────────────────────────────────┘ │
 │                                                   [ Create ] │
@@ -125,8 +130,9 @@ class to build, the response as a record to read.
 2. **Into** — the package the files go into, or *Into the source root*.
 3. **Name** — the call's name; `User` gives `UserRequest` and `UserResponse`.
 4. **Request** and **Response** — a section each, three lines high while
-   empty, growing with what is pasted. The section's line names the file it
-   becomes.
+   empty, growing with what is pasted, in the editor's JSON colors. The
+   section's line names the file it becomes, and its **Format JSON** button
+   lays the body out over lines.
 5. **Create** — and the strip of keys under it.
 
 ## Main flow
