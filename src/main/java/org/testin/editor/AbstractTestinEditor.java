@@ -530,7 +530,6 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
                 () -> Disposer.dispose(projectDisposable),
 
                 this::stopListening,
-                () -> getToolBar().dispose(),
 
                 () -> undoHistories.forget(UndoScope.of(parent.getPath())),
 
@@ -540,6 +539,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
                 model::removeAll,
                 mainPanel::removeAll,
+                () -> getToolBar().dispose(),
 
                 TestinEditor.super::dispose);
 
