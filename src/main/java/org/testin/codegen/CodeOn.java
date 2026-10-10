@@ -102,6 +102,6 @@ public final class CodeOn {
         presentation.setEnabled(false);
         presentation.setText(Bundle.message("code.needs", Objects.requireNonNullElse(own.getText(), ""), TestinYml.fileName()));
         presentation.setDescription(why.orElseThrow());
-        return false;
+        return true;
     }
 }

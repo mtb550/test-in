@@ -44,6 +44,8 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Automate and Execute are gray while code is off:** while `testin.yml` did not name the open test project, both
+  entries said they needed it but could still be clicked. They are gray with the reason, as every code action is.
 - **Moving a test case from the grid no longer freezes the editor:** after a move, the list and the grid could each
   select the other's row by its old index and correct each other until the IDE reported a stack overflow. The grid now
   follows the selected test case, not its row number.
