@@ -56,7 +56,8 @@ There is no key for this. It is what the **Details** tab shows.
 - **Rule-VIEW-PANEL-061** — Who did something and when are one row, not two. **Created** reads the name, then *on*, then
   the date.
 - **Rule-VIEW-PANEL-062** — **Order** is where the test case sits in its test
-  set, read from the set rather than from the test case.
+  set, read from the set rather than from the test case. A test case its set
+  no longer holds - a deleted one, read in a test run - has no Order.
 - **Rule-VIEW-PANEL-082** — Every field in the Details tab has its caption on a
   line of its own above its value, in the caption font, so the value has the
   whole width of the panel at any width.

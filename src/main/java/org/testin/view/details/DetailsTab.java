@@ -27,6 +27,7 @@ import org.testin.codegen.ExecutionPosition;
 import org.testin.editor.WheelForwarding;
 import org.testin.model.TestCaseDto;
 import org.testin.model.testrun.RunItem;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.FontSync;
@@ -69,7 +70,7 @@ public class DetailsTab {
                 new AttributeRow(TestSetEditorAttributes.TEST_DATA.getName(), (_, dto) -> TestSetEditorAttributes.TEST_DATA.displayValue(dto)),
                 new AttributeRow(TestSetEditorAttributes.REFERENCE.getName(), (_, dto) -> TestSetEditorAttributes.REFERENCE.displayValue(dto)),
                 new AttributeRow(TestSetEditorAttributes.MODULE.getName(), (_, dto) -> TestSetEditorAttributes.MODULE.displayValue(dto)),
-                new AttributeRow(TestSetEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
+                new AttributeRow(TestSetEditorAttributes.ORDER.getName(), (p, dto) -> TestCaseOrder.placeText(ExecutionPosition.placesOf(p, List.of(dto)).getOrDefault(dto.getId(), 0))),
                 new AttributeRow(Bundle.message("details.created"), (_, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
                 new AttributeRow(Bundle.message("details.updated"), (_, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt())));
     }

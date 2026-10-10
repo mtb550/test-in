@@ -47,6 +47,8 @@ is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Moving a test case from the grid no longer freezes the editor:** after a move, the list and the grid could each
   select the other's row by its old index and correct each other until the IDE reported a stack overflow. The grid now
   follows the selected test case, not its row number.
+- **A deleted test case has no Order in the details panel:** a run item whose test case was deleted showed Order 1;
+  the row is now left out, as the run's card already leaves out its number.
 
 ## 2.14.1-alpha - 2026-10-10
 

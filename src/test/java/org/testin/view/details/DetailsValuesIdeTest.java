@@ -161,6 +161,17 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
         assertEquals("Order did not follow the test set when a test case was put above it", "3", orderIn(Drawn.words(Drawn.detailsTab(getProject(), middle, Optional.empty(), ts.getPath2()))));
     }
 
+    // Rule-VIEW-PANEL-062
+    public void testATestCaseNoLongerInItsTestSetHasNoOrder() {
+        final @NotNull TestSetNode ts = aTestSet("Login");
+        aTestCase(ts, "Log in with a valid user", "a");
+        final @NotNull TestCaseDto deleted = TestCaseDto.builder().parent(ts).description("Log in with a locked user").build();
+
+        final @NotNull List<String> words = Drawn.words(Drawn.detailsTab(getProject(), deleted, Optional.empty(), ts.getPath2()));
+
+        assertFalse("a test case its test set no longer holds was given a place in it: " + words, words.contains(ORDER));
+    }
+
     // Rule-VIEW-PANEL-081
     public void testTheStacktraceLinkComesFirstThenOneThumbnailForEachScreenshot() {
         final @NotNull TestSetNode ts = aTestSet("Login");

@@ -19,7 +19,10 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.ShownFields;
+import org.testin.indexer.TestCases;
 import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetNode;
+import org.testin.services.Services;
 import org.testin.testcase.TestSetEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
@@ -28,6 +31,7 @@ import org.testin.view.Drawn;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
@@ -83,9 +87,19 @@ public class DetailsRowsIdeTest extends BasePlatformTestCase {
 
     // Rule-VIEW-PANEL-023
     public void testTheRowsAreDrawnInOneFixedOrder() {
-        final @NotNull List<String> captions = words(everyFieldFilled()).stream().filter(ROWS_IN_ORDER::contains).toList();
+        final @NotNull TestCaseDto tc = everyFieldFilled();
+        final @NotNull TestSetNode login = new TestSetNode();
+        login.setPath(Path.of(String.join("/", PATH)));
+        tc.setParent(login);
+        final @NotNull TestCases testCases = Services.getInstance(getProject(), TestCases.class);
+        testCases.putTestCaseVerbatim(login.getPath(), tc);
+        try {
+            final @NotNull List<String> captions = words(tc).stream().filter(ROWS_IN_ORDER::contains).toList();
 
-        assertEquals("the test case's rows were drawn out of their fixed order", ROWS_IN_ORDER, captions);
+            assertEquals("the test case's rows were drawn out of their fixed order", ROWS_IN_ORDER, captions);
+        } finally {
+            testCases.removeTestCase(login.getPath(), tc.getId());
+        }
     }
 
     // Rule-VIEW-PANEL-103
