@@ -33,8 +33,11 @@ import java.util.Optional;
 public final class CollapsiblePanel {
     // Rule-INTERNAL-099, Rule-INTERNAL-133
     public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
-        final @NotNull JBLabel titleLabel = new JBLabel(title);
+        return build(new JBLabel(title), content, initiallyVisible);
+    }
 
+    // Rule-INTERNAL-099, Rule-INTERNAL-133, Rule-INTERNAL-137
+    public static @NotNull JBPanel<?> build(final @NotNull JBLabel titleLabel, final @NotNull JComponent content, final boolean initiallyVisible) {
         final @NotNull JBLabel hintLabel = DialogStyle.hint();
 
         final @NotNull JBPanel<?> header = Caption.header(titleLabel, Optional.of(hintLabel));

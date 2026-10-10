@@ -99,6 +99,26 @@ public enum Refused {
             Bundle.message("refused.no.test.case.behind.it")
     ),
 
+    // UC-CODEGEN-022, Rule-CODEGEN-099
+    NOTHING_PASTED(
+            Bundle.message("refused.nothing.pasted")
+    ),
+
+    // UC-CODEGEN-022, Rule-CODEGEN-099
+    NOT_JSON(
+            Bundle.message("refused.not.json")
+    ),
+
+    // UC-CODEGEN-022, Rule-CODEGEN-099
+    NOT_A_JSON_OBJECT(
+            Bundle.message("refused.not.a.json.object")
+    ),
+
+    // UC-CODEGEN-022, Rule-CODEGEN-099
+    NO_KEYS(
+            Bundle.message("refused.no.keys")
+    ),
+
     // UC-EDITOR-PANEL-008, UC-SHARE-006, Rule-EDITOR-PANEL-206, Rule-SHARE-106
     UNREADABLE(
             Bundle.message("refused.unreadable")

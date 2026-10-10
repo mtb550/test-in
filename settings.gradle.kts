@@ -21,6 +21,7 @@ rootProject.name = "Testin"
 // support (#144).
 include(":testin-java")
 include(":testin-testng")
+include(":testin-apimodel")
 
 develocity {
     buildScan {

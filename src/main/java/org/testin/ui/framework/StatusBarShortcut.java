@@ -53,6 +53,11 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
         return hint(Shortcuts.Corrections.getShortcutText(), Bundle.message("dialog.key.corrections"));
     }
 
+    // Rule-INTERNAL-137
+    public static @NotNull StatusBarShortcut paste() {
+        return hint(Shortcuts.PasteItem.getShortcutText(), Bundle.message("shortcut.paste"));
+    }
+
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     public static @NotNull StatusBarShortcut pasteScreenshot() {
         return hint(Shortcuts.PasteItem.getShortcutText(), Bundle.message("dialog.key.paste.screenshot"));

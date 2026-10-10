@@ -18,6 +18,7 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBLabel;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,6 +54,16 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         field.setText(value);
 
         return new ComponentDialogBase<>(field);
+    }
+
+    // Rule-INTERNAL-136
+    public static @NotNull ComponentDialogBase<MultiLineField> multiLineField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final int minimumLines, final int maximumLines, final boolean spellChecked) {
+        return new ComponentDialogBase<>(new MultiLineField(p, SpellChecker.createField(p, spellChecked), caption, placeholder, minimumLines, maximumLines));
+    }
+
+    // Rule-INTERNAL-137
+    public static @NotNull ComponentDialogBase<FieldPair> fieldPair(final @NotNull Project p, final @NotNull String rememberedAs, final @NotNull JBLabel firstTitle, final @NotNull MultiLineField first, final @NotNull JBLabel secondTitle, final @NotNull MultiLineField second) {
+        return new ComponentDialogBase<>(new FieldPair(p, rememberedAs, firstTitle, first, secondTitle, second));
     }
 
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text) {

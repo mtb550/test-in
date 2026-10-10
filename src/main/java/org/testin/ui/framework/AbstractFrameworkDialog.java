@@ -49,6 +49,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,12 +164,20 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         openDialogs.remember(getClass(), getPopup());
         getPopup().showCenteredInCurrentWindow(p);
 
-        // Rule-INTERNAL-100
+        // Rule-INTERNAL-061, Rule-INTERNAL-100
         if (sizeIsTheTesters() && !size.namesAHeight()) {
-            shownSize().ifPresent(shown -> getPopup().setSize(new Dimension(DialogSize.widthOn(p, shown.width), shown.height)));
+            shownSize().ifPresent(this::widenInPlace);
         }
 
         return true;
+    }
+
+    // Rule-INTERNAL-061, Rule-INTERNAL-100
+    private void widenInPlace(final @NotNull Dimension shown) {
+        final int width = DialogSize.widthOn(p, shown.width);
+        final @NotNull Point at = getPopup().getLocationOnScreen();
+        getPopup().setSize(new Dimension(width, shown.height));
+        getPopup().setLocation(new Point(at.x - (width - shown.width) / 2, at.y));
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-075
@@ -186,9 +195,9 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         final @NotNull ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title(), dismissOnClickOutside);
         size.applyTo(p, contentPanel);
 
-        // Rule-INTERNAL-101
+        // Rule-INTERNAL-101, Rule-INTERNAL-138
         if (sizeIsTheTesters())
-            builder.setResizable(true).setMovable(true).setCommandButton(Maximized.button(() -> maximized.toggle(getPopup(), DialogSize.frameOn(p))));
+            builder.setResizable(true).setMovable(true).setCommandButton(TitleButtons.beside(titleButtons(), Maximized.button(() -> maximized.toggle(getPopup(), DialogSize.frameOn(p)))));
 
         // Rule-INTERNAL-059
         builder.setCancelKeyEnabled(dto().shortcuts().stream().noneMatch(one -> one.shortcut() == Shortcuts.Escape));
@@ -208,6 +217,11 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     }
 
     protected void closed() {
+    }
+
+    // Rule-INTERNAL-138
+    protected @NotNull List<JComponent> titleButtons() {
+        return List.of();
     }
 
     // UC-INTERNAL-007

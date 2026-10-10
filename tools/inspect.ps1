@@ -323,7 +323,7 @@ function Get-SourceRoots
         Only the ones that exist: a checkout mid-refactor, or a future module,
         should not fail the run.
     #>
-    return @('src/main', 'testin-java/src/main', 'testin-testng/src/main') |
+    return @('src/main', 'testin-java/src/main', 'testin-testng/src/main', 'testin-apimodel/src/main') |
             ForEach-Object { Join-Path $repo $_ } |
             Where-Object { Test-Path $_ }
 }
@@ -341,7 +341,7 @@ function Get-JavaSourceRoots
 
         Only the ones that exist, for the same reason as above.
     #>
-    return @('src/main', 'src/test', 'testin-java/src', 'testin-testng/src') |
+    return @('src/main', 'src/test', 'testin-java/src', 'testin-testng/src', 'testin-apimodel/src') |
             ForEach-Object { Join-Path $repo $_ } |
             Where-Object { Test-Path $_ }
 }
@@ -368,7 +368,7 @@ function Resolve-CrossModuleUsages([object[]] $problems)
         calls would be spared wrongly. That is the safe direction to be wrong
         in, and the finding is still in the list to read.
     #>
-    $moduleRoots = @('testin-java/src/main', 'testin-testng/src/main') |
+    $moduleRoots = @('testin-java/src/main', 'testin-testng/src/main', 'testin-apimodel/src/main') |
             ForEach-Object { Join-Path $repo $_ } |
             Where-Object { Test-Path $_ }
 

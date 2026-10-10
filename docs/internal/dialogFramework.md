@@ -152,8 +152,8 @@ and which keys it answers, and the shell builds the rest.
   tree or table inside it scrolls on its own. A tree or table asks for eight
   rows, so a dialog opens at the height its form needs rather than the height
   its rows would take. A box that takes several lines shows six of them and
-  scrolls past that, so one long value cannot push the rest of the dialog out of
-  sight.
+  scrolls past that, unless the dialog tells it otherwise (Rule-INTERNAL-136),
+  so one long value cannot push the rest of the dialog out of sight.
 - **Rule-INTERNAL-103** — A box that spell-checks what is typed into it
   underlines a misspelled word and shows nothing else. No bulb, no icon and no
   button offers the corrections: the underline says there is something to
@@ -237,6 +237,20 @@ and which keys it answers, and the shell builds the rest.
   Find or Replace bar. A key IntelliJ would give to it either belongs to the
   dialog, as Ctrl+R opens the reference in the test case dialogs, or does
   nothing.
+- **Rule-INTERNAL-136** — A box that holds many lines can be told the fewest
+  lines it shows, the most it shows, and whether its spelling is checked. Told
+  nothing, it starts at its content, stops at six lines with its scrollbar, and
+  checks spelling, as every box did before. A box with no upper limit grows with
+  what is typed or pasted until the dialog fills the IDE frame. Past that it
+  scrolls, under a scrollbar drawn over the text that takes no width of its own.
+- **Rule-INTERNAL-137** — Two boxes can be paired, stacked or side by side, and
+  a button in the dialog's title bar switches between the two. Paired boxes
+  start stacked, and open the next time the way the tester left them. Each box
+  sits in a section that opens and closes, both open to start. A box that grows
+  never pushes the dialog past the frame: it stops at the height the frame has
+  left and scrolls there.
+- **Rule-INTERNAL-138** — A dialog can add buttons to its title bar, beside the
+  maximize button. A dialog that adds none shows maximize alone, as before.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
@@ -251,8 +265,8 @@ outside the framework name each file.
 | Standing                                           | Files                                                                                                                                                                                                                                                                                                                                                                                                                     | Why                                                                                              |
 |----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
 | **Kept** - two or more screens ask for it          | `ComponentDialogBase`, `StatusBarShortcut`, `AbstractFrameworkDialog`, `AbstractIconButton`, `TextInput`, `DialogSize`, `DialogComponent`, `ConfirmDialog`, `RadioSelection`, `Prose`, `SelectionTree`, `Row`, `MultiLineField`, `Answer`, `TextFieldWithSelections`, `RowStripe`, `DialogHost`, `DialogButton`, `ShortcutMenuPopup`, `TextArea`, `StatusBarBase`, `SelectionTable`, `Alternative`, `Spacing`, `CardEdge` | The system's parts                                                                               |
-| **Kept on purpose** - one screen asks for it today | `SelectionList` (Global Search), `DialogSplitButton` and `ChoiceInput` (Pending Commits), `Screenshots` (the failure form), `Picture` (a stack trace line), `Keycap` (light mode's keys), `DialogPlace` (the rename card), `DialogKeys` (the letter menus), `TextValue` (the import preview), `HtmlPage` (a Testin Help guide)                                                                                            | Each is the one way to ask its question; folded into its caller, the second caller would copy it |
-| **Internal** - reached through a builder           | `ButtonFooter`, `FrameworkTextField`, `ScreenshotStrip`, `ShortcutMenuRenderer`, `Rows`, `OpenDialogs`, `EmptyWarning`, `DialogDto`, `DialogDetails`, `DialogMessage`, `ConfirmCard`, `Option`, `Maximized`                                                                                                                                                                                                               | Parts of the parts                                                                               |
+| **Kept on purpose** - one screen asks for it today | `SelectionList` (Global Search), `DialogSplitButton` and `ChoiceInput` (Pending Commits), `Screenshots` (the failure form), `Picture` (a stack trace line), `Keycap` (light mode's keys), `DialogPlace` (the rename card), `DialogKeys` (the letter menus), `TextValue` (the import preview), `HtmlPage` (a Testin Help guide), `FieldPair` (the API model dialog)                                                        | Each is the one way to ask its question; folded into its caller, the second caller would copy it |
+| **Internal** - reached through a builder           | `ButtonFooter`, `FrameworkTextField`, `ScreenshotStrip`, `ShortcutMenuRenderer`, `Rows`, `OpenDialogs`, `EmptyWarning`, `DialogDto`, `DialogDetails`, `DialogMessage`, `ConfirmCard`, `Option`, `Maximized`, `TitleButtons`                                                                                                                                                                                               | Parts of the parts                                                                               |
 
 ### The kinds of dialog
 

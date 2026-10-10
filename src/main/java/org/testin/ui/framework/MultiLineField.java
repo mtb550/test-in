@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
@@ -40,14 +41,21 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.IntSupplier;
 
 // Rule-INTERNAL-096, Rule-INTERNAL-097
 public final class MultiLineField implements DialogComponent {
+    public static final int NO_LIMIT = Integer.MAX_VALUE;
+
     private static final int VISIBLE_LINES = 6;
 
     private final @NotNull Project p;
     private final @NotNull EditorTextField field;
     private final @NotNull String caption;
+    private final int minimumLines;
+    private final int maximumLines;
+
+    private @NotNull IntSupplier heightCap = () -> Integer.MAX_VALUE;
 
     private final @NotNull List<Runnable> onGrow = new ArrayList<>();
 
@@ -57,9 +65,16 @@ public final class MultiLineField implements DialogComponent {
 
     // Rule-INTERNAL-058, Rule-INTERNAL-095, Rule-INTERNAL-096
     public MultiLineField(final @NotNull Project p, final @NotNull EditorTextField field, final @NotNull String caption, final @NotNull String placeholder) {
+        this(p, field, caption, placeholder, 0, VISIBLE_LINES);
+    }
+
+    // Rule-INTERNAL-058, Rule-INTERNAL-095, Rule-INTERNAL-096, Rule-INTERNAL-136
+    public MultiLineField(final @NotNull Project p, final @NotNull EditorTextField field, final @NotNull String caption, final @NotNull String placeholder, final int minimumLines, final int maximumLines) {
         this.p = p;
         this.field = field;
         this.caption = caption;
+        this.minimumLines = minimumLines;
+        this.maximumLines = maximumLines;
 
         DialogStyle.asField(field);
         // Rule-INTERNAL-087
@@ -71,7 +86,7 @@ public final class MultiLineField implements DialogComponent {
         field.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(final @NotNull DocumentEvent event) {
-                capToVisibleLines();
+                fitToLines();
                 ApplicationManager.getApplication().invokeLater(MultiLineField.this::grew);
             }
         });
@@ -82,6 +97,8 @@ public final class MultiLineField implements DialogComponent {
             editor.setBorder(new DarculaEditorTextFieldBorder(field, editor));
             // Rule-INTERNAL-102
             editor.setVerticalScrollbarVisible(true);
+            // Rule-INTERNAL-136
+            if (maximumLines == NO_LIMIT && editor.getScrollPane() instanceof JBScrollPane pane) pane.setOverlappingScrollBar(true);
             // Rule-INTERNAL-103
             editor.getSettings().setShowIntentionBulb(false);
 
@@ -91,6 +108,14 @@ public final class MultiLineField implements DialogComponent {
             themed.setEditorFontSize(font.getSize());
             editor.setColorsScheme(themed);
         });
+
+        if (minimumLines > 0) fitToLines();
+    }
+
+    // Rule-INTERNAL-136
+    void capHeight(final @NotNull IntSupplier cap) {
+        heightCap = cap;
+        fitToLines();
     }
 
     // Rule-INTERNAL-060, Rule-EDITOR-PANEL-048, Rule-EDITOR-PANEL-246
@@ -164,15 +189,18 @@ public final class MultiLineField implements DialogComponent {
         editor.getScrollingModel().scrollToCaret(ScrollType.RELATIVE);
     }
 
-    // Rule-INTERNAL-102
-    private void capToVisibleLines() {
+    // Rule-INTERNAL-102, Rule-INTERNAL-136
+    private void fitToLines() {
         field.setPreferredSize(null);
 
         final @NotNull Dimension natural = field.getPreferredSize();
-        final int cap = field.getFontMetrics(Fonts.field()).getHeight() * VISIBLE_LINES;
-        if (natural.height <= cap) return;
+        final int line = field.getFontMetrics(Fonts.field()).getHeight();
+        final int least = minimumLines == 0 ? 0 : line * minimumLines + field.getInsets().top + field.getInsets().bottom;
+        final int most = Math.min(maximumLines == NO_LIMIT ? Integer.MAX_VALUE : line * maximumLines, heightCap.getAsInt());
+        final int height = Math.clamp(natural.height, Math.min(least, most), most);
+        if (height == natural.height) return;
 
-        field.setPreferredSize(new Dimension(natural.width, cap));
+        field.setPreferredSize(new Dimension(natural.width, height));
         field.revalidate();
     }
 

@@ -37,7 +37,7 @@ import static org.testng.Assert.fail;
 
 public class RuleNumbersTest {
 
-    private static final List<Path> SOURCES = List.of(Paths.get("src", "main", "java"), Paths.get("testin-java", "src", "main", "java"), Paths.get("testin-testng", "src", "main", "java"));
+    private static final List<Path> SOURCES = List.of(Paths.get("src", "main", "java"), Paths.get("testin-java", "src", "main", "java"), Paths.get("testin-testng", "src", "main", "java"), Paths.get("testin-apimodel", "src", "main", "java"));
 
     private static final Pattern REFERENCE = Pattern.compile("Rule-([A-Z][A-Z-]*)-(\\d+)");
 

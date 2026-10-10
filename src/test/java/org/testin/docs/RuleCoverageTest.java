@@ -40,7 +40,8 @@ public class RuleCoverageTest {
     private static final @NotNull List<Path> TEST_ROOTS = List.of(
             Paths.get("src", "test", "java"),
             Paths.get("testin-java", "src", "test", "java"),
-            Paths.get("testin-testng", "src", "test", "java"));
+            Paths.get("testin-testng", "src", "test", "java"),
+            Paths.get("testin-apimodel", "src", "test", "java"));
 
     private static final @NotNull Path REPORT = Paths.get("build", "reports", "rule-coverage", "unproven.md");
 

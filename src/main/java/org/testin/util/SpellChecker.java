@@ -42,9 +42,14 @@ import java.util.Optional;
 public final class SpellChecker {
     // Rule-INTERNAL-134
     public static @NotNull EditorTextField createField(final @NotNull Project p) {
+        return createField(p, true);
+    }
+
+    // Rule-INTERNAL-134, Rule-INTERNAL-136
+    public static @NotNull EditorTextField createField(final @NotNull Project p, final boolean spellChecked) {
         final @NotNull List<EditorCustomization> customizations = new ArrayList<>();
-        ContainerUtil.addIfNotNull(customizations,
-                SpellCheckingEditorCustomizationProvider.getInstance().getEnabledCustomization());
+        final @NotNull SpellCheckingEditorCustomizationProvider spelling = SpellCheckingEditorCustomizationProvider.getInstance();
+        ContainerUtil.addIfNotNull(customizations, spellChecked ? spelling.getEnabledCustomization() : spelling.getDisabledCustomization());
         customizations.add(editor -> editor.putUserData(IncrementalFindAction.SEARCH_DISABLED, Boolean.TRUE));
 
         return EditorTextFieldProvider.getInstance()

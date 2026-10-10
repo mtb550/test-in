@@ -79,7 +79,8 @@ public class ArchitectureTest {
         final @NotNull List<Path> compiled = List.of(
                 Path.of("build", "classes", "java", "main").toAbsolutePath(),
                 Path.of("testin-java", "build", "classes", "java", "main").toAbsolutePath(),
-                Path.of("testin-testng", "build", "classes", "java", "main").toAbsolutePath());
+                Path.of("testin-testng", "build", "classes", "java", "main").toAbsolutePath(),
+                Path.of("testin-apimodel", "build", "classes", "java", "main").toAbsolutePath());
 
         for (final Path module : compiled) {
             if (!Files.isDirectory(module)) {
@@ -120,13 +121,13 @@ public class ArchitectureTest {
     public void theCoreWorksWithoutJava() {
         final @NotNull ArchRule rule = noClasses()
                 .that().resideInAPackage("org.testin..")
-                .and().resideOutsideOfPackages("org.testin.java..", "org.testin.testng..")
+                .and().resideOutsideOfPackages("org.testin.java..", "org.testin.testng..", "org.testin.apimodel..")
                 .should().dependOnClassesThat().resideInAnyPackage("com.intellij.psi.impl.source..", "com.intellij.java..", "com.intellij.codeInsight.daemon.impl.analysis..")
                 .orShould().dependOnClassesThat().haveSimpleNameStartingWith("PsiJava")
                 .orShould().dependOnClassesThat().haveSimpleNameStartingWith("JavaPsi")
                 .orShould().dependOnClassesThat().haveFullyQualifiedName("com.intellij.psi.PsiClass")
                 .orShould().dependOnClassesThat().haveFullyQualifiedName("com.intellij.psi.PsiMethod")
-                .because("Java lives in the optional testin-java and testin-testng modules, so an IDE without Java still runs"
+                .because("Java lives in the optional testin-java, testin-testng and testin-apimodel modules, so an IDE without Java still runs"
                         + " everything but the automation code");
 
         rule.check(CLASSES);

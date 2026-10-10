@@ -49,11 +49,12 @@ explorer          editor           view          lightmode      the surfaces
    codegen   git   report   importexport   runner
 ```
 
-Two content modules sit outside this entirely, loaded only where their platform
-plugin is: `testin-java` writes and reconciles the generated Java, and
-`testin-testng` starts a TestNG execution. The core declares extension points
-and never learns whether anything answered — see [The two content
-modules](#the-two-content-modules).
+Three content modules sit outside this entirely, loaded only where their
+platform plugin is: `testin-java` writes and reconciles the generated Java,
+`testin-testng` starts a TestNG execution, and `testin-apimodel` turns an API
+call's JSON into a request class and a response record. The core declares
+extension points and never learns whether anything answered — see [The content
+modules](#the-content-modules).
 
 ### The layers and what each is allowed to do
 
@@ -410,16 +411,21 @@ its badge at the tester's next keystroke (#116).
 
 ---
 
-## The two content modules
+## The content modules
 
 The core plugin runs in every IDE. Anything that needs another plugin's classes
 lives in a content module, which the platform loads only where that plugin is
 present.
 
-| Module          | Needs             | Contributes                                                                                                                     |
-|-----------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `testin-java`   | the Java plugin   | Writing, moving, renaming and reconciling the generated test classes and methods, and the gutter mark beside a generated method |
-| `testin-testng` | the TestNG plugin | `TestNGRunner`, the one implementation of `runner/TestRunner`                                                                   |
+| Module            | Needs             | Contributes                                                                                                                                                                                                                                                 |
+|-------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `testin-java`     | the Java plugin   | Writing, moving, renaming and reconciling the generated test classes and methods, and the gutter mark beside a generated method                                                                                                                             |
+| `testin-testng`   | the TestNG plugin | `TestNGRunner`, the one implementation of `runner/TestRunner`                                                                                                                                                                                               |
+| `testin-apimodel` | the Java plugin   | **New → Testin API Model from JSON** on a package: the request as a Lombok class and the response as a record (UC-CODEGEN-022). It answers `codegen/ApiModelMaker`, and reaches the core otherwise only through its public classes and the dialog framework |
+
+`testin-apimodel` answers `ApiModelMaker`, whose action `plugin.xml` declares with
+every other action. With no Java plugin the action is gray and says why, as
+every code action is (Rule-CODEGEN-082).
 
 The core declares the extension point and never learns whether anything answered:
 `TestRunner.available()` returns a runner that logs and starts nothing when the

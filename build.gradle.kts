@@ -276,6 +276,7 @@ dependencies {
         // module compiles against the core.
         pluginModule(project(":testin-java"))
         pluginModule(project(":testin-testng"))
+        pluginModule(project(":testin-apimodel"))
     }
 
     // Lombok is a compile-time tool: annotations generate plain Java, nothing
@@ -503,7 +504,8 @@ tasks {
             listOf(
                 "src",
                 "testin-java/src",
-                "testin-testng/src"
+                "testin-testng/src",
+                "testin-apimodel/src"
             ).map { layout.projectDirectory.dir("$it/main/java") })
             .withPropertyName("markedSources")
             .withPathSensitivity(PathSensitivity.RELATIVE)

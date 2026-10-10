@@ -9,11 +9,13 @@
       <w>JAVACMD</w>
       <w>JBUI</w>
       <w>Muteb's</w>
+      <w>Shchenev</w>
       <w>Testins</w>
       <w>absher</w>
       <w>almughyiri</w>
       <w>alnum</w>
       <w>alzamil</w>
+      <w>apimodel</w>
       <w>appname</w>
       <w>baos</w>
       <w>bfinal</w>
@@ -58,8 +60,11 @@
       <w>pwsh</w>
       <w>readarray</w>
       <w>refname</w>
+      <w>robo</w>
+      <w>robohorse</w>
       <w>sara</w>
       <w>setlocal</w>
+      <w>shchenev</w>
       <w>shellness</w>
       <w>skippedbyadependency</w>
       <w>snapshotted</w>
@@ -71,6 +76,7 @@
       <w>ulimit</w>
       <w>unescaping</w>
       <w>unpushed</w>
+      <w>vadim</w>
       <w>xvfb</w>
     </words>
   </dictionary>

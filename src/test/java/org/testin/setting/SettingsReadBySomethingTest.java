@@ -38,7 +38,7 @@ public class SettingsReadBySomethingTest {
     private static final @NotNull List<String> THE_PAGES = List.of("AppSettingsState.java", "SettingsConfigurable.java", "AgentSettingsConfigurable.java", "AgentPromptConfigurable.java");
 
     private static @NotNull List<String> theSourcesThatAreNotThePages() {
-        try (Stream<Path> files = Stream.of("src", "testin-java/src", "testin-testng/src")
+        try (Stream<Path> files = Stream.of("src", "testin-java/src", "testin-testng/src", "testin-apimodel/src")
                 .map(RepositoryRoot::resolve)
                 .map(tree -> tree.resolve("main").resolve("java"))
                 .flatMap(tree -> walked(tree).stream())) {

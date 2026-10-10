@@ -54,7 +54,8 @@ public class BundleKeysTest {
     private static @NotNull List<Path> sources() {
         return Stream.of(Path.of("src", "main", "java"),
                         Path.of("testin-java", "src", "main", "java"),
-                        Path.of("testin-testng", "src", "main", "java"))
+                        Path.of("testin-testng", "src", "main", "java"),
+                        Path.of("testin-apimodel", "src", "main", "java"))
                 .filter(Files::isDirectory)
                 .flatMap(BundleKeysTest::javaFilesUnder)
                 .toList();

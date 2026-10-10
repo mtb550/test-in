@@ -37,7 +37,7 @@ import static org.testng.Assert.assertTrue;
 
 public class DeclaredContractsTest {
 
-    private static final @NotNull List<Path> ROOTS = List.of(Path.of("src", "main", "java"), Path.of("src", "test", "java"), Path.of("testin-java", "src", "main", "java"), Path.of("testin-java", "src", "test", "java"), Path.of("testin-testng", "src", "main", "java"));
+    private static final @NotNull List<Path> ROOTS = List.of(Path.of("src", "main", "java"), Path.of("src", "test", "java"), Path.of("testin-java", "src", "main", "java"), Path.of("testin-java", "src", "test", "java"), Path.of("testin-testng", "src", "main", "java"), Path.of("testin-apimodel", "src", "main", "java"), Path.of("testin-apimodel", "src", "test", "java"));
 
     private static final @NotNull Pattern THROWS = Pattern.compile("^\\s+(?!return\\b)[^=;]*?\\b(\\w+)\\s*\\(.*\\)\\s+throws\\s+[\\w., ]+\\s*[{;]\\s*$");
 

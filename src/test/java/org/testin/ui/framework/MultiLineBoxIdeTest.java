@@ -19,9 +19,11 @@ package org.testin.ui.framework;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.IncrementalFindAction;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Fonts;
 import org.testin.util.Shortcuts;
@@ -128,6 +130,31 @@ public class MultiLineBoxIdeTest extends BasePlatformTestCase {
         box.setText(lines(20));
 
         assertEquals("a box of twenty lines does not stop at six", 6 * lineHeight, box.getFocusComponent().getPreferredSize().height);
+    }
+
+    // Rule-INTERNAL-136
+    public void testAGrowingBoxStartsAtThreeLinesAndShowsAWholePasteUnderAScrollbarOverTheText() {
+        final @NotNull MultiLineField box = ComponentDialogBase.multiLineField(getProject(), "", "Paste the request body", 3, MultiLineField.NO_LIMIT, false).getComponent();
+        final @NotNull Editor editor = editorOf(box);
+        final int line = box.getFocusComponent().getFontMetrics(Fonts.field()).getHeight();
+
+        assertTrue("an empty growing box is shorter than three lines", box.getFocusComponent().getPreferredSize().height >= 3 * line);
+
+        box.setText(lines(20));
+        assertTrue("a growing box stopped before the whole paste showed", box.getFocusComponent().getPreferredSize().height >= 20 * line);
+        assertTrue("a growing box's scrollbar takes space beside the text", ((EditorEx) editor).getScrollPane() instanceof final JBScrollPane pane && pane.isOverlappingScrollBar());
+    }
+
+    // Rule-INTERNAL-136, Rule-INTERNAL-137
+    public void testAGrowingBoxStopsAtTheHeightItIsCappedAt() {
+        final @NotNull MultiLineField box = ComponentDialogBase.multiLineField(getProject(), "", "", 3, MultiLineField.NO_LIMIT, false).getComponent();
+        editorOf(box);
+        final int line = box.getFocusComponent().getFontMetrics(Fonts.field()).getHeight();
+
+        box.capHeight(() -> 5 * line);
+        box.setText(lines(20));
+
+        assertEquals("a growing box went past its cap", 5 * line, box.getFocusComponent().getPreferredSize().height);
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-103

@@ -1,0 +1,17 @@
+<!--
+  The descriptor for this content module. Its file name is the module name, and
+  plugin.xml names it in <content>, loading="optional", so an IDE without the
+  Java plugin does not load it.
+
+  The New menu's Testin API Model from JSON is declared in plugin.xml with every
+  other action; this module answers it through the core's apiModelMakers point.
+-->
+<idea-plugin>
+    <dependencies>
+        <plugin id="com.intellij.java"/>
+    </dependencies>
+
+    <extensions defaultExtensionNs="org.testin">
+        <apiModelMakers implementation="org.testin.apimodel.ApiModels"/>
+    </extensions>
+</idea-plugin>
