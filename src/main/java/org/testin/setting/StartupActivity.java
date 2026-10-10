@@ -65,13 +65,14 @@ public final class StartupActivity implements ProjectActivity {
         TestCaseExecutionSubscriber.initRecording(p);
     }
 
-    // UC-SETTING-002, Rule-SETTING-014
+    // UC-SETTING-002, Rule-SETTING-014, Rule-SETTING-046
     private static void readTheFolder(final @NotNull Project p) {
-        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
+        final @NotNull String stored = Services.getInstance(p, AppSettingsState.class).rootTestinPath;
+        final @NotNull Path testinPath = TestinRoot.stored(stored);
 
         if (!TestinRoot.isConfigured(testinPath)) {
-            Logger.info("No Testin folder is set yet, so nothing is read until one is");
+            Logger.info(stored.isBlank() ? "No Testin folder is set yet, so nothing is read until one is"
+                    : "The stored Testin folder '" + stored + "' is not a full path, so it is read as not set");
             return;
         }
 
@@ -84,7 +85,7 @@ public final class StartupActivity implements ProjectActivity {
     // UC-SETTING-002, Rule-SETTING-014, Rule-INTERNAL-127, Rule-INTERNAL-129
     static void hintTestinFolder(final @NotNull Project p) {
         final @NotNull Hints hints = Services.getInstance(p, Hints.class);
-        if (TestinRoot.isConfigured(TestinRoot.normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath))) {
+        if (TestinRoot.isConfigured(TestinRoot.stored(Services.getInstance(p, AppSettingsState.class).rootTestinPath))) {
             hints.clear(SetupStep.TESTIN_FOLDER);
             return;
         }

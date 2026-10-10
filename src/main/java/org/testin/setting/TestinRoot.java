@@ -45,6 +45,16 @@ public final class TestinRoot {
         return Path.of(Objects.requireNonNullElse(rawPath, "").trim());
     }
 
+    // UC-SETTING-002, Rule-SETTING-011, Rule-SETTING-046
+    public static @NotNull Path stored(final @Nullable String rawPath) {
+        try {
+            final @NotNull Path root = normalize(rawPath);
+            return root.isAbsolute() ? root : NONE;
+        } catch (final InvalidPathException notAPath) {
+            return NONE;
+        }
+    }
+
     // UC-SETTING-002, Rule-SETTING-011
     public static boolean isConfigured(final @NotNull Path root) {
         return !NONE.equals(root);
@@ -92,8 +102,9 @@ public final class TestinRoot {
         }
     }
 
+    // UC-SETTING-002, Rule-SETTING-046
     public @NotNull Path getPath() {
-        return normalize(settings.rootTestinPath);
+        return stored(settings.rootTestinPath);
     }
 
     // UC-SETTING-002, Rule-SETTING-011
@@ -101,12 +112,9 @@ public final class TestinRoot {
         return isConfigured(getPath());
     }
 
-    // UC-SETTING-002, Rule-SETTING-013
+    // UC-SETTING-002, Rule-SETTING-013, Rule-SETTING-046
     public @NotNull Path absolutePath() {
-        final @NotNull Path root = getPath();
-        if (!isConfigured(root)) return NONE;
-
-        return root.isAbsolute() ? root : basePath().resolve(root);
+        return getPath();
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-108

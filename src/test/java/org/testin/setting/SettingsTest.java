@@ -83,6 +83,24 @@ public class SettingsTest {
         assertEquals(TestinRoot.normalize("C:/testin"), root);
     }
 
+    // Rule-SETTING-046
+    @Test
+    public void aStoredFolderThatIsNotAFullPathIsReadAsNotSet() {
+        assertEquals(TestinRoot.stored("C:SERSMTBDOWNLOADSTESTIN"), TestinRoot.NONE, "a drive-relative path was read as a folder");
+        assertEquals(TestinRoot.stored("Downloads/Testin"), TestinRoot.NONE, "a relative path was read as a folder");
+        assertEquals(TestinRoot.stored("C:/Tes" + (char) 0 + "tin"), TestinRoot.NONE, "a value that is not a path was read as a folder");
+        assertEquals(TestinRoot.stored(null), TestinRoot.NONE);
+        assertEquals(TestinRoot.stored("  "), TestinRoot.NONE);
+    }
+
+    // Rule-SETTING-046
+    @Test
+    public void aStoredFullPathIsReadAsItIs() {
+        final @NotNull Path full = Path.of(System.getProperty("java.io.tmpdir")).toAbsolutePath();
+
+        assertEquals(TestinRoot.stored("  " + full + "  "), full);
+    }
+
     // Rule-SETTING-004
     @Test
     public void changingTheTestinFolderRequiresTheTreeToReload() {

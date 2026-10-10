@@ -25,6 +25,7 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
+import org.testin.model.NodeType;
 import org.testin.util.Bundle;
 
 import java.io.IOException;
@@ -137,6 +138,35 @@ public class SettingsPageIdeTest extends AbstractTempRootIdeTest {
 
         assertEquals(HtmlChunk.text(Bundle.message("settings.not.a.folder", file)).toString(), refused().getMessageHtml().toString());
         assertEquals("a file was refused, and the page stored it anyway", "", settings().rootTestinPath);
+    }
+
+    // Rule-SETTING-045
+    public void testATestProjectsOwnFolderIsRefusedAsTheTestinFolder() {
+        final @NotNull Path testProject = root.resolve("test-02");
+        try {
+            Files.createDirectories(testProject);
+            Files.writeString(testProject.resolve(NodeType.TP.getMarker()), "{}");
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not make the test project " + testProject + ": " + ex.getMessage(), ex);
+        }
+        typedOver(values("", "Sara"), values(testProject.toString(), "Omar"));
+
+        assertEquals(HtmlChunk.text(Bundle.message("settings.test.project", testProject, root)).toString(), refused().getMessageHtml().toString());
+        assertEquals("a test project's own folder was refused, and the page stored it anyway", "", settings().rootTestinPath);
+    }
+
+    // Rule-SETTING-045
+    public void testTheFolderHoldingATestProjectIsTaken() {
+        try {
+            Files.createDirectories(root.resolve("test-02"));
+            Files.writeString(root.resolve("test-02").resolve(NodeType.TP.getMarker()), "{}");
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not make a test project under " + root + ": " + ex.getMessage(), ex);
+        }
+        typedOver(values("", "Sara"), values(root.toString(), "Omar"));
+        applied();
+
+        assertEquals("the folder holding a test project was not stored", root.toString(), settings().rootTestinPath);
     }
 
     // Rule-SETTING-042

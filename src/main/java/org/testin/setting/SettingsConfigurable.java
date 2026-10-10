@@ -36,6 +36,7 @@ import org.testin.help.Guide;
 import org.testin.help.Guides;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
+import org.testin.model.NodeType;
 import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
@@ -155,6 +156,10 @@ public final class SettingsConfigurable implements SearchableConfigurable {
 
         if (!Files.isDirectory(root))
             return Optional.of(new ConfigurationException(Bundle.message("settings.not.a.folder", root), Bundle.message("settings.not.a.folder.title")));
+
+        // Rule-SETTING-045
+        if (Files.isRegularFile(root.resolve(NodeType.TP.getMarker())))
+            return Optional.of(new ConfigurationException(Bundle.message("settings.test.project", root, Objects.requireNonNullElse(root.getParent(), root)), Bundle.message("settings.test.project.title")));
 
         return Optional.empty();
     }
